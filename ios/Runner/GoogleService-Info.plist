@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyBv2N9kh8KLpFKOQpag3D8-ZLYMN5Nd6hI</string>
+	<key>GCM_SENDER_ID</key>
+	<string>871434716176</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.akib.akfinance</string>
+	<key>PROJECT_ID</key>
+	<string>akib-akfinance</string>
+	<key>STORAGE_BUCKET</key>
+	<string>akib-akfinance.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:871434716176:ios:48afe6b5a1db5dd411b695</string>
+</dict>
+</plist>

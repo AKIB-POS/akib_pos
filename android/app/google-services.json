@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "871434716176",
+    "project_id": "akib-akfinance",
+    "storage_bucket": "akib-akfinance.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:871434716176:android:2085ebe4e55c78f111b695",
+        "android_client_info": {
+          "package_name": "com.akib.akfinance"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChewOKiRElmC5EpHOjWPQcpy8FNMa8UMM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

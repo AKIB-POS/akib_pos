@@ -41,6 +41,9 @@ dependencies:
   equatable: ^2.0.5
   drift: ^2.19.1+1
   flutter_bloc: ^8.1.6
+  firebase_core: ^3.2.0
+  firebase_auth: ^5.1.2
+  google_sign_in: ^6.2.1
 
 dev_dependencies:
   flutter_test:
