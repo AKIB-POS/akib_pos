@@ -1,4 +1,4 @@
-package com.akpos.akib
+package com.akib.akfinance
 
 import io.flutter.embedding.android.FlutterActivity
 
