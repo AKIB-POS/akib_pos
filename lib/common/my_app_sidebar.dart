@@ -160,14 +160,28 @@ class MyAppSidebar extends StatelessWidget {
       ],
     );
   }
-
-  void _showModeSelection(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Select Mode'),
-          content: const Text('Choose the mode for the Kasir page:'),
+void _showModeSelection(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return Theme(
+        data: ThemeData(
+          dialogBackgroundColor: canvasColor,
+          textTheme: const TextTheme(
+            titleLarge: TextStyle(color: primaryColor),
+            bodyMedium: TextStyle(color: Colors.black),
+          ),
+          colorScheme: ColorScheme.light(
+            primary: primaryColor,
+            onPrimary: Colors.white,
+            secondary: actionColor,
+            onSecondary: Colors.black,
+            surface: Colors.white,
+            onSurface: Colors.black,
+          ),
+        ),
+        child: AlertDialog(
+          content: const Text('Pilih Tipe Device Yang Anda Gunakan'),
           actions: [
             TextButton(
               onPressed: () {
@@ -176,7 +190,7 @@ class MyAppSidebar extends StatelessWidget {
                 controller.selectIndex(1);
                 debugPrint('Portrait mode selected');
               },
-              child: const Text('Portrait (HP)'),
+              child: const Text('Smartphone'),
             ),
             TextButton(
               onPressed: () {
@@ -185,12 +199,13 @@ class MyAppSidebar extends StatelessWidget {
                 controller.selectIndex(1);
                 debugPrint('Landscape mode selected');
               },
-              child: const Text('Landscape (Tablet)'),
+              child: const Text('Tablet'),
             ),
           ],
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
 }
 
