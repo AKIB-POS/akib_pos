@@ -48,6 +48,7 @@ dependencies:
   sizer: ^2.0.15
   device_preview: ^1.2.0
   sidebarx: ^0.17.1
+  extended_image: ^8.2.1
 
 dev_dependencies:
   flutter_test:
