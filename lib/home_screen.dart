@@ -1,76 +1,96 @@
+import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/my_app_sidebar.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/accounting_page.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/cashier_mode_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/pages/cashier_page.dart';
 import 'package:akib_pos/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:akib_pos/features/settings/presentation/pages/settings_page.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/stockist_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sidebarx/sidebarx.dart';
 
-class HomeScreen extends StatefulWidget {
+
+class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider<CashierModeCubit>(
+      create: (context) => CashierModeCubit(),
+      child: _HomeScreenContent(),
+    );
+  }
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenContent extends StatefulWidget {
+  @override
+  _HomeScreenContentState createState() => _HomeScreenContentState();
+}
+
+class _HomeScreenContentState extends State<_HomeScreenContent> {
   final SidebarXController _controller = SidebarXController(selectedIndex: 0, extended: true);
   final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
-  String _kasirMode = 'portrait';
-
-  void _setKasirMode(String mode) {
-    setState(() {
-      _kasirMode = mode;
-      if (mode == 'landscape') {
-        SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
-      } else {
-        SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-      }
-    });
-  }
 
   @override
-  void dispose() {
-    // Reset orientation when the widget is disposed
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-    super.dispose();
+  void initState() {
+    super.initState();
+    _controller.addListener(() {
+      setState(() {});
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final isSmallScreen = MediaQuery.of(context).size.width < 600;
-    return Builder(
-      builder: (context) {
-        return Scaffold(
-          key: _key,
-          appBar: isSmallScreen
-              ? AppBar(
-                  backgroundColor: canvasColor,
-                  title: Text(_getTitleByIndex(_controller.selectedIndex)),
-                  leading: IconButton(
-                    onPressed: () {
-                      _key.currentState?.openDrawer();
-                    },
-                    icon: const Icon(Icons.menu),
-                  ),
-                )
-              : null,
-          drawer: MyAppSidebar(controller: _controller, setKasirMode: _setKasirMode, isSmallScreen: isSmallScreen),
-          body: Row(
-            children: [
-              if (!isSmallScreen) MyAppSidebar(controller: _controller, setKasirMode: _setKasirMode, isSmallScreen: isSmallScreen),
-              Expanded(
-                child: Center(
-                  child: _ScreensExample(controller: _controller, kasirMode: _kasirMode),
-                ),
+    return Scaffold(
+      key: _key,
+      appBar: isSmallScreen
+          ? AppBar(
+              backgroundColor: canvasColor,
+              title: Text(_getTitleByIndex(_controller.selectedIndex)),
+              leading: IconButton(
+                onPressed: () {
+                  _key.currentState?.openDrawer();
+                },
+                icon: const Icon(Icons.menu),
               ),
-            ],
+            )
+          : null,
+      drawer: MyAppSidebar(controller: _controller, setKasirMode: (mode) => context.read<CashierModeCubit>().setMode(mode), isSmallScreen: isSmallScreen),
+      body: Row(
+        children: [
+          if (!isSmallScreen) MyAppSidebar(controller: _controller, setKasirMode: (mode) => context.read<CashierModeCubit>().setMode(mode), isSmallScreen: isSmallScreen),
+          Expanded(
+            child: Center(
+              child: BlocBuilder<CashierModeCubit, String>(
+                builder: (context, kasirMode) {
+                  return _ScreensExample(controller: _controller, kasirMode: kasirMode);
+                },
+              ),
+            ),
           ),
-        );
-      },
+        ],
+      ),
     );
+  }
+
+  String _getTitleByIndex(int index) {
+    switch (index) {
+      case 0:
+        return 'Dashboard';
+      case 1:
+        return 'Kasir';
+      case 2:
+        return 'Accounting';
+      case 3:
+        return 'Stockist';
+      case 4:
+        return 'Settings';
+      default:
+        return 'Not found page';
+    }
   }
 }
 
@@ -103,19 +123,30 @@ class _ScreensExample extends StatelessWidget {
   }
 }
 
-String _getTitleByIndex(int index) {
-  switch (index) {
-    case 0:
-      return 'Dashboard';
-    case 1:
-      return 'Kasir';
-    case 2:
-      return 'Accounting';
-    case 3:
-      return 'Stockist';
-    case 4:
-      return 'Settings';
-    default:
-      return 'Not found page';
+class CashierModeCubit extends Cubit<String> {
+  CashierModeCubit() : super('portrait');
+
+  void setMode(String mode) {
+    emit(mode);
+    if (mode == 'landscape') {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight
+      ]);
+    } else {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown
+      ]);
+    }
+  }
+
+  @override
+  Future<void> close() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown
+    ]);
+    return super.close();
   }
 }

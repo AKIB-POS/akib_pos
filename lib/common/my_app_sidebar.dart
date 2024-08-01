@@ -10,11 +10,11 @@ class MyAppSidebar extends StatelessWidget {
   final bool isSmallScreen;
 
   const MyAppSidebar({
-    super.key,
+    Key? key,
     required this.controller,
     required this.setKasirMode,
     required this.isSmallScreen,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +54,7 @@ class MyAppSidebar extends StatelessWidget {
             )
           ],
         ),
-        iconTheme: const IconThemeData(
+        iconTheme: IconThemeData(
           color: primaryColor,
           size: 20,
         ),
@@ -71,7 +71,7 @@ class MyAppSidebar extends StatelessWidget {
         textStyle: TextStyle(color: Colors.black.withOpacity(0.7)),
         itemTextPadding: const EdgeInsets.only(left: 20),
         selectedItemTextPadding: const EdgeInsets.only(left: 20),
-        iconTheme: const IconThemeData(
+        iconTheme: IconThemeData(
           color: primaryColor,
           size: 24,
         ),
@@ -93,10 +93,11 @@ class MyAppSidebar extends StatelessWidget {
                 height: extended ? 100 : 7.h,
               ),
             ),
-            SizedBox(height:1.h),
+            SizedBox(height:2.h),
             if (extended)
               const Column(
                 children: [
+                  SizedBox(height: 20),
                   Text(
                     'Employee Name',
                     style: TextStyle(color: Colors.black),
@@ -115,8 +116,8 @@ class MyAppSidebar extends StatelessWidget {
           icon: Icons.dashboard,
           label: 'Dashboard',
           onTap: () {
-            setKasirMode('portrait');
             controller.selectIndex(0);
+            Navigator.pushReplacementNamed(context, '/dashboard');
           },
         ),
         SidebarXItem(
@@ -130,24 +131,24 @@ class MyAppSidebar extends StatelessWidget {
           icon: Icons.account_balance,
           label: 'Accounting',
           onTap: () {
-            setKasirMode('portrait');
             controller.selectIndex(2);
+            Navigator.pushReplacementNamed(context, '/accounting');
           },
         ),
         SidebarXItem(
           icon: Icons.storage,
           label: 'Stockist',
           onTap: () {
-            setKasirMode('portrait');
             controller.selectIndex(3);
+            Navigator.pushReplacementNamed(context, '/stockist');
           },
         ),
         SidebarXItem(
           icon: Icons.settings,
           label: 'Settings',
           onTap: () {
-            setKasirMode('portrait');
             controller.selectIndex(4);
+            Navigator.pushReplacementNamed(context, '/settings');
           },
         ),
         SidebarXItem(
@@ -160,52 +161,53 @@ class MyAppSidebar extends StatelessWidget {
       ],
     );
   }
-void _showModeSelection(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return Theme(
-        data: ThemeData(
-          dialogBackgroundColor: canvasColor,
-          textTheme: const TextTheme(
-            titleLarge: TextStyle(color: primaryColor),
-            bodyMedium: TextStyle(color: Colors.black),
-          ),
-          colorScheme: ColorScheme.light(
-            primary: primaryColor,
-            onPrimary: Colors.white,
-            secondary: actionColor,
-            onSecondary: Colors.black,
-            surface: Colors.white,
-            onSurface: Colors.black,
-          ),
-        ),
-        child: AlertDialog(
-          content: const Text('Pilih Tipe Device Yang Anda Gunakan'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                setKasirMode('portrait');
-                controller.selectIndex(1);
-                debugPrint('Portrait mode selected');
-              },
-              child: const Text('Smartphone'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                setKasirMode('landscape');
-                controller.selectIndex(1);
-                debugPrint('Landscape mode selected');
-              },
-              child: const Text('Tablet'),
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
-}
 
+  void _showModeSelection(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Theme(
+          data: ThemeData(
+            dialogBackgroundColor: canvasColor,
+            textTheme: TextTheme(
+              headlineMedium: TextStyle(color: primaryColor),
+              bodyMedium: TextStyle(color: Colors.black),
+            ),
+            colorScheme: ColorScheme.light(
+              primary: primaryColor,
+              onPrimary: Colors.white,
+              secondary: actionColor,
+              onSecondary: Colors.black,
+              surface: Colors.white,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: AlertDialog(
+            title: const Text('Select Mode'),
+            content: const Text('Pilih Tipe Device Anda:'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  setKasirMode('portrait');
+                  Navigator.pushReplacementNamed(context, '/kasir', arguments: 'portrait');
+                  debugPrint('Portrait mode selected');
+                },
+                child: const Text('Smartphone'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  setKasirMode('landscape');
+                  Navigator.pushReplacementNamed(context, '/kasir', arguments: 'landscape');
+                  debugPrint('Landscape mode selected');
+                },
+                child: const Text('Tabley'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
