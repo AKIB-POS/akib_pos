@@ -87,7 +87,7 @@ class MyAppSidebar extends StatelessWidget {
             SizedBox(height:4.h),
             ClipOval(
               child: ExtendedImage.network(
-                "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+                "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
                 fit: BoxFit.cover,
                 width: extended ? 100 : 7.h,
                 height: extended ? 100 : 7.h,
