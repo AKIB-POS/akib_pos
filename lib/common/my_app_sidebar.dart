@@ -89,8 +89,8 @@ class MyAppSidebar extends StatelessWidget {
               child: ExtendedImage.network(
                 "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
                 fit: BoxFit.cover,
-                width: extended ? 14.h : 7.h,
-                height: extended ? 14.h : 7.h,
+                width: extended ? 100 : 7.h,
+                height: extended ? 100 : 7.h,
               ),
             ),
             SizedBox(height:1.h),

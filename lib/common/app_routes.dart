@@ -6,7 +6,6 @@ import 'package:akib_pos/features/stockist/presentation/pages/stockist_page.dart
 import 'package:akib_pos/main.dart';
 import 'package:akib_pos/splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 
 
 
