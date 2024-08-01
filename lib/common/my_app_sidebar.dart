@@ -183,7 +183,6 @@ class MyAppSidebar extends StatelessWidget {
             ),
           ),
           child: AlertDialog(
-            title: const Text('Select Mode'),
             content: const Text('Pilih Tipe Device Anda:'),
             actions: [
               TextButton(
@@ -202,7 +201,7 @@ class MyAppSidebar extends StatelessWidget {
                   Navigator.pushReplacementNamed(context, '/kasir', arguments: 'landscape');
                   debugPrint('Landscape mode selected');
                 },
-                child: const Text('Tabley'),
+                child: const Text('Tablet'),
               ),
             ],
           ),
