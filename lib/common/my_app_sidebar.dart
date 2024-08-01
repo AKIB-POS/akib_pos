@@ -54,7 +54,7 @@ class MyAppSidebar extends StatelessWidget {
             )
           ],
         ),
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: primaryColor,
           size: 20,
         ),
@@ -71,7 +71,7 @@ class MyAppSidebar extends StatelessWidget {
         textStyle: TextStyle(color: Colors.black.withOpacity(0.7)),
         itemTextPadding: const EdgeInsets.only(left: 20),
         selectedItemTextPadding: const EdgeInsets.only(left: 20),
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: primaryColor,
           size: 24,
         ),

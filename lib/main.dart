@@ -22,13 +22,17 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
+//enable device preview
   runApp(
     DevicePreview(
       enabled: !kReleaseMode,
       builder: (_) => const MyApp(),
     ),
   );
+//disable device preview
+  //  runApp(
+  //    MyApp()
+  // );
 }
 
 class MyApp extends StatelessWidget {
