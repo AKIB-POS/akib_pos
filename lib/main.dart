@@ -1,32 +1,170 @@
-import 'package:flutter/material.dart';
+import 'package:akib_pos/features/accounting/presentation/pages/accounting_page.dart';
+import 'package:akib_pos/features/cashier/presentation/pages/cashier_page.dart';
+import 'package:akib_pos/features/dashboard/presentation/pages/dashboard_page.dart';
+import 'package:akib_pos/features/settings/presentation/pages/settings_page.dart';
+import 'package:akib_pos/features/stockist/presentation/pages/stockist_page.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'package:flutter/material.dart';
+import 'package:sidebarx/sidebarx.dart';
+import 'package:device_preview/device_preview.dart';
+import 'package:sizer/sizer.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart'; // Import for setting orientation
+import 'firebase_options.dart'; // Make sure to generate this file using Firebase CLI
+import 'common/my_app_sidebar.dart';
+
+
 
 void main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
-  runApp(const MyApp());
+
+  runApp(
+    DevicePreview(
+      enabled: !kReleaseMode,
+      builder: (_) => const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) => Sizer(
+        builder: (BuildContext context, orientation, deviceType) => MaterialApp(
+          locale: DevicePreview.locale(context),
+          builder: DevicePreview.appBuilder,
+          title: 'MyApp',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            primaryColor: primaryColor,
+            canvasColor: canvasColor,
+            scaffoldBackgroundColor: scaffoldBackgroundColor,
+          ),
+          home: const HomeScreen(),
+        ),
+      );
+}
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final SidebarXController _controller = SidebarXController(selectedIndex: 0, extended: true);
+  final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
+  String _kasirMode = 'portrait';
+
+  void _setKasirMode(String mode) {
+    setState(() {
+      _kasirMode = mode;
+      if (mode == 'landscape') {
+        SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+      } else {
+        SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    // Reset orientation when the widget is disposed
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const Scaffold(
-        body: Text("TEST"),
-      ),
+    final isSmallScreen = MediaQuery.of(context).size.width < 600;
+    return Builder(
+      builder: (context) {
+        return Scaffold(
+          key: _key,
+          appBar: isSmallScreen
+              ? AppBar(
+                  backgroundColor: canvasColor,
+                  title: Text(_getTitleByIndex(_controller.selectedIndex)),
+                  leading: IconButton(
+                    onPressed: () {
+                      _key.currentState?.openDrawer();
+                    },
+                    icon: const Icon(Icons.menu),
+                  ),
+                )
+              : null,
+          drawer: MyAppSidebar(controller: _controller, setKasirMode: _setKasirMode, isSmallScreen: isSmallScreen),
+          body: Row(
+            children: [
+              if (!isSmallScreen) MyAppSidebar(controller: _controller, setKasirMode: _setKasirMode, isSmallScreen: isSmallScreen),
+              Expanded(
+                child: Center(
+                  child: _ScreensExample(controller: _controller, kasirMode: _kasirMode),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
+
+class _ScreensExample extends StatelessWidget {
+  final SidebarXController controller;
+  final String kasirMode;
+
+  const _ScreensExample({
+    Key? key,
+    required this.controller,
+    required this.kasirMode,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    switch (controller.selectedIndex) {
+      case 0:
+        return  DashboardPage();
+      case 1:
+        return CashierPage(mode: kasirMode);
+      case 2:
+        return  AccountingPage();
+      case 3:
+        return  StockistPage();
+      case 4:
+        return  SettingsPage();
+      default:
+        return  Center(child: Text('Page not found'));
+    }
+  }
+}
+
+String _getTitleByIndex(int index) {
+  switch (index) {
+    case 0:
+      return 'Dashboard';
+    case 1:
+      return 'Kasir';
+    case 2:
+      return 'Accounting';
+    case 3:
+      return 'Stockist';
+    case 4:
+      return 'Settings';
+    default:
+      return 'Not found page';
+  }
+}
+
+const primaryColor = Color(0xFFFC1200);
+const canvasColor = Color(0xFFF5F5F5); // Light canvas color
+const scaffoldBackgroundColor = Color(0xFFFFFFFF); // White background
+const accentCanvasColor = Color(0xFFE0E0E0);
+const white = Colors.black; // Text color for better contrast on light background
+final actionColor = const Color(0xFF5F5FA7).withOpacity(0.6);
+final divider = Divider(color: Colors.black.withOpacity(0.3), height: 1);
