@@ -5,6 +5,8 @@ import 'package:akib_pos/features/dashboard/presentation/pages/dashboard_page.da
 import 'package:akib_pos/features/settings/presentation/pages/settings_page.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/stockist_page.dart';
 import 'package:akib_pos/home_screen.dart';
+import 'package:akib_pos/features/auth/presentation/pages/auth_page.dart';
+import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:sidebarx/sidebarx.dart';
