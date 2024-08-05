@@ -1,21 +1,21 @@
 import 'package:akib_pos/common/app_colors.dart';
-import 'package:akib_pos/features/accounting/presentation/pages/accounting_page.dart';
 import 'package:akib_pos/features/cashier/presentation/pages/cashier_page.dart';
+import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
+import 'package:akib_pos/routes/app_routes.dart';
+import 'package:akib_pos/features/cashier/presentation/pages/cashier_landscape.dart';
+import 'package:akib_pos/features/cashier/presentation/pages/cashier_portrait.dart';
 import 'package:akib_pos/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:akib_pos/features/settings/presentation/pages/settings_page.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/stockist_page.dart';
-import 'package:akib_pos/home_screen.dart';
+import 'package:akib_pos/features/home/home_screen.dart';
+import 'package:akib_pos/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:sidebarx/sidebarx.dart';
 import 'package:device_preview/device_preview.dart';
-import 'package:sizer/sizer.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart'; // Import for setting orientation
-import 'firebase_options.dart'; // Make sure to generate this file using Firebase CLI
-import 'common/my_app_sidebar.dart';
-
-
+import 'package:google_fonts/google_fonts.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,32 +26,25 @@ void main() async {
   runApp(
     DevicePreview(
       enabled: !kReleaseMode,
-      builder: (_) => const MyApp(),
+      builder: (_) => BlocProvider(
+        create: (context) => NavigationCubit(),
+        child: MyApp(),
+      ),
     ),
   );
-//disable device preview
-  //  runApp(
-  //    MyApp()
-  // );
+
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
-  Widget build(BuildContext context) => Sizer(
-        builder: (BuildContext context, orientation, deviceType) => MaterialApp(
-          locale: DevicePreview.locale(context),
-          builder: DevicePreview.appBuilder,
-          title: 'MyApp',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            primaryColor: primaryColor,
-            canvasColor: canvasColor,
-            scaffoldBackgroundColor: scaffoldBackgroundColor,
-          ),
-          home: const HomeScreen(),
-        ),
-      );
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Multi-Module App',
+      theme: ThemeData(
+        textTheme: GoogleFonts.plusJakartaSansTextTheme(),
+        primaryColor: AppColors.primaryMain,
+      ),
+      home: const SplashScreen(),
+    );
+  }
 }
-

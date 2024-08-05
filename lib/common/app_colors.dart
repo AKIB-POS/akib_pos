@@ -2,10 +2,63 @@ import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 
 
-const primaryColor = Color(0xFFFC1200);
-const canvasColor = Color(0xFFF5F5F5); // Light canvas color
-const scaffoldBackgroundColor = Color(0xFFFFFFFF); // White background
-const accentCanvasColor = Color(0xFFE0E0E0);
-const white = Colors.black; // Text color for better contrast on light background
-final actionColor = const Color(0xFFFC1200).withOpacity(0.6);
-final divider = Divider(color: Colors.black.withOpacity(0.3), height: 1);
+class AppColors {
+  // Primary Colors
+  static const Color primaryLighter = Color(0xFFFFF1F0);
+  static const Color primaryLight = Color(0xFFFF9C94);
+  static const Color primaryMain = Color(0xFFF02030);
+  static const Color primaryDark = Color(0xFFB81003);
+  static const Color primaryDarker = Color(0xFF560000);
+
+  // Secondary Colors
+  static const Color secondaryLighter = Color(0xFFE0FFFE);
+  static const Color secondaryLight = Color(0xFFA6F9FC);
+  static const Color secondaryMain = Color(0xFF04A3F9);
+  static const Color secondaryDark = Color(0xFF013843);
+  static const Color secondaryDarker = Color(0xFF012627);
+
+  // Info Colors
+  static const Color infoLighter = Color(0xFFCAFDFF);
+  static const Color infoLight = Color(0xFF77ED8B);
+  static const Color infoMain = Color(0xFF00B8D9);
+  static const Color infoDark = Color(0xFF005C9C);
+  static const Color infoDarker = Color(0xFF003768);
+
+  // Success Colors
+  static const Color successLighter = Color(0xFFD3FCD2);
+  static const Color successLight = Color(0xFF76ED8B);
+  static const Color successMain = Color(0xFF20E56E);
+  static const Color successDark = Color(0xFF018767);
+  static const Color successDarker = Color(0xFF045E49);
+
+  // Warning Colors
+  static const Color warningLighter = Color(0xFFFFF5CC);
+  static const Color warningLight = Color(0xFFFFD666);
+  static const Color warningMain = Color(0xFFFAAD00);
+  static const Color warningDark = Color(0xFF876000);
+  static const Color warningDarker = Color(0xFF7A4A00);
+
+  // Error Colors
+  static const Color errorLighter = Color(0xFFFFE9E9);
+  static const Color errorLight = Color(0xFFFFA2A2);
+  static const Color errorMain = Color(0xFFF83B30);
+  static const Color errorDark = Color(0xFFB7183D);
+  static const Color errorDarker = Color(0xFF7A0919);
+
+  // Background Colors
+  static const Color backgroundWhite = Color(0xFFFFFFFF);
+  static const Color backgroundGrey = Color(0xFFE8F1F8);
+
+  // Text Colors
+  static const Color textGrey100 = Color(0xFFF9FAFB);
+  static const Color textGrey200 = Color(0xFFF4F6F8);
+  static const Color textGrey300 = Color(0xFFDFE3E8);
+  static const Color textGrey400 = Color(0xFFC4CDD5);
+  static const Color textGrey500 = Color(0xFF919EAB);
+  static const Color textGrey600 = Color(0xFF637381);
+  static const Color textGrey700 = Color(0xFF454F5B);
+  static const Color textGrey800 = Color(0xFF212B36);
+
+  // Additional Colors
+  static const Color black = Color(0xFF121212);
+}

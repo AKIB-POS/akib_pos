@@ -3,28 +3,101 @@ import 'package:flutter/material.dart';
 
 
 class AppTextStyle {
-	/*static TextStyle getAppTextStyle(
-	/*static TextStyle getAppTextStyle(
-		{double size = 14,
-		{double size = 14,
-		FontWeight weight = FontWeight.normal,
-		FontWeight weight = FontWeight.normal,
-		FontStyle style = FontStyle.normal,
-		FontStyle style = FontStyle.normal,
-		Color color = Colors.black}) {
-		Color color = Colors.black}) {
-	  return TextStyle(
-	  return TextStyle(
-		  color: color,
-		  color: color,
-		  fontSize: size,
-		  fontSize: size,
-		  fontWeight: weight,
-		  fontWeight: weight,
-		  fontStyle: style,
-		  fontStyle: style,
-		  fontFamily: "Jost"
-		  fontFamily: "Jost"
-	}*/
-	}*/
+  static const TextStyle headline1 = TextStyle(
+    fontSize: 64.0,
+    height: 1.25,  // Line height of 80 divided by font size of 64
+    fontWeight: FontWeight.w800,
+    letterSpacing: 0,
+  );
+
+  static const TextStyle headline2 = TextStyle(
+    fontSize: 48.0,
+    height: 1.33,  // Line height of 64 divided by font size of 48
+    fontWeight: FontWeight.w800,
+    letterSpacing: 0,
+  );
+
+  static const TextStyle headline3 = TextStyle(
+    fontSize: 32.0,
+    height: 1.5,  // Line height of 48 divided by font size of 32
+    fontWeight: FontWeight.w700,
+    letterSpacing: 0,
+  );
+
+  static const TextStyle headline4 = TextStyle(
+    fontSize: 24.0,
+    height: 1.5,  // Line height of 36 divided by font size of 24
+    fontWeight: FontWeight.w700,
+    letterSpacing: 0,
+  );
+
+  static const TextStyle headline5 = TextStyle(
+    fontSize: 20.0,
+    height: 1.5,  // Line height of 30 divided by font size of 20
+    fontWeight: FontWeight.w700,
+    letterSpacing: 0,
+  );
+
+  static const TextStyle headline6 = TextStyle(
+    fontSize: 18.0,
+    height: 1.56,  // Line height of 28 divided by font size of 18
+    fontWeight: FontWeight.w700,
+    letterSpacing: 0,
+  );
+
+  static const TextStyle subtitle1 = TextStyle(
+    fontSize: 22.0,
+    height: 1.55,  // Line height of 34 divided by font size of 22
+    fontWeight: FontWeight.w500,
+    letterSpacing: 0,
+  );
+
+  static const TextStyle subtitle2 = TextStyle(
+    fontSize: 16.0,
+    height: 1.5,  // Line height of 24 divided by font size of 16
+    fontWeight: FontWeight.w700,
+    letterSpacing: 0,
+  );
+
+  static const TextStyle subtitle3 = TextStyle(
+    fontSize: 14.0,
+    height: 1.57,  // Line height of 22 divided by font size of 14
+    fontWeight: FontWeight.w700,
+    letterSpacing: 0,
+  );
+
+  static const TextStyle body1 = TextStyle(
+    fontSize: 20.0,
+    height: 1.4,  // Line height of 28 divided by font size of 20
+    fontWeight: FontWeight.w500,
+    letterSpacing: 0,
+  );
+
+  static const TextStyle body2 = TextStyle(
+    fontSize: 16.0,
+    height: 1.5,  // Line height of 24 divided by font size of 16
+    fontWeight: FontWeight.w400,
+    letterSpacing: 0,
+  );
+
+  static const TextStyle body3 = TextStyle(
+    fontSize: 14.0,
+    height: 1.57,  // Line height of 22 divided by font size of 14
+    fontWeight: FontWeight.w400,
+    letterSpacing: 0,
+  );
+
+  static const TextStyle caption = TextStyle(
+    fontSize: 12.0,
+    height: 1.5,  // Line height of 18 divided by font size of 12
+    fontWeight: FontWeight.w400,
+    letterSpacing: 0,
+  );
+
+  static const TextStyle button = TextStyle(
+    fontSize: 20.0,
+    height: 1.5,  // Line height of 30 divided by font size of 20
+    fontWeight: FontWeight.w700,
+    letterSpacing: 0,
+  );
 }
