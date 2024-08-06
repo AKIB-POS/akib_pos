@@ -11,8 +11,8 @@ import 'package:flutter/material.dart';
 
 class AppRoutes {
   static const String initialRoute = '/';
-  static List<Widget> pages = [ CashierPage(), DashboardPage(),HrdPage(), StockistPage(), SettingsPage()];
-  static List<String> pageTitles = [ "Kasir", "Dashboard","HRD", "Stockist", "Pengaturan"];
+  static List<Widget> pages = [DashboardPage(), CashierPage(), HrdPage(), StockistPage(), SettingsPage()];
+  static List<String> pageTitles = ["Dashboard", "Kasir", "HRD", "Stockist", "Pengaturan"];
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {

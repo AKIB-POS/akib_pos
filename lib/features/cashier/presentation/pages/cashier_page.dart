@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
-
 class CashierPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -29,7 +28,8 @@ class CashierPage extends StatelessWidget {
                   builder: (context, searchText) {
                     return Text(
                       searchText.isEmpty ? 'Belum Ada Produk' : searchText,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     );
                   },
                 ),
@@ -54,13 +54,16 @@ class CashierPage extends StatelessWidget {
                     Radio(value: true, groupValue: true, onChanged: (value) {}),
                     const SizedBox(width: 20),
                     const Text('Take Away'),
-                    Radio(value: false, groupValue: true, onChanged: (value) {}),
+                    Radio(
+                        value: false, groupValue: true, onChanged: (value) {}),
                   ],
                 ),
-                const Icon(Icons.shopping_cart, size: 100, color: Colors.orange),
+                const Icon(Icons.shopping_cart,
+                    size: 100, color: Colors.orange),
                 const SizedBox(height: 20),
                 const Text('Keranjang Masih Kosong',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 10),
                 const Text(
                     'Silahkan tambahkan produk ke keranjang melalui katalog yang ada'),
@@ -104,109 +107,128 @@ class CashierPage extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Expanded(
-              flex: 5,
-              child: Row(
-                children: [
-                  Builder(
-                    builder: (BuildContext context) {
-                      return IconButton(
-                        icon: SvgPicture.asset(
-                          "assets/icons/ic_burger_menu.svg",
-                          height: 50,
-                          width: 50,
-                        ),
-                        onPressed: () => Scaffold.of(context).openDrawer(),
-                      );
-                    },
-                  ),
-                  const SizedBox(width: 10),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Cafe Arrazzaq', style: AppTextStyle.headline5),
-                      Text('Fadhil Muhaimin', style: AppTextStyle.body2),
-                    ],
-                  ),
-                  const SizedBox(width: 20),
-                  Expanded(
-                    child: SizedBox(
-                      child: Center(
-                        child: TextField(
-                          controller: _controller,
-                          decoration: InputDecoration(
-                            hintText: 'Cari Produk',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(6),
-                              borderSide: BorderSide.none,
-                            ),
-                            focusColor: Colors.white,
-                            fillColor: Colors.white,
-                            filled: true,
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 25.0),
-                            suffixIcon: IconButton(
-                              icon: const Icon(Icons.search, color: Colors.black),
-                              onPressed: () {
-                                BlocProvider.of<CashierSearchCubit>(context)
-                                    .updateSearchText(_controller.text);
-                              },
-                            ),
-                          ),
-                          onSubmitted: (text) {
-                            BlocProvider.of<CashierSearchCubit>(context)
-                                .updateSearchText(text);
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  IconButton(
-                    icon: const Icon(Icons.notifications, color: Colors.black),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              flex: 3,
-              child: Container(
-                padding: const EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3), // changes position of shadow
-                    ),
-                  ],
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Icon(Icons.discount, color: Colors.black),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Nama Pelanggan',
-                            style: TextStyle(color: Colors.black, fontSize: 18)),
-                        Text('No. Order: 0001',
-                            style: TextStyle(color: Colors.black, fontSize: 14)),
-                      ],
-                    ),
-                    Icon(Icons.edit, color: Colors.black),
-                  ],
-                ),
-              ),
-            ),
+            section_one(_controller, context),
+            section_two(),
           ],
         ),
       ),
     );
+  }
+
+  Expanded section_two() {
+    return Expanded(
+            flex: 3,
+            child: Container(
+              margin: EdgeInsets.fromLTRB(20, 2, 2, 20),
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 1,
+                    offset: const Offset(0, 2), // changes position of shadow
+                  ),
+                ],
+              ),
+              child:  Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SvgPicture.asset("assets/icons/ic_disc.svg"),
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Nama Pelanggan',
+                          style:
+                              TextStyle(color: Colors.black, fontSize: 18)),
+                      Text('No. Order: 0001',
+                          style:
+                              TextStyle(color: Colors.black, fontSize: 14)),
+                    ],
+                  ),
+                  SvgPicture.asset("assets/icons/ic_note.svg"),
+                ],
+              ),
+            ),
+          );
+  }
+
+  Expanded section_one(TextEditingController _controller, BuildContext context) {
+    return Expanded(
+            flex: 5,
+            child: Row(
+              children: [
+                Builder(
+                  builder: (BuildContext context) {
+                    return IconButton(
+                      icon: SvgPicture.asset(
+                        "assets/icons/ic_burger_menu.svg",
+                        height: 50,
+                        width: 50,
+                      ),
+                      onPressed: () => Scaffold.of(context).openDrawer(),
+                    );
+                  },
+                ),
+                const SizedBox(width: 10),
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Cafe Arrazzaq', style: AppTextStyle.headline5),
+                    Text('Fadhil Muhaimin', style: AppTextStyle.body2),
+                  ],
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: SizedBox(
+                    child: Center(
+                      child: TextField(
+                        controller: _controller,
+                        decoration: InputDecoration(
+                          hintText: 'Cari Produk',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusColor: Colors.white,
+                          fillColor: Colors.white,
+                          filled: true,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 25.0,
+                          ),
+                          suffixIcon: IconButton(
+                            icon:
+                                const Icon(Icons.search, color: Colors.black),
+                            onPressed: () {
+                              BlocProvider.of<CashierSearchCubit>(context)
+                                  .updateSearchText(_controller.text);
+                            },
+                          ),
+                        ),
+                        onSubmitted: (text) {
+                          BlocProvider.of<CashierSearchCubit>(context)
+                              .updateSearchText(text);
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Container(
+                  height: 68.0, 
+                  child: Center(
+                    child: SvgPicture.asset(
+                      "assets/icons/ic_save.svg",
+        
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
   }
 }
