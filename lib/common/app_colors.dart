@@ -48,7 +48,7 @@ class AppColors {
 
   // Background Colors
   static const Color backgroundWhite = Color(0xFFFFFFFF);
-  static const Color backgroundGrey = Color(0xFFE8F1F8);
+  static const Color backgroundGrey = Color.fromRGBO(248, 248, 248, 1);
 
   // Text Colors
   static const Color textGrey100 = Color(0xFFF9FAFB);

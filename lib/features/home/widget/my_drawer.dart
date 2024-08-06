@@ -5,8 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class MyDrawer extends StatelessWidget {
-  final List<String> menuTitles = ["Dashboard", "Kasir", "HRD", "Stockist", "Settings"];
-  final List<String> iconTitles = ["assets/icons/ic_dashboard.svg", "assets/icons/ic_kasir.svg", "assets/icons/ic_hrd.svg", "assets/icons/ic_stockist.svg", "assets/icons/ic_pengaturan.svg"];
+  final List<String> menuTitles = ["Kasir","Dashboard","HRD", "Stockist", "Settings"];
+  final List<String> iconTitles = [ "assets/icons/ic_kasir.svg", "assets/icons/ic_dashboard.svg", "assets/icons/ic_hrd.svg", "assets/icons/ic_stockist.svg", "assets/icons/ic_pengaturan.svg"];
   final String cafeName = "Cafe Arrazzaq";
   final String ownerName = "Fadhil Muhaimin";
 

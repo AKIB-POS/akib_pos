@@ -5,15 +5,24 @@ import 'package:flutter_svg/svg.dart';
 class DashboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dashboard'),
-        leading: SvgPicture.asset("assets/icons/ic_burger_menu.svg"),
-        // Pastikan tidak ada duplikasi ikon menu di sini
-      ),
-      drawer: MyDrawer(),
-      body: const Center(
-        child: Text('Welcome to Dashboard'),
+    return SafeArea(
+      right: true,
+      minimum: EdgeInsets.only(left: 16),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Dashboard'),
+          leading: IconButton(
+            icon: SvgPicture.asset(
+              "assets/icons/ic_burger_menu.svg",
+              
+            ),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
+        drawer: MyDrawer(),
+        body: const Center(
+          child: Text('Welcome to Dashboard'),
+        ),
       ),
     );
   }

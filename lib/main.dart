@@ -1,13 +1,6 @@
 import 'package:akib_pos/common/app_colors.dart';
-import 'package:akib_pos/features/cashier/presentation/pages/cashier_page.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/cashier_search_cubit.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
-import 'package:akib_pos/routes/app_routes.dart';
-import 'package:akib_pos/features/cashier/presentation/pages/cashier_landscape.dart';
-import 'package:akib_pos/features/cashier/presentation/pages/cashier_portrait.dart';
-import 'package:akib_pos/features/dashboard/presentation/pages/dashboard_page.dart';
-import 'package:akib_pos/features/settings/presentation/pages/settings_page.dart';
-import 'package:akib_pos/features/stockist/presentation/pages/stockist_page.dart';
-import 'package:akib_pos/features/home/home_screen.dart';
 import 'package:akib_pos/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -26,13 +19,19 @@ void main() async {
   runApp(
     DevicePreview(
       enabled: !kReleaseMode,
-      builder: (_) => BlocProvider(
-        create: (context) => NavigationCubit(),
+      builder: (_) => MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => NavigationCubit(),
+          ),
+          BlocProvider(
+            create: (context) => CashierSearchCubit(),
+          ),
+        ],
         child: MyApp(),
       ),
     ),
   );
-
 }
 
 class MyApp extends StatelessWidget {
