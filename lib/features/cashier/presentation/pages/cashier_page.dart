@@ -1,6 +1,6 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
-import 'package:akib_pos/features/cashier/presentation/bloc/cashier_search_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
 import 'package:akib_pos/features/home/widget/my_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,7 +24,7 @@ class CashierPage extends StatelessWidget {
               children: [
                 const Icon(Icons.add_box, size: 100, color: Colors.orange),
                 const SizedBox(height: 20),
-                BlocBuilder<CashierSearchCubit, String>(
+                BlocBuilder<CashierCubit, String>(
                   builder: (context, searchText) {
                     return Text(
                       searchText.isEmpty ? 'Belum Ada Produk' : searchText,
@@ -204,13 +204,13 @@ class CashierPage extends StatelessWidget {
                             icon:
                                 const Icon(Icons.search, color: Colors.black),
                             onPressed: () {
-                              BlocProvider.of<CashierSearchCubit>(context)
+                              BlocProvider.of<CashierCubit>(context)
                                   .updateSearchText(_controller.text);
                             },
                           ),
                         ),
                         onSubmitted: (text) {
-                          BlocProvider.of<CashierSearchCubit>(context)
+                          BlocProvider.of<CashierCubit>(context)
                               .updateSearchText(text);
                         },
                       ),

@@ -1,5 +1,5 @@
 import 'package:akib_pos/common/app_colors.dart';
-import 'package:akib_pos/features/cashier/presentation/bloc/cashier_search_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
 import 'package:akib_pos/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -25,7 +25,7 @@ void main() async {
             create: (context) => NavigationCubit(),
           ),
           BlocProvider(
-            create: (context) => CashierSearchCubit(),
+            create: (context) => CashierCubit(),
           ),
         ],
         child: MyApp(),
