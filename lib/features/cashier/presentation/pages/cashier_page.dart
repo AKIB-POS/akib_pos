@@ -5,6 +5,7 @@ import 'package:akib_pos/features/home/widget/my_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:sizer/sizer.dart';
 
 class CashierPage extends StatelessWidget {
   @override
@@ -34,8 +35,7 @@ class CashierPage extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                    'Tambah produk terlebih dahulu untuk bisa mengatur sesuai kebutuhan'),
+                const Text('Tambah produk terlebih dahulu untuk bisa mengatur sesuai kebutuhan'),
               ],
             ),
           ),
@@ -72,33 +72,13 @@ class CashierPage extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: BottomAppBar(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text('Simpan'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey,
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text('Bayar'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromRGBO(244, 96, 63, 1),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
   AppBar appBar(BuildContext context) {
     final TextEditingController _controller = TextEditingController();
     return AppBar(
+    
       automaticallyImplyLeading: false,
       backgroundColor: const Color.fromRGBO(248, 248, 248, 1),
       elevation: 0,
@@ -119,7 +99,7 @@ class CashierPage extends StatelessWidget {
     return Expanded(
             flex: 3,
             child: Container(
-              margin: EdgeInsets.fromLTRB(20, 2, 2, 20),
+              margin: EdgeInsets.fromLTRB(20, 0, 2, 2.5.h),
               padding: EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -135,7 +115,7 @@ class CashierPage extends StatelessWidget {
               child:  Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SvgPicture.asset("assets/icons/ic_disc.svg"),
+                  SvgPicture.asset("assets/icons/ic_disc.svg",height: 3.5.h,width: 3.5.w,),
                   const Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -148,7 +128,7 @@ class CashierPage extends StatelessWidget {
                               TextStyle(color: Colors.black, fontSize: 14)),
                     ],
                   ),
-                  SvgPicture.asset("assets/icons/ic_note.svg"),
+                  SvgPicture.asset("assets/icons/ic_note.svg",height: 3.5.h,width: 3.5.w,),
                 ],
               ),
             ),
@@ -165,20 +145,20 @@ class CashierPage extends StatelessWidget {
                     return IconButton(
                       icon: SvgPicture.asset(
                         "assets/icons/ic_burger_menu.svg",
-                        height: 50,
-                        width: 50,
+                        height: 6.w,
+                        width: 6.h,
                       ),
                       onPressed: () => Scaffold.of(context).openDrawer(),
                     );
                   },
                 ),
                 const SizedBox(width: 10),
-                const Column(
+                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Cafe Arrazzaq', style: AppTextStyle.headline5),
-                    Text('Fadhil Muhaimin', style: AppTextStyle.body2),
+                    Text('Cafe Arrazzaq', style: AppTextStyle.headline6),
+                    Text('Fadhil Muhaimin', style: AppTextStyle.body3),
                   ],
                 ),
                 const SizedBox(width: 20),
@@ -198,7 +178,7 @@ class CashierPage extends StatelessWidget {
                           filled: true,
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
-                            vertical: 25.0,
+                            vertical: 8.0,
                           ),
                           suffixIcon: IconButton(
                             icon:
@@ -219,11 +199,10 @@ class CashierPage extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Container(
-                  height: 68.0, 
+                  height: 50.0, 
                   child: Center(
                     child: SvgPicture.asset(
                       "assets/icons/ic_save.svg",
-        
                     ),
                   ),
                 ),

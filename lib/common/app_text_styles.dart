@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 
 class AppTextStyle {
@@ -38,9 +39,8 @@ class AppTextStyle {
     letterSpacing: 0,
   );
 
-  static const TextStyle headline6 = TextStyle(
-    fontSize: 18.0,
-    height: 1.56,  // Line height of 28 divided by font size of 18
+  static  TextStyle headline6 = TextStyle(
+    fontSize: 6.sp,// Line height of 28 divided by font size of 18
     fontWeight: FontWeight.w700,
     letterSpacing: 0,
   );
@@ -59,8 +59,8 @@ class AppTextStyle {
     letterSpacing: 0,
   );
 
-  static const TextStyle subtitle3 = TextStyle(
-    fontSize: 14.0,
+  static  TextStyle subtitle3 = TextStyle(
+    fontSize: 3.sp,
     height: 1.57,  // Line height of 22 divided by font size of 14
     fontWeight: FontWeight.w700,
     letterSpacing: 0,

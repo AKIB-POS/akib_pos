@@ -8,6 +8,7 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sizer/sizer.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -15,35 +16,51 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-//enable device preview
+//disable device preview
   runApp(
-    DevicePreview(
-      enabled: !kReleaseMode,
-      builder: (_) => MultiBlocProvider(
-        providers: [
-          BlocProvider(
-            create: (context) => NavigationCubit(),
-          ),
-          BlocProvider(
-            create: (context) => CashierCubit(),
-          ),
-        ],
-        child: MyApp(),
-      ),
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => NavigationCubit(),
+        ),
+        BlocProvider(
+          create: (context) => CashierCubit(),
+        ),
+      ],
+      child: MyApp(),
     ),
   );
+  // runApp(
+  //   DevicePreview(
+  //     enabled: !kReleaseMode,
+  //     builder: (_) => MultiBlocProvider(
+  //       providers: [
+  //         BlocProvider(
+  //           create: (context) => NavigationCubit(),
+  //         ),
+  //         BlocProvider(
+  //           create: (context) => CashierCubit(),
+  //         ),
+  //       ],
+  //       child: MyApp(),
+  //     ),
+  //   ),
+  // );
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Multi-Module App',
-      theme: ThemeData(
-        textTheme: GoogleFonts.plusJakartaSansTextTheme(),
-        primaryColor: AppColors.primaryMain,
-      ),
-      home: const SplashScreen(),
+     return Sizer(builder: (context, orientation, deviceType) {
+        return MaterialApp(
+          title: 'Multi-Module App',
+          theme: ThemeData(
+            textTheme: GoogleFonts.plusJakartaSansTextTheme(),
+            primaryColor: AppColors.primaryMain,
+          ),
+          home: const SplashScreen(),
+        );
+      }
     );
   }
 }
