@@ -1,5 +1,6 @@
 import 'package:akib_pos/features/cashier/presentation/widgets/app_bar_content.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/category_drop_down.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/menu_grid.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/sub_category_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -47,15 +48,12 @@ class CashierPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  BlocBuilder<CashierCubit, CashierState>(
-                    builder: (context, state) {
-                      return Text(
-                        state.selectedSubCategory.isNotEmpty
-                            ? 'Subcategory: ${state.selectedSubCategory}'
-                            : 'Search: ${state.searchText}',
-                        style: const TextStyle(fontSize: 16),
-                      );
-                    },
+                  Expanded(
+                    child: BlocBuilder<CashierCubit, CashierState>(
+                      builder: (context, state) {
+                        return MenuGrid();
+                      },
+                    ),
                   ),
                 ],
               ),
