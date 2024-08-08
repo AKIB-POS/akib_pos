@@ -1,8 +1,10 @@
 import 'package:akib_pos/common/app_colors.dart';
+import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:sizer/sizer.dart';
 
 class MyDrawer extends StatelessWidget {
   final List<String> menuTitles = ["Dashboard", "Kasir", "HRD", "Stockist", "Settings"];
@@ -30,7 +32,7 @@ class MyDrawer extends StatelessWidget {
           ),
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.all(16.0), // Padding for the entire list
+              padding: const EdgeInsets.all(10.0), // Padding for the entire list
               itemCount: menuTitles.length,
               itemBuilder: (BuildContext context, int index) {
                 bool isSelected = BlocProvider.of<NavigationCubit>(context).state == index;
@@ -39,16 +41,16 @@ class MyDrawer extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8.0), // Rounded corners for the ListTile
                     child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0),
                       tileColor: isSelected ? AppColors.primaryBackgorund : null,
                       selected: isSelected,
-                      selectedTileColor: AppColors.primaryBackgorund,
+                      selectedTileColor: AppColors.primaryBackgorund.withOpacity(0.8),
                       selectedColor: AppColors.primaryMain,
                       title: Text(menuTitles[index]),
                       leading: SvgPicture.asset(
                         iconTitles[index],
-                        width: 32,
-                        height: 32,
+                        width: 2.h,
+                        height: 2.h,
                         colorFilter: isSelected ? const ColorFilter.mode(AppColors.primaryMain, BlendMode.srcIn) : const ColorFilter.mode(AppColors.textGrey600, BlendMode.srcIn),
                       ),
                       onTap: () {
@@ -105,9 +107,9 @@ class CustomDrawerHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height : 250,
+      height : 200,
       child: DrawerHeader(
-        padding: EdgeInsets.only(bottom: 20,left: 20,right: 20),
+        padding: EdgeInsets.only(bottom: 10,left: 20,right: 20),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -123,12 +125,12 @@ class CustomDrawerHeader extends StatelessWidget {
           children: [
             SvgPicture.asset(
               iconPath, // Replace with your icon asset
-              height: 48,
-              width: 48,
+              height: 38,
+              width: 38,
             ),
             SizedBox(height: 30),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 25),
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
                 color: Color.fromRGBO(254, 244, 242, 0.12),
                 borderRadius: BorderRadius.circular(12),
@@ -152,17 +154,12 @@ class CustomDrawerHeader extends StatelessWidget {
                       children: [
                         Text(
                           cafeName,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: AppTextStyle.headline6.copyWith(color: Colors.white),
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           ownerName,
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
+                          style: AppTextStyle.body4.copyWith(color: Colors.white),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],

@@ -33,9 +33,9 @@ class AppTextStyle {
   );
 
   static const TextStyle headline5 = TextStyle(
-    fontSize: 20.0,
+    fontSize: 15.0,
     height: 1.5,  // Line height of 30 divided by font size of 20
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.w800,
     letterSpacing: 0,
   );
 
@@ -81,7 +81,14 @@ class AppTextStyle {
   );
 
   static const TextStyle body3 = TextStyle(
-    fontSize: 14.0,
+    fontSize: 11.0,
+    height: 1.57,  // Line height of 22 divided by font size of 14
+    fontWeight: FontWeight.w400,
+    letterSpacing: 0,
+  );
+  
+  static  TextStyle body4 = TextStyle(
+    fontSize: 4.5.sp,
     height: 1.57,  // Line height of 22 divided by font size of 14
     fontWeight: FontWeight.w400,
     letterSpacing: 0,

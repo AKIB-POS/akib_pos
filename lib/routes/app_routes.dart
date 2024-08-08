@@ -2,6 +2,7 @@
 
 
 import 'package:akib_pos/features/cashier/presentation/pages/cashier_page.dart';
+import 'package:akib_pos/features/cashier/presentation/pages/cashier_page.dart';
 import 'package:akib_pos/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/hrd_page.dart';
 import 'package:akib_pos/features/settings/presentation/pages/settings_page.dart';
