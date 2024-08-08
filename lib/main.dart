@@ -4,56 +4,71 @@ import 'package:akib_pos/features/cashier/presentation/pages/cashier_page.dart';
 import 'package:akib_pos/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:akib_pos/features/settings/presentation/pages/settings_page.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/stockist_page.dart';
-import 'package:akib_pos/home_screen.dart';
+
 import 'package:akib_pos/features/auth/presentation/pages/auth_page.dart';
+import 'package:akib_pos/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:sidebarx/sidebarx.dart';
 import 'package:device_preview/device_preview.dart';
-import 'package:sizer/sizer.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart'; // Import for setting orientation
-import 'firebase_options.dart'; // Make sure to generate this file using Firebase CLI
-import 'common/my_app_sidebar.dart';
-
-
+import 'package:google_fonts/google_fonts.dart';
+import 'package:sizer/sizer.dart';
+import 'features/cashier/presentation/bloc/cashier_cubit.dart';
+import 'features/home/cubit/navigation_cubit.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-//enable device preview
+//disable device preview
   runApp(
-    DevicePreview(
-      enabled: !kReleaseMode,
-      builder: (_) => const MyApp(),
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => NavigationCubit(),
+        ),
+        BlocProvider(
+          create: (context) => CashierCubit(),
+        ),
+      ],
+      child: MyApp(),
     ),
   );
-//disable device preview
-  //  runApp(
-  //    MyApp()
+  // runApp(
+  //   DevicePreview(
+  //     enabled: !kReleaseMode,
+  //     builder: (_) => MultiBlocProvider(
+  //       providers: [
+  //         BlocProvider(
+  //           create: (context) => NavigationCubit(),
+  //         ),
+  //         BlocProvider(
+  //           create: (context) => CashierCubit(),
+  //         ),
+  //       ],
+  //       child: MyApp(),
+  //     ),
+  //   ),
   // );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
-  Widget build(BuildContext context) => Sizer(
-        builder: (BuildContext context, orientation, deviceType) => MaterialApp(
-          locale: DevicePreview.locale(context),
-          builder: DevicePreview.appBuilder,
-          title: 'MyApp',
-          debugShowCheckedModeBanner: false,
+  Widget build(BuildContext context) {
+     return Sizer(builder: (context, orientation, deviceType) {
+        return MaterialApp(
+          title: 'Multi-Module App',
           theme: ThemeData(
-            primaryColor: primaryColor,
-            canvasColor: canvasColor,
-            scaffoldBackgroundColor: scaffoldBackgroundColor,
+            textTheme: GoogleFonts.plusJakartaSansTextTheme(),
+            primaryColor: AppColors.primaryMain,
           ),
-          home: const HomeScreen(),
-        ),
-      );
+          home: const SplashScreen(),
+        );
+      }
+    );
+  }
 }
-
