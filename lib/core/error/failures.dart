@@ -1,30 +1,14 @@
 import 'package:equatable/equatable.dart';
 
 abstract class Failure extends Equatable {
-  final String message;
+  final List properties;
 
-  const Failure(this.message);
+  Failure([this.properties = const <dynamic>[]]);
 
   @override
-  List<Object?> get props => [message];
+  List<Object> get props => [properties];
 }
 
-class ServerFailure extends Failure {
-  const ServerFailure(super.message);
-}
-
-class ConnectionFailure extends Failure {
-  const ConnectionFailure(super.message);
-}
-
-class TimeoutFailure extends Failure {
-  const TimeoutFailure(super.message);
-}
-
-class CachedFailure extends Failure {
-  const CachedFailure(super.message);
-}
-
-class NotFoundFailure extends Failure {
-  const NotFoundFailure(super.message);
-}
+class ServerFailure extends Failure {}
+class CacheFailure extends Failure {}
+class NetworkFailure extends Failure {}
