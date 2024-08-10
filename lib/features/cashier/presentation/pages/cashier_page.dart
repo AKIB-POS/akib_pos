@@ -52,7 +52,7 @@ class CashierPage extends StatelessWidget {
                 Expanded(
                   flex: 5,
                   child: Container(
-                    margin: const EdgeInsets.only(top: 2, left: 16, right: 0),
+                    margin: const EdgeInsets.only(top: 10, left: 16, right: 0),
                     color: AppColors.backgroundGrey,
                     child: Column(
                       children: [
@@ -75,6 +75,7 @@ class CashierPage extends StatelessWidget {
                             ),
                           ],
                         ),
+                        SizedBox(height: 10),
                         Expanded(
                           child: MenuGrid(),
                         ),
