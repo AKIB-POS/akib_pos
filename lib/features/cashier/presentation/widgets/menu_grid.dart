@@ -62,7 +62,7 @@ class MenuGrid extends StatelessWidget {
                           style: AppTextStyle.headline6,
                         ),
                         Text(
-                          product.name,
+                          product.description,
                           style: AppTextStyle.body3
                               .copyWith(color: AppColors.textGrey800),
                         ),

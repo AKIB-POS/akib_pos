@@ -1,6 +1,7 @@
 
 import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/core/error/failures.dart';
+import 'package:akib_pos/features/cashier/data/datasources/kasir_local_data_source.dart';
 import 'package:akib_pos/features/cashier/data/datasources/kasir_remote_data_source.dart';
 import 'package:akib_pos/features/cashier/data/models/category_model.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
@@ -10,56 +11,45 @@ import 'package:dartz/dartz.dart';
 abstract class KasirRepository {
   Future<Either<Failure, List<ProductModel>>> getAllProducts();
   Future<Either<Failure, List<CategoryModel>>> getCategories();
-  Future<Either<Failure, List<SubCategoryModel>>> getSubCategories(int categoryId);
-  Future<Either<Failure, List<ProductModel>>> getProductsByCategory(int categoryId);
-  Future<Either<Failure, List<ProductModel>>> getProductsBySubCategory(int subCategoryId);
-  Future<Either<Failure, List<ProductModel>>> searchProductsByName(String productName);
+  Future<Either<Failure, List<SubCategoryModel>>> getSubCategories();
 }
 
 class KasirRepositoryImpl implements KasirRepository {
   final KasirRemoteDataSource remoteDataSource;
+  final KasirLocalDataSource localDataSource;
 
-  KasirRepositoryImpl({required this.remoteDataSource});
+  KasirRepositoryImpl({
+    required this.remoteDataSource,
+    required this.localDataSource,
+  });
 
   @override
   Future<Either<Failure, List<ProductModel>>> getAllProducts() async {
     return await _getProducts(() {
-      return remoteDataSource.getAllProducts();
+      return remoteDataSource.getAllProducts().then((products) {
+        localDataSource.cacheProducts(products);
+        return products;
+      });
     });
   }
 
   @override
   Future<Either<Failure, List<CategoryModel>>> getCategories() async {
     return await _getCategories(() {
-      return remoteDataSource.getCategories();
+      return remoteDataSource.getCategories().then((categories) {
+        localDataSource.cacheCategories(categories);
+        return categories;
+      });
     });
   }
 
   @override
-  Future<Either<Failure, List<SubCategoryModel>>> getSubCategories(int categoryId) async {
+  Future<Either<Failure, List<SubCategoryModel>>> getSubCategories() async {
     return await _getSubCategories(() {
-      return remoteDataSource.getSubCategories(categoryId);
-    });
-  }
-
-  @override
-  Future<Either<Failure, List<ProductModel>>> getProductsByCategory(int categoryId) async {
-    return await _getProducts(() {
-      return remoteDataSource.getProductsByCategory(categoryId);
-    });
-  }
-
-  @override
-  Future<Either<Failure, List<ProductModel>>> getProductsBySubCategory(int subCategoryId) async {
-    return await _getProducts(() {
-      return remoteDataSource.getProductsBySubCategory(subCategoryId);
-    });
-  }
-
-  @override
-  Future<Either<Failure, List<ProductModel>>> searchProductsByName(String productName) async {
-    return await _getProducts(() {
-      return remoteDataSource.searchProductsByName(productName);
+      return remoteDataSource.getSubCategories().then((subCategories) {
+        localDataSource.cacheSubCategories(subCategories);
+        return subCategories;
+      });
     });
   }
 

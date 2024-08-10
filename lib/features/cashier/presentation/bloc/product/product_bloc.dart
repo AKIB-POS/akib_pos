@@ -1,4 +1,5 @@
 import 'package:akib_pos/core/error/failures.dart';
+import 'package:akib_pos/features/cashier/data/datasources/kasir_local_data_source.dart';
 import 'package:akib_pos/features/cashier/data/models/category_model.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
 import 'package:akib_pos/features/cashier/data/models/sub_category_model.dart';
@@ -11,68 +12,60 @@ part 'product_state.dart';
 
 class ProductBloc extends Bloc<ProductEvent, ProductState> {
   final KasirRepository kasirRepository;
+  final KasirLocalDataSource localDataSource;
 
-  ProductBloc({required this.kasirRepository}) : super(ProductInitial()) {
+  ProductBloc({
+    required this.kasirRepository,
+    required this.localDataSource,
+  }) : super(ProductInitial()) {
     on<FetchProductsEvent>(_onFetchProducts);
     on<FetchCategoriesEvent>(_onFetchCategories);
     on<FetchSubCategoriesEvent>(_onFetchSubCategories);
-    on<SearchProductsEvent>(_onSearchProducts);
-    on<FetchProductsByCategoryEvent>(_onFetchProductsByCategory);
-    on<FetchProductsBySubCategoryEvent>(_onFetchProductsBySubCategory);
   }
 
-  void _onFetchProducts(FetchProductsEvent event, Emitter<ProductState> emit) async {
+  Future<void> _onFetchProducts(FetchProductsEvent event, Emitter<ProductState> emit) async {
     emit(ProductLoading());
     final failureOrProducts = await kasirRepository.getAllProducts();
-    emit(failureOrProducts.fold(
-      (failure) => ProductError(message: _mapFailureToMessage(failure)),
-      (products) => ProductLoaded(products: products),
-    ));
+    await failureOrProducts.fold(
+      (failure) async {
+        emit(ProductError(message: _mapFailureToMessage(failure)));
+      },
+      (products) async {
+        await localDataSource.clearProductsCache();
+        await localDataSource.cacheProducts(products);
+        emit(ProductLoaded(products: products));
+      },
+    );
   }
 
-  void _onFetchCategories(FetchCategoriesEvent event, Emitter<ProductState> emit) async {
+  Future<void> _onFetchCategories(FetchCategoriesEvent event, Emitter<ProductState> emit) async {
     emit(ProductLoading());
     final failureOrCategories = await kasirRepository.getCategories();
-    emit(failureOrCategories.fold(
-      (failure) => ProductError(message: _mapFailureToMessage(failure)),
-      (categories) => CategoryLoaded(categories: categories),
-    ));
+    await failureOrCategories.fold(
+      (failure) async {
+        emit(ProductError(message: _mapFailureToMessage(failure)));
+      },
+      (categories) async {
+        await localDataSource.clearCategoriesCache();
+        await localDataSource.cacheCategories(categories);
+        emit(CategoryLoaded(categories: categories));
+      },
+    );
   }
 
-  void _onFetchSubCategories(FetchSubCategoriesEvent event, Emitter<ProductState> emit) async {
+  Future<void> _onFetchSubCategories(FetchSubCategoriesEvent event, Emitter<ProductState> emit) async {
     emit(ProductLoading());
-    final failureOrSubCategories = await kasirRepository.getSubCategories(event.categoryId);
-    emit(failureOrSubCategories.fold(
-      (failure) => ProductError(message: _mapFailureToMessage(failure)),
-      (subCategories) => SubCategoryLoaded(subCategories: subCategories),
-    ));
-  }
-
-  void _onSearchProducts(SearchProductsEvent event, Emitter<ProductState> emit) async {
-    emit(ProductLoading());
-    final failureOrProducts = await kasirRepository.searchProductsByName(event.searchText);
-    emit(failureOrProducts.fold(
-      (failure) => ProductError(message: _mapFailureToMessage(failure)),
-      (products) => ProductLoaded(products: products),
-    ));
-  }
-
-  void _onFetchProductsByCategory(FetchProductsByCategoryEvent event, Emitter<ProductState> emit) async {
-    emit(ProductLoading());
-    final failureOrProducts = await kasirRepository.getProductsByCategory(event.categoryId);
-    emit(failureOrProducts.fold(
-      (failure) => ProductError(message: _mapFailureToMessage(failure)),
-      (products) => ProductLoaded(products: products),
-    ));
-  }
-
-  void _onFetchProductsBySubCategory(FetchProductsBySubCategoryEvent event, Emitter<ProductState> emit) async {
-    emit(ProductLoading());
-    final failureOrProducts = await kasirRepository.getProductsBySubCategory(event.subCategoryId);
-    emit(failureOrProducts.fold(
-      (failure) => ProductError(message: _mapFailureToMessage(failure)),
-      (products) => ProductLoaded(products: products),
-    ));
+    final failureOrSubCategories = await kasirRepository.getSubCategories();
+    await failureOrSubCategories.fold(
+      (failure) async {
+        emit(ProductError(message: _mapFailureToMessage(failure)));
+      },
+      (subCategories) async {
+        await localDataSource.clearSubCategoriesCache();
+        await localDataSource.cacheSubCategories(subCategories);
+        emit(SubCategoryLoaded(subCategories: subCategories));
+      },
+    );
   }
 
   String _mapFailureToMessage(Failure failure) {

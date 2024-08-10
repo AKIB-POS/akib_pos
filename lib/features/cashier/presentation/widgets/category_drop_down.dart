@@ -7,20 +7,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sizer/sizer.dart';
 
 class CategoryDropdown extends StatelessWidget {
-  final List<Map<String, dynamic>> categoryItems = [
-    {'value': 'semua_kategori', 'label': 'Semua Kategori', 'count': 10},
-    {'value': 'makanan', 'label': 'Makanan', 'count': 8},
-    {'value': 'minuman', 'label': 'Minuman', 'count': 5},
-    {'value': 'favorit', 'label': 'Favorit', 'count': 0},
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Form(
       key: GlobalKey<FormState>(),
       child: BlocBuilder<CashierCubit, CashierState>(
         builder: (context, state) {
-          return DropdownButtonFormField2<String>(
+          return DropdownButtonFormField2<int>(
             isExpanded: true,
             value: state.selectedCategory,
             decoration: InputDecoration(
@@ -32,13 +25,13 @@ class CategoryDropdown extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            items: categoryItems
-                .map((item) => DropdownMenuItem<String>(
-                      value: item['value'] as String,
+            items: state.categories
+                .map((item) => DropdownMenuItem<int>(
+                      value: item.id,
                       child: _buildDropdownItem(
-                        item['label'] as String,
-                        item['count'] as int,
-                        state.selectedCategory == item['value'],
+                        item.categoryName,
+                        item.count,
+                        state.selectedCategory == item.id,
                       ),
                     ))
                 .toList(),
@@ -75,9 +68,9 @@ class CategoryDropdown extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 8),
             ),
             selectedItemBuilder: (BuildContext context) {
-              return categoryItems.map((item) {
+              return state.categories.map((item) {
                 return Text(
-                  item['label'] as String,
+                  item.categoryName,
                   style: const TextStyle(
                     fontSize: 14,
                   ),
@@ -89,7 +82,6 @@ class CategoryDropdown extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _buildDropdownItem(String label, int count, bool isSelected) {
     return Container(
@@ -111,7 +103,7 @@ class CategoryDropdown extends StatelessWidget {
                 size: 20,
               ),
               SizedBox(width: 8.0),
-              Text( label.length > 10 ? label.substring(0, 10)+'...' : label, style: AppTextStyle.headline6),
+              Text(label.length > 10 ? label.substring(0, 10) + '...' : label, style: AppTextStyle.headline6),
             ],
           ),
           Text('$count', style: AppTextStyle.headline6),

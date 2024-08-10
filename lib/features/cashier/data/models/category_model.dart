@@ -21,4 +21,12 @@ class CategoryModel extends Equatable {
       count: json['count'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'category_name': categoryName,
+      'count': count,
+    };
+  }
 }

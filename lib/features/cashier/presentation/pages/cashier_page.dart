@@ -21,50 +21,77 @@ class CashierPage extends StatelessWidget {
         elevation: 0,
         flexibleSpace: AppBarContent(),
       ),
-      body: Row(
-        children: [
-          Expanded(
-            flex: 5,
-            child: Container(
-              margin: const EdgeInsets.only(top: 2, left: 16, right: 0),
-              color: AppColors.backgroundGrey,
+      body: BlocBuilder<CashierCubit, CashierState>(
+        builder: (context, state) {
+          if (state.isLoading) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (state.error != null) {
+            return Center(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: CategoryDropdown(),
-                      ),
-                      Expanded(
-                        flex: 7,
-                        child: BlocBuilder<CashierCubit, CashierState>(
-                          builder: (context, state) {
-                            return state.selectedCategory != 'semua_kategori'
-                                ? SubCategoryList(
-                                    category: state.selectedCategory)
-                                : SizedBox.shrink();
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  Expanded(
-                    child: BlocBuilder<CashierCubit, CashierState>(
-                      builder: (context, state) {
-                        return MenuGrid();
-                      },
-                    ),
+                  Text(state.error!),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<CashierCubit>().loadData();
+                    },
+                    child: Text('Retry'),
                   ),
                 ],
               ),
+            );
+          }
+          return RefreshIndicator(
+            onRefresh: () async {
+              await context.read<CashierCubit>().loadData();
+            },
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 5,
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 2, left: 16, right: 0),
+                    color: AppColors.backgroundGrey,
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: CategoryDropdown(),
+                            ),
+                            Expanded(
+                              flex: 7,
+                              child: BlocBuilder<CashierCubit, CashierState>(
+                                builder: (context, state) {
+                                  return state.selectedCategory != 0
+                                      ? SubCategoryList(
+                                          categoryId: state.selectedCategory)
+                                      : SizedBox.shrink();
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        Expanded(
+                          child: MenuGrid(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                bodyRight(),
+              ],
             ),
-          ),
-          bodyRight(),
-        ],
+          );
+        },
       ),
     );
   }
+
+
 
   Expanded bodyRight() {
     return Expanded(
@@ -89,4 +116,5 @@ class CashierPage extends StatelessWidget {
       ),
     );
   }
+
 }

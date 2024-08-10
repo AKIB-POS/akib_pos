@@ -1,4 +1,5 @@
 import 'package:akib_pos/common/app_colors.dart';
+import 'package:akib_pos/di/injection_container.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/product/product_bloc.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
@@ -25,12 +26,18 @@ void main() async {
           create: (context) => NavigationCubit(),
         ),
         BlocProvider(
-          create: (context) => CashierCubit(),
+          create: (context) => ProductBloc(
+            kasirRepository: sl(),
+            localDataSource: sl(),
+          )..add(FetchCategoriesEvent())
+           ..add(FetchSubCategoriesEvent())
+           ..add(FetchProductsEvent()),
         ),
         BlocProvider(
-          create: (context) => di.sl<ProductBloc>()
-            ..add(FetchCategoriesEvent())
-            ..add(FetchProductsEvent()),
+          create: (context) => CashierCubit(
+            localDataSource: sl(),
+            productBloc: sl<ProductBloc>(),
+          )..loadData(),
         ),
       ],
       child: MyApp(),
