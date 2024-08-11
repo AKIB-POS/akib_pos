@@ -2,6 +2,7 @@ import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/di/injection_container.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/product/product_bloc.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
 import 'package:akib_pos/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -25,7 +26,7 @@ void main() async {
         BlocProvider(
           create: (context) => NavigationCubit(),
         ),
-         BlocProvider(
+        BlocProvider(
           create: (context) => ProductBloc(
             kasirRepository: sl(),
             localDataSource: sl(),
@@ -41,6 +42,7 @@ void main() async {
             productBloc: sl<ProductBloc>(),
           )..loadData(),
         ),
+        BlocProvider(create:  (context) => TransactionCubit()) // Ensure this is provided here
       ],
       child: MyApp(),
     ),
@@ -64,3 +66,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+

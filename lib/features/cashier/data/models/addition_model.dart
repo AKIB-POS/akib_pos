@@ -1,4 +1,34 @@
-import 'package:akib_pos/features/cashier/data/models/option_model.dart';
+import 'package:akib_pos/features/cashier/data/models/addition_option.dart';
+
+class SubAdditionModel {
+  final int id;
+  final String subAdditionType;
+  final List<AdditionOption> options;
+
+  SubAdditionModel({
+    required this.id,
+    required this.subAdditionType,
+    required this.options,
+  });
+
+  factory SubAdditionModel.fromJson(Map<String, dynamic> json) {
+    return SubAdditionModel(
+      id: json['id'],
+      subAdditionType: json['sub_addition_type'],
+      options: (json['options'] as List)
+          .map((i) => AdditionOption.fromJson(i))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'sub_addition_type': subAdditionType,
+      'options': options.map((e) => e.toJson()).toList(),
+    };
+  }
+}
 
 class AdditionModel {
   final int id;
@@ -29,34 +59,3 @@ class AdditionModel {
     };
   }
 }
-
-class SubAdditionModel {
-  final int id;
-  final String subAdditionType;
-  final List<OptionModel> options;
-
-  SubAdditionModel({
-    required this.id,
-    required this.subAdditionType,
-    required this.options,
-  });
-
-  factory SubAdditionModel.fromJson(Map<String, dynamic> json) {
-    return SubAdditionModel(
-      id: json['id'],
-      subAdditionType: json['sub_addition_type'],
-      options: (json['options'] as List)
-          .map((i) => OptionModel.fromJson(i))
-          .toList(),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'sub_addition_type': subAdditionType,
-      'options': options.map((e) => e.toJson()).toList(),
-    };
-  }
-}
-

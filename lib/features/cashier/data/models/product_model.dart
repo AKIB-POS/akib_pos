@@ -40,7 +40,31 @@ class ProductModel {
       additionId: json['addition_id'] != null ? json['addition_id'] : null,
     );
   }
-
+ProductModel copyWith({
+    int? id,
+    String? name,
+    String? description,
+    int? price,
+    int? stock,
+    String? imageUrl,
+    int? categoryId,
+    int? subCategoryId,
+    int? variantId,
+    int? additionId,
+  }) {
+    return ProductModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      price: price ?? this.price,
+      stock: stock ?? this.stock,
+      imageUrl: imageUrl ?? this.imageUrl,
+      categoryId: categoryId ?? this.categoryId,
+      subCategoryId: subCategoryId ?? this.subCategoryId,
+      variantId: variantId ?? this.variantId,
+      additionId: additionId ?? this.additionId,
+    );
+  }
   Map<String, dynamic> toJson() {
     return {
       'id': id,
