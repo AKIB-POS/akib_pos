@@ -1,16 +1,17 @@
 import 'package:equatable/equatable.dart';
 
-import 'package:equatable/equatable.dart';
 
-class ProductModel extends Equatable {
+class ProductModel {
   final int id;
   final String name;
   final String description;
-  final String price;
-  final String stock;
+  final int price;
+  final int stock;
   final String imageUrl;
   final int categoryId;
   final int subCategoryId;
+  final int? variantId;
+  final int? additionId;
 
   ProductModel({
     required this.id,
@@ -21,21 +22,22 @@ class ProductModel extends Equatable {
     required this.imageUrl,
     required this.categoryId,
     required this.subCategoryId,
+    this.variantId,
+    this.additionId,
   });
-
-  @override
-  List<Object> get props => [id, name, description, price, stock, imageUrl, categoryId, subCategoryId];
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
       id: json['id'],
       name: json['name'],
       description: json['description'],
-      price: json['price'],
-      stock: json['stock'],
+      price: int.parse(json['price']),
+      stock: int.parse(json['stock']),
       imageUrl: json['imageUrl'],
       categoryId: json['category_id'],
       subCategoryId: json['sub_category_id'],
+      variantId: json['variant_id'] != null ? json['variant_id'] : null,
+      additionId: json['addition_id'] != null ? json['addition_id'] : null,
     );
   }
 
@@ -44,11 +46,13 @@ class ProductModel extends Equatable {
       'id': id,
       'name': name,
       'description': description,
-      'price': price,
-      'stock': stock,
+      'price': price.toString(),
+      'stock': stock.toString(),
       'imageUrl': imageUrl,
       'category_id': categoryId,
       'sub_category_id': subCategoryId,
+      'variant_id': variantId,
+      'addition_id': additionId,
     };
   }
 }

@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:akib_pos/features/cashier/data/datasources/kasir_local_data_source.dart';
+import 'package:akib_pos/features/cashier/data/models/addition_model.dart';
 import 'package:akib_pos/features/cashier/data/models/category_model.dart';
 import 'package:akib_pos/features/cashier/data/models/menu_item_exmpl.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
 import 'package:akib_pos/features/cashier/data/models/sub_category_model.dart';
+import 'package:akib_pos/features/cashier/data/models/variant_model.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/product/product_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -25,11 +27,15 @@ class CashierCubit extends Cubit<CashierState> {
       final categories = await localDataSource.getCachedCategories();
       final subCategories = await localDataSource.getCachedSubCategories();
       final products = await localDataSource.getCachedProducts();
+      final additions = await localDataSource.getCachedAdditions();
+      final variants = await localDataSource.getCachedVariants();
 
       emit(state.copyWith(
         categories: categories,
         subCategories: subCategories,
         menuItems: products,
+        additions: additions,
+        variants: variants,
         isLoading: false,
       ));
     } catch (e) {
@@ -45,6 +51,8 @@ class CashierCubit extends Cubit<CashierState> {
     productBloc.add(FetchCategoriesEvent());
     productBloc.add(FetchSubCategoriesEvent());
     productBloc.add(FetchProductsEvent());
+    productBloc.add(FetchAdditionsEvent());
+    productBloc.add(FetchVariantsEvent());
 
     StreamSubscription? subscription;
     subscription = productBloc.stream.listen((state) async {
@@ -54,6 +62,10 @@ class CashierCubit extends Cubit<CashierState> {
         await localDataSource.cacheCategories(state.categories);
       } else if (state is SubCategoryLoaded) {
         await localDataSource.cacheSubCategories(state.subCategories);
+      } else if (state is AdditionLoaded) {
+        await localDataSource.cacheAdditions(state.additions);
+      } else if (state is VariantLoaded) {
+        await localDataSource.cacheVariants(state.variants);
       } else if (state is ProductError) {
         emit(this.state.copyWith(error: state.message, isLoading: false));
         if (!completer.isCompleted) {
@@ -63,7 +75,7 @@ class CashierCubit extends Cubit<CashierState> {
         return;
       }
 
-      if (state is ProductLoaded || state is CategoryLoaded || state is SubCategoryLoaded) {
+      if (state is ProductLoaded || state is CategoryLoaded || state is SubCategoryLoaded || state is AdditionLoaded || state is VariantLoaded) {
         if (!completer.isCompleted) {
           completer.complete();
         }
@@ -110,6 +122,8 @@ class CashierState {
   final List<ProductModel> menuItems;
   final List<CategoryModel> categories;
   final List<SubCategoryModel> subCategories;
+  final List<AdditionModel> additions;
+  final List<VariantModel> variants;
   final String? error;
   final bool isLoading;
 
@@ -120,6 +134,8 @@ class CashierState {
     this.menuItems = const [],
     this.categories = const [],
     this.subCategories = const [],
+    this.additions = const [],
+    this.variants = const [],
     this.error,
     this.isLoading = false,
   });
@@ -131,6 +147,8 @@ class CashierState {
     List<ProductModel>? menuItems,
     List<CategoryModel>? categories,
     List<SubCategoryModel>? subCategories,
+    List<AdditionModel>? additions,
+    List<VariantModel>? variants,
     String? error,
     bool? isLoading,
   }) {
@@ -141,6 +159,8 @@ class CashierState {
       menuItems: menuItems ?? this.menuItems,
       categories: categories ?? this.categories,
       subCategories: subCategories ?? this.subCategories,
+      additions: additions ?? this.additions,
+      variants: variants ?? this.variants,
       error: error ?? this.error,
       isLoading: isLoading ?? this.isLoading,
     );

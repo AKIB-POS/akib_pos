@@ -92,8 +92,6 @@ class CashierPage extends StatelessWidget {
     );
   }
 
-
-
   Expanded bodyRight() {
     return Expanded(
       flex: 3,
@@ -117,5 +115,4 @@ class CashierPage extends StatelessWidget {
       ),
     );
   }
-
 }

@@ -25,13 +25,15 @@ void main() async {
         BlocProvider(
           create: (context) => NavigationCubit(),
         ),
-        BlocProvider(
+         BlocProvider(
           create: (context) => ProductBloc(
             kasirRepository: sl(),
             localDataSource: sl(),
           )..add(FetchCategoriesEvent())
            ..add(FetchSubCategoriesEvent())
-           ..add(FetchProductsEvent()),
+           ..add(FetchProductsEvent())
+           ..add(FetchAdditionsEvent())
+           ..add(FetchVariantsEvent()),
         ),
         BlocProvider(
           create: (context) => CashierCubit(

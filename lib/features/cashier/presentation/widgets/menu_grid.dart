@@ -3,6 +3,7 @@ import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/cashier/data/models/menu_item_exmpl.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/product_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:extended_image/extended_image.dart';
@@ -15,7 +16,7 @@ class MenuGrid extends StatelessWidget {
     return BlocBuilder<CashierCubit, CashierState>(
       builder: (context, state) {
         final menuItems = context.read<CashierCubit>().filteredItems;
-        return GridView.builder(     
+        return GridView.builder(
           padding: const EdgeInsets.only(right: 8),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 4, // Update to 4 columns
@@ -26,9 +27,21 @@ class MenuGrid extends StatelessWidget {
           itemCount: menuItems.length,
           itemBuilder: (context, index) {
             final product = menuItems[index];
-            return MenuCard(item: product);
+            return GestureDetector(
+              onTap: () => _showProductDialog(context, product),
+              child: MenuCard(item: product),
+            );
           },
         );
+      },
+    );
+  }
+
+  void _showProductDialog(BuildContext context, ProductModel product) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ProductDialog(product: product);
       },
     );
   }
@@ -71,7 +84,7 @@ class MenuCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 1.0),
                 Text(
-                  item.price,
+                  item.price.toString(),
                   style: AppTextStyle.body3,
                 ),
               ],
