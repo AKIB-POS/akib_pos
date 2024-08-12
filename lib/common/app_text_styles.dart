@@ -53,7 +53,7 @@ class AppTextStyle {
   );
 
   static const TextStyle subtitle2 = TextStyle(
-    fontSize: 16.0,
+    fontSize: 10,
     height: 1.5,  // Line height of 24 divided by font size of 16
     fontWeight: FontWeight.w700,
     letterSpacing: 0,

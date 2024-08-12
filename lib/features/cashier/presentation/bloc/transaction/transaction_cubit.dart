@@ -43,7 +43,7 @@ class TransactionCubit extends Cubit<TransactionState> {
           transactions: [],
         ));
 
-        void resetState() {
+  void resetState() {
     emit(TransactionState(
       selectedVariants: {},
       selectedAdditions: {},
@@ -82,6 +82,18 @@ class TransactionCubit extends Cubit<TransactionState> {
   void addTransaction(TransactionModel transaction) {
     final updatedTransactions = List<TransactionModel>.from(state.transactions)
       ..add(transaction);
+    emit(state.copyWith(transactions: updatedTransactions));
+  }
+
+  void updateTransaction(int index, TransactionModel transaction) {
+    final updatedTransactions = List<TransactionModel>.from(state.transactions)
+      ..[index] = transaction;
+    emit(state.copyWith(transactions: updatedTransactions));
+  }
+
+  void removeTransaction(int index) {
+    final updatedTransactions = List<TransactionModel>.from(state.transactions)
+      ..removeAt(index);
     emit(state.copyWith(transactions: updatedTransactions));
   }
 }
