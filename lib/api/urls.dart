@@ -1,3 +1,3 @@
 class URLs{
-  static const baseUrlMock = "https://akib.wiremockapi.cloud/api";
+  static const baseUrlMock = "https://akibpos.wiremockapi.cloud/api";
 }

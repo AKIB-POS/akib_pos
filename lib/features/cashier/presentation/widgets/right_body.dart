@@ -1,6 +1,7 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/product_dialog.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
@@ -50,10 +51,9 @@ class RightBody extends StatelessWidget {
                               fit: BoxFit.fill,
                               cache: true,
                               shape: BoxShape.rectangle,
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(8.0)),
+                              borderRadius: const BorderRadius.all(Radius.circular(8.0)),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Container(
                               decoration: BoxDecoration(
                                 color: AppColors.backgroundGrey,
@@ -64,22 +64,19 @@ class RightBody extends StatelessWidget {
                                 onTap: () {
                                   showDialog(
                                     context: context,
-                                    builder: (_) => BlocProvider.value(
-                                      value: context.read<TransactionCubit>(),
-                                      // child: EditProductDialog(
-                                      //   index: index,
-                                      //   transaction: transaction,
-                                      // ),
-                                    ),
+                                    builder: (context) {
+                                      return ProductDialog(
+                                        product: transaction.product,
+                                        editIndex: index,
+                                      );
+                                    },
                                   );
                                 },
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text('Edit',
-                                        style: AppTextStyle.subtitle2.copyWith(
-                                            color: AppColors.primaryMain)),
-                                    SizedBox(width: 4),
+                                    Text('Edit', style: AppTextStyle.subtitle2.copyWith(color: AppColors.primaryMain)),
+                                    const SizedBox(width: 4),
                                     Icon(
                                       Icons.edit,
                                       color: AppColors.primaryMain,
@@ -96,26 +93,21 @@ class RightBody extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(transaction.product.name,
-                                  style: AppTextStyle.headline6),
+                              Text(transaction.product.name, style: AppTextStyle.headline6),
                               const SizedBox(height: 2),
-                              Text(
-                                  Utils.formatCurrency(
-                                      transaction.product.price.toString()),
-                                  style: AppTextStyle.body3),
+                              Text(Utils.formatCurrency(transaction.product.totalPrice.toString()), style: AppTextStyle.body3),
                               const SizedBox(height: 8),
-                              Text('Catatan: ${transaction.notes}',
-                                  style: AppTextStyle.body3),
+                              Text('Catatan: ${transaction.notes}', style: AppTextStyle.body3),
                               const SizedBox(height: 8),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Variants: ${transaction.selectedVariants?.values.join(', ') ?? ''}',
+                                    'Variants: ${transaction.selectedVariants.map((v) => v.name).join(', ')}',
                                     style: AppTextStyle.body3,
                                   ),
                                   Text(
-                                    'Additions: ${transaction.selectedAdditions?.values.expand((i) => i).join(', ') ?? ''}',
+                                    'Additions: ${transaction.selectedAdditions.map((a) => a.name).join(', ')}',
                                     style: AppTextStyle.body3,
                                   ),
                                 ],
@@ -136,18 +128,11 @@ class RightBody extends StatelessWidget {
                                     width: 28,
                                   ),
                                   onPressed: () {
-                                    if (transaction.quantity > 1) {
-                                      context.read<TransactionCubit>().updateQuantity(
-                                        transaction.quantity - 1,
-                                      );
-                                    } else {
-                                      context.read<TransactionCubit>().removeTransaction(index);
-                                    }
+                                    context.read<TransactionCubit>().subtractQuantity(index);
                                   },
                                 ),
                                 const SizedBox(width: 8),
-                                Text(transaction.quantity.toString(),
-                                    style: AppTextStyle.headline6),
+                                Text(transaction.quantity.toString(), style: AppTextStyle.headline6),
                                 const SizedBox(width: 8),
                                 IconButton(
                                   icon: SvgPicture.asset(
@@ -156,9 +141,7 @@ class RightBody extends StatelessWidget {
                                     width: 28,
                                   ),
                                   onPressed: () {
-                                    context.read<TransactionCubit>().updateQuantity(
-                                      transaction.quantity + 1,
-                                    );
+                                    context.read<TransactionCubit>().addQuantity(index);
                                   },
                                 ),
                               ],

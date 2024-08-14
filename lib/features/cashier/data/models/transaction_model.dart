@@ -2,8 +2,8 @@ import 'package:akib_pos/features/cashier/data/models/product_model.dart';
 
 class TransactionModel {
   final ProductModel product;
-  final Map<String, String>? selectedVariants;
-  final Map<String, List<String>>? selectedAdditions;// Key: sub_addition_type, Value: List of option names
+  final List<SelectedVariant> selectedVariants;
+  final List<SelectedAddition> selectedAdditions;
   final String notes;
   final int quantity;
 
@@ -15,8 +15,24 @@ class TransactionModel {
     required this.quantity,
   });
 
+  TransactionModel copyWith({
+    ProductModel? product,
+    List<SelectedVariant>? selectedVariants,
+    List<SelectedAddition>? selectedAdditions,
+    String? notes,
+    int? quantity,
+  }) {
+    return TransactionModel(
+      product: product ?? this.product,
+      selectedVariants: selectedVariants ?? this.selectedVariants,
+      selectedAdditions: selectedAdditions ?? this.selectedAdditions,
+      notes: notes ?? this.notes,
+      quantity: quantity ?? this.quantity,
+    );
+  }
+
   @override
   String toString() {
-    return 'TransactionModel(product: ${product.name}, price: ${product.price}, selectedVariants: $selectedVariants, selectedAdditions: $selectedAdditions, notes: $notes, quantity: $quantity)';
+    return 'TransactionModel{product: $product, selectedVariants: $selectedVariants, selectedAdditions: $selectedAdditions, notes: $notes, quantity: $quantity}';
   }
 }

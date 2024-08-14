@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-
 class ProductModel {
   final int id;
   final String name;
@@ -12,6 +11,9 @@ class ProductModel {
   final int subCategoryId;
   final int? variantId;
   final int? additionId;
+  final List<SelectedVariant> selectedVariants;
+  final List<SelectedAddition> selectedAdditions;
+  final int? totalPrice; // New variable for storing total price
 
   ProductModel({
     required this.id,
@@ -24,7 +26,42 @@ class ProductModel {
     required this.subCategoryId,
     this.variantId,
     this.additionId,
+    required this.selectedVariants,
+    required this.selectedAdditions,
+    this.totalPrice, // Initialize the new variable
   });
+
+  ProductModel copyWith({
+    int? id,
+    String? name,
+    String? description,
+    int? price,
+    int? stock,
+    String? imageUrl,
+    int? categoryId,
+    int? subCategoryId,
+    int? variantId,
+    int? additionId,
+    List<SelectedVariant>? selectedVariants,
+    List<SelectedAddition>? selectedAdditions,
+    int? totalPrice, // Add the new variable to the copyWith method
+  }) {
+    return ProductModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      price: price ?? this.price,
+      stock: stock ?? this.stock,
+      imageUrl: imageUrl ?? this.imageUrl,
+      categoryId: categoryId ?? this.categoryId,
+      subCategoryId: subCategoryId ?? this.subCategoryId,
+      variantId: variantId ?? this.variantId,
+      additionId: additionId ?? this.additionId,
+      selectedVariants: selectedVariants ?? this.selectedVariants,
+      selectedAdditions: selectedAdditions ?? this.selectedAdditions,
+      totalPrice: totalPrice ?? this.totalPrice, // Add the new variable
+    );
+  }
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
@@ -38,33 +75,12 @@ class ProductModel {
       subCategoryId: json['sub_category_id'],
       variantId: json['variant_id'] != null ? json['variant_id'] : null,
       additionId: json['addition_id'] != null ? json['addition_id'] : null,
+      selectedVariants: [],
+      selectedAdditions: [],
+      totalPrice: json['total_price'] != null ? int.parse(json['total_price']) : null, // Handle the new variable
     );
   }
-ProductModel copyWith({
-    int? id,
-    String? name,
-    String? description,
-    int? price,
-    int? stock,
-    String? imageUrl,
-    int? categoryId,
-    int? subCategoryId,
-    int? variantId,
-    int? additionId,
-  }) {
-    return ProductModel(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      description: description ?? this.description,
-      price: price ?? this.price,
-      stock: stock ?? this.stock,
-      imageUrl: imageUrl ?? this.imageUrl,
-      categoryId: categoryId ?? this.categoryId,
-      subCategoryId: subCategoryId ?? this.subCategoryId,
-      variantId: variantId ?? this.variantId,
-      additionId: additionId ?? this.additionId,
-    );
-  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -77,6 +93,73 @@ ProductModel copyWith({
       'sub_category_id': subCategoryId,
       'variant_id': variantId,
       'addition_id': additionId,
+      'selected_variants': selectedVariants.map((variant) => variant.toJson()).toList(),
+      'selected_additions': selectedAdditions.map((addition) => addition.toJson()).toList(),
+      'total_price': totalPrice?.toString(), // Add the new variable to the JSON map
     };
+  }
+
+  @override
+  String toString() {
+    return 'ProductModel{id: $id, name: $name, description: $description, price: $price, stock: $stock, imageUrl: $imageUrl, categoryId: $categoryId, subCategoryId: $subCategoryId, variantId: $variantId, additionId: $additionId, selectedVariants: $selectedVariants, selectedAdditions: $selectedAdditions, totalPrice: $totalPrice}';
+  }
+}
+
+
+class SelectedVariant {
+  final String name;
+  final int price;
+
+  SelectedVariant({
+    required this.name,
+    required this.price,
+  });
+
+  factory SelectedVariant.fromJson(Map<String, dynamic> json) {
+    return SelectedVariant(
+      name: json['name'],
+      price: int.parse(json['price']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'price': price.toString(),
+    };
+  }
+
+  @override
+  String toString() {
+    return 'SelectedVariant{name: $name, price: $price}';
+  }
+}
+
+class SelectedAddition {
+  final String name;
+  final int price;
+
+  SelectedAddition({
+    required this.name,
+    required this.price,
+  });
+
+  factory SelectedAddition.fromJson(Map<String, dynamic> json) {
+    return SelectedAddition(
+      name: json['name'],
+      price: int.parse(json['price']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'price': price.toString(),
+    };
+  }
+
+  @override
+  String toString() {
+    return 'SelectedAddition{name: $name, price: $price}';
   }
 }
