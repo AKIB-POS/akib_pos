@@ -1,6 +1,7 @@
 import 'package:akib_pos/features/cashier/data/models/addition_model.dart';
 import 'package:akib_pos/features/cashier/data/models/addition_option.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
+import 'package:akib_pos/features/cashier/data/models/redeem_voucher_response.dart';
 import 'package:akib_pos/features/cashier/data/models/varian_option.dart';
 import 'package:akib_pos/features/cashier/data/models/variant_model.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
@@ -16,6 +17,7 @@ class TransactionState {
   final List<TransactionModel> transactions;
   final double discount;
   final double tax;
+  final VoucherData? voucher; // Add voucher field
 
   TransactionState({
     required this.selectedVariants,
@@ -25,6 +27,7 @@ class TransactionState {
     required this.transactions,
     this.discount = 0.0,
     this.tax = 0.0,
+    this.voucher,
   });
 
   TransactionState copyWith({
@@ -35,6 +38,7 @@ class TransactionState {
     List<TransactionModel>? transactions,
     double? discount,
     double? tax,
+    VoucherData? voucher, // Add voucher parameter
   }) {
     return TransactionState(
       selectedVariants: selectedVariants ?? this.selectedVariants,
@@ -44,9 +48,11 @@ class TransactionState {
       transactions: transactions ?? this.transactions,
       discount: discount ?? this.discount,
       tax: tax ?? this.tax,
+      voucher: voucher ?? this.voucher, // Assign voucher
     );
   }
 }
+
 
 class TransactionCubit extends Cubit<TransactionState> {
   TransactionCubit()
@@ -57,6 +63,10 @@ class TransactionCubit extends Cubit<TransactionState> {
           quantity: 1,
           transactions: [],
         ));
+
+  void updateVoucher(VoucherData? voucher) {
+    emit(state.copyWith(voucher: voucher));
+  }
 
   void resetState() {
     emit(TransactionState(
@@ -206,6 +216,15 @@ class TransactionCubit extends Cubit<TransactionState> {
     additions.forEach((addition) {
       totalPrice += addition.price * quantity;
     });
+
+    // Apply voucher discount
+     if (state.voucher != null) {
+      if (state.voucher!.type == 'nominal') {
+        totalPrice -= state.voucher!.amount.toInt();
+      } else if (state.voucher!.type == 'percentage') {
+        totalPrice -= (totalPrice * state.voucher!.amount / 100).toInt();
+      }
+    }
 
     return totalPrice;
   }

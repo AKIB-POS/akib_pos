@@ -6,6 +6,7 @@ import 'package:akib_pos/features/cashier/data/datasources/kasir_remote_data_sou
 import 'package:akib_pos/features/cashier/data/models/addition_model.dart';
 import 'package:akib_pos/features/cashier/data/models/category_model.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
+import 'package:akib_pos/features/cashier/data/models/redeem_voucher_response.dart';
 import 'package:akib_pos/features/cashier/data/models/sub_category_model.dart';
 import 'package:akib_pos/features/cashier/data/models/variant_model.dart';
 import 'package:dartz/dartz.dart';
@@ -16,6 +17,7 @@ abstract class KasirRepository {
   Future<Either<Failure, List<SubCategoryModel>>> getSubCategories();
   Future<Either<Failure, List<VariantModel>>> getVariants();
   Future<Either<Failure, List<AdditionModel>>> getAdditions();
+   Future<Either<Failure, RedeemVoucherResponse>> redeemVoucher(String code);
 }
 
 class KasirRepositoryImpl implements KasirRepository {
@@ -134,6 +136,16 @@ class KasirRepositoryImpl implements KasirRepository {
       return Left(ServerFailure());
     } catch (_) {
       return Left(NetworkFailure());
+    }
+  }
+  
+  @override
+  Future<Either<Failure, RedeemVoucherResponse>> redeemVoucher(String code) async {
+    try {
+      final voucher = await remoteDataSource.redeemVoucher(code);
+      return Right(voucher);
+    } on ServerException {
+      return Left(ServerFailure());
     }
   }
 }

@@ -4,6 +4,7 @@ import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/features/cashier/data/models/addition_model.dart';
 import 'package:akib_pos/features/cashier/data/models/category_model.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
+import 'package:akib_pos/features/cashier/data/models/redeem_voucher_response.dart';
 import 'package:akib_pos/features/cashier/data/models/sub_category_model.dart';
 import 'package:akib_pos/features/cashier/data/models/variant_model.dart';
 import 'package:akib_pos/util/shared_prefs_helper.dart';
@@ -17,6 +18,7 @@ abstract class KasirRemoteDataSource {
   Future<List<SubCategoryModel>> getSubCategories();
   Future<List<AdditionModel>> getAdditions();
   Future<List<VariantModel>> getVariants();
+  Future<RedeemVoucherResponse> redeemVoucher(String code);
 }
 
 class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
@@ -31,6 +33,17 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
     return _parseProductList(response);
   }
 
+  @override
+  Future<RedeemVoucherResponse> redeemVoucher(String code) async {
+    final url = '${URLs.baseUrlMock}/redeem-voucher/$code';
+    final response = await _postFromUrl(url);
+
+    if (response.statusCode != 200) {
+      throw ServerException();
+    }
+
+    return RedeemVoucherResponse.fromJson(json.decode(response.body));
+  }
   @override
   Future<List<CategoryModel>> getCategories() async {
     final response = await _getFromUrl('${URLs.baseUrlMock}/categories');
@@ -58,6 +71,23 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
   Future<http.Response> _getFromUrl(String url) async {
     final token = sharedPrefsHelper.getToken();
     final response = await client.get(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw ServerException();
+    }
+    return response;
+  }
+  
+  
+  Future<http.Response> _postFromUrl(String url) async {
+    final token = sharedPrefsHelper.getToken();
+    final response = await client.post(
       Uri.parse(url),
       headers: {
         'Content-Type': 'application/json',

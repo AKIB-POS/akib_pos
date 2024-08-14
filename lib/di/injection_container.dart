@@ -2,6 +2,7 @@ import 'package:akib_pos/features/cashier/data/datasources/kasir_local_data_sour
 import 'package:akib_pos/features/cashier/data/datasources/kasir_remote_data_source.dart';
 import 'package:akib_pos/features/cashier/data/repositories/kasir_repository.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/product/product_bloc.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
 import 'package:akib_pos/util/shared_prefs_helper.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,6 +14,9 @@ Future<void> init() async {
   // Bloc
   sl.registerFactory(
     () => ProductBloc(kasirRepository: sl(), localDataSource: sl()),
+  );
+  sl.registerFactory(
+    () => VoucherCubit(sl()),
   );
 
   // Repository

@@ -237,8 +237,8 @@ class RightBody extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text('Diskon', style: AppTextStyle.body3),
-                                  Text(Utils.formatCurrencyDouble(state.discount),
-                                      style: AppTextStyle.body3),
+                                  Text(Utils.formatCurrencyDouble(_calculateDiscount(
+                                  context.read<TransactionCubit>().state)),style: AppTextStyle.body3),
                                 ],
                               ),
                               const SizedBox(height: 4),
@@ -356,17 +356,32 @@ class RightBody extends StatelessWidget {
     );
   }
 
+  
   double _calculateSubtotal(TransactionState state) {
     print("${state.transactions}");
     return state.transactions.fold(
         0, (total, transaction) => total + transaction.product.totalPrice!);
   }
 
-  double _calculateTotal(TransactionState state) {
-    final subtotal = state.transactions.fold(
-        0, (total, transaction) => total + transaction.product.totalPrice!);
-    final discount = state.discount;
-    final tax = state.tax;
-    return (subtotal - discount + tax);
+  double _calculateDiscount(TransactionState state) {
+  final subtotal = _calculateSubtotal(state);
+
+  double discountAmount = state.discount;
+  if (state.voucher != null) {
+    if (state.voucher!.type == 'nominal') {
+      discountAmount += state.voucher!.amount;
+    } else if (state.voucher!.type == 'percentage') {
+      discountAmount += (subtotal * state.voucher!.amount / 100);
+    }
   }
+
+  return discountAmount;
+}
+
+ double _calculateTotal(TransactionState state) {
+  final subtotal = _calculateSubtotal(state);
+  final discount = _calculateDiscount(state);
+  final tax = state.tax;
+  return (subtotal - discount + tax);
+}
 }

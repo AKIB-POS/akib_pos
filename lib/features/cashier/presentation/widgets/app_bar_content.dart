@@ -1,3 +1,6 @@
+import 'package:akib_pos/features/cashier/data/repositories/kasir_repository.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/voucher_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
@@ -8,19 +11,25 @@ import 'package:akib_pos/common/app_text_styles.dart';
 
 class AppBarContent extends StatelessWidget {
   final TextEditingController _controller = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        appBarLeft(_controller, context),
-        appBarRight(),
-      ],
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          appBarLeft(_controller, context, _focusNode),
+          appBarRight(context),
+        ],
+      ),
     );
   }
 
-  Expanded appBarRight() {
+  Expanded appBarRight(BuildContext context) {
     return Expanded(
       flex: 3,
       child: Container(
@@ -39,10 +48,20 @@ class AppBarContent extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            SvgPicture.asset(
-              "assets/icons/ic_disc.svg",
-              height: 3.5.h,
-              width: 3.5.w,
+            GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return VoucherDialog();
+                  },
+                );
+              },
+              child: SvgPicture.asset(
+                "assets/icons/ic_disc.svg",
+                height: 3.5.h,
+                width: 3.5.w,
+              ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -68,7 +87,7 @@ class AppBarContent extends StatelessWidget {
     );
   }
 
-  Expanded appBarLeft(TextEditingController controller, BuildContext context) {
+  Expanded appBarLeft(TextEditingController controller, BuildContext context, FocusNode focusNode) {
     return Expanded(
       flex: 5,
       child: Container(
@@ -101,33 +120,39 @@ class AppBarContent extends StatelessWidget {
             Expanded(
               child: SizedBox(
                 child: Center(
-                  child: TextField(
-                    controller: controller,
-                    decoration: InputDecoration(
-                      hintText: 'Cari Produk',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusColor: Colors.white,
-                      fillColor: Colors.white,
-                      filled: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8.0,
-                      ),
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.search, color: Colors.black),
-                        onPressed: () {
-                          BlocProvider.of<CashierCubit>(context)
-                              .updateSearchText(controller.text);
-                        },
-                      ),
-                    ),
-                    onSubmitted: (text) {
-                      BlocProvider.of<CashierCubit>(context)
-                          .updateSearchText(text);
+                  child: FocusScope(
+                    onFocusChange: (hasFocus) {
+                      if (!hasFocus) {
+                        // Do something when TextField loses focus if needed
+                      }
                     },
+                    child: TextField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      decoration: InputDecoration(
+                        hintText: 'Cari Produk',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusColor: Colors.white,
+                        fillColor: Colors.white,
+                        filled: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8.0,
+                        ),
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.search, color: Colors.black),
+                          onPressed: () {
+                            _performSearch(context, controller.text);
+                          },
+                        ),
+                      ),
+                      onSubmitted: (text) {
+                        _performSearch(context, text);
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -146,5 +171,10 @@ class AppBarContent extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _performSearch(BuildContext context, String text) {
+    BlocProvider.of<CashierCubit>(context).updateSearchText(text);
+    _focusNode.unfocus();
   }
 }

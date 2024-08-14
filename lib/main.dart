@@ -4,6 +4,7 @@ import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/product/product_bloc.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/process_transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
 import 'package:akib_pos/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -44,7 +45,8 @@ void main() async {
           )..loadData(),
         ),
         BlocProvider(create:  (context) => TransactionCubit()), // Ensure this is provided here
-        BlocProvider(create:  (context) => ProcessTransactionCubit()) // Ensure this is provided here
+        BlocProvider(create:  (context) => ProcessTransactionCubit()), // Ensure this is provided here
+        BlocProvider(create:  (context) => VoucherCubit(sl())) // Ensure this is provided here
       ],
       child: MyApp(),
     ),
