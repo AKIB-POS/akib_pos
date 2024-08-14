@@ -108,7 +108,7 @@ class ProductModel {
 
 class SelectedVariant {
   final String name;
-  final int price;
+  final int price; // Added field
 
   SelectedVariant({
     required this.name,
@@ -125,7 +125,7 @@ class SelectedVariant {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'price': price.toString(),
+      'price': price.toString(),// Added field
     };
   }
 
@@ -134,6 +134,7 @@ class SelectedVariant {
     return 'SelectedVariant{name: $name, price: $price}';
   }
 }
+
 
 class SelectedAddition {
   final String name;

@@ -61,11 +61,11 @@ class TransactionCubit extends Cubit<TransactionState> {
     ));
   }
 
-  void selectVariant(SelectedVariant variant) {
-    final updatedVariants = List<SelectedVariant>.from(state.selectedVariants)..add(variant);
-    emit(state.copyWith(selectedVariants: updatedVariants));
-    _updateTotalPrice();
-  }
+ void selectVariant(SelectedVariant variant) {
+  final updatedVariants = [variant]; // Hanya menyimpan variant yang baru dipilih
+  emit(state.copyWith(selectedVariants: updatedVariants));
+  _updateTotalPrice();
+}
 
   void deselectVariant(SelectedVariant variant) {
     final updatedVariants = List<SelectedVariant>.from(state.selectedVariants)
