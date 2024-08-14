@@ -4,6 +4,7 @@ import 'package:akib_pos/features/cashier/data/models/menu_item_exmpl.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/product_dialog.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:extended_image/extended_image.dart';
@@ -84,7 +85,7 @@ class MenuCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 1.0),
                 Text(
-                  item.price.toString(),
+                  Utils.formatCurrency(item.price.toString()),
                   style: AppTextStyle.body3,
                 ),
               ],

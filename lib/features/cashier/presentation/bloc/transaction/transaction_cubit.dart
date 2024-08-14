@@ -14,6 +14,8 @@ class TransactionState {
   final String notes;
   final int quantity;
   final List<TransactionModel> transactions;
+  final double discount;
+  final double tax;
 
   TransactionState({
     required this.selectedVariants,
@@ -21,6 +23,8 @@ class TransactionState {
     required this.notes,
     required this.quantity,
     required this.transactions,
+    this.discount = 0.0,
+    this.tax = 0.0,
   });
 
   TransactionState copyWith({
@@ -29,6 +33,8 @@ class TransactionState {
     String? notes,
     int? quantity,
     List<TransactionModel>? transactions,
+    double? discount,
+    double? tax,
   }) {
     return TransactionState(
       selectedVariants: selectedVariants ?? this.selectedVariants,
@@ -36,10 +42,11 @@ class TransactionState {
       notes: notes ?? this.notes,
       quantity: quantity ?? this.quantity,
       transactions: transactions ?? this.transactions,
+      discount: discount ?? this.discount,
+      tax: tax ?? this.tax,
     );
   }
 }
-
 
 class TransactionCubit extends Cubit<TransactionState> {
   TransactionCubit()
@@ -58,14 +65,16 @@ class TransactionCubit extends Cubit<TransactionState> {
       notes: '',
       quantity: 1,
       transactions: state.transactions,
+      discount: state.discount,
+      tax: state.tax,
     ));
   }
 
- void selectVariant(SelectedVariant variant) {
-  final updatedVariants = [variant]; // Hanya menyimpan variant yang baru dipilih
-  emit(state.copyWith(selectedVariants: updatedVariants));
-  _updateTotalPrice();
-}
+  void selectVariant(SelectedVariant variant) {
+    final updatedVariants = [variant]; // Hanya menyimpan variant yang baru dipilih
+    emit(state.copyWith(selectedVariants: updatedVariants));
+    _updateTotalPrice();
+  }
 
   void deselectVariant(SelectedVariant variant) {
     final updatedVariants = List<SelectedVariant>.from(state.selectedVariants)
@@ -91,9 +100,6 @@ class TransactionCubit extends Cubit<TransactionState> {
     emit(state.copyWith(notes: notes));
   }
 
-  
-
- 
   void addTransaction(TransactionModel transaction) {
     final updatedTransactions = List<TransactionModel>.from(state.transactions)..add(transaction);
     emit(state.copyWith(transactions: updatedTransactions));
@@ -126,28 +132,26 @@ class TransactionCubit extends Cubit<TransactionState> {
   }
 
   void addQuantity(int index) {
-  final currentTransaction = state.transactions[index];
-  final updatedTransaction = currentTransaction.copyWith(quantity: currentTransaction.quantity + 1);
-  final updatedTransactions = List<TransactionModel>.from(state.transactions)..[index] = updatedTransaction;
-  emit(state.copyWith(transactions: updatedTransactions));
-  _updateTotalPrice(index: index); // Update the total price
-}
-
-void subtractQuantity(int index) {
-  final currentTransaction = state.transactions[index];
-  if (currentTransaction.quantity > 1) {
-    final updatedTransaction = currentTransaction.copyWith(quantity: currentTransaction.quantity - 1);
+    final currentTransaction = state.transactions[index];
+    final updatedTransaction = currentTransaction.copyWith(quantity: currentTransaction.quantity + 1);
     final updatedTransactions = List<TransactionModel>.from(state.transactions)..[index] = updatedTransaction;
     emit(state.copyWith(transactions: updatedTransactions));
     _updateTotalPrice(index: index); // Update the total price
-  } else {
-    removeTransaction(index);
   }
-}
 
+  void subtractQuantity(int index) {
+    final currentTransaction = state.transactions[index];
+    if (currentTransaction.quantity > 1) {
+      final updatedTransaction = currentTransaction.copyWith(quantity: currentTransaction.quantity - 1);
+      final updatedTransactions = List<TransactionModel>.from(state.transactions)..[index] = updatedTransaction;
+      emit(state.copyWith(transactions: updatedTransactions));
+      _updateTotalPrice(index: index); // Update the total price
+    } else {
+      removeTransaction(index);
+    }
+  }
 
-
-   void updateTransactionQuantity(int index, int quantity) {
+  void updateTransactionQuantity(int index, int quantity) {
     final currentTransaction = state.transactions[index];
     final newQuantity = quantity.clamp(1, 100);
     final updatedTransaction = currentTransaction.copyWith(quantity: newQuantity);
@@ -155,17 +159,23 @@ void subtractQuantity(int index) {
       ..[index] = updatedTransaction;
     emit(state.copyWith(transactions: updatedTransactions));
     _updateTotalPrice(index: index);
-    print("apakah update  ${updatedTransactions}");
   }
 
+  void updateDiscount(double discount) {
+    emit(state.copyWith(discount: discount));
+    _updateTotalPrice();
+  }
+
+  void updateTax(double tax) {
+    emit(state.copyWith(tax: tax));
+    _updateTotalPrice();
+  }
 
   void _updateTotalPrice({int? index, int reduce = 0}) {
     if (state.transactions.isEmpty) return;
 
     if (index == null) {
-      print("apakah sebelum calculate ${state.quantity}  ${state.transactions}");
       final totalPrice = _calculateTotalPrice(state.quantity, state.selectedVariants, state.selectedAdditions) - reduce * state.quantity;
-      print("apakah calculate $totalPrice");
       final updatedProduct = state.transactions.last.product.copyWith(totalPrice: totalPrice);
       final updatedTransaction = state.transactions.last.copyWith(product: updatedProduct);
       final updatedTransactions = List<TransactionModel>.from(state.transactions)

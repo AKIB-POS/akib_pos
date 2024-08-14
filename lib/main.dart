@@ -2,6 +2,7 @@ import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/di/injection_container.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/product/product_bloc.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/transaction/process_transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
 import 'package:akib_pos/splash_screen.dart';
@@ -42,7 +43,8 @@ void main() async {
             productBloc: sl<ProductBloc>(),
           )..loadData(),
         ),
-        BlocProvider(create:  (context) => TransactionCubit()) // Ensure this is provided here
+        BlocProvider(create:  (context) => TransactionCubit()), // Ensure this is provided here
+        BlocProvider(create:  (context) => ProcessTransactionCubit()) // Ensure this is provided here
       ],
       child: MyApp(),
     ),

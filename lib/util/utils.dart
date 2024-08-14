@@ -10,5 +10,12 @@ class Utils{
   );
   return formatter.format(value);
 }
-
+static String formatCurrencyDouble(double input) {
+    final NumberFormat formatter = NumberFormat.currency(
+      locale: 'id',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    );
+    return formatter.format(input);
+  }
 }
