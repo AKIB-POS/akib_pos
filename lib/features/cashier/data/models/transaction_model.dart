@@ -20,6 +20,7 @@ class TransactionModel {
     List<SelectedVariant>? selectedVariants,
     List<SelectedAddition>? selectedAdditions,
     String? notes,
+    String? savedNotes,
     int? quantity,
   }) {
     return TransactionModel(
@@ -28,6 +29,30 @@ class TransactionModel {
       selectedAdditions: selectedAdditions ?? this.selectedAdditions,
       notes: notes ?? this.notes,
       quantity: quantity ?? this.quantity,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'product': product.toJson(),
+      'selectedVariants': selectedVariants.map((v) => v.toJson()).toList(),
+      'selectedAdditions': selectedAdditions.map((a) => a.toJson()).toList(),
+      'notes': notes,
+      'quantity': quantity,
+    };
+  }
+
+  factory TransactionModel.fromJson(Map<String, dynamic> json) {
+    return TransactionModel(
+      product: ProductModel.fromJson(json['product']),
+      selectedVariants: (json['selectedVariants'] as List)
+          .map((v) => SelectedVariant.fromJson(v))
+          .toList(),
+      selectedAdditions: (json['selectedAdditions'] as List)
+          .map((a) => SelectedAddition.fromJson(a))
+          .toList(),
+      notes: json['notes'],
+      quantity: json['quantity'],
     );
   }
 

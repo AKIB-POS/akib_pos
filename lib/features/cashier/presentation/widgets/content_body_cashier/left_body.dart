@@ -1,8 +1,8 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
-import 'package:akib_pos/features/cashier/presentation/widgets/category_drop_down.dart';
-import 'package:akib_pos/features/cashier/presentation/widgets/menu_grid.dart';
-import 'package:akib_pos/features/cashier/presentation/widgets/sub_category_list.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/category_drop_down.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/menu_grid.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/sub_category_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

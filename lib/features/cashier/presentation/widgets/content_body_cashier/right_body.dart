@@ -1,8 +1,12 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/features/cashier/data/models/full_transaction_models.dart';
+import 'package:akib_pos/features/cashier/data/models/transaction_model.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/process_transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
-import 'package:akib_pos/features/cashier/presentation/widgets/product_dialog.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/transaction/product_dialog.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/transaction/save_transaction_dialog.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
@@ -49,8 +53,8 @@ class RightBody extends StatelessWidget {
                                 children: [
                                   ExtendedImage.network(
                                     transaction.product.imageUrl,
-                                    width: 90,
-                                    height: 90,
+                                    width: 80,
+                                    height: 80,
                                     fit: BoxFit.fill,
                                     cache: true,
                                     shape: BoxShape.rectangle,
@@ -197,7 +201,8 @@ class RightBody extends StatelessWidget {
                     ),
                   ],
                 ),
-                padding: EdgeInsets.only(left: 16,right: 12, top: 0,bottom: 2),
+                padding:
+                    EdgeInsets.only(left: 16, right: 12, top: 0, bottom: 2),
                 child: AnimatedCrossFade(
                   firstChild: Container(
                     decoration: BoxDecoration(
@@ -214,16 +219,20 @@ class RightBody extends StatelessWidget {
                   ),
                   secondChild: BlocBuilder<TransactionCubit, TransactionState>(
                     builder: (context, state) {
-                      return Visibility(  
+                      return Visibility(
                         visible: processState.isDetailsVisible,
                         child: Container(
                           margin: EdgeInsets.only(top: 16),
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: AppColors.textGrey300.withOpacity(0.8)),
-                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: AppColors.textGrey300.withOpacity(0.8)),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                           child: Column(
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text('Subtotal', style: AppTextStyle.body3),
                                   Text(
@@ -234,16 +243,22 @@ class RightBody extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text('Diskon', style: AppTextStyle.body3),
-                                  Text(Utils.formatCurrencyDouble(_calculateDiscount(
-                                  context.read<TransactionCubit>().state)),style: AppTextStyle.body3),
+                                  Text(
+                                      Utils.formatCurrencyDouble(
+                                          _calculateDiscount(context
+                                              .read<TransactionCubit>()
+                                              .state)),
+                                      style: AppTextStyle.body3),
                                 ],
                               ),
                               const SizedBox(height: 4),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text('Pajak(PPN)', style: AppTextStyle.body3),
                                   Text(Utils.formatCurrencyDouble(state.tax),
@@ -272,20 +287,20 @@ class RightBody extends StatelessWidget {
                     const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                 child: Column(
                   children: [
-                    Row(
-                      children: [
-                        Text(
-                          'Total (${context.read<TransactionCubit>().state.transactions.length})',
-                          style: AppTextStyle.headline6,
-                        ),
-                        const SizedBox(width: 2),
-                        GestureDetector(
-                          onTap: () {
-                            context
-                                .read<ProcessTransactionCubit>()
-                                .toggleDetailsVisibility();
-                          },
-                          child: BlocBuilder<ProcessTransactionCubit,
+                    GestureDetector(
+                      onTap: () {
+                        context
+                            .read<ProcessTransactionCubit>()
+                            .toggleDetailsVisibility();
+                      },
+                      child: Row(
+                        children: [
+                          Text(
+                            'Total (${context.read<TransactionCubit>().state.transactions.length})',
+                            style: AppTextStyle.headline6,
+                          ),
+                          const SizedBox(width: 2),
+                          BlocBuilder<ProcessTransactionCubit,
                               ProcessTransactionState>(
                             builder: (context, state) {
                               return Icon(
@@ -296,18 +311,18 @@ class RightBody extends StatelessWidget {
                               );
                             },
                           ),
-                        ),
-                        Spacer(),
-                        Row(
-                          children: [
-                            Text(
-                              Utils.formatCurrencyDouble(_calculateTotal(
-                                  context.read<TransactionCubit>().state)),
-                              style: AppTextStyle.headline6,
-                            ),
-                          ],
-                        ),
-                      ],
+                          Spacer(),
+                          Row(
+                            children: [
+                              Text(
+                                Utils.formatCurrencyDouble(_calculateTotal(
+                                    context.read<TransactionCubit>().state)),
+                                style: AppTextStyle.headline6,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Row(
@@ -322,10 +337,38 @@ class RightBody extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            onPressed: () {
-                              // Handle Simpan action
+                            onPressed: () async {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return SaveTransactionDialog(
+                                    onSave: (notes) async {
+                                      List<TransactionModel> transactions =
+                                          context
+                                              .read<TransactionCubit>()
+                                              .state
+                                              .transactions;
+
+                                      await context
+                                          .read<TransactionCubit>()
+                                          .saveFullTransaction(
+                                              transactions, notes);
+                                      // Get the saved full transactions count and update the badge count
+                                      List<FullTransactionModel>
+                                          savedFullTransactions = await context
+                                              .read<TransactionCubit>()
+                                              .getFullTransactions();
+                                      context
+                                          .read<BadgeCubit>()
+                                          .updateBadgeCount();
+                                    },
+                                  );
+                                },
+                              );
                             },
-                            child:  Text('Simpan',style: AppTextStyle.headline5.copyWith(color: AppColors.primaryMain)),
+                            child: Text('Simpan',
+                                style: AppTextStyle.headline5
+                                    .copyWith(color: AppColors.primaryMain)),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -341,7 +384,9 @@ class RightBody extends StatelessWidget {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 )),
-                            child:  Text('Bayar',style: AppTextStyle.headline5.copyWith(color: Colors.white)),
+                            child: Text('Bayar',
+                                style: AppTextStyle.headline5
+                                    .copyWith(color: Colors.white)),
                           ),
                         ),
                       ],
@@ -356,7 +401,6 @@ class RightBody extends StatelessWidget {
     );
   }
 
-  
   double _calculateSubtotal(TransactionState state) {
     print("${state.transactions}");
     return state.transactions.fold(
@@ -364,24 +408,25 @@ class RightBody extends StatelessWidget {
   }
 
   double _calculateDiscount(TransactionState state) {
-  final subtotal = _calculateSubtotal(state);
+    final subtotal = _calculateSubtotal(state);
 
-  double discountAmount = state.discount;
-  if (state.voucher != null) {
-    if (state.voucher!.type == 'nominal') {
-      discountAmount += state.voucher!.amount;
-    } else if (state.voucher!.type == 'percentage') {
-      discountAmount += (subtotal * state.voucher!.amount / 100);
+    double discountAmount = state.discount;
+    if (state.voucher != null) {
+      if (state.voucher!.type == 'nominal') {
+        discountAmount += state.voucher!.amount;
+      } else if (state.voucher!.type == 'percentage') {
+        discountAmount += (subtotal * state.voucher!.amount / 100);
+      }
     }
+
+    return discountAmount;
   }
 
-  return discountAmount;
-}
-
- double _calculateTotal(TransactionState state) {
-  final subtotal = _calculateSubtotal(state);
-  final discount = _calculateDiscount(state);
-  final tax = state.tax;
-  return (subtotal - discount + tax);
-}
+  double _calculateTotal(TransactionState state) {
+    print("apa statenya ${state.transactions}");
+    final subtotal = _calculateSubtotal(state);
+    final discount = _calculateDiscount(state);
+    final tax = state.tax;
+    return (subtotal - discount + tax);
+  }
 }

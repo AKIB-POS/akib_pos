@@ -1,6 +1,8 @@
 import 'package:akib_pos/features/cashier/data/repositories/kasir_repository.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
-import 'package:akib_pos/features/cashier/presentation/widgets/voucher_dialog.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/transaction/saved_transactions_dialog.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/transaction/voucher_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
@@ -8,6 +10,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sizer/sizer.dart';
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:badges/badges.dart' as badges;
 
 class AppBarContent extends StatelessWidget {
   final TextEditingController _controller = TextEditingController();
@@ -87,12 +90,14 @@ class AppBarContent extends StatelessWidget {
     );
   }
 
-  Expanded appBarLeft(TextEditingController controller, BuildContext context, FocusNode focusNode) {
+  Expanded appBarLeft(TextEditingController controller, BuildContext context,
+      FocusNode focusNode) {
     return Expanded(
       flex: 5,
       child: Container(
         color: AppColors.backgroundGrey,
         margin: const EdgeInsets.only(top: 20, left: 8),
+        padding: EdgeInsets.only(right: 8),
         child: Row(
           children: [
             Builder(
@@ -158,12 +163,30 @@ class AppBarContent extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 2),
-            Container(
-              height: 50.0,
-              child: Center(
-                child: SvgPicture.asset(
-                  "assets/icons/ic_save.svg",
-                ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: BlocBuilder<BadgeCubit, int>(
+                builder: (context, badgeCount) {
+                  context.read<BadgeCubit>().updateBadgeCount();
+                  return badges.Badge(
+                    badgeContent: Text(badgeCount.toString(),
+                        style: TextStyle(color: Colors.white)),
+                    child: GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return SavedTransactionsDialog();
+                          },
+                        );
+                      },
+                      child: SvgPicture.asset(
+                        "assets/icons/ic_save.svg",
+                        height: 50.0,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
             const SizedBox(width: 2),

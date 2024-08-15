@@ -1,7 +1,10 @@
 import 'package:akib_pos/features/cashier/data/datasources/kasir_local_data_source.dart';
 import 'package:akib_pos/features/cashier/data/datasources/kasir_remote_data_source.dart';
+import 'package:akib_pos/features/cashier/data/datasources/transaction_service.dart';
 import 'package:akib_pos/features/cashier/data/repositories/kasir_repository.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/product/product_bloc.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
 import 'package:akib_pos/util/shared_prefs_helper.dart';
 import 'package:get_it/get_it.dart';
@@ -19,6 +22,13 @@ Future<void> init() async {
     () => VoucherCubit(sl()),
   );
 
+  sl.registerFactory(
+    () => TransactionCubit(sl()),
+  );
+  sl.registerFactory(
+    () => BadgeCubit(sl()),
+  );
+
   // Repository
   sl.registerLazySingleton<KasirRepository>(
     () => KasirRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),
@@ -31,6 +41,9 @@ Future<void> init() async {
 
   sl.registerLazySingleton<KasirLocalDataSource>(
     () => KasirLocalDataSource(sharedPreferences: sl()),
+  );
+  sl.registerLazySingleton<TransactionService>(
+    () => TransactionService(sharedPreferences: sl()),
   );
 
   //! Core

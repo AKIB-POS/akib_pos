@@ -3,7 +3,7 @@ import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/cashier/data/models/menu_item_exmpl.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
-import 'package:akib_pos/features/cashier/presentation/widgets/product_dialog.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/transaction/product_dialog.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

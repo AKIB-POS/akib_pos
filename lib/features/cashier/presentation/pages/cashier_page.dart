@@ -1,5 +1,5 @@
-import 'package:akib_pos/features/cashier/presentation/widgets/left_body.dart';
-import 'package:akib_pos/features/cashier/presentation/widgets/right_body.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/left_body.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/right_body.dart';
 import 'package:flutter/material.dart';
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/features/home/widget/my_drawer.dart';

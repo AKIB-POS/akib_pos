@@ -1,5 +1,7 @@
+import 'package:akib_pos/features/cashier/data/datasources/transaction_service.dart';
 import 'package:akib_pos/features/cashier/data/models/addition_model.dart';
 import 'package:akib_pos/features/cashier/data/models/addition_option.dart';
+import 'package:akib_pos/features/cashier/data/models/full_transaction_models.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
 import 'package:akib_pos/features/cashier/data/models/redeem_voucher_response.dart';
 import 'package:akib_pos/features/cashier/data/models/varian_option.dart';
@@ -55,7 +57,9 @@ class TransactionState {
 
 
 class TransactionCubit extends Cubit<TransactionState> {
-  TransactionCubit()
+  final TransactionService transactionService;
+
+  TransactionCubit(this.transactionService)
       : super(TransactionState(
           selectedVariants: [],
           selectedAdditions: [],
@@ -63,6 +67,33 @@ class TransactionCubit extends Cubit<TransactionState> {
           quantity: 1,
           transactions: [],
         ));
+
+  
+  Future<void> saveFullTransaction(List<TransactionModel> transactions, String notes) async {
+    FullTransactionModel fullTransaction = FullTransactionModel(
+      transactions: transactions,
+      savedNotes: notes,
+      time: DateTime.now()
+    );
+
+    await transactionService.saveFullTransaction(fullTransaction);
+    emit(state.copyWith(transactions: [])); 
+  }
+
+  Future<List<FullTransactionModel>> getFullTransactions() async {
+    return await transactionService.getFullTransactions();
+  }
+
+   Future<void> loadFullTransactions(FullTransactionModel fullTransaction) async {
+    final allTransactions = fullTransaction.transactions;
+    emit(state.copyWith(transactions: allTransactions));
+  }
+
+  Future<void> removeFullTransaction(FullTransactionModel fullTransaction) async {
+    await transactionService.removeFullTransaction(fullTransaction);
+    await loadFullTransactions(fullTransaction);
+  }
+  
 
   void updateVoucher(VoucherData? voucher) {
     emit(state.copyWith(voucher: voucher));

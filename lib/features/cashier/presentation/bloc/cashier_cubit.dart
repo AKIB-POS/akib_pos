@@ -23,7 +23,6 @@ class CashierCubit extends Cubit<CashierState> {
     emit(state.copyWith(isLoading: true));
     try {
       await _fetchDataFromApi();
-
       final categories = await localDataSource.getCachedCategories();
       final subCategories = await localDataSource.getCachedSubCategories();
       final products = await localDataSource.getCachedProducts();
