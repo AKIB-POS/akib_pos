@@ -12,6 +12,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:sizer/sizer.dart';
 
 class RightBody extends StatelessWidget {
   @override
@@ -34,8 +35,35 @@ class RightBody extends StatelessWidget {
             child: BlocBuilder<TransactionCubit, TransactionState>(
               builder: (context, state) {
                 if (state.transactions.isEmpty) {
-                  return const Center(child: Text("No transactions yet"));
-                }
+        return SingleChildScrollView(
+          child: Container(
+            alignment: Alignment.center, // Center the content in the container
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: 8.h,),
+                SvgPicture.asset(
+                  "assets/images/empty_cart.svg",
+                  height: 12.h,
+                  width: 12.h,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Belum ada transaksi',
+                  style: AppTextStyle.headline6,
+                ),
+                const Text(
+                  'Silahkan tambahkan produk ke keranjang\nmelalui katalog yang ada',
+                  style: AppTextStyle.body3,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        );
+      }
                 return ListView.builder(
                   itemCount: state.transactions.length,
                   itemBuilder: (context, index) {
@@ -89,7 +117,7 @@ class RightBody extends StatelessWidget {
                                                       color: AppColors
                                                           .primaryMain)),
                                           const SizedBox(width: 4),
-                                          Icon(
+                                          const Icon(
                                             Icons.edit,
                                             color: AppColors.primaryMain,
                                             size: 16,
@@ -197,12 +225,12 @@ class RightBody extends StatelessWidget {
                       color: Colors.black.withOpacity(0.1),
                       spreadRadius: 1,
                       blurRadius: 5,
-                      offset: Offset(0, -3),
+                      offset: const Offset(0, -3),
                     ),
                   ],
                 ),
-                padding:
-                    EdgeInsets.only(left: 16, right: 12, top: 0, bottom: 2),
+                padding: const EdgeInsets.only(
+                    left: 16, right: 12, top: 0, bottom: 2),
                 child: AnimatedCrossFade(
                   firstChild: Container(
                     decoration: BoxDecoration(
@@ -212,7 +240,7 @@ class RightBody extends StatelessWidget {
                           color: Colors.black.withOpacity(0.1),
                           spreadRadius: 1,
                           blurRadius: 5,
-                          offset: Offset(0, -3),
+                          offset: const Offset(0, -3),
                         ),
                       ],
                     ),
@@ -222,19 +250,20 @@ class RightBody extends StatelessWidget {
                       return Visibility(
                         visible: processState.isDetailsVisible,
                         child: Container(
-                          margin: EdgeInsets.only(top: 16),
+                          margin: const EdgeInsets.only(top: 16),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
                               color: AppColors.textGrey300.withOpacity(0.8)),
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 8),
                           child: Column(
                             children: [
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text('Subtotal', style: AppTextStyle.body3),
+                                  const Text('Subtotal',
+                                      style: AppTextStyle.body3),
                                   Text(
                                       Utils.formatCurrencyDouble(
                                           _calculateSubtotal(state)),
@@ -246,7 +275,8 @@ class RightBody extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text('Diskon', style: AppTextStyle.body3),
+                                  const Text('Diskon',
+                                      style: AppTextStyle.body3),
                                   Text(
                                       Utils.formatCurrencyDouble(
                                           _calculateDiscount(context
@@ -260,7 +290,8 @@ class RightBody extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text('Pajak(PPN)', style: AppTextStyle.body3),
+                                  const Text('Pajak(PPN)',
+                                      style: AppTextStyle.body3),
                                   Text(Utils.formatCurrencyDouble(state.tax),
                                       style: AppTextStyle.body3),
                                 ],
@@ -281,6 +312,7 @@ class RightBody extends StatelessWidget {
           ),
           BlocBuilder<TransactionCubit, TransactionState>(
             builder: (context, state) {
+              final isEmpty = state.transactions.isEmpty;
               return Container(
                 color: Colors.white,
                 padding:
@@ -311,7 +343,7 @@ class RightBody extends StatelessWidget {
                               );
                             },
                           ),
-                          Spacer(),
+                          const Spacer(),
                           Row(
                             children: [
                               Text(
@@ -332,43 +364,54 @@ class RightBody extends StatelessWidget {
                           child: OutlinedButton(
                             style: OutlinedButton.styleFrom(
                               side: BorderSide(
-                                  color: Theme.of(context).primaryColor),
+                                color: isEmpty
+                                    ? Colors.grey
+                                    : Theme.of(context).primaryColor,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            onPressed: () async {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return SaveTransactionDialog(
-                                    onSave: (notes) async {
-                                      List<TransactionModel> transactions =
-                                          context
-                                              .read<TransactionCubit>()
-                                              .state
-                                              .transactions;
+                            onPressed: isEmpty
+                                ? null
+                                : () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return SaveTransactionDialog(
+                                          onSave: (notes) async {
+                                            List<TransactionModel>
+                                                transactions = context
+                                                    .read<TransactionCubit>()
+                                                    .state
+                                                    .transactions;
 
-                                      await context
-                                          .read<TransactionCubit>()
-                                          .saveFullTransaction(
-                                              transactions, notes);
-                                      // Get the saved full transactions count and update the badge count
-                                      List<FullTransactionModel>
-                                          savedFullTransactions = await context
-                                              .read<TransactionCubit>()
-                                              .getFullTransactions();
-                                      context
-                                          .read<BadgeCubit>()
-                                          .updateBadgeCount();
-                                    },
-                                  );
-                                },
-                              );
-                            },
-                            child: Text('Simpan',
-                                style: AppTextStyle.headline5
-                                    .copyWith(color: AppColors.primaryMain)),
+                                            await context
+                                                .read<TransactionCubit>()
+                                                .saveFullTransaction(
+                                                    transactions, notes);
+                                            // Get the saved full transactions count and update the badge count
+                                            List<FullTransactionModel>
+                                                savedFullTransactions =
+                                                await context
+                                                    .read<TransactionCubit>()
+                                                    .getFullTransactions();
+                                            context
+                                                .read<BadgeCubit>()
+                                                .updateBadgeCount();
+                                          },
+                                        );
+                                      },
+                                    );
+                                  },
+                            child: Text(
+                              'Simpan',
+                              style: AppTextStyle.headline5.copyWith(
+                                color: isEmpty
+                                    ? Colors.grey
+                                    : AppColors.primaryMain,
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -379,11 +422,13 @@ class RightBody extends StatelessWidget {
                               // Handle Bayar action
                             },
                             style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primaryMain,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                )),
+                              backgroundColor:
+                                  isEmpty ? Colors.grey : AppColors.primaryMain,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
                             child: Text('Bayar',
                                 style: AppTextStyle.headline5
                                     .copyWith(color: Colors.white)),

@@ -10,6 +10,7 @@ class CashierPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.backgroundGrey,
       drawer: MyDrawer(),
       appBar: AppBar(

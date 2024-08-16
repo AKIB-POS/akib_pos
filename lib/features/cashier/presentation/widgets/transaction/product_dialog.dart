@@ -24,7 +24,8 @@ class ProductDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (editIndex != null) {
-      final transaction = context.read<TransactionCubit>().state.transactions[editIndex!];
+      final transaction =
+          context.read<TransactionCubit>().state.transactions[editIndex!];
       context.read<TransactionCubit>().setInitialStateForEdit(transaction);
     } else {
       context.read<TransactionCubit>().resetState();
@@ -34,10 +35,12 @@ class ProductDialog extends StatelessWidget {
     final variants = context.read<CashierCubit>().state.variants;
     final productAddition = additions.firstWhere(
         (addition) => addition.id == product.additionId,
-        orElse: () => AdditionModel(id: 0, additionType: 'None', subAdditions: []));
+        orElse: () =>
+            AdditionModel(id: 0, additionType: 'None', subAdditions: []));
     final productVariant = variants.firstWhere(
         (variant) => variant.id == product.variantId,
-        orElse: () => VariantModel(id: 0, variantType: 'None', subVariants: []));
+        orElse: () =>
+            VariantModel(id: 0, variantType: 'None', subVariants: []));
 
     return Dialog(
       backgroundColor: Colors.white,
@@ -49,7 +52,7 @@ class ProductDialog extends StatelessWidget {
             final currentQuantity = editIndex != null
                 ? state.transactions[editIndex!].quantity
                 : state.quantity;
-                
+
             return Column(
               children: [
                 Container(
@@ -69,7 +72,8 @@ class ProductDialog extends StatelessWidget {
                     ],
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -77,35 +81,66 @@ class ProductDialog extends StatelessWidget {
                         IconButton(
                           icon: const Icon(Icons.close, color: Colors.black),
                           onPressed: () {
-                            int totalPrice = product.price * context.read<TransactionCubit>().state.quantity;
+                            int totalPrice = product.price *
+                                context.read<TransactionCubit>().state.quantity;
 
-                      // Add variant prices if any
-                      context.read<TransactionCubit>().state.selectedVariants.forEach((variant) {
-                        totalPrice += variant.price * context.read<TransactionCubit>().state.quantity;
-                      });
+                            // Add variant prices if any
+                            context
+                                .read<TransactionCubit>()
+                                .state
+                                .selectedVariants
+                                .forEach((variant) {
+                              totalPrice += variant.price *
+                                  context
+                                      .read<TransactionCubit>()
+                                      .state
+                                      .quantity;
+                            });
 
-                      // Add addition prices if any
-                      context.read<TransactionCubit>().state.selectedAdditions.forEach((addition) {
-                        totalPrice += addition.price * context.read<TransactionCubit>().state.quantity;
-                      });
+                            // Add addition prices if any
+                            context
+                                .read<TransactionCubit>()
+                                .state
+                                .selectedAdditions
+                                .forEach((addition) {
+                              totalPrice += addition.price *
+                                  context
+                                      .read<TransactionCubit>()
+                                      .state
+                                      .quantity;
+                            });
 
-                      final transaction = TransactionModel(
-                        product: product,
-                        selectedVariants: context.read<TransactionCubit>().state.selectedVariants,
-                        selectedAdditions: context.read<TransactionCubit>().state.selectedAdditions,
-                        notes: context.read<TransactionCubit>().state.notes,
-                        quantity: context.read<TransactionCubit>().state.quantity,
-                      );
+                            final transaction = TransactionModel(
+                              product: product,
+                              selectedVariants: context
+                                  .read<TransactionCubit>()
+                                  .state
+                                  .selectedVariants,
+                              selectedAdditions: context
+                                  .read<TransactionCubit>()
+                                  .state
+                                  .selectedAdditions,
+                              notes:
+                                  context.read<TransactionCubit>().state.notes,
+                              quantity: context
+                                  .read<TransactionCubit>()
+                                  .state
+                                  .quantity,
+                            );
 
-                      if (editIndex != null) {
-                        context.read<TransactionCubit>().updateTransaction(editIndex!, transaction);
-                      } else {
-                        context.read<TransactionCubit>().addTransaction(transaction);
-                      }
+                            if (editIndex != null) {
+                              context
+                                  .read<TransactionCubit>()
+                                  .updateTransaction(editIndex!, transaction);
+                            } else {
+                              context
+                                  .read<TransactionCubit>()
+                                  .addTransaction(transaction);
+                            }
 
-                      print('Transaction details: $transaction');
+                            print('Transaction details: $transaction');
 
-                      Navigator.of(context).pop();
+                            Navigator.of(context).pop();
                           },
                         ),
                       ],
@@ -128,15 +163,20 @@ class ProductDialog extends StatelessWidget {
                                 fit: BoxFit.fill,
                                 cache: true,
                                 shape: BoxShape.rectangle,
-                                borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(8.0)),
                               ),
                               const SizedBox(width: 16),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(product.name, style: AppTextStyle.headline6),
+                                  Text(product.name,
+                                      style: AppTextStyle.headline6),
                                   const SizedBox(height: 2),
-                                  Text(Utils.formatCurrency(product.price.toString()), style: AppTextStyle.body3),
+                                  Text(
+                                      Utils.formatCurrency(
+                                          product.price.toString()),
+                                      style: AppTextStyle.body3),
                                 ],
                               ),
                             ],
@@ -150,38 +190,83 @@ class ProductDialog extends StatelessWidget {
                                   Expanded(
                                     flex: productAddition.id != 0 ? 1 : 2,
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        ...productVariant.subVariants.map((subVariant) {
+                                        ...productVariant.subVariants
+                                            .map((subVariant) {
                                           return Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Text(subVariant.subVariantType, style: AppTextStyle.headline6.copyWith(color: AppColors.primaryMain)),
-                                              ...subVariant.options.map((option) {
-                                                return BlocBuilder<TransactionCubit, TransactionState>(
+                                              Text(subVariant.subVariantType,
+                                                  style: AppTextStyle.headline6
+                                                      .copyWith(
+                                                          color: AppColors
+                                                              .primaryMain)),
+                                              ...subVariant.options
+                                                  .map((option) {
+                                                return BlocBuilder<
+                                                    TransactionCubit,
+                                                    TransactionState>(
                                                   builder: (context, state) {
-                                                    final selected = state.selectedVariants.any((v) => v.name == option.name);
-                                                    final currentSelectedVariantName = state.selectedVariants.isNotEmpty
-                                                        ? state.selectedVariants.first.name
-                                                        : null;
+                                                    // Check if the current option is selected based on both name and subVariantType
+                                                    final selected = state
+                                                        .selectedVariants
+                                                        .any((v) =>
+                                                            v.name ==
+                                                                option.name &&
+                                                            v.subVariantType ==
+                                                                subVariant
+                                                                    .subVariantType);
 
                                                     return RadioListTile(
-                                                      title: Text(option.name, style: AppTextStyle.headline6),
-                                                      subtitle: Text("+ ${Utils.formatCurrency(option.price.toString())}", style: AppTextStyle.body3),
+                                                      title: Text(option.name,
+                                                          style: AppTextStyle
+                                                              .headline6),
+                                                      subtitle: Text(
+                                                          "+ ${Utils.formatCurrency(option.price.toString())}",
+                                                          style: AppTextStyle
+                                                              .body3),
                                                       value: option.name,
-                                                      groupValue: currentSelectedVariantName,
+                                                      groupValue: selected
+                                                          ? option.name
+                                                          : null,
                                                       dense: true,
-                                                      activeColor: AppColors.primaryMain,
+                                                      activeColor:
+                                                          AppColors.primaryMain,
                                                       toggleable: true,
-                                                      visualDensity: VisualDensity.compact,
+                                                      visualDensity:
+                                                          VisualDensity.compact,
                                                       onChanged: (value) {
                                                         if (selected) {
-                                                          context.read<TransactionCubit>().deselectVariant(SelectedVariant(name: option.name, price: option.price));
+                                                          context
+                                                              .read<
+                                                                  TransactionCubit>()
+                                                              .deselectVariant(SelectedVariant(
+                                                                  name: option
+                                                                      .name,
+                                                                  price: option
+                                                                      .price,
+                                                                  subVariantType:
+                                                                      subVariant
+                                                                          .subVariantType));
                                                         } else {
-                                                          context.read<TransactionCubit>().selectVariant(SelectedVariant(name: option.name, price: option.price));
+                                                          context
+                                                              .read<
+                                                                  TransactionCubit>()
+                                                              .selectVariant(SelectedVariant(
+                                                                  name: option
+                                                                      .name,
+                                                                  price: option
+                                                                      .price,
+                                                                  subVariantType:
+                                                                      subVariant
+                                                                          .subVariantType));
                                                         }
                                                       },
-                                                      contentPadding: EdgeInsets.zero,
+                                                      contentPadding:
+                                                          EdgeInsets.zero,
                                                     );
                                                   },
                                                 );
@@ -196,32 +281,70 @@ class ProductDialog extends StatelessWidget {
                                   Expanded(
                                     flex: productVariant.id != 0 ? 1 : 2,
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        ...productAddition.subAdditions.map((subAddition) {
+                                        ...productAddition.subAdditions
+                                            .map((subAddition) {
                                           return Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Text(subAddition.subAdditionType, style: AppTextStyle.headline6.copyWith(color: AppColors.primaryMain)),
-                                              ...subAddition.options.map((option) {
-                                                return BlocBuilder<TransactionCubit, TransactionState>(
+                                              Text(subAddition.subAdditionType,
+                                                  style: AppTextStyle.headline6
+                                                      .copyWith(
+                                                          color: AppColors
+                                                              .primaryMain)),
+                                              ...subAddition.options
+                                                  .map((option) {
+                                                return BlocBuilder<
+                                                    TransactionCubit,
+                                                    TransactionState>(
                                                   builder: (context, state) {
-                                                    final selected = state.selectedAdditions.any((a) => a.name == option.name);
+                                                    final selected = state
+                                                        .selectedAdditions
+                                                        .any((a) =>
+                                                            a.name ==
+                                                            option.name);
                                                     return CheckboxListTile(
-                                                      title: Text(option.name, style: AppTextStyle.headline6),
-                                                      subtitle: Text("+ ${Utils.formatCurrency(option.price.toString())}", style: AppTextStyle.body3),
+                                                      title: Text(option.name,
+                                                          style: AppTextStyle
+                                                              .headline6),
+                                                      subtitle: Text(
+                                                          "+ ${Utils.formatCurrency(option.price.toString())}",
+                                                          style: AppTextStyle
+                                                              .body3),
                                                       value: selected,
                                                       dense: true,
-                                                      activeColor: AppColors.primaryMain,
-                                                      visualDensity: VisualDensity.compact,
+                                                      activeColor:
+                                                          AppColors.primaryMain,
+                                                      visualDensity:
+                                                          VisualDensity.compact,
                                                       onChanged: (value) {
                                                         if (selected) {
-                                                          context.read<TransactionCubit>().deselectAddition(SelectedAddition(name: option.name, price: option.price));
+                                                          context
+                                                              .read<
+                                                                  TransactionCubit>()
+                                                              .deselectAddition(
+                                                                  SelectedAddition(
+                                                                      name: option
+                                                                          .name,
+                                                                      price: option
+                                                                          .price));
                                                         } else {
-                                                          context.read<TransactionCubit>().selectAddition(SelectedAddition(name: option.name, price: option.price));
+                                                          context
+                                                              .read<
+                                                                  TransactionCubit>()
+                                                              .selectAddition(
+                                                                  SelectedAddition(
+                                                                      name: option
+                                                                          .name,
+                                                                      price: option
+                                                                          .price));
                                                         }
                                                       },
-                                                      contentPadding: EdgeInsets.zero,
+                                                      contentPadding:
+                                                          EdgeInsets.zero,
                                                     );
                                                   },
                                                 );
@@ -238,7 +361,9 @@ class ProductDialog extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Catatan', style: AppTextStyle.headline6.copyWith(color: AppColors.primaryMain)),
+                              Text('Catatan',
+                                  style: AppTextStyle.headline6
+                                      .copyWith(color: AppColors.primaryMain)),
                               const SizedBox(height: 8),
                               BlocBuilder<TransactionCubit, TransactionState>(
                                 builder: (context, state) {
@@ -248,18 +373,23 @@ class ProductDialog extends StatelessWidget {
                                       fillColor: AppColors.textGrey200,
                                       filled: true,
                                       border: OutlineInputBorder(
-                                        borderSide: BorderSide(color: AppColors.textGrey500),
+                                        borderSide: BorderSide(
+                                            color: AppColors.textGrey500),
                                       ),
                                       enabledBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(color: AppColors.textGrey500),
+                                        borderSide: BorderSide(
+                                            color: AppColors.textGrey500),
                                       ),
                                       focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(color: AppColors.primaryMain),
+                                        borderSide: BorderSide(
+                                            color: AppColors.primaryMain),
                                       ),
                                       hintText: 'Masukkan catatan tambahan',
                                     ),
                                     onChanged: (value) {
-                                      context.read<TransactionCubit>().updateNotes(value);
+                                      context
+                                          .read<TransactionCubit>()
+                                          .updateNotes(value);
                                     },
                                   );
                                 },
@@ -270,29 +400,42 @@ class ProductDialog extends StatelessWidget {
                                   color: AppColors.backgroundGrey,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 2),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     IconButton(
                                       icon: SvgPicture.asset(
                                         "assets/icons/ic_minus.svg",
                                         height: 38,
                                         width: 38,
-                                        color: currentQuantity > 1 ? null : Colors.grey,
+                                        color: currentQuantity > 1
+                                            ? null
+                                            : Colors.grey,
                                       ),
-                                      onPressed: currentQuantity > 1 ? () {
-                                        if (editIndex != null) {
-                                          context.read<TransactionCubit>().subtractQuantity(editIndex!);
-                                        } else {
-                                          if (currentQuantity > 1) {
-                                            context.read<TransactionCubit>().updateQuantity(currentQuantity - 1);
-                                          }
-                                        }
-                                      } : null,
+                                      onPressed: currentQuantity > 1
+                                          ? () {
+                                              if (editIndex != null) {
+                                                context
+                                                    .read<TransactionCubit>()
+                                                    .subtractQuantity(
+                                                        editIndex!);
+                                              } else {
+                                                if (currentQuantity > 1) {
+                                                  context
+                                                      .read<TransactionCubit>()
+                                                      .updateQuantity(
+                                                          currentQuantity - 1);
+                                                }
+                                              }
+                                            }
+                                          : null,
                                     ),
                                     const SizedBox(width: 16),
-                                    Text(currentQuantity.toString(), style: AppTextStyle.headline6),
+                                    Text(currentQuantity.toString(),
+                                        style: AppTextStyle.headline6),
                                     const SizedBox(width: 16),
                                     IconButton(
                                       icon: SvgPicture.asset(
@@ -302,9 +445,14 @@ class ProductDialog extends StatelessWidget {
                                       ),
                                       onPressed: () {
                                         if (editIndex != null) {
-                                          context.read<TransactionCubit>().addQuantity(editIndex!);
+                                          context
+                                              .read<TransactionCubit>()
+                                              .addQuantity(editIndex!);
                                         } else {
-                                          context.read<TransactionCubit>().updateQuantity(currentQuantity + 1);
+                                          context
+                                              .read<TransactionCubit>()
+                                              .updateQuantity(
+                                                  currentQuantity + 1);
                                         }
                                       },
                                     ),
@@ -339,7 +487,8 @@ class ProductDialog extends StatelessWidget {
                   ),
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: const WidgetStatePropertyAll<Color>(AppColors.primaryMain),
+                      backgroundColor: const WidgetStatePropertyAll<Color>(
+                          AppColors.primaryMain),
                       padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
                         EdgeInsets.symmetric(vertical: 16),
                       ),
@@ -350,30 +499,52 @@ class ProductDialog extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      int totalPrice = product.price * context.read<TransactionCubit>().state.quantity;
+                      int totalPrice = product.price *
+                          context.read<TransactionCubit>().state.quantity;
 
                       // Add variant prices if any
-                      context.read<TransactionCubit>().state.selectedVariants.forEach((variant) {
-                        totalPrice += variant.price * context.read<TransactionCubit>().state.quantity;
+                      context
+                          .read<TransactionCubit>()
+                          .state
+                          .selectedVariants
+                          .forEach((variant) {
+                        totalPrice += variant.price *
+                            context.read<TransactionCubit>().state.quantity;
                       });
 
                       // Add addition prices if any
-                      context.read<TransactionCubit>().state.selectedAdditions.forEach((addition) {
-                        totalPrice += addition.price * context.read<TransactionCubit>().state.quantity;
+                      context
+                          .read<TransactionCubit>()
+                          .state
+                          .selectedAdditions
+                          .forEach((addition) {
+                        totalPrice += addition.price *
+                            context.read<TransactionCubit>().state.quantity;
                       });
 
                       final transaction = TransactionModel(
                         product: product,
-                        selectedVariants: context.read<TransactionCubit>().state.selectedVariants,
-                        selectedAdditions: context.read<TransactionCubit>().state.selectedAdditions,
+                        selectedVariants: context
+                            .read<TransactionCubit>()
+                            .state
+                            .selectedVariants,
+                        selectedAdditions: context
+                            .read<TransactionCubit>()
+                            .state
+                            .selectedAdditions,
                         notes: context.read<TransactionCubit>().state.notes,
-                        quantity: context.read<TransactionCubit>().state.quantity,
+                        quantity:
+                            context.read<TransactionCubit>().state.quantity,
                       );
 
                       if (editIndex != null) {
-                        context.read<TransactionCubit>().updateTransaction(editIndex!, transaction);
+                        context
+                            .read<TransactionCubit>()
+                            .updateTransaction(editIndex!, transaction);
                       } else {
-                        context.read<TransactionCubit>().addTransaction(transaction);
+                        context
+                            .read<TransactionCubit>()
+                            .addTransaction(transaction);
                       }
 
                       print('Transaction details: $transaction');

@@ -108,30 +108,34 @@ class ProductModel {
 
 class SelectedVariant {
   final String name;
-  final int price; // Added field
+  final int price;
+  final String subVariantType; // Add this to ensure uniqueness within a subVariantType
 
   SelectedVariant({
     required this.name,
     required this.price,
+    required this.subVariantType, // Add this to ensure uniqueness within a subVariantType
   });
 
   factory SelectedVariant.fromJson(Map<String, dynamic> json) {
     return SelectedVariant(
       name: json['name'],
       price: int.parse(json['price']),
+      subVariantType: json['sub_variant_type'], // Add this to ensure uniqueness within a subVariantType
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'price': price.toString(),// Added field
+      'price': price.toString(),
+      'sub_variant_type': subVariantType, // Add this to ensure uniqueness within a subVariantType
     };
   }
 
   @override
   String toString() {
-    return 'SelectedVariant{name: $name, price: $price}';
+    return 'SelectedVariant{name: $name, price: $price, subVariantType: $subVariantType}';
   }
 }
 

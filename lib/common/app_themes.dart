@@ -37,6 +37,18 @@ class AppThemes {
       ),
     ],
   );
+  static BoxDecoration allBoxDecorationDialog = BoxDecoration(
+    color: Colors.white,
+    borderRadius: const BorderRadius.all(Radius.circular(10)),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.1),
+        spreadRadius: 2,
+        blurRadius: 5,
+        offset: const Offset(0, 2),
+      ),
+    ],
+  );
 
   static InputDecoration inputDecorationStyle = InputDecoration(
     hintStyle: AppTextStyle.bodyInput.copyWith(color: AppColors.textGrey500),
