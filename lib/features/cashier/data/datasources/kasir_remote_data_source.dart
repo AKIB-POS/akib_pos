@@ -3,6 +3,7 @@ import 'package:akib_pos/api/urls.dart';
 import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/features/cashier/data/models/addition_model.dart';
 import 'package:akib_pos/features/cashier/data/models/category_model.dart';
+import 'package:akib_pos/features/cashier/data/models/member_model.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
 import 'package:akib_pos/features/cashier/data/models/redeem_voucher_response.dart';
 import 'package:akib_pos/features/cashier/data/models/sub_category_model.dart';
@@ -19,6 +20,9 @@ abstract class KasirRemoteDataSource {
   Future<List<AdditionModel>> getAdditions();
   Future<List<VariantModel>> getVariants();
   Future<RedeemVoucherResponse> redeemVoucher(String code);
+  Future<List<MemberModel>> getAllMembers();
+  Future<List<MemberModel>> searchMemberByName(String name);
+  Future<void> postMember(String name, String phoneNumber, {String? email});
 }
 
 class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
@@ -26,6 +30,58 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
   final SharedPrefsHelper sharedPrefsHelper;
 
   KasirRemoteDataSourceImpl({required this.client, required this.sharedPrefsHelper});
+
+  @override
+  Future<void> postMember(String name, String phoneNumber, {String? email}) async {
+    final url = '${URLs.baseUrlMock}/members';
+    final response = await client.post(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'name': name,
+        'phone_number': phoneNumber,
+        'email': email,
+      }),
+    );
+
+    if (response.statusCode != 201) {
+      throw ServerException();
+    }
+  }
+
+   @override
+  Future<List<MemberModel>> getAllMembers() async {
+    final response = await _getFromUrl('${URLs.baseUrlMock}/members');
+    
+    if (response.statusCode != 200) {
+      throw ServerException();
+    }
+
+    return _parseMemberList(response);
+  }
+
+  @override
+  Future<List<MemberModel>> searchMemberByName(String name) async {
+    final response = await _getFromUrl('${URLs.baseUrlMock}/members?name=$name');
+    
+    if (response.statusCode != 200) {
+      throw ServerException();
+    }
+
+    return _parseMemberList(response);
+  }
+
+List<MemberModel> _parseMemberList(http.Response response) {
+  // Decode response body
+  final Map<String, dynamic> decodedResponse = json.decode(response.body);
+
+  // Ambil daftar data member dari kunci "data"
+  final List<dynamic> membersJson = decodedResponse['data'];
+
+  // Parse each item in the list into MemberModel
+  return membersJson.map<MemberModel>((json) => MemberModel.fromJson(json)).toList();
+}
+
 
   @override
   Future<List<ProductModel>> getAllProducts() async {

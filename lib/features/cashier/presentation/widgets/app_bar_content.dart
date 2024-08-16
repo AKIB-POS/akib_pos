@@ -1,6 +1,7 @@
 import 'package:akib_pos/features/cashier/data/repositories/kasir_repository.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/transaction/member_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/saved_transactions_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/voucher_dialog.dart';
 import 'package:flutter/material.dart';
@@ -33,62 +34,77 @@ class AppBarContent extends StatelessWidget {
   }
 
   Expanded appBarRight(BuildContext context) {
-    return Expanded(
-      flex: 3,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 1,
-              offset: const Offset(0, 2),
+  return Expanded(
+    flex: 3,
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 1,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          GestureDetector(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return VoucherDialog();
+                },
+              );
+            },
+            child: SvgPicture.asset(
+              "assets/icons/ic_disc.svg",
+              height: 3.5.h,
+              width: 3.5.w,
             ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            GestureDetector(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return VoucherDialog();
-                  },
-                );
-              },
-              child: SvgPicture.asset(
-                "assets/icons/ic_disc.svg",
-                height: 3.5.h,
-                width: 3.5.w,
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Nama Pelanggan',
-                    style: AppTextStyle.headline5
-                        .copyWith(color: AppColors.textGrey800)),
-                const SizedBox(height: 0.5),
-                Text('No. Order: 0001',
-                    style: AppTextStyle.body3
-                        .copyWith(color: AppColors.textGrey500)),
-              ],
-            ),
-            SvgPicture.asset(
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Nama Pelanggan',
+                  style: AppTextStyle.headline5
+                      .copyWith(color: AppColors.textGrey800)),
+              const SizedBox(height: 0.5),
+              Text('No. Order: 0001',
+                  style: AppTextStyle.body3
+                      .copyWith(color: AppColors.textGrey500)),
+            ],
+          ),
+          GestureDetector(
+            onTap: () {
+              _showMemberDialog(context); // Panggil fungsi untuk menampilkan MemberDialog
+            },
+            child: SvgPicture.asset(
               "assets/icons/ic_note.svg",
               height: 3.5.h,
               width: 3.5.w,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
+void _showMemberDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return MemberDialog(); 
+    },
+  );
+}
+
 
   Expanded appBarLeft(TextEditingController controller, BuildContext context,
       FocusNode focusNode) {

@@ -3,6 +3,7 @@ import 'package:akib_pos/features/cashier/data/datasources/kasir_remote_data_sou
 import 'package:akib_pos/features/cashier/data/datasources/transaction_service.dart';
 import 'package:akib_pos/features/cashier/data/repositories/kasir_repository.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/member/member_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/product/product_bloc.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
@@ -27,6 +28,9 @@ Future<void> init() async {
   );
   sl.registerFactory(
     () => BadgeCubit(sl()),
+  );
+  sl.registerFactory(
+    () => MemberCubit(repository: sl()),
   );
 
   // Repository

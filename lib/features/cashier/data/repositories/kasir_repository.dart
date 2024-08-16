@@ -5,6 +5,7 @@ import 'package:akib_pos/features/cashier/data/datasources/kasir_local_data_sour
 import 'package:akib_pos/features/cashier/data/datasources/kasir_remote_data_source.dart';
 import 'package:akib_pos/features/cashier/data/models/addition_model.dart';
 import 'package:akib_pos/features/cashier/data/models/category_model.dart';
+import 'package:akib_pos/features/cashier/data/models/member_model.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
 import 'package:akib_pos/features/cashier/data/models/redeem_voucher_response.dart';
 import 'package:akib_pos/features/cashier/data/models/sub_category_model.dart';
@@ -18,6 +19,9 @@ abstract class KasirRepository {
   Future<Either<Failure, List<VariantModel>>> getVariants();
   Future<Either<Failure, List<AdditionModel>>> getAdditions();
    Future<Either<Failure, RedeemVoucherResponse>> redeemVoucher(String code);
+  Future<Either<Failure, List<MemberModel>>> getAllMembers(); // Tambahkan metode ini
+  Future<Either<Failure, List<MemberModel>>> searchMemberByName(String name);
+  Future<Either<Failure, void>> postMember(String name, String phoneNumber, {String? email});
 }
 
 class KasirRepositoryImpl implements KasirRepository {
@@ -28,6 +32,36 @@ class KasirRepositoryImpl implements KasirRepository {
     required this.remoteDataSource,
     required this.localDataSource,
   });
+
+   @override
+  Future<Either<Failure, void>> postMember(String name, String phoneNumber, {String? email}) async {
+    try {
+      await remoteDataSource.postMember(name, phoneNumber, email: email);
+      return Right(null);
+    } catch (e) {
+      return Left(ServerFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<MemberModel>>> getAllMembers() async {
+    try {
+      final members = await remoteDataSource.getAllMembers();
+      return Right(members);
+    } catch (e) {
+      return Left(ServerFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<MemberModel>>> searchMemberByName(String name) async {
+    try {
+      final members = await remoteDataSource.searchMemberByName(name);
+      return Right(members);
+    } catch (e) {
+      return Left(ServerFailure());
+    }
+  }
 
   @override
   Future<Either<Failure, List<ProductModel>>> getAllProducts() async {
