@@ -19,7 +19,10 @@ class TransactionState {
   final List<TransactionModel> transactions;
   final double discount;
   final double tax;
-  final VoucherData? voucher; // Add voucher field
+  final VoucherData? voucher;
+  final int? customerId; // Add customer ID
+  final String? customerName;
+  final String? customerPhone; // Add customer name
 
   TransactionState({
     required this.selectedVariants,
@@ -30,6 +33,9 @@ class TransactionState {
     this.discount = 0.0,
     this.tax = 0.0,
     this.voucher,
+    this.customerId,
+    this.customerName,
+    this.customerPhone,
   });
 
   TransactionState copyWith({
@@ -40,7 +46,10 @@ class TransactionState {
     List<TransactionModel>? transactions,
     double? discount,
     double? tax,
-    VoucherData? voucher, // Add voucher parameter
+    VoucherData? voucher,
+    int? customerId, // Add customer ID
+    String? customerName, // Add customer name
+    String? customerPhone, // Add customer name
   }) {
     return TransactionState(
       selectedVariants: selectedVariants ?? this.selectedVariants,
@@ -50,11 +59,13 @@ class TransactionState {
       transactions: transactions ?? this.transactions,
       discount: discount ?? this.discount,
       tax: tax ?? this.tax,
-      voucher: voucher ?? this.voucher, // Assign voucher
+      voucher: voucher ?? this.voucher,
+      customerId: customerId ?? this.customerId, // Assign customer ID
+      customerName: customerName ?? this.customerName,
+      customerPhone: customerPhone ?? this.customerPhone, // Assign customer name
     );
   }
 }
-
 
 class TransactionCubit extends Cubit<TransactionState> {
   final TransactionService transactionService;
@@ -68,32 +79,34 @@ class TransactionCubit extends Cubit<TransactionState> {
           transactions: [],
         ));
 
-  
-  Future<void> saveFullTransaction(List<TransactionModel> transactions, String notes) async {
+  void updateCustomer(int customerId, String customerName, String customerPhone) {
+    emit(state.copyWith(customerId: customerId, customerName: customerName,customerPhone: customerPhone));
+  }
+
+  Future<void> saveFullTransaction(
+      List<TransactionModel> transactions, String notes) async {
     FullTransactionModel fullTransaction = FullTransactionModel(
-      transactions: transactions,
-      savedNotes: notes,
-      time: DateTime.now()
-    );
+        transactions: transactions, savedNotes: notes, time: DateTime.now());
 
     await transactionService.saveFullTransaction(fullTransaction);
-    emit(state.copyWith(transactions: [])); 
+    emit(state.copyWith(transactions: [],customerName: "Nama Pelanggan",customerId: null, customerPhone: null));
   }
 
   Future<List<FullTransactionModel>> getFullTransactions() async {
     return await transactionService.getFullTransactions();
   }
 
-   Future<void> loadFullTransactions(FullTransactionModel fullTransaction) async {
+  Future<void> loadFullTransactions(
+      FullTransactionModel fullTransaction) async {
     final allTransactions = fullTransaction.transactions;
     emit(state.copyWith(transactions: allTransactions));
   }
 
-  Future<void> removeFullTransaction(FullTransactionModel fullTransaction) async {
+  Future<void> removeFullTransaction(
+      FullTransactionModel fullTransaction) async {
     await transactionService.removeFullTransaction(fullTransaction);
     await loadFullTransactions(fullTransaction);
   }
-  
 
   void updateVoucher(VoucherData? voucher) {
     emit(state.copyWith(voucher: voucher));
@@ -111,35 +124,36 @@ class TransactionCubit extends Cubit<TransactionState> {
     ));
   }
 
-void selectVariant(SelectedVariant variant) {
-  // Remove any existing variant with the same subVariantType before adding the new one
-  final updatedVariants = List<SelectedVariant>.from(state.selectedVariants)
-    ..removeWhere((v) => v.subVariantType == variant.subVariantType)
-    ..add(variant);
+  void selectVariant(SelectedVariant variant) {
+    // Remove any existing variant with the same subVariantType before adding the new one
+    final updatedVariants = List<SelectedVariant>.from(state.selectedVariants)
+      ..removeWhere((v) => v.subVariantType == variant.subVariantType)
+      ..add(variant);
 
-  emit(state.copyWith(selectedVariants: updatedVariants));
-  _updateTotalPrice();
-}
+    emit(state.copyWith(selectedVariants: updatedVariants));
+    _updateTotalPrice();
+  }
 
-void deselectVariant(SelectedVariant variant) {
-  // Remove the variant by matching the name
-  final updatedVariants = List<SelectedVariant>.from(state.selectedVariants)
-    ..removeWhere((v) => v.name == variant.name);
+  void deselectVariant(SelectedVariant variant) {
+    // Remove the variant by matching the name
+    final updatedVariants = List<SelectedVariant>.from(state.selectedVariants)
+      ..removeWhere((v) => v.name == variant.name);
 
-  emit(state.copyWith(selectedVariants: updatedVariants));
-  _updateTotalPrice(reduce: variant.price);
-}
-
+    emit(state.copyWith(selectedVariants: updatedVariants));
+    _updateTotalPrice(reduce: variant.price);
+  }
 
   void selectAddition(SelectedAddition addition) {
-    final updatedAdditions = List<SelectedAddition>.from(state.selectedAdditions)..add(addition);
+    final updatedAdditions =
+        List<SelectedAddition>.from(state.selectedAdditions)..add(addition);
     emit(state.copyWith(selectedAdditions: updatedAdditions));
     _updateTotalPrice();
   }
 
   void deselectAddition(SelectedAddition addition) {
-    final updatedAdditions = List<SelectedAddition>.from(state.selectedAdditions)
-      ..removeWhere((a) => a.name == addition.name);
+    final updatedAdditions =
+        List<SelectedAddition>.from(state.selectedAdditions)
+          ..removeWhere((a) => a.name == addition.name);
     emit(state.copyWith(selectedAdditions: updatedAdditions));
     _updateTotalPrice(reduce: addition.price);
   }
@@ -149,19 +163,22 @@ void deselectVariant(SelectedVariant variant) {
   }
 
   void addTransaction(TransactionModel transaction) {
-    final updatedTransactions = List<TransactionModel>.from(state.transactions)..add(transaction);
+    final updatedTransactions = List<TransactionModel>.from(state.transactions)
+      ..add(transaction);
     emit(state.copyWith(transactions: updatedTransactions));
     _updateTotalPrice();
   }
 
   void updateTransaction(int index, TransactionModel transaction) {
-    final updatedTransactions = List<TransactionModel>.from(state.transactions)..[index] = transaction;
+    final updatedTransactions = List<TransactionModel>.from(state.transactions)
+      ..[index] = transaction;
     emit(state.copyWith(transactions: updatedTransactions));
     _updateTotalPrice(index: index);
   }
 
   void removeTransaction(int index) {
-    final updatedTransactions = List<TransactionModel>.from(state.transactions)..removeAt(index);
+    final updatedTransactions = List<TransactionModel>.from(state.transactions)
+      ..removeAt(index);
     emit(state.copyWith(transactions: updatedTransactions));
   }
 
@@ -181,8 +198,10 @@ void deselectVariant(SelectedVariant variant) {
 
   void addQuantity(int index) {
     final currentTransaction = state.transactions[index];
-    final updatedTransaction = currentTransaction.copyWith(quantity: currentTransaction.quantity + 1);
-    final updatedTransactions = List<TransactionModel>.from(state.transactions)..[index] = updatedTransaction;
+    final updatedTransaction =
+        currentTransaction.copyWith(quantity: currentTransaction.quantity + 1);
+    final updatedTransactions = List<TransactionModel>.from(state.transactions)
+      ..[index] = updatedTransaction;
     emit(state.copyWith(transactions: updatedTransactions));
     _updateTotalPrice(index: index); // Update the total price
   }
@@ -190,8 +209,11 @@ void deselectVariant(SelectedVariant variant) {
   void subtractQuantity(int index) {
     final currentTransaction = state.transactions[index];
     if (currentTransaction.quantity > 1) {
-      final updatedTransaction = currentTransaction.copyWith(quantity: currentTransaction.quantity - 1);
-      final updatedTransactions = List<TransactionModel>.from(state.transactions)..[index] = updatedTransaction;
+      final updatedTransaction = currentTransaction.copyWith(
+          quantity: currentTransaction.quantity - 1);
+      final updatedTransactions =
+          List<TransactionModel>.from(state.transactions)
+            ..[index] = updatedTransaction;
       emit(state.copyWith(transactions: updatedTransactions));
       _updateTotalPrice(index: index); // Update the total price
     } else {
@@ -202,7 +224,8 @@ void deselectVariant(SelectedVariant variant) {
   void updateTransactionQuantity(int index, int quantity) {
     final currentTransaction = state.transactions[index];
     final newQuantity = quantity.clamp(1, 100);
-    final updatedTransaction = currentTransaction.copyWith(quantity: newQuantity);
+    final updatedTransaction =
+        currentTransaction.copyWith(quantity: newQuantity);
     final updatedTransactions = List<TransactionModel>.from(state.transactions)
       ..[index] = updatedTransaction;
     emit(state.copyWith(transactions: updatedTransactions));
@@ -223,24 +246,34 @@ void deselectVariant(SelectedVariant variant) {
     if (state.transactions.isEmpty) return;
 
     if (index == null) {
-      final totalPrice = _calculateTotalPrice(state.quantity, state.selectedVariants, state.selectedAdditions) - reduce * state.quantity;
-      final updatedProduct = state.transactions.last.product.copyWith(totalPrice: totalPrice);
-      final updatedTransaction = state.transactions.last.copyWith(product: updatedProduct);
-      final updatedTransactions = List<TransactionModel>.from(state.transactions)
-        ..[state.transactions.length - 1] = updatedTransaction;
+      final totalPrice = _calculateTotalPrice(
+              state.quantity, state.selectedVariants, state.selectedAdditions) -
+          reduce * state.quantity;
+      final updatedProduct =
+          state.transactions.last.product.copyWith(totalPrice: totalPrice);
+      final updatedTransaction =
+          state.transactions.last.copyWith(product: updatedProduct);
+      final updatedTransactions =
+          List<TransactionModel>.from(state.transactions)
+            ..[state.transactions.length - 1] = updatedTransaction;
       emit(state.copyWith(transactions: updatedTransactions));
     } else {
       final transaction = state.transactions[index];
-      final totalPrice = _calculateTotalPrice(transaction.quantity, transaction.selectedVariants, transaction.selectedAdditions) - reduce * transaction.quantity;
-      final updatedProduct = transaction.product.copyWith(totalPrice: totalPrice);
+      final totalPrice = _calculateTotalPrice(transaction.quantity,
+              transaction.selectedVariants, transaction.selectedAdditions) -
+          reduce * transaction.quantity;
+      final updatedProduct =
+          transaction.product.copyWith(totalPrice: totalPrice);
       final updatedTransaction = transaction.copyWith(product: updatedProduct);
-      final updatedTransactions = List<TransactionModel>.from(state.transactions)
-        ..[index] = updatedTransaction;
+      final updatedTransactions =
+          List<TransactionModel>.from(state.transactions)
+            ..[index] = updatedTransaction;
       emit(state.copyWith(transactions: updatedTransactions));
     }
   }
 
-  int _calculateTotalPrice(int quantity, List<SelectedVariant> variants, List<SelectedAddition> additions) {
+  int _calculateTotalPrice(int quantity, List<SelectedVariant> variants,
+      List<SelectedAddition> additions) {
     if (state.transactions.isEmpty) return 0;
 
     int totalPrice = state.transactions.last.product.price * quantity;
@@ -256,7 +289,7 @@ void deselectVariant(SelectedVariant variant) {
     });
 
     // Apply voucher discount
-     if (state.voucher != null) {
+    if (state.voucher != null) {
       if (state.voucher!.type == 'nominal') {
         totalPrice -= state.voucher!.amount.toInt();
       } else if (state.voucher!.type == 'percentage') {

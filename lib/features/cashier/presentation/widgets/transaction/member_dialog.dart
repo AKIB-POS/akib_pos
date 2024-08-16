@@ -1,6 +1,12 @@
+
+import 'package:akib_pos/common/app_colors.dart';
+import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/common/app_themes.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/member/member_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 import 'add_member_dialog.dart';  // Pastikan untuk mengimpor AddMemberDialog
 
@@ -11,29 +17,45 @@ class MemberDialog extends StatefulWidget {
 
 class _MemberDialogState extends State<MemberDialog> {
   final TextEditingController _searchController = TextEditingController();
+  FocusNode _focusNode = FocusNode();
+  bool _isListEmpty = false;
+  int? _selectedCustomerId;
+  String? _selectedCustomerName;
+  String? _selectedCustomerPhone;
 
   @override
   void initState() {
     super.initState();
     context.read<MemberCubit>().getAllMembers(); // Memuat semua member saat dialog dibuka
-
-    // Menambahkan listener untuk mendeteksi perubahan teks
     _searchController.addListener(_onSearchTextChanged);
   }
 
   @override
   void dispose() {
-    // Membersihkan listener ketika widget ini dihapus
     _searchController.removeListener(_onSearchTextChanged);
     _searchController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
   void _onSearchTextChanged() {
     if (_searchController.text.isEmpty) {
-      // Jika teks kosong, muat ulang semua data member
       context.read<MemberCubit>().getAllMembers();
     }
+  }
+
+  void _searchMembers() {
+    _unfocusSearchField();
+    final query = _searchController.text;
+    if (query.isNotEmpty) {
+      context.read<MemberCubit>().searchMemberByName(query);
+    } else {
+      context.read<MemberCubit>().getAllMembers();
+    }
+  }
+
+  void _unfocusSearchField() {
+    _focusNode.unfocus();
   }
 
   void _showAddMemberDialog(BuildContext context) {
@@ -52,78 +74,171 @@ class _MemberDialogState extends State<MemberDialog> {
     );
   }
 
+  void _saveSelectedCustomer() {
+    if (_selectedCustomerId != null && _selectedCustomerName != null) {
+      context.read<TransactionCubit>().updateCustomer(_selectedCustomerId!, _selectedCustomerName!,_selectedCustomerPhone!);
+      Navigator.of(context).pop(); // Close dialog after saving
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      insetPadding: EdgeInsets.symmetric(
-        vertical: MediaQuery.of(context).size.height * 0.05, // 5% top & bottom padding
-        horizontal: MediaQuery.of(context).size.width * 0.15, // 15% left & right padding
-      ),
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.7, // 70% of screen width
-        height: MediaQuery.of(context).size.height * 0.9, // 90% of screen height
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      labelText: 'Enter member name',
+    return GestureDetector(
+      onTap: _unfocusSearchField,
+      child: Dialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.9,
+          width: MediaQuery.of(context).size.width * 0.7,
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
+                decoration: AppThemes.topBoxDecorationDialog,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Detail Pelanggan', style: AppTextStyle.headline6),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        focusNode: _focusNode,
+                        decoration: AppThemes.inputDecorationStyle.copyWith(
+                          hintText: "Masukkan nama pelanggan",
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.search, color: Colors.black),
+                            onPressed: _searchMembers,
+                          ),
+                        ),
+                        onSubmitted: (_) => _searchMembers(),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton.icon(
+                      onPressed: () => _showAddMemberDialog(context),
+                      icon: const Icon(Icons.add, size: 21),
+                      label: const Text('Tambah Pelanggan'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryMain,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
+                        minimumSize: const Size(0, 48),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: BlocBuilder<MemberCubit, MemberState>(
+                  builder: (context, state) {
+                    if (state is MemberLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (state is MemberLoaded) {
+                      _isListEmpty = state.members.isEmpty;
+                      if (_isListEmpty) {
+                        return _buildEmptyState();
+                      }
+                      return ListView.builder(
+                        itemCount: state.members.length,
+                        itemBuilder: (context, index) {
+                          final member = state.members[index];
+                          final isSelected = _selectedCustomerId == member.id;
+                          return ListTile(
+                            title: Text(member.name),
+                            subtitle: Text(member.phoneNumber),
+                            tileColor: isSelected ? AppColors.primaryMain.withOpacity(0.3) : null,
+                            onTap: () {
+                              setState(() {
+                                _selectedCustomerId = member.id;
+                                _selectedCustomerName = member.name;
+                                _selectedCustomerPhone = member.phoneNumber;
+                              });
+                            },
+                          );
+                        },
+                      );
+                    } else if (state is MemberError) {
+                      return Center(child: Text(state.message));
+                    }
+                    return const Center(child: Text('Please search for a member or wait while members are loading'));
+                  },
+                ),
+              ),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: const Offset(0, -2),
+                    ),
+                  ],
+                ),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _selectedCustomerId != null ? AppColors.primaryMain : Colors.grey,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: _selectedCustomerId != null ? _saveSelectedCustomer : null,
+                  child: const Text(
+                    'Simpan',
+                    style: TextStyle(
+                      color: Colors.white,
                     ),
                   ),
                 ),
-                SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    final query = _searchController.text;
-                    if (query.isNotEmpty) {
-                      context.read<MemberCubit>().searchMemberByName(query);
-                    } else {
-                      context.read<MemberCubit>().getAllMembers(); // Kembali ke daftar semua member
-                    }
-                  },
-                  child: Icon(Icons.search),
-                ),
-                SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () => _showAddMemberDialog(context),
-                  child: Text('Tambah Pelanggan'),
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-            Expanded(
-              child: BlocBuilder<MemberCubit, MemberState>(
-                builder: (context, state) {
-                  if (state is MemberLoading) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (state is MemberLoaded) {
-                    return ListView.builder(
-                      itemCount: state.members.length,
-                      itemBuilder: (context, index) {
-                        final member = state.members[index];
-                        return ListTile(
-                          title: Text(member.name),
-                          subtitle: Text(member.email ?? "No email"),
-                        );
-                      },
-                    );
-                  } else if (state is MemberError) {
-                    return Center(child: Text(state.message));
-                  }
-                  return Center(child: Text('Please search for a member or wait while members are loading'));
-                },
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        SvgPicture.asset(
+          "assets/images/empty_saved.svg",
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'Belum ada pelanggan',
+          style: AppTextStyle.headline5,
+        ),
+        const Text(
+          'Silahkan tambahkan pelanggan',
+          style: AppTextStyle.body2,
+        ),
+      ],
     );
   }
 }

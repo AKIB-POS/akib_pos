@@ -53,6 +53,8 @@ class AppThemes {
   static InputDecoration inputDecorationStyle = InputDecoration(
     hintStyle: AppTextStyle.bodyInput.copyWith(color: AppColors.textGrey500),
     filled: true,
+    focusColor: AppColors.primaryMain,
+    hoverColor: AppColors.primaryMain,
     fillColor: AppColors.fillColorInput,
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(6),

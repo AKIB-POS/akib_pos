@@ -105,7 +105,7 @@ class _SavedTransactionsDialogState extends State<SavedTransactionsDialog> {
                       controller: _searchController,
                       focusNode: _focusNode,
                       decoration: AppThemes.inputDecorationStyle.copyWith(
-                        hintText: "Masukkan kata kunci",
+                        hintText: "Masukkan Keterangan Pesanan",
                         suffixIcon: IconButton(
                           icon: const Icon(Icons.search, color: Colors.black),
                           onPressed: () {

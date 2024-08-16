@@ -34,11 +34,12 @@ void main() async {
           create: (context) => ProductBloc(
             kasirRepository: sl(),
             localDataSource: sl(),
-          )..add(FetchCategoriesEvent())
-           ..add(FetchSubCategoriesEvent())
-           ..add(FetchProductsEvent())
-           ..add(FetchAdditionsEvent())
-           ..add(FetchVariantsEvent()),
+          )
+            ..add(FetchCategoriesEvent())
+            ..add(FetchSubCategoriesEvent())
+            ..add(FetchProductsEvent())
+            ..add(FetchAdditionsEvent())
+            ..add(FetchVariantsEvent()),
         ),
         BlocProvider(
           create: (context) => CashierCubit(
@@ -46,11 +47,21 @@ void main() async {
             productBloc: sl<ProductBloc>(),
           )..loadData(),
         ),
-        BlocProvider(create:  (context) => TransactionCubit(sl())), // Ensure this is provided here
-        BlocProvider(create:  (context) => ProcessTransactionCubit()), // Ensure this is provided here
-        BlocProvider(create:  (context) => VoucherCubit(sl())), // Ensure this is provided here
-        BlocProvider(create:  (context) => BadgeCubit(sl())), // Ensure this is provided here
-        BlocProvider(create:  (context) => MemberCubit(repository: sl())), // Ensure this is provided here
+        BlocProvider(
+            create: (context) =>
+                TransactionCubit(sl())), // Ensure this is provided here
+        BlocProvider(
+            create: (context) =>
+                ProcessTransactionCubit()), // Ensure this is provided here
+        BlocProvider(
+            create: (context) =>
+                VoucherCubit(sl())), // Ensure this is provided here
+        BlocProvider(
+            create: (context) =>
+                BadgeCubit(sl())), // Ensure this is provided here
+        BlocProvider(
+            create: (context) =>
+                MemberCubit(repository: sl())), // Ensure this is provided here
       ],
       child: MyApp(),
     ),
@@ -65,8 +76,19 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           title: 'Multi-Module App',
           theme: ThemeData(
+            textSelectionTheme: TextSelectionThemeData(
+              cursorColor:
+                  AppColors.primaryMain, // Warna kursor di seluruh aplikasi
+              selectionColor: AppColors.primaryMain
+                  .withOpacity(0.5), // Warna selection (highlight)
+              selectionHandleColor:
+                  AppColors.primaryMain, // Warna handle selection
+            ),
             textTheme: GoogleFonts.plusJakartaSansTextTheme(),
             primaryColor: AppColors.primaryMain,
+   progressIndicatorTheme: const ProgressIndicatorThemeData(
+          color: AppColors.primaryMain, // Warna progress indicator
+        ),
           ),
           home: const SplashScreen(),
         );
@@ -74,4 +96,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

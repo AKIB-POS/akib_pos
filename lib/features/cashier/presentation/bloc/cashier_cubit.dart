@@ -43,48 +43,74 @@ class CashierCubit extends Cubit<CashierState> {
   }
 
   Future<void> _fetchDataFromApi() async {
-    await localDataSource.clearCache();
+  await localDataSource.clearCache();
 
-    final Completer<void> completer = Completer<void>();
+  final Completer<void> completer = Completer<void>();
+  final timer = Timer(Duration(seconds: 15), () {
+    if (!completer.isCompleted) {
+      completer.completeError('Timeout: Data loading took too long');
+    }
+  });
 
-    productBloc.add(FetchCategoriesEvent());
-    productBloc.add(FetchSubCategoriesEvent());
-    productBloc.add(FetchProductsEvent());
-    productBloc.add(FetchAdditionsEvent());
-    productBloc.add(FetchVariantsEvent());
+  // Track the loading status of each type
+  bool isProductLoaded = false;
+  bool isCategoryLoaded = false;
+  bool isSubCategoryLoaded = false;
+  bool isAdditionLoaded = false;
+  bool isVariantLoaded = false;
 
-    StreamSubscription? subscription;
-    subscription = productBloc.stream.listen((state) async {
-      if (state is ProductLoaded) {
-        await localDataSource.cacheProducts(state.products);
-      } else if (state is CategoryLoaded) {
-        await localDataSource.cacheCategories(state.categories);
-      } else if (state is SubCategoryLoaded) {
-        await localDataSource.cacheSubCategories(state.subCategories);
-      } else if (state is AdditionLoaded) {
-        await localDataSource.cacheAdditions(state.additions);
-      } else if (state is VariantLoaded) {
-        await localDataSource.cacheVariants(state.variants);
-      } else if (state is ProductError) {
-        emit(this.state.copyWith(error: state.message, isLoading: false));
-        if (!completer.isCompleted) {
-          completer.complete();
-        }
-        subscription?.cancel();
-        return;
+  productBloc.add(FetchCategoriesEvent());
+  productBloc.add(FetchSubCategoriesEvent());
+  productBloc.add(FetchProductsEvent());
+  productBloc.add(FetchAdditionsEvent());
+  productBloc.add(FetchVariantsEvent());
+
+  StreamSubscription? subscription;
+  subscription = productBloc.stream.listen((state) async {
+    if (state is ProductLoaded) {
+      isProductLoaded = true;
+      await localDataSource.cacheProducts(state.products);
+    } else if (state is CategoryLoaded) {
+      isCategoryLoaded = true;
+      await localDataSource.cacheCategories(state.categories);
+    } else if (state is SubCategoryLoaded) {
+      isSubCategoryLoaded = true;
+      await localDataSource.cacheSubCategories(state.subCategories);
+    } else if (state is AdditionLoaded) {
+      isAdditionLoaded = true;
+      await localDataSource.cacheAdditions(state.additions);
+    } else if (state is VariantLoaded) {
+      isVariantLoaded = true;
+      await localDataSource.cacheVariants(state.variants);
+    } else if (state is ProductError) {
+      emit(this.state.copyWith(error: state.message, isLoading: false));
+      if (!completer.isCompleted) {
+        completer.completeError(state.message);
       }
+      subscription?.cancel();
+      timer.cancel();
+      return;
+    }
 
-      if (state is ProductLoaded || state is CategoryLoaded || state is SubCategoryLoaded || state is AdditionLoaded || state is VariantLoaded) {
-        if (!completer.isCompleted) {
-          completer.complete();
-        }
-        subscription?.cancel();
+    // Check if all data has been loaded
+    if (isProductLoaded && isCategoryLoaded && isSubCategoryLoaded && isAdditionLoaded && isVariantLoaded) {
+      if (!completer.isCompleted) {
+        completer.complete();
       }
-    });
+      subscription?.cancel();
+      timer.cancel();
+    }
+  });
 
+  try {
     await completer.future;
     emit(state.copyWith(isLoading: false));
+  } catch (error) {
+    emit(state.copyWith(error: error.toString(), isLoading: false));
+  } finally {
+    timer.cancel(); // Ensure the timer is canceled if the task is completed
   }
+}
 
   void updateSearchText(String newText) {
     emit(state.copyWith(searchText: newText, selectedSubCategory: 0));
