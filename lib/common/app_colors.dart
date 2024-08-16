@@ -59,6 +59,8 @@ class AppColors {
   static const Color textGrey600 = Color(0xFF637381);
   static const Color textGrey700 = Color(0xFF454F5B);
   static const Color textGrey800 = Color(0xFF212B36);
+  static const Color fillColorInput = Color(0xFFF9FAFB);
+  static const Color borderColorInput = Color(0xFFDFE3E8);
 
   // Additional Colors
   static const Color black = Color(0xFF121212);

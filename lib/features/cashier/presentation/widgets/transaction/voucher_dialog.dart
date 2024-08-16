@@ -1,5 +1,6 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/common/app_themes.dart';
 import 'package:akib_pos/features/cashier/data/models/redeem_voucher_response.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
@@ -15,8 +16,36 @@ class VoucherDialog extends StatefulWidget {
 class _VoucherDialogState extends State<VoucherDialog> {
   final TextEditingController _voucherController = TextEditingController();
   final TextEditingController _manualDiscountController = TextEditingController();
-  bool _isButtonDisabled = false;
+  bool _isButtonDisabled = true; // Initially, the button is disabled
   String? _discountType;
+
+  @override
+  void initState() {
+    super.initState();
+    _voucherController.addListener(_validateInput);
+    _manualDiscountController.addListener(_validateInput);
+  }
+
+  @override
+  void dispose() {
+    _voucherController.removeListener(_validateInput);
+    _manualDiscountController.removeListener(_validateInput);
+    _voucherController.dispose();
+    _manualDiscountController.dispose();
+    super.dispose();
+  }
+
+  void _validateInput() {
+    setState(() {
+      if (_voucherController.text.trim().isNotEmpty) {
+        _isButtonDisabled = false;
+      } else if (_manualDiscountController.text.trim().isNotEmpty && _discountType != null) {
+        _isButtonDisabled = false;
+      } else {
+        _isButtonDisabled = true;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,45 +57,26 @@ class _VoucherDialogState extends State<VoucherDialog> {
         child: Column(
           children: [
             Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  topRight: Radius.circular(10),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: const Offset(0, 2),
+              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+              decoration: AppThemes.topBoxDecorationDialog,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Detail Diskon', style: AppTextStyle.headline5),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.black),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
                   ),
                 ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Detail Diskon', style: AppTextStyle.headline5),
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.black),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                ),
               ),
             ),
             const SizedBox(height: 16),
             Expanded(
               child: BlocListener<VoucherCubit, VoucherState>(
                 listener: (context, state) {
-                  if (state is VoucherLoading) {
-                    // Do nothing specific for loading state in listener
-                  } else if (state is VoucherLoaded) {
-                    // Update the TransactionCubit with the redeemed voucher
+                  if (state is VoucherLoaded) {
                     BlocProvider.of<TransactionCubit>(context).updateVoucher(state.voucher.data);
 
                     // Show snackbar
@@ -77,8 +87,6 @@ class _VoucherDialogState extends State<VoucherDialog> {
 
                     Navigator.of(context).pop(); // Close the dialog
                   } else if (state is VoucherError) {
-                    DInfo.snackBarError(context, "Gagal Menerapkan Diskon");
-                  } else {
                     DInfo.snackBarError(context, "Gagal Menerapkan Diskon");
                   }
                 },
@@ -91,30 +99,7 @@ class _VoucherDialogState extends State<VoucherDialog> {
                       const SizedBox(height: 8),
                       TextField(
                         controller: _voucherController,
-                        decoration: InputDecoration(
-                          hintText: 'Masukkan Kode Diskon',
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(6),
-                            borderSide: BorderSide(
-                              color: Colors.grey.shade300,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(6),
-                            borderSide: BorderSide(
-                              color: Colors.grey.shade300,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(6),
-                            borderSide: BorderSide(
-                              color: AppColors.primaryMain,
-                            ),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        ),
+                        decoration: AppThemes.inputDecorationStyle.copyWith(hintText: 'Masukkan Kode Voucher'),
                       ),
                       const SizedBox(height: 24),
                       Text('Diskon Lainnya', style: AppTextStyle.headline6.copyWith(color: AppColors.primaryMain)),
@@ -132,6 +117,7 @@ class _VoucherDialogState extends State<VoucherDialog> {
                                     setState(() {
                                       _discountType = value;
                                     });
+                                    _validateInput();
                                   },
                                   activeColor: AppColors.primaryMain,
                                 ),
@@ -150,6 +136,7 @@ class _VoucherDialogState extends State<VoucherDialog> {
                                     setState(() {
                                       _discountType = value;
                                     });
+                                    _validateInput();
                                   },
                                   activeColor: AppColors.primaryMain,
                                 ),
@@ -162,30 +149,7 @@ class _VoucherDialogState extends State<VoucherDialog> {
                       const SizedBox(height: 8),
                       TextField(
                         controller: _manualDiscountController,
-                        decoration: InputDecoration(
-                          hintText: 'Masukkan Total Diskon',
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(6),
-                            borderSide: BorderSide(
-                              color: Colors.grey.shade300,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(6),
-                            borderSide: BorderSide(
-                              color: Colors.grey.shade300,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(6),
-                            borderSide: BorderSide(
-                              color: AppColors.primaryMain,
-                            ),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        ),
+                        decoration: AppThemes.inputDecorationStyle.copyWith(hintText: 'Masukkan Nominal'),
                         keyboardType: TextInputType.number,
                       ),
                     ],
@@ -199,28 +163,16 @@ class _VoucherDialogState extends State<VoucherDialog> {
                 return Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(10),
-                      bottomRight: Radius.circular(10),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                        offset: const Offset(0, -2),
-                      ),
-                    ],
-                  ),
+                  decoration: AppThemes.bottomBoxDecorationDialog,
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: const MaterialStatePropertyAll<Color>(AppColors.primaryMain),
-                      padding: const MaterialStatePropertyAll<EdgeInsetsGeometry>(
+                      backgroundColor: _isButtonDisabled || isLoading
+                          ? WidgetStatePropertyAll<Color>(Colors.grey)
+                          : const WidgetStatePropertyAll<Color>(AppColors.primaryMain),
+                      padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
                         EdgeInsets.symmetric(vertical: 16),
                       ),
-                      shape: MaterialStatePropertyAll<RoundedRectangleBorder>(
+                      shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),

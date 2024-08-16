@@ -1,4 +1,5 @@
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/common/app_themes.dart';
 import 'package:akib_pos/features/cashier/data/models/full_transaction_models.dart';
 import 'package:akib_pos/features/cashier/data/models/transaction_model.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
@@ -56,58 +57,61 @@ class _SavedTransactionsDialogState extends State<SavedTransactionsDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Container(
         height: MediaQuery.of(context).size.height * 0.9,
         width: MediaQuery.of(context).size.width * 0.7,
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Pesanan Tersimpan', style: AppTextStyle.headline6),
-                IconButton(
-                  icon: Icon(Icons.close),
-                  onPressed: () => Navigator.of(context).pop(),
+        child: Container(
+          decoration: AppThemes.topBoxDecorationDialog,
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Pesanan Tersimpan', style: AppTextStyle.headline6),
+                  IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16),
+              TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  labelText: 'Cari Pesanan',
+                  hintText: 'Masukkan kata kunci',
+                  border: OutlineInputBorder(),
                 ),
-              ],
-            ),
-            SizedBox(height: 16),
-            TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                labelText: 'Cari Pesanan',
-                hintText: 'Masukkan kata kunci',
-                border: OutlineInputBorder(),
               ),
-            ),
-            SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
-                itemCount: _filteredTransactions.length,
-                itemBuilder: (context, index) {
-                  final transaction = _filteredTransactions[index];
-                  return ListTile(
-                    title:
-                        Text(transaction.savedNotes, style: AppTextStyle.body2),
-                    subtitle: Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-         
-                        '${transaction.transactions.length} Item • ${DateFormat('HH:mm').format(transaction.time)}',
+              SizedBox(height: 16),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _filteredTransactions.length,
+                  itemBuilder: (context, index) {
+                    final transaction = _filteredTransactions[index];
+                    return ListTile(
+                      title:
+                          Text(transaction.savedNotes, style: AppTextStyle.body2),
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+           
+                          '${transaction.transactions.length} Item • ${DateFormat('HH:mm').format(transaction.time)}',
+                        ),
                       ),
-                    ),
-                    trailing: Text(
-                        'Rp ${transaction.transactions.fold(0, (total, t) => total + t.product.totalPrice!)}'),
-                    onTap: () {
-                      _showTransactionDetailDialog(context, transaction);
-                    },
-                  );
-                },
+                      trailing: Text(
+                          'Rp ${transaction.transactions.fold(0, (total, t) => total + t.product.totalPrice!)}'),
+                      onTap: () {
+                        _showTransactionDetailDialog(context, transaction);
+                      },
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
