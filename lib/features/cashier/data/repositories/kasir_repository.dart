@@ -22,6 +22,7 @@ abstract class KasirRepository {
   Future<Either<Failure, List<MemberModel>>> getAllMembers(); // Tambahkan metode ini
   Future<Either<Failure, List<MemberModel>>> searchMemberByName(String name);
   Future<Either<Failure, void>> postMember(String name, String phoneNumber, {String? email});
+  Future<Either<Failure, MemberModel>> updateMember(MemberModel member);
 }
 
 class KasirRepositoryImpl implements KasirRepository {
@@ -32,6 +33,16 @@ class KasirRepositoryImpl implements KasirRepository {
     required this.remoteDataSource,
     required this.localDataSource,
   });
+
+   @override
+  Future<Either<Failure, MemberModel>> updateMember(MemberModel member) async {
+    try {
+      final updatedMember = await remoteDataSource.updateMember(member);
+      return Right(updatedMember);
+    } catch (e) {
+      return Left(ServerFailure());
+    }
+  }
 
    @override
   Future<Either<Failure, void>> postMember(String name, String phoneNumber, {String? email}) async {

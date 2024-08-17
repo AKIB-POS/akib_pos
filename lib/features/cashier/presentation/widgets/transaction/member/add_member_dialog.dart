@@ -49,6 +49,10 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
     });
   }
 
+  void _closeKeyboard() {
+    FocusScope.of(context).unfocus();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<MemberCubit, MemberState>(
@@ -61,14 +65,16 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
           setState(() {
             _isLoading = false;
           });
-          DInfo.snackBarSuccess(context, "Member berhasil ditambahkan");
+          _closeKeyboard();
+          DInfo.toastSuccess('Member berhasil ditambahkan');
           Navigator.of(context).pop();
           widget.onSuccess();
-        } else if (state is MemberError) {
+        } else if (state is AddMemberError) {
           setState(() {
             _isLoading = false;
           });
-          DInfo.snackBarError(context, "Gagal menambahkan member");
+          _closeKeyboard();
+          DInfo.toastError('Gagal menambahkan member',);
         }
       },
       child: Dialog(
@@ -177,6 +183,7 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                   ),
                   onPressed: _isButtonEnabled && !_isLoading
                       ? () {
+                          _closeKeyboard();
                           if (_formKey.currentState?.validate() ?? false) {
                             context.read<MemberCubit>().postMember(
                                   _nameController.text,

@@ -10,6 +10,8 @@ abstract class MemberState extends Equatable {
 class MemberInitial extends MemberState {}
 
 class MemberLoading extends MemberState {}
+class UpdateMemberLoading extends MemberState {}
+class AddMemberLoading extends MemberState {}
 
 class MemberLoaded extends MemberState {
   final List<MemberModel> members;
@@ -33,3 +35,25 @@ class MemberPosting extends MemberState {}
 
 class MemberPostedSuccess extends MemberState {}
 
+class MemberUpdatedSuccess extends MemberState {
+  final MemberModel member;
+
+  MemberUpdatedSuccess(this.member);
+}
+
+class MemberUpdateError extends MemberState {
+  final String message;
+
+  const MemberUpdateError(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
+class AddMemberError extends MemberState {
+  final String message;
+
+  const AddMemberError(this.message);
+
+  @override
+  List<Object> get props => [message];
+}

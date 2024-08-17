@@ -2,8 +2,10 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
+import 'package:akib_pos/features/cashier/data/models/member_model.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/member/member_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/transaction/member/edit_member_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -26,7 +28,7 @@ class _MemberDialogState extends State<MemberDialog> {
   @override
   void initState() {
     super.initState();
-    context.read<MemberCubit>().getAllMembers(); // Memuat semua member saat dialog dibuka
+    context.read<MemberCubit>().getAllMembers(); // Load all members on dialog open
     _searchController.addListener(_onSearchTextChanged);
   }
 
@@ -74,9 +76,27 @@ class _MemberDialogState extends State<MemberDialog> {
     );
   }
 
+  void _showEditMemberDialog(BuildContext context, MemberModel member) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return BlocProvider.value(
+          value: context.read<MemberCubit>(),
+          child: EditMemberDialog(
+            member: member,
+            onSuccess: () {
+              context.read<MemberCubit>().getAllMembers(); // Reload members after successful update
+            },
+          ),
+        );
+      },
+    );
+  }
+
   void _saveSelectedCustomer() {
     if (_selectedCustomerId != null && _selectedCustomerName != null) {
-      context.read<TransactionCubit>().updateCustomer(_selectedCustomerId!, _selectedCustomerName!,_selectedCustomerPhone!);
+      context.read<TransactionCubit>().updateCustomer(
+          _selectedCustomerId!, _selectedCustomerName!, _selectedCustomerPhone!);
       Navigator.of(context).pop(); // Close dialog after saving
     }
   }
@@ -160,9 +180,28 @@ class _MemberDialogState extends State<MemberDialog> {
                           final member = state.members[index];
                           final isSelected = _selectedCustomerId == member.id;
                           return ListTile(
-                            title: Text(member.name),
-                            subtitle: Text(member.phoneNumber),
+                            leading: SvgPicture.asset(
+                                "assets/icons/ic_members.svg",
+                                height: 24,
+                                width: 24,
+                              ),
+                            title: Text(member.name,style: AppTextStyle.headline6),
+                            subtitle: Text(member.phoneNumber,style: AppTextStyle.body2),
                             tileColor: isSelected ? AppColors.primaryMain.withOpacity(0.3) : null,
+                            trailing: ElevatedButton.icon(
+                              icon: const Icon(Icons.edit, size: 16,color: Colors.white,),
+                              onPressed: () => _showEditMemberDialog(context, member),
+                              label: const Text('Edit', style: TextStyle(fontSize: 12)),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primaryMain,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4.0),
+                                ),
+                                minimumSize: const Size(0, 30),
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                              ),
+                            ),
                             onTap: () {
                               setState(() {
                                 _selectedCustomerId = member.id;

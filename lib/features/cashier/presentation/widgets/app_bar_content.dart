@@ -2,7 +2,7 @@ import 'package:akib_pos/features/cashier/data/repositories/kasir_repository.dar
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
-import 'package:akib_pos/features/cashier/presentation/widgets/transaction/member_dialog.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/transaction/member/member_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/saved_transactions_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/voucher_dialog.dart';
 import 'package:flutter/material.dart';

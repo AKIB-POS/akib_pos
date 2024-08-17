@@ -8,6 +8,7 @@ import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:extended_image/extended_image.dart';
+import 'package:sizer/sizer.dart';
 
 class MenuGrid extends StatelessWidget {
   MenuGrid();
@@ -69,7 +70,7 @@ class MenuCard extends StatelessWidget {
             ExtendedImage.network(
               item.imageUrl,
               width: double.infinity,
-              height: 120,
+              height: 11.h,
               fit: BoxFit.fill,
               cache: true,
               shape: BoxShape.rectangle,

@@ -23,20 +23,24 @@ abstract class KasirRemoteDataSource {
   Future<List<MemberModel>> getAllMembers();
   Future<List<MemberModel>> searchMemberByName(String name);
   Future<void> postMember(String name, String phoneNumber, {String? email});
+  Future<MemberModel> updateMember(MemberModel member);
 }
 
 class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
   final http.Client client;
   final SharedPrefsHelper sharedPrefsHelper;
 
-  KasirRemoteDataSourceImpl({required this.client, required this.sharedPrefsHelper});
+  KasirRemoteDataSourceImpl({
+    required this.client,
+    required this.sharedPrefsHelper,
+  });
 
   @override
   Future<void> postMember(String name, String phoneNumber, {String? email}) async {
     final url = '${URLs.baseUrlMock}/members';
     final response = await client.post(
       Uri.parse(url),
-      headers: {'Content-Type': 'application/json'},
+      headers: _buildHeaders(),
       body: jsonEncode({
         'name': name,
         'phone_number': phoneNumber,
@@ -49,39 +53,39 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
     }
   }
 
-   @override
-  Future<List<MemberModel>> getAllMembers() async {
-    final response = await _getFromUrl('${URLs.baseUrlMock}/members');
-    
-    if (response.statusCode != 200) {
+  @override
+  Future<MemberModel> updateMember(MemberModel member) async {
+    final url = '${URLs.baseUrlMock}/members/${member.id}';
+    final response = await client.put(
+      Uri.parse(url),
+      headers: _buildHeaders(),
+      body: json.encode(member.toJson()),
+    );
+
+    if (response.statusCode != 201) {
       throw ServerException();
     }
 
+    return MemberModel.fromJson(json.decode(response.body)['data']);
+  }
+
+  @override
+  Future<List<MemberModel>> getAllMembers() async {
+    final response = await _getFromUrl('${URLs.baseUrlMock}/members');
     return _parseMemberList(response);
   }
 
   @override
   Future<List<MemberModel>> searchMemberByName(String name) async {
     final response = await _getFromUrl('${URLs.baseUrlMock}/members?name=$name');
-    
-    if (response.statusCode != 200) {
-      throw ServerException();
-    }
-
     return _parseMemberList(response);
   }
 
-List<MemberModel> _parseMemberList(http.Response response) {
-  // Decode response body
-  final Map<String, dynamic> decodedResponse = json.decode(response.body);
-
-  // Ambil daftar data member dari kunci "data"
-  final List<dynamic> membersJson = decodedResponse['data'];
-
-  // Parse each item in the list into MemberModel
-  return membersJson.map<MemberModel>((json) => MemberModel.fromJson(json)).toList();
-}
-
+  List<MemberModel> _parseMemberList(http.Response response) {
+    final Map<String, dynamic> decodedResponse = json.decode(response.body);
+    final List<dynamic> membersJson = decodedResponse['data'];
+    return membersJson.map<MemberModel>((json) => MemberModel.fromJson(json)).toList();
+  }
 
   @override
   Future<List<ProductModel>> getAllProducts() async {
@@ -100,6 +104,7 @@ List<MemberModel> _parseMemberList(http.Response response) {
 
     return RedeemVoucherResponse.fromJson(json.decode(response.body));
   }
+
   @override
   Future<List<CategoryModel>> getCategories() async {
     final response = await _getFromUrl('${URLs.baseUrlMock}/categories');
@@ -124,32 +129,25 @@ List<MemberModel> _parseMemberList(http.Response response) {
     return _parseVariantList(response);
   }
 
-  Future<http.Response> _getFromUrl(String url) async {
+  Map<String, String> _buildHeaders() {
     final token = sharedPrefsHelper.getToken();
-    final response = await client.get(
-      Uri.parse(url),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+  }
+
+  Future<http.Response> _getFromUrl(String url) async {
+    final response = await client.get(Uri.parse(url), headers: _buildHeaders());
 
     if (response.statusCode != 200) {
       throw ServerException();
     }
     return response;
   }
-  
-  
+
   Future<http.Response> _postFromUrl(String url) async {
-    final token = sharedPrefsHelper.getToken();
-    final response = await client.post(
-      Uri.parse(url),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
+    final response = await client.post(Uri.parse(url), headers: _buildHeaders());
 
     if (response.statusCode != 200) {
       throw ServerException();
