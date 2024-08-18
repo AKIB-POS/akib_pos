@@ -31,3 +31,9 @@ class FetchVariantsEvent extends ProductEvent {
   @override
   List<Object> get props => [];
 }
+
+
+class FetchTaxEvent extends ProductEvent {
+  @override
+  List<Object> get props => [];
+}

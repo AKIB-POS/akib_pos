@@ -33,6 +33,8 @@ class ProductDialog extends StatelessWidget {
 
     final additions = context.read<CashierCubit>().state.additions;
     final variants = context.read<CashierCubit>().state.variants;
+    final tax  = context.read<CashierCubit>().state.taxAmount;
+    
     final productAddition = additions.firstWhere(
         (addition) => addition.id == product.additionId,
         orElse: () =>
@@ -111,6 +113,7 @@ class ProductDialog extends StatelessWidget {
                             });
 
                             final transaction = TransactionModel(
+                              
                               product: product,
                               selectedVariants: context
                                   .read<TransactionCubit>()
@@ -126,6 +129,7 @@ class ProductDialog extends StatelessWidget {
                                   .read<TransactionCubit>()
                                   .state
                                   .quantity,
+                              
                             );
 
                             if (editIndex != null) {
@@ -135,7 +139,7 @@ class ProductDialog extends StatelessWidget {
                             } else {
                               context
                                   .read<TransactionCubit>()
-                                  .addTransaction(transaction);
+                                  .addTransaction(transaction,tax);
                             }
 
                             print('Transaction details: $transaction');
@@ -511,7 +515,7 @@ class ProductDialog extends StatelessWidget {
                         totalPrice += variant.price *
                             context.read<TransactionCubit>().state.quantity;
                       });
-
+                      print("pajaknya ${tax}");
                       // Add addition prices if any
                       context
                           .read<TransactionCubit>()
@@ -544,7 +548,7 @@ class ProductDialog extends StatelessWidget {
                       } else {
                         context
                             .read<TransactionCubit>()
-                            .addTransaction(transaction);
+                            .addTransaction(transaction,tax);
                       }
 
                       print('Transaction details: $transaction');

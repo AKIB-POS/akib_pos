@@ -28,6 +28,7 @@ class CashierCubit extends Cubit<CashierState> {
       final products = await localDataSource.getCachedProducts();
       final additions = await localDataSource.getCachedAdditions();
       final variants = await localDataSource.getCachedVariants();
+      final taxAmount = await localDataSource.getCachedTaxAmount();
 
       emit(state.copyWith(
         categories: categories,
@@ -35,6 +36,7 @@ class CashierCubit extends Cubit<CashierState> {
         menuItems: products,
         additions: additions,
         variants: variants,
+        taxAmount: taxAmount,
         isLoading: false,
       ));
     } catch (e) {
@@ -43,74 +45,77 @@ class CashierCubit extends Cubit<CashierState> {
   }
 
   Future<void> _fetchDataFromApi() async {
-  await localDataSource.clearCache();
+    await localDataSource.clearCache();
 
-  final Completer<void> completer = Completer<void>();
-  final timer = Timer(Duration(seconds: 15), () {
-    if (!completer.isCompleted) {
-      completer.completeError('Timeout: Data loading took too long');
-    }
-  });
-
-  // Track the loading status of each type
-  bool isProductLoaded = false;
-  bool isCategoryLoaded = false;
-  bool isSubCategoryLoaded = false;
-  bool isAdditionLoaded = false;
-  bool isVariantLoaded = false;
-
-  productBloc.add(FetchCategoriesEvent());
-  productBloc.add(FetchSubCategoriesEvent());
-  productBloc.add(FetchProductsEvent());
-  productBloc.add(FetchAdditionsEvent());
-  productBloc.add(FetchVariantsEvent());
-
-  StreamSubscription? subscription;
-  subscription = productBloc.stream.listen((state) async {
-    if (state is ProductLoaded) {
-      isProductLoaded = true;
-      await localDataSource.cacheProducts(state.products);
-    } else if (state is CategoryLoaded) {
-      isCategoryLoaded = true;
-      await localDataSource.cacheCategories(state.categories);
-    } else if (state is SubCategoryLoaded) {
-      isSubCategoryLoaded = true;
-      await localDataSource.cacheSubCategories(state.subCategories);
-    } else if (state is AdditionLoaded) {
-      isAdditionLoaded = true;
-      await localDataSource.cacheAdditions(state.additions);
-    } else if (state is VariantLoaded) {
-      isVariantLoaded = true;
-      await localDataSource.cacheVariants(state.variants);
-    } else if (state is ProductError) {
-      emit(this.state.copyWith(error: state.message, isLoading: false));
+    final Completer<void> completer = Completer<void>();
+    final timer = Timer(Duration(seconds: 15), () {
       if (!completer.isCompleted) {
-        completer.completeError(state.message);
+        completer.completeError('Timeout: Data loading took too long');
       }
-      subscription?.cancel();
-      timer.cancel();
-      return;
-    }
+    });
 
-    // Check if all data has been loaded
-    if (isProductLoaded && isCategoryLoaded && isSubCategoryLoaded && isAdditionLoaded && isVariantLoaded) {
-      if (!completer.isCompleted) {
-        completer.complete();
+    bool isProductLoaded = false;
+    bool isCategoryLoaded = false;
+    bool isSubCategoryLoaded = false;
+    bool isAdditionLoaded = false;
+    bool isVariantLoaded = false;
+    bool isTaxLoaded = false;
+
+    productBloc.add(FetchCategoriesEvent());
+    productBloc.add(FetchSubCategoriesEvent());
+    productBloc.add(FetchProductsEvent());
+    productBloc.add(FetchAdditionsEvent());
+    productBloc.add(FetchVariantsEvent());
+    productBloc.add(FetchTaxEvent());
+
+    StreamSubscription? subscription;
+    subscription = productBloc.stream.listen((state) async {
+      if (state is ProductLoaded) {
+        isProductLoaded = true;
+        await localDataSource.cacheProducts(state.products);
+      } else if (state is CategoryLoaded) {
+        isCategoryLoaded = true;
+        await localDataSource.cacheCategories(state.categories);
+      } else if (state is SubCategoryLoaded) {
+        isSubCategoryLoaded = true;
+        await localDataSource.cacheSubCategories(state.subCategories);
+      } else if (state is AdditionLoaded) {
+        isAdditionLoaded = true;
+        await localDataSource.cacheAdditions(state.additions);
+      } else if (state is VariantLoaded) {
+        isVariantLoaded = true;
+        await localDataSource.cacheVariants(state.variants);
+      } else if (state is TaxLoaded) {
+        isTaxLoaded = true;
+        await localDataSource.cacheTaxAmount(state.taxAmount);
+      } else if (state is ProductError) {
+        emit(this.state.copyWith(error: state.message, isLoading: false));
+        if (!completer.isCompleted) {
+          completer.completeError(state.message);
+        }
+        subscription?.cancel();
+        timer.cancel();
+        return;
       }
-      subscription?.cancel();
+
+      if (isProductLoaded && isCategoryLoaded && isSubCategoryLoaded && isAdditionLoaded && isVariantLoaded && isTaxLoaded) {
+        if (!completer.isCompleted) {
+          completer.complete();
+        }
+        subscription?.cancel();
+        timer.cancel();
+      }
+    });
+
+    try {
+      await completer.future;
+      emit(state.copyWith(isLoading: false));
+    } catch (error) {
+      emit(state.copyWith(error: error.toString(), isLoading: false));
+    } finally {
       timer.cancel();
     }
-  });
-
-  try {
-    await completer.future;
-    emit(state.copyWith(isLoading: false));
-  } catch (error) {
-    emit(state.copyWith(error: error.toString(), isLoading: false));
-  } finally {
-    timer.cancel(); // Ensure the timer is canceled if the task is completed
   }
-}
 
   void updateSearchText(String newText) {
     emit(state.copyWith(searchText: newText, selectedSubCategory: 0));
@@ -139,7 +144,6 @@ class CashierCubit extends Cubit<CashierState> {
   }
 }
 
-
 class CashierState {
   final String searchText;
   final int selectedCategory;
@@ -149,6 +153,7 @@ class CashierState {
   final List<SubCategoryModel> subCategories;
   final List<AdditionModel> additions;
   final List<VariantModel> variants;
+  final double taxAmount; // New field for tax amount
   final String? error;
   final bool isLoading;
 
@@ -161,6 +166,7 @@ class CashierState {
     this.subCategories = const [],
     this.additions = const [],
     this.variants = const [],
+    this.taxAmount = 0,
     this.error,
     this.isLoading = false,
   });
@@ -174,6 +180,7 @@ class CashierState {
     List<SubCategoryModel>? subCategories,
     List<AdditionModel>? additions,
     List<VariantModel>? variants,
+    double? taxAmount,
     String? error,
     bool? isLoading,
   }) {
@@ -186,6 +193,7 @@ class CashierState {
       subCategories: subCategories ?? this.subCategories,
       additions: additions ?? this.additions,
       variants: variants ?? this.variants,
+      taxAmount: taxAmount ?? this.taxAmount,
       error: error ?? this.error,
       isLoading: isLoading ?? this.isLoading,
     );

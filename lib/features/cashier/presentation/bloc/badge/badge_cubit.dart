@@ -8,7 +8,7 @@ class BadgeCubit extends Cubit<int> {
   BadgeCubit(this._transactionService) : super(0);
 
   void updateBadgeCount() async {
-    List<FullTransactionModel> transactions = await _transactionService.getFullTransactions();
+    List<SaveTransactionModel> transactions = await _transactionService.getFullTransactions();
     emit(transactions.length);
   }
 

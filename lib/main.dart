@@ -86,6 +86,7 @@ class MyApp extends StatelessWidget {
             ),
             textTheme: GoogleFonts.plusJakartaSansTextTheme(),
             primaryColor: AppColors.primaryMain,
+            indicatorColor: AppColors.primaryMain,
    progressIndicatorTheme: const ProgressIndicatorThemeData(
           color: AppColors.primaryMain, // Warna progress indicator
         ),

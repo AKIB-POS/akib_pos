@@ -64,3 +64,13 @@ class ProductError extends ProductState {
   @override
   List<Object> get props => [message];
 }
+
+
+class TaxLoaded extends ProductState {
+  final double taxAmount;
+
+  const TaxLoaded({required this.taxAmount});
+
+  @override
+  List<Object> get props => [taxAmount];
+}

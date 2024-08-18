@@ -23,33 +23,72 @@ abstract class KasirRepository {
   Future<Either<Failure, List<MemberModel>>> searchMemberByName(String name);
   Future<Either<Failure, void>> postMember(String name, String phoneNumber, {String? email});
   Future<Either<Failure, MemberModel>> updateMember(MemberModel member);
+  Future<Either<Failure, double>> getTaxAmount();
 }
 
 class KasirRepositoryImpl implements KasirRepository {
   final KasirRemoteDataSource remoteDataSource;
-  final KasirLocalDataSource localDataSource;
 
   KasirRepositoryImpl({
     required this.remoteDataSource,
-    required this.localDataSource,
   });
 
-   @override
-  Future<Either<Failure, MemberModel>> updateMember(MemberModel member) async {
+  @override
+  Future<Either<Failure, double>> getTaxAmount() async {
     try {
-      final updatedMember = await remoteDataSource.updateMember(member);
-      return Right(updatedMember);
-    } catch (e) {
+      final taxAmount = await remoteDataSource.getTaxAmount();
+      return Right(taxAmount);
+    } catch (error) {
       return Left(ServerFailure());
     }
   }
 
-   @override
-  Future<Either<Failure, void>> postMember(String name, String phoneNumber, {String? email}) async {
+  @override
+  Future<Either<Failure, List<CategoryModel>>> getCategories() async {
     try {
-      await remoteDataSource.postMember(name, phoneNumber, email: email);
-      return Right(null);
-    } catch (e) {
+      final categories = await remoteDataSource.getCategories();
+      return Right(categories);
+    } catch (error) {
+      return Left(ServerFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ProductModel>>> getAllProducts() async {
+    try {
+      final products = await remoteDataSource.getAllProducts();
+      return Right(products);
+    } catch (error) {
+      return Left(ServerFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<SubCategoryModel>>> getSubCategories() async {
+    try {
+      final subCategories = await remoteDataSource.getSubCategories();
+      return Right(subCategories);
+    } catch (error) {
+      return Left(ServerFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<VariantModel>>> getVariants() async {
+    try {
+      final variants = await remoteDataSource.getVariants();
+      return Right(variants);
+    } catch (error) {
+      return Left(ServerFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<AdditionModel>>> getAdditions() async {
+    try {
+      final additions = await remoteDataSource.getAdditions();
+      return Right(additions);
+    } catch (error) {
       return Left(ServerFailure());
     }
   }
@@ -59,7 +98,7 @@ class KasirRepositoryImpl implements KasirRepository {
     try {
       final members = await remoteDataSource.getAllMembers();
       return Right(members);
-    } catch (e) {
+    } catch (error) {
       return Left(ServerFailure());
     }
   }
@@ -69,127 +108,37 @@ class KasirRepositoryImpl implements KasirRepository {
     try {
       final members = await remoteDataSource.searchMemberByName(name);
       return Right(members);
-    } catch (e) {
+    } catch (error) {
       return Left(ServerFailure());
     }
   }
 
   @override
-  Future<Either<Failure, List<ProductModel>>> getAllProducts() async {
-    return await _getProducts(() {
-      return remoteDataSource.getAllProducts().then((products) {
-        localDataSource.cacheProducts(products);
-        return products;
-      });
-    });
+  Future<Either<Failure, void>> postMember(String name, String phoneNumber, {String? email}) async {
+    try {
+      await remoteDataSource.postMember(name, phoneNumber, email: email);
+      return Right(null);
+    } catch (error) {
+      return Left(ServerFailure());
+    }
   }
 
   @override
-  Future<Either<Failure, List<CategoryModel>>> getCategories() async {
-    return await _getCategories(() {
-      return remoteDataSource.getCategories().then((categories) {
-        localDataSource.cacheCategories(categories);
-        return categories;
-      });
-    });
-  }
-
-  @override
-  Future<Either<Failure, List<SubCategoryModel>>> getSubCategories() async {
-    return await _getSubCategories(() {
-      return remoteDataSource.getSubCategories().then((subCategories) {
-        localDataSource.cacheSubCategories(subCategories);
-        return subCategories;
-      });
-    });
-  }
-
-  @override
-  Future<Either<Failure, List<VariantModel>>> getVariants() async {
-    return await _getVariants(() {
-      return remoteDataSource.getVariants().then((variants) {
-        localDataSource.cacheVariants(variants);
-        return variants;
-      });
-    });
-  }
-
-  @override
-  Future<Either<Failure, List<AdditionModel>>> getAdditions() async {
-    return await _getAdditions(() {
-      return remoteDataSource.getAdditions().then((additions) {
-        localDataSource.cacheAdditions(additions);
-        return additions;
-      });
-    });
-  }
-
-  Future<Either<Failure, List<ProductModel>>> _getProducts(
-      Future<List<ProductModel>> Function() getProducts) async {
+  Future<Either<Failure, MemberModel>> updateMember(MemberModel member) async {
     try {
-      final products = await getProducts();
-      return Right(products);
-    } on ServerException {
+      final updatedMember = await remoteDataSource.updateMember(member);
+      return Right(updatedMember);
+    } catch (error) {
       return Left(ServerFailure());
-    } catch (_) {
-      return Left(NetworkFailure());
     }
   }
 
-  Future<Either<Failure, List<CategoryModel>>> _getCategories(
-      Future<List<CategoryModel>> Function() getCategories) async {
-    try {
-      final categories = await getCategories();
-      return Right(categories);
-    } on ServerException {
-      return Left(ServerFailure());
-    } catch (_) {
-      return Left(NetworkFailure());
-    }
-  }
-
-  Future<Either<Failure, List<SubCategoryModel>>> _getSubCategories(
-      Future<List<SubCategoryModel>> Function() getSubCategories) async {
-    try {
-      final subCategories = await getSubCategories();
-      return Right(subCategories);
-    } on ServerException {
-      return Left(ServerFailure());
-    } catch (_) {
-      return Left(NetworkFailure());
-    }
-  }
-
-  Future<Either<Failure, List<VariantModel>>> _getVariants(
-      Future<List<VariantModel>> Function() getVariants) async {
-    try {
-      final variants = await getVariants();
-      return Right(variants);
-    } on ServerException {
-      return Left(ServerFailure());
-    } catch (_) {
-      return Left(NetworkFailure());
-    }
-  }
-
-  Future<Either<Failure, List<AdditionModel>>> _getAdditions(
-      Future<List<AdditionModel>> Function() getAdditions) async {
-    try {
-      final additions = await getAdditions();
-      return Right(additions);
-    } on ServerException {
-      return Left(ServerFailure());
-    } catch (_) {
-      return Left(NetworkFailure());
-    }
-  }
-  
   @override
   Future<Either<Failure, RedeemVoucherResponse>> redeemVoucher(String code) async {
     try {
       final voucher = await remoteDataSource.redeemVoucher(code);
       return Right(voucher);
-    } on ServerException {
+    } catch (error) {
       return Left(ServerFailure());
     }
   }

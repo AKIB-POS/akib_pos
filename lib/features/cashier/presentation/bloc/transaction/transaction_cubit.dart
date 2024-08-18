@@ -31,7 +31,7 @@ class TransactionState {
     required this.quantity,
     required this.transactions,
     this.discount = 0.0,
-    this.tax = 0.0,
+    this.tax = 0,
     this.voucher,
     this.customerId,
     this.customerName,
@@ -85,25 +85,23 @@ class TransactionCubit extends Cubit<TransactionState> {
 
   Future<void> saveFullTransaction(
       List<TransactionModel> transactions, String notes) async {
-    FullTransactionModel fullTransaction = FullTransactionModel(
+    SaveTransactionModel fullTransaction = SaveTransactionModel(
         transactions: transactions, savedNotes: notes, time: DateTime.now());
-
-    await transactionService.saveFullTransaction(fullTransaction);
-    emit(state.copyWith(transactions: [],customerName: "Nama Pelanggan",customerId: null, customerPhone: null));
+  emit(state.copyWith(transactions: [],customerName: "Nama Pelanggan",customerId: null, customerPhone: null,tax: 0));
   }
 
-  Future<List<FullTransactionModel>> getFullTransactions() async {
+  Future<List<SaveTransactionModel>> getFullTransactions() async {
     return await transactionService.getFullTransactions();
   }
 
   Future<void> loadFullTransactions(
-      FullTransactionModel fullTransaction) async {
+      SaveTransactionModel fullTransaction) async {
     final allTransactions = fullTransaction.transactions;
     emit(state.copyWith(transactions: allTransactions));
   }
 
   Future<void> removeFullTransaction(
-      FullTransactionModel fullTransaction) async {
+      SaveTransactionModel fullTransaction) async {
     await transactionService.removeFullTransaction(fullTransaction);
     await loadFullTransactions(fullTransaction);
   }
@@ -120,7 +118,7 @@ class TransactionCubit extends Cubit<TransactionState> {
       quantity: 1,
       transactions: state.transactions,
       discount: state.discount,
-      tax: state.tax,
+      tax: 0,
     ));
   }
 
@@ -162,10 +160,10 @@ class TransactionCubit extends Cubit<TransactionState> {
     emit(state.copyWith(notes: notes));
   }
 
-  void addTransaction(TransactionModel transaction) {
+  void addTransaction(TransactionModel transaction, double tax) {
     final updatedTransactions = List<TransactionModel>.from(state.transactions)
       ..add(transaction);
-    emit(state.copyWith(transactions: updatedTransactions));
+    emit(state.copyWith(transactions: updatedTransactions,tax: tax));
     _updateTotalPrice();
   }
 
@@ -180,6 +178,7 @@ class TransactionCubit extends Cubit<TransactionState> {
     final updatedTransactions = List<TransactionModel>.from(state.transactions)
       ..removeAt(index);
     emit(state.copyWith(transactions: updatedTransactions));
+    resetState();
   }
 
   void setInitialStateForEdit(TransactionModel transaction) {
@@ -237,10 +236,7 @@ class TransactionCubit extends Cubit<TransactionState> {
     _updateTotalPrice();
   }
 
-  void updateTax(double tax) {
-    emit(state.copyWith(tax: tax));
-    _updateTotalPrice();
-  }
+  
 
   void _updateTotalPrice({int? index, int reduce = 0}) {
     if (state.transactions.isEmpty) return;

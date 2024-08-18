@@ -1,11 +1,11 @@
 import 'package:akib_pos/features/cashier/data/models/transaction_model.dart';
 
-class FullTransactionModel {
+class SaveTransactionModel {
   final List<TransactionModel> transactions;
   final String savedNotes;
   final DateTime time; // Add this line
 
-  FullTransactionModel({
+  SaveTransactionModel({
     required this.transactions,
     required this.savedNotes,
     required this.time, // Add this line
@@ -17,7 +17,7 @@ class FullTransactionModel {
     'time': time.toIso8601String(), // Add this line
   };
 
-  factory FullTransactionModel.fromJson(Map<String, dynamic> json) => FullTransactionModel(
+  factory SaveTransactionModel.fromJson(Map<String, dynamic> json) => SaveTransactionModel(
     transactions: (json['transactions'] as List)
         .map((item) => TransactionModel.fromJson(item))
         .toList(),

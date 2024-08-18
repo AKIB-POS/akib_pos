@@ -35,7 +35,7 @@ Future<void> init() async {
 
   // Repository
   sl.registerLazySingleton<KasirRepository>(
-    () => KasirRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),
+    () => KasirRepositoryImpl(remoteDataSource: sl(),),
   );
 
   // Data sources

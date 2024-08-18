@@ -24,6 +24,7 @@ abstract class KasirRemoteDataSource {
   Future<List<MemberModel>> searchMemberByName(String name);
   Future<void> postMember(String name, String phoneNumber, {String? email});
   Future<MemberModel> updateMember(MemberModel member);
+  Future<double> getTaxAmount();
 }
 
 class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
@@ -34,6 +35,19 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
     required this.client,
     required this.sharedPrefsHelper,
   });
+
+  @override
+  Future<double> getTaxAmount() async {
+    final url = '${URLs.baseUrlMock}/tax';
+    final response = await client.get(Uri.parse(url), headers: _buildHeaders());
+
+    if (response.statusCode != 200) {
+      throw ServerException();
+    }
+
+    final Map<String, dynamic> jsonResponse = json.decode(response.body);
+    return jsonResponse['data']['amount'];
+  }
 
   @override
   Future<void> postMember(String name, String phoneNumber, {String? email}) async {

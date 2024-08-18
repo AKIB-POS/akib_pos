@@ -21,7 +21,7 @@ class SavedTransactionsDialog extends StatefulWidget {
 class _SavedTransactionsDialogState extends State<SavedTransactionsDialog> {
   TextEditingController _searchController = TextEditingController();
   FocusNode _focusNode = FocusNode();
-  List<FullTransactionModel> _filteredTransactions = [];
+  List<SaveTransactionModel> _filteredTransactions = [];
   bool _isListEmpty = false;
 
   @override
@@ -38,7 +38,7 @@ class _SavedTransactionsDialogState extends State<SavedTransactionsDialog> {
   }
 
   void _loadTransactions() async {
-    List<FullTransactionModel> transactions =
+    List<SaveTransactionModel> transactions =
         await context.read<TransactionCubit>().getFullTransactions();
     setState(() {
       _filteredTransactions = transactions;
@@ -47,7 +47,7 @@ class _SavedTransactionsDialogState extends State<SavedTransactionsDialog> {
   }
 
   void _filterTransactions(String query) async {
-    List<FullTransactionModel> transactions =
+    List<SaveTransactionModel> transactions =
         await context.read<TransactionCubit>().getFullTransactions();
     if (query.isEmpty) {
       setState(() {
@@ -179,7 +179,7 @@ class _SavedTransactionsDialogState extends State<SavedTransactionsDialog> {
 }
 
 void _showTransactionDetailDialog(
-    BuildContext context, FullTransactionModel fullTransaction) {
+    BuildContext context, SaveTransactionModel fullTransaction) {
   showDialog(
     context: context,
     builder: (BuildContext context) {

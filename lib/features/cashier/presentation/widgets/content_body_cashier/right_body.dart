@@ -292,7 +292,7 @@ class RightBody extends StatelessWidget {
                                 children: [
                                   const Text('Pajak(PPN)',
                                       style: AppTextStyle.body3),
-                                  Text(Utils.formatCurrencyDouble(state.tax),
+                                  Text("${state.tax}%",
                                       style: AppTextStyle.body3),
                                 ],
                               ),
@@ -391,7 +391,7 @@ class RightBody extends StatelessWidget {
                                                 .saveFullTransaction(
                                                     transactions, notes);
                                             // Get the saved full transactions count and update the badge count
-                                            List<FullTransactionModel>
+                                            List<SaveTransactionModel>
                                                 savedFullTransactions =
                                                 await context
                                                     .read<TransactionCubit>()
@@ -471,7 +471,7 @@ class RightBody extends StatelessWidget {
     print("apa statenya ${state.transactions}");
     final subtotal = _calculateSubtotal(state);
     final discount = _calculateDiscount(state);
-    final tax = state.tax;
+    final tax = state.tax/100 * subtotal;
     return (subtotal - discount + tax);
   }
 }

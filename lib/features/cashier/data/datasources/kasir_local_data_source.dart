@@ -40,9 +40,24 @@ class KasirLocalDataSource {
     await clearSubCategoriesCache();
     await clearAdditionsCache();
     await clearVariantsCache();
+    await clearTaxAmountCache();
   }
 
-  // Methods to cache products, categories, sub-categories, additions, and variants
+  // Methods to cache products, categories, sub-categories, additions,variants, and tax amount
+
+   Future<void> clearTaxAmountCache() async {
+    await sharedPreferences.remove('CACHED_TAX_AMOUNT');
+  }
+
+  // Method to cache tax amount
+  Future<void> cacheTaxAmount(double taxAmount) async {
+    await sharedPreferences.setDouble('CACHED_TAX_AMOUNT', taxAmount);
+  }
+
+  // Method to get cached tax amount
+  Future<double> getCachedTaxAmount() async {
+    return sharedPreferences.getDouble('CACHED_TAX_AMOUNT') ?? 0; // Default to 0 if no cached tax amount
+  }
   Future<void> cacheProducts(List<ProductModel> products) async {
     final productsJson = products.map((product) => product.toJson()).toList();
     await sharedPreferences.setString('CACHED_PRODUCTS', json.encode(productsJson));
