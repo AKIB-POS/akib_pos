@@ -1,10 +1,12 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/features/cashier/data/models/full_transaction_model.dart';
 import 'package:akib_pos/features/cashier/data/models/full_transaction_models.dart';
 import 'package:akib_pos/features/cashier/data/models/transaction_model.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/process_transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/transaction/payment_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/product_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/save_transaction_dialog.dart';
 import 'package:akib_pos/util/utils.dart';
@@ -418,8 +420,32 @@ class RightBody extends StatelessWidget {
                         Expanded(
                           flex: 6,
                           child: ElevatedButton(
-                            onPressed: () {
-                              // Handle Bayar action
+                            onPressed: isEmpty
+                          ? null
+                          : () {
+                              // Show the PaymentDialog
+                              final fullTransaction = FullTransactionModel(
+                                transactions: state.transactions,
+                                selectedVariants: state.selectedVariants,
+                                selectedAdditions: state.selectedAdditions,
+                                discount: state.discount,
+                                tax: state.tax,
+                                voucher: state.voucher,
+                                customerId: state.customerId,
+                                customerName: state.customerName,
+                                customerPhone: state.customerPhone,
+                                totalPrice: _calculateTotal(
+                                    context.read<TransactionCubit>().state)
+                              );
+
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return PaymentDialog(
+                                    fullTransaction: fullTransaction,
+                                  );
+                                },
+                              );
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor:
@@ -445,6 +471,8 @@ class RightBody extends StatelessWidget {
       ),
     );
   }
+
+  
 
   double _calculateSubtotal(TransactionState state) {
     print("${state.transactions}");
@@ -475,3 +503,5 @@ class RightBody extends StatelessWidget {
     return (subtotal - discount + tax);
   }
 }
+
+

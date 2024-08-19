@@ -61,7 +61,7 @@ void main() async {
                 BadgeCubit(sl())), // Ensure this is provided here
         BlocProvider(
             create: (context) =>
-                MemberCubit(repository: sl())), // Ensure this is provided here
+                MemberCubit(repository: sl())),
       ],
       child: MyApp(),
     ),

@@ -39,4 +39,13 @@ class VoucherData {
       amount: json['amount'].toDouble(),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'type': type,
+      'amount': amount,
+    };
+  }
 }

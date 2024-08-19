@@ -87,6 +87,7 @@ class TransactionCubit extends Cubit<TransactionState> {
       List<TransactionModel> transactions, String notes) async {
     SaveTransactionModel fullTransaction = SaveTransactionModel(
         transactions: transactions, savedNotes: notes, time: DateTime.now());
+          await transactionService.saveFullTransaction(fullTransaction);
   emit(state.copyWith(transactions: [],customerName: "Nama Pelanggan",customerId: null, customerPhone: null,tax: 0));
   }
 
