@@ -4,10 +4,12 @@ import 'package:akib_pos/features/cashier/data/datasources/transaction_service.d
 import 'package:akib_pos/features/cashier/data/repositories/kasir_repository.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/member/member_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/printer/printer_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/product/product_bloc.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
 import 'package:akib_pos/util/shared_prefs_helper.dart';
+import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -31,6 +33,9 @@ Future<void> init() async {
   );
   sl.registerFactory(
     () => MemberCubit(repository: sl()),
+  );
+  sl.registerFactory(
+    () => PrinterCubit(bluetooth: sl(),sharedPreferences: sl()),
   );
 
   // Repository
@@ -59,4 +64,5 @@ Future<void> init() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => http.Client());
+    sl.registerLazySingleton(() => BlueThermalPrinter.instance);
 }

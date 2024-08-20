@@ -1,17 +1,12 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_themes.dart';
 import 'package:akib_pos/features/cashier/data/models/full_transaction_model.dart';
-import 'package:akib_pos/features/cashier/data/models/transaction_model.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:auto_height_grid_view/auto_height_grid_view.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:intl/intl.dart';
-import 'package:sizer/sizer.dart';
 
 class PaymentDialog extends StatefulWidget {
   final FullTransactionModel fullTransaction;
@@ -87,7 +82,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
     widget.fullTransaction.paymentMethod = paymentMethod;
     widget.fullTransaction.paymentAmount = paymentAmount;
 
-    print(widget.fullTransaction.toJson());
+    print("apakah jsonnya${widget.fullTransaction.toApiJson()}");
 
     Future.delayed(const Duration(seconds: 2), () {
       setState(() {

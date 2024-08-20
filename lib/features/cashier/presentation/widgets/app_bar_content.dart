@@ -20,8 +20,10 @@ class AppBarContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final customerName = context.select((TransactionCubit cubit) => cubit.state.customerName);
-    final customerPhone = context.select((TransactionCubit cubit) => cubit.state.customerPhone); // Add this line
+    final customerName =
+        context.select((TransactionCubit cubit) => cubit.state.customerName);
+    final customerPhone = context.select(
+        (TransactionCubit cubit) => cubit.state.customerPhone); // Add this line
 
     return GestureDetector(
       onTap: () {
@@ -31,13 +33,16 @@ class AppBarContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           appBarLeft(_controller, context, _focusNode),
-          appBarRight(context, customerName, customerPhone), // Pass the phone number to the method
+          appBarRight(context, customerName,
+              customerPhone), // Pass the phone number to the method
         ],
       ),
     );
   }
 
-  Expanded appBarRight(BuildContext context, String? customerName, String? customerPhone) { // Add customerPhone parameter
+  Expanded appBarRight(
+      BuildContext context, String? customerName, String? customerPhone) {
+    // Add customerPhone parameter
     return Expanded(
       flex: 3,
       child: Container(
@@ -77,21 +82,24 @@ class AppBarContent extends StatelessWidget {
               children: [
                 Text(
                   customerName ?? 'Nama Pelanggan',
-                  style: AppTextStyle.headline5.copyWith(color: AppColors.textGrey800),
+                  style: AppTextStyle.headline5
+                      .copyWith(color: AppColors.textGrey800),
                 ),
                 const SizedBox(height: 0.5),
                 Visibility(
                   visible: customerPhone != null && customerPhone.isNotEmpty,
                   child: Text(
                     customerPhone ?? '',
-                    style: AppTextStyle.body3.copyWith(color: AppColors.textGrey500),
+                    style: AppTextStyle.body3
+                        .copyWith(color: AppColors.textGrey500),
                   ),
                 ),
               ],
             ),
             GestureDetector(
               onTap: () {
-                _showMemberDialog(context); // Panggil fungsi untuk menampilkan MemberDialog
+                _showMemberDialog(
+                    context); // Panggil fungsi untuk menampilkan MemberDialog
               },
               child: SvgPicture.asset(
                 "assets/icons/ic_note.svg",
@@ -114,7 +122,8 @@ class AppBarContent extends StatelessWidget {
     );
   }
 
-  Expanded appBarLeft(TextEditingController controller, BuildContext context, FocusNode focusNode) {
+  Expanded appBarLeft(TextEditingController controller, BuildContext context,
+      FocusNode focusNode) {
     return Expanded(
       flex: 5,
       child: Container(
@@ -166,7 +175,8 @@ class AppBarContent extends StatelessWidget {
                         focusColor: Colors.white,
                         fillColor: Colors.white,
                         filled: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8.0),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8.0),
                         suffixIcon: IconButton(
                           icon: const Icon(Icons.search, color: Colors.black),
                           onPressed: () {
@@ -182,33 +192,50 @@ class AppBarContent extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 2),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: BlocBuilder<BadgeCubit, int>(
-                builder: (context, badgeCount) {
-                  context.read<BadgeCubit>().updateBadgeCount();
-                  return badges.Badge(
-                    badgeContent: Text(badgeCount.toString(), style: const TextStyle(color: Colors.white)),
-                    child: GestureDetector(
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return SavedTransactionsDialog();
-                          },
-                        );
-                      },
-                      child: SvgPicture.asset(
-                        "assets/icons/ic_save.svg",
-                        height: 50.0,
+            const SizedBox(width: 10),
+            Container(
+              height: 50,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                color: Colors.white, // White background color
+                borderRadius: BorderRadius.circular(4.0), // Border radius of 4
+              ),
+              child: Center(
+                child: BlocBuilder<BadgeCubit, int>(
+                  builder: (context, badgeCount) {
+                    context.read<BadgeCubit>().updateBadgeCount();
+                    return badges.Badge(
+                      badgeContent: Text(
+                        badgeCount.toString(),
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10), // Smaller text size
                       ),
-                    ),
-                  );
-                },
+                      badgeStyle: badges.BadgeStyle(
+                        badgeColor:
+                            Colors.red, // Default badge color, adjust if needed
+                        padding: EdgeInsets.all(4.0), // Smaller badge size
+                      ),
+                      child: GestureDetector(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return SavedTransactionsDialog();
+                            },
+                          );
+                        },
+                        child: SvgPicture.asset(
+                          "assets/icons/ic_save1.svg",
+                          height: 2.h,
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
-            const SizedBox(width: 2),
+            
           ],
         ),
       ),

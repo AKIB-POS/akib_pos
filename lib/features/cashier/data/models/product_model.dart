@@ -11,9 +11,7 @@ class ProductModel {
   final int subCategoryId;
   final int? variantId;
   final int? additionId;
-  final List<SelectedVariant> selectedVariants;
-  final List<SelectedAddition> selectedAdditions;
-  final int? totalPrice; // New variable for storing total price
+  final int? totalPrice; // Field to store the total price
 
   ProductModel({
     required this.id,
@@ -26,9 +24,7 @@ class ProductModel {
     required this.subCategoryId,
     this.variantId,
     this.additionId,
-    required this.selectedVariants,
-    required this.selectedAdditions,
-    this.totalPrice, // Initialize the new variable
+    this.totalPrice,
   });
 
   ProductModel copyWith({
@@ -42,9 +38,7 @@ class ProductModel {
     int? subCategoryId,
     int? variantId,
     int? additionId,
-    List<SelectedVariant>? selectedVariants,
-    List<SelectedAddition>? selectedAdditions,
-    int? totalPrice, // Add the new variable to the copyWith method
+    int? totalPrice,
   }) {
     return ProductModel(
       id: id ?? this.id,
@@ -57,12 +51,19 @@ class ProductModel {
       subCategoryId: subCategoryId ?? this.subCategoryId,
       variantId: variantId ?? this.variantId,
       additionId: additionId ?? this.additionId,
-      selectedVariants: selectedVariants ?? this.selectedVariants,
-      selectedAdditions: selectedAdditions ?? this.selectedAdditions,
-      totalPrice: totalPrice ?? this.totalPrice, // Add the new variable
+      totalPrice: totalPrice ?? this.totalPrice,
     );
   }
 
+    /// Serialize only necessary fields for the API request
+  Map<String, dynamic> toApiJson() {
+    return {
+      'id': id,
+      'price': price,
+    };
+  }
+
+  // Factory method to create a ProductModel from JSON
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
       id: json['id'],
@@ -75,12 +76,11 @@ class ProductModel {
       subCategoryId: json['sub_category_id'],
       variantId: json['variant_id'] != null ? json['variant_id'] : null,
       additionId: json['addition_id'] != null ? json['addition_id'] : null,
-      selectedVariants: [],
-      selectedAdditions: [],
-      totalPrice: json['total_price'] != null ? int.parse(json['total_price']) : null, // Handle the new variable
+      totalPrice: json['total_price'] != null ? int.parse(json['total_price']) : null,
     );
   }
 
+  // Method to convert ProductModel to JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -93,27 +93,25 @@ class ProductModel {
       'sub_category_id': subCategoryId,
       'variant_id': variantId,
       'addition_id': additionId,
-      'selected_variants': selectedVariants.map((variant) => variant.toJson()).toList(),
-      'selected_additions': selectedAdditions.map((addition) => addition.toJson()).toList(),
-      'total_price': totalPrice?.toString(), // Add the new variable to the JSON map
+      'total_price': totalPrice?.toString(),
     };
   }
 
   @override
   String toString() {
-    return 'ProductModel{id: $id, name: $name, description: $description, price: $price, stock: $stock, imageUrl: $imageUrl, categoryId: $categoryId, subCategoryId: $subCategoryId, variantId: $variantId, additionId: $additionId, selectedVariants: $selectedVariants, selectedAdditions: $selectedAdditions, totalPrice: $totalPrice}';
+    return 'ProductModel{id: $id, name: $name, description: $description, price: $price, stock: $stock, imageUrl: $imageUrl, categoryId: $categoryId, subCategoryId: $subCategoryId, variantId: $variantId, additionId: $additionId, totalPrice: $totalPrice}';
   }
 }
 
 
 class SelectedVariant {
-  final int id; // Add an ID field
+  final int id;
   final String name;
   final int price;
   final String subVariantType;
 
   SelectedVariant({
-    required this.id, // Include this in the constructor
+    required this.id,
     required this.name,
     required this.price,
     required this.subVariantType,
@@ -121,18 +119,27 @@ class SelectedVariant {
 
   factory SelectedVariant.fromJson(Map<String, dynamic> json) {
     return SelectedVariant(
-      id: json['id'], // Parse the ID from JSON
+      id: json['id'],
       name: json['name'],
-      price: int.parse(json['price']),
+      price: json['price'],
       subVariantType: json['sub_variant_type'],
     );
   }
 
+  /// Serialize only necessary fields for the API request
+  Map<String, dynamic> toApiJson() {
+    return {
+      'id': id,
+      'price': price,
+    };
+  }
+
+  /// General purpose serialization (all fields)
   Map<String, dynamic> toJson() {
     return {
-      'id': id, // Include the ID in the toJson method
+      'id': id,
       'name': name,
-      'price': price.toString(),
+      'price': price,
       'sub_variant_type': subVariantType,
     };
   }
@@ -146,29 +153,38 @@ class SelectedVariant {
 
 
 class SelectedAddition {
-  final int id; // Add an ID field
+  final int id;
   final String name;
   final int price;
 
   SelectedAddition({
-    required this.id, // Include this in the constructor
+    required this.id,
     required this.name,
     required this.price,
   });
 
   factory SelectedAddition.fromJson(Map<String, dynamic> json) {
     return SelectedAddition(
-      id: json['id'], // Parse the ID from JSON
+      id: json['id'],
       name: json['name'],
-      price: int.parse(json['price']),
+      price: json['price'],
     );
   }
 
+  /// Serialize only necessary fields for the API request
+  Map<String, dynamic> toApiJson() {
+    return {
+      'id': id,
+      'price': price.toString(),
+    };
+  }
+
+  /// General purpose serialization (all fields)
   Map<String, dynamic> toJson() {
     return {
-      'id': id, // Include the ID in the toJson method
+      'id': id,
       'name': name,
-      'price': price.toString(),
+      'price': price,
     };
   }
 

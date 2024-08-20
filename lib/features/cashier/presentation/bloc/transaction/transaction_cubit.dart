@@ -97,12 +97,13 @@ class TransactionCubit extends Cubit<TransactionState> {
         customerId: state.customerId,
         customerName: state.customerName,
         customerPhone: state.customerPhone,
+        tax: state.tax
       );
 
       await transactionService.saveFullTransaction(fullTransaction);
     }else{
       SaveTransactionModel fullTransaction = SaveTransactionModel(
-        transactions: transactions, savedNotes: notes, time: DateTime.now());
+        transactions: transactions, savedNotes: notes, time: DateTime.now(),tax: state.tax);
           await transactionService.saveFullTransaction(fullTransaction);
     }
 
@@ -122,7 +123,7 @@ class TransactionCubit extends Cubit<TransactionState> {
   Future<void> loadFullTransactions(
       SaveTransactionModel fullTransaction) async {
     final allTransactions = fullTransaction.transactions;
-    emit(state.copyWith(transactions: allTransactions));
+    emit(state.copyWith(transactions: allTransactions, tax: fullTransaction.tax,discount: fullTransaction.discount));
   }
 
   Future<void> removeFullTransaction(
@@ -200,7 +201,10 @@ class TransactionCubit extends Cubit<TransactionState> {
     final updatedTransactions = List<TransactionModel>.from(state.transactions)
       ..removeAt(index);
     emit(state.copyWith(transactions: updatedTransactions));
-    resetState();
+    if(state.transactions.isEmpty){
+      resetState();
+    }
+    
   }
 
   void setInitialStateForEdit(TransactionModel transaction) {

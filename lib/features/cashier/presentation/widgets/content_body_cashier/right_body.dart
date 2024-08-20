@@ -6,6 +6,7 @@ import 'package:akib_pos/features/cashier/data/models/transaction_model.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/process_transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/printer_management_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/payment_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/product_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/save_transaction_dialog.dart';
@@ -37,35 +38,38 @@ class RightBody extends StatelessWidget {
             child: BlocBuilder<TransactionCubit, TransactionState>(
               builder: (context, state) {
                 if (state.transactions.isEmpty) {
-        return SingleChildScrollView(
-          child: Container(
-            alignment: Alignment.center, // Center the content in the container
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 8.h,),
-                SvgPicture.asset(
-                  "assets/images/empty_cart.svg",
-                  height: 12.h,
-                  width: 12.h,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Belum ada transaksi',
-                  style: AppTextStyle.headline6,
-                ),
-                const Text(
-                  'Silahkan tambahkan produk ke keranjang\nmelalui katalog yang ada',
-                  style: AppTextStyle.body3,
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        );
-      }
+                  return SingleChildScrollView(
+                    child: Container(
+                      alignment: Alignment
+                          .center, // Center the content in the container
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            height: 8.h,
+                          ),
+                          SvgPicture.asset(
+                            "assets/images/empty_cart.svg",
+                            height: 12.h,
+                            width: 12.h,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Belum ada transaksi',
+                            style: AppTextStyle.headline6,
+                          ),
+                          const Text(
+                            'Silahkan tambahkan produk ke keranjang\nmelalui katalog yang ada',
+                            style: AppTextStyle.body3,
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
                 return ListView.builder(
                   itemCount: state.transactions.length,
                   itemBuilder: (context, index) {
@@ -362,7 +366,38 @@ class RightBody extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(
-                          flex: 4,
+                          flex: 1,
+                          child: GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return PrinterManagementDialog();
+                                },
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 8),
+                              decoration: BoxDecoration(
+                                border:
+                                    Border.all(color: AppColors.primaryMain),
+                                color: Colors.white, // White background color
+                                borderRadius: BorderRadius.circular(
+                                    4.0), // Border radius of 4
+                              ),
+                              child: SvgPicture.asset(
+                                "assets/icons/ic_print.svg",
+                                height: 2.h,
+                                colorFilter: ColorFilter.mode(
+                                    AppColors.primaryMain, BlendMode.srcIn),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          flex: 3,
                           child: OutlinedButton(
                             style: OutlinedButton.styleFrom(
                               side: BorderSide(
@@ -371,7 +406,7 @@ class RightBody extends StatelessWidget {
                                     : Theme.of(context).primaryColor,
                               ),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(4),
                               ),
                             ),
                             onPressed: isEmpty
@@ -418,41 +453,40 @@ class RightBody extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Expanded(
-                          flex: 6,
+                          flex: 5,
                           child: ElevatedButton(
                             onPressed: isEmpty
-                          ? null
-                          : () {
-                              // Show the PaymentDialog
-                              final fullTransaction = FullTransactionModel(
-                                transactions: state.transactions,
-                                selectedVariants: state.selectedVariants,
-                                selectedAdditions: state.selectedAdditions,
-                                discount: state.discount,
-                                tax: state.tax,
-                                voucher: state.voucher,
-                                customerId: state.customerId,
-                                customerName: state.customerName,
-                                customerPhone: state.customerPhone,
-                                totalPrice: _calculateTotal(
-                                    context.read<TransactionCubit>().state)
-                              );
+                                ? null
+                                : () {
+                                    // Show the PaymentDialog
+                                    final fullTransaction =
+                                        FullTransactionModel(
+                                            transactions: state.transactions,
+                                            discount: state.discount,
+                                            tax: _getTax(state),
+                                            voucher: state.voucher,
+                                            customerId: state.customerId,
+                                            customerName: state.customerName,
+                                            customerPhone: state.customerPhone,
+                                            totalPrice: _calculateTotal(context
+                                                .read<TransactionCubit>()
+                                                .state));
 
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return PaymentDialog(
-                                    fullTransaction: fullTransaction,
-                                  );
-                                },
-                              );
-                            },
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return PaymentDialog(
+                                          fullTransaction: fullTransaction,
+                                        );
+                                      },
+                                    );
+                                  },
                             style: ElevatedButton.styleFrom(
                               backgroundColor:
                                   isEmpty ? Colors.grey : AppColors.primaryMain,
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
+                                borderRadius: BorderRadius.circular(4.0),
                               ),
                             ),
                             child: Text('Bayar',
@@ -471,8 +505,6 @@ class RightBody extends StatelessWidget {
       ),
     );
   }
-
-  
 
   double _calculateSubtotal(TransactionState state) {
     print("${state.transactions}");
@@ -499,9 +531,17 @@ class RightBody extends StatelessWidget {
     print("apa statenya ${state.transactions}");
     final subtotal = _calculateSubtotal(state);
     final discount = _calculateDiscount(state);
-    final tax = state.tax/100 * subtotal;
-    return (subtotal - discount + tax);
+    final totall = subtotal - discount;
+    final tax = state.tax / 100 * totall;
+    return (subtotal + tax);
+  }
+
+  double _getTax(TransactionState state) {
+    print("apa statenya ${state.transactions}");
+    final subtotal = _calculateSubtotal(state);
+    final discount = _calculateDiscount(state);
+    final totall = subtotal - discount;
+    final tax = state.tax / 100 * totall;
+    return (tax);
   }
 }
-
-

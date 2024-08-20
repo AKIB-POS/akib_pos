@@ -5,6 +5,7 @@ import 'package:akib_pos/features/cashier/data/models/save_transaction_model.dar
 import 'package:akib_pos/features/cashier/data/models/transaction_model.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/test_print.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -178,6 +179,29 @@ class _SavedTransactionsDialogState extends State<SavedTransactionsDialog> {
   }
 }
 
+double _calculateSubtotal(SaveTransactionModel transaction) {
+  return transaction.transactions.fold(
+    0.0,
+    (total, item) => total + item.product.totalPrice!,
+  );
+}
+
+double _calculateTax(SaveTransactionModel transaction) {
+  final subtotal = _calculateSubtotal(transaction);
+  return subtotal * (transaction.tax / 100);
+}
+
+double _calculateDiscount(SaveTransactionModel transaction) {
+  return transaction.discount ?? 0.0;
+}
+
+double _calculateTotal(SaveTransactionModel transaction) {
+  final subtotal = _calculateSubtotal(transaction);
+  final tax = _calculateTax(transaction);
+  final discount = _calculateDiscount(transaction);
+  return subtotal + tax - discount;
+}
+
 void _showTransactionDetailDialog(
     BuildContext context, SaveTransactionModel fullTransaction) {
   showDialog(
@@ -216,10 +240,10 @@ void _showTransactionDetailDialog(
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 16,right: 16),
+                  padding: const EdgeInsets.only(left: 16, right: 16),
                   child: SingleChildScrollView(
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 2,bottom: 16),
+                      padding: const EdgeInsets.only(top: 2, bottom: 16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -256,8 +280,9 @@ void _showTransactionDetailDialog(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.start,
-                              children: [                               
-                                Text("Rincian Pesanan",style: AppTextStyle.headline6),
+                              children: [
+                                Text("Rincian Pesanan",
+                                    style: AppTextStyle.headline6),
                                 SizedBox(height: 8),
                                 ListView.builder(
                                   shrinkWrap: true,
@@ -278,7 +303,10 @@ void _showTransactionDetailDialog(
                                             "${transaction.quantity} x ${transaction.product.name}",
                                           ),
                                           Text(
-                                            Utils.formatCurrency((transaction.product.price * transaction.quantity).toString()),
+                                            Utils.formatCurrency(
+                                                (transaction.product.price *
+                                                        transaction.quantity)
+                                                    .toString()),
                                           ),
                                         ],
                                       ),
@@ -311,7 +339,8 @@ void _showTransactionDetailDialog(
                         ),
                         onPressed: () async {
                           Navigator.of(context).pop();
-                          // Implement print receipt functionality here
+                          TestPrint testPrint = TestPrint();
+                          testPrint.printTransaction(fullTransaction);
                         },
                         child: Text(
                           'Cetak Struk',

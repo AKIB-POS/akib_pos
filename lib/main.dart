@@ -3,6 +3,7 @@ import 'package:akib_pos/di/injection_container.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/member/member_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/printer/printer_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/product/product_bloc.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/process_transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
@@ -13,6 +14,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 import 'package:akib_pos/di/injection_container.dart' as di;
 import 'firebase_options.dart';
@@ -22,6 +24,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+   await _requestPermissions(); 
   await di.init();
 
   runApp(
@@ -62,10 +65,27 @@ void main() async {
         BlocProvider(
             create: (context) =>
                 MemberCubit(repository: sl())),
+        BlocProvider(
+            create: (context) =>
+                PrinterCubit(bluetooth: sl(),sharedPreferences: sl())),
       ],
       child: MyApp(),
     ),
   );
+}
+
+Future<void> _requestPermissions() async {
+  // Request Bluetooth and Location Permissions
+  PermissionStatus bluetoothStatus = await Permission.bluetooth.status;
+  PermissionStatus locationStatus = await Permission.location.status;
+
+  if (!bluetoothStatus.isGranted) {
+    await Permission.bluetooth.request();
+  }
+
+  if (!locationStatus.isGranted) {
+    await Permission.location.request();
+  }
 }
 
 class MyApp extends StatelessWidget {

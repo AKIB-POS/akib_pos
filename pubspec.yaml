@@ -61,6 +61,8 @@ dependencies:
   badges: ^3.1.2
   auto_height_grid_view: ^1.0.0
   currency_text_input_formatter: ^2.2.3
+  blue_thermal_printer: ^1.2.3
+  permission_handler: ^11.3.1
 
 dev_dependencies:
   flutter_test:

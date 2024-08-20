@@ -1,5 +1,4 @@
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
-
 class TransactionModel {
   final ProductModel product;
   final List<SelectedVariant> selectedVariants;
@@ -20,7 +19,6 @@ class TransactionModel {
     List<SelectedVariant>? selectedVariants,
     List<SelectedAddition>? selectedAdditions,
     String? notes,
-    String? savedNotes,
     int? quantity,
   }) {
     return TransactionModel(
@@ -34,9 +32,19 @@ class TransactionModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'product': product.toJson(),
+      'product': product.toJson(), // Full JSON with all fields
       'selectedVariants': selectedVariants.map((v) => v.toJson()).toList(),
       'selectedAdditions': selectedAdditions.map((a) => a.toJson()).toList(),
+      'notes': notes,
+      'quantity': quantity,
+    };
+  }
+
+  Map<String, dynamic> toApiJson() {
+    return {
+      'product': product.toApiJson(), // Reduced JSON for API with only necessary fields
+      'selectedVariants': selectedVariants.map((v) => v.toApiJson()).toList(),
+      'selectedAdditions': selectedAdditions.map((a) => a.toApiJson()).toList(),
       'notes': notes,
       'quantity': quantity,
     };

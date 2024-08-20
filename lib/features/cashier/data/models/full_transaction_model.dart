@@ -4,8 +4,6 @@ import 'package:akib_pos/features/cashier/data/models/redeem_voucher_response.da
 import 'package:akib_pos/features/cashier/data/models/transaction_model.dart';
 
 class FullTransactionModel {
-  final List<SelectedVariant> selectedVariants;
-  final List<SelectedAddition> selectedAdditions;
   final List<TransactionModel> transactions;
   final double totalPrice;
   final double discount;
@@ -14,13 +12,13 @@ class FullTransactionModel {
   final int? customerId;
   final String? customerName;
   final String? customerPhone;
-  String? paymentMethod;  // New field
-  double? paymentAmount;  // New field
+  String? paymentMethod;
+  double? paymentAmount;
+  final int companyId; // New field
+  final int branchId;  // New field
 
   FullTransactionModel({
-    required this.selectedVariants,
-    required this.selectedAdditions,
-      required this.transactions,
+    required this.transactions,
     required this.totalPrice,
     required this.discount,
     required this.tax,
@@ -30,36 +28,89 @@ class FullTransactionModel {
     this.customerPhone,
     this.paymentMethod,
     this.paymentAmount,
+    this.companyId = 1, // Default value
+    this.branchId = 1,  // Default value
   });
 
-  Map<String, dynamic> toJson() => {
-        'selectedVariants': selectedVariants.map((v) => v.toJson()).toList(),
-        'selectedAdditions': selectedAdditions.map((a) => a.toJson()).toList(),
-        'transactions': transactions.map((t) => t.toJson()).toList(),
-        'totalPrice': totalPrice,
-        'discount': discount,
-        'tax': tax,
-        'voucher': voucher?.toJson(),
-        'customerId': customerId,
-        'customerName': customerName,
-        'customerPhone': customerPhone,
-        'paymentMethod': paymentMethod,
-        'paymentAmount': paymentAmount,
-        
-      };
+  FullTransactionModel copyWith({
+    List<TransactionModel>? transactions,
+    double? totalPrice,
+    double? discount,
+    double? tax,
+    VoucherData? voucher,
+    int? customerId,
+    String? customerName,
+    String? customerPhone,
+    String? paymentMethod,
+    double? paymentAmount,
+    int? companyId,
+    int? branchId,
+  }) {
+    return FullTransactionModel(
+      transactions: transactions ?? this.transactions,
+      totalPrice: totalPrice ?? this.totalPrice,
+      discount: discount ?? this.discount,
+      tax: tax ?? this.tax,
+      voucher: voucher ?? this.voucher,
+      customerId: customerId ?? this.customerId,
+      customerName: customerName ?? this.customerName,
+      customerPhone: customerPhone ?? this.customerPhone,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      paymentAmount: paymentAmount ?? this.paymentAmount,
+      companyId: companyId ?? this.companyId, // Include new field
+      branchId: branchId ?? this.branchId,    // Include new field
+    );
+  }
 
-  factory FullTransactionModel.fromJson(Map<String, dynamic> json) => FullTransactionModel(
-        selectedVariants: (json['selectedVariants'] as List).map((item) => SelectedVariant.fromJson(item)).toList(),
-        selectedAdditions: (json['selectedAdditions'] as List).map((item) => SelectedAddition.fromJson(item)).toList(),
-        transactions: (json['transactions'] as List).map((item) => TransactionModel.fromJson(item)).toList(),
-        totalPrice: json['totalPrice'],
-        discount: json['discount'],
-        tax: json['tax'],
-        voucher: json['voucher'] != null ? VoucherData.fromJson(json['voucher']) : null,
-        customerId: json['customerId'],
-        customerName: json['customerName'],
-        customerPhone: json['customerPhone'],
-        paymentMethod: json['paymentMethod'],
-        paymentAmount: json['paymentAmount'], 
-      );
+  // General JSON serialization for full object data
+  Map<String, dynamic> toJson() {
+    return {
+      'transactions': transactions.map((t) => t.toJson()).toList(),
+      'totalPrice': totalPrice,
+      'discount': discount,
+      'tax': tax,
+      'voucher': voucher?.toJson(),
+      'customerId': customerId,
+      'customerName': customerName,
+      'customerPhone': customerPhone,
+      'paymentMethod': paymentMethod,
+      'paymentAmount': paymentAmount,
+      'companyId': companyId, // Include in JSON output
+      'branchId': branchId,   // Include in JSON output
+    };
+  }
+
+  // JSON serialization tailored for API request
+  Map<String, dynamic> toApiJson() {
+    return {
+      'transactions': transactions.map((t) => t.toApiJson()).toList(), // Use toApiJson of TransactionModel
+      'totalPrice': totalPrice,
+      'discount': discount,
+      'tax': tax,
+      'customerId': customerId,
+      'paymentMethod': paymentMethod,
+      'paymentAmount': paymentAmount,
+      'companyId': companyId, // Include in API JSON output
+      'branchId': branchId,   // Include in API JSON output
+    };
+  }
+
+  factory FullTransactionModel.fromJson(Map<String, dynamic> json) {
+    return FullTransactionModel(
+      transactions: (json['transactions'] as List)
+          .map((item) => TransactionModel.fromJson(item))
+          .toList(),
+      totalPrice: json['totalPrice'],
+      discount: json['discount'],
+      tax: json['tax'],
+      voucher: json['voucher'] != null ? VoucherData.fromJson(json['voucher']) : null,
+      customerId: json['customerId'],
+      customerName: json['customerName'],
+      customerPhone: json['customerPhone'],
+      paymentMethod: json['paymentMethod'],
+      paymentAmount: json['paymentAmount'],
+      companyId: json['companyId'] ?? 1, // Parse the new field, with default
+      branchId: json['branchId'] ?? 1,   // Parse the new field, with default
+    );
+  }
 }
