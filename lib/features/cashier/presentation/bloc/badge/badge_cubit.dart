@@ -1,5 +1,5 @@
 import 'package:akib_pos/features/cashier/data/datasources/transaction_service.dart';
-import 'package:akib_pos/features/cashier/data/models/full_transaction_models.dart';
+import 'package:akib_pos/features/cashier/data/models/save_transaction_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BadgeCubit extends Cubit<int> {

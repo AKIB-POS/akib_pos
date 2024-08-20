@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:akib_pos/features/cashier/data/models/full_transaction_models.dart';
+import 'package:akib_pos/features/cashier/data/models/save_transaction_model.dart';
 import 'package:akib_pos/features/cashier/data/models/transaction_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class TransactionService {
   final SharedPreferences sharedPreferences;
-  static const String _transactionKey = 'transactions';
+  static const String _transactionKey = 'Save_transactions';
 
   TransactionService({required this.sharedPreferences});
 

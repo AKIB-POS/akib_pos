@@ -107,50 +107,58 @@ class ProductModel {
 
 
 class SelectedVariant {
+  final int id; // Add an ID field
   final String name;
   final int price;
-  final String subVariantType; // Add this to ensure uniqueness within a subVariantType
+  final String subVariantType;
 
   SelectedVariant({
+    required this.id, // Include this in the constructor
     required this.name,
     required this.price,
-    required this.subVariantType, // Add this to ensure uniqueness within a subVariantType
+    required this.subVariantType,
   });
 
   factory SelectedVariant.fromJson(Map<String, dynamic> json) {
     return SelectedVariant(
+      id: json['id'], // Parse the ID from JSON
       name: json['name'],
       price: int.parse(json['price']),
-      subVariantType: json['sub_variant_type'], // Add this to ensure uniqueness within a subVariantType
+      subVariantType: json['sub_variant_type'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id, // Include the ID in the toJson method
       'name': name,
       'price': price.toString(),
-      'sub_variant_type': subVariantType, // Add this to ensure uniqueness within a subVariantType
+      'sub_variant_type': subVariantType,
     };
   }
 
   @override
   String toString() {
-    return 'SelectedVariant{name: $name, price: $price, subVariantType: $subVariantType}';
+    return 'SelectedVariant{id: $id, name: $name, price: $price, subVariantType: $subVariantType}';
   }
 }
 
 
+
 class SelectedAddition {
+  final int id; // Add an ID field
   final String name;
   final int price;
 
   SelectedAddition({
+    required this.id, // Include this in the constructor
     required this.name,
     required this.price,
   });
 
   factory SelectedAddition.fromJson(Map<String, dynamic> json) {
     return SelectedAddition(
+      id: json['id'], // Parse the ID from JSON
       name: json['name'],
       price: int.parse(json['price']),
     );
@@ -158,6 +166,7 @@ class SelectedAddition {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id, // Include the ID in the toJson method
       'name': name,
       'price': price.toString(),
     };
@@ -165,6 +174,6 @@ class SelectedAddition {
 
   @override
   String toString() {
-    return 'SelectedAddition{name: $name, price: $price}';
+    return 'SelectedAddition{id: $id, name: $name, price: $price}';
   }
 }

@@ -1,10 +1,10 @@
 import 'package:akib_pos/features/cashier/data/datasources/transaction_service.dart';
 import 'package:akib_pos/features/cashier/data/models/addition_model.dart';
 import 'package:akib_pos/features/cashier/data/models/addition_option.dart';
-import 'package:akib_pos/features/cashier/data/models/full_transaction_models.dart';
+import 'package:akib_pos/features/cashier/data/models/save_transaction_model.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
 import 'package:akib_pos/features/cashier/data/models/redeem_voucher_response.dart';
-import 'package:akib_pos/features/cashier/data/models/varian_option.dart';
+
 import 'package:akib_pos/features/cashier/data/models/variant_model.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
 import 'package:flutter/material.dart';
@@ -83,14 +83,38 @@ class TransactionCubit extends Cubit<TransactionState> {
     emit(state.copyWith(customerId: customerId, customerName: customerName,customerPhone: customerPhone));
   }
 
-  Future<void> saveFullTransaction(
-      List<TransactionModel> transactions, String notes) async {
-    SaveTransactionModel fullTransaction = SaveTransactionModel(
+ Future<void> saveFullTransaction(List<TransactionModel> transactions, String notes) async {
+    if (state.customerId != null && 
+        state.customerName != null && state.customerName!.isNotEmpty && 
+        state.customerPhone != null && state.customerPhone!.isNotEmpty &&
+        state.discount > 0) {
+        
+      SaveTransactionModel fullTransaction = SaveTransactionModel(
+        transactions: transactions,
+        savedNotes: notes,
+        time: DateTime.now(),
+        discount: state.discount,
+        customerId: state.customerId,
+        customerName: state.customerName,
+        customerPhone: state.customerPhone,
+      );
+
+      await transactionService.saveFullTransaction(fullTransaction);
+    }else{
+      SaveTransactionModel fullTransaction = SaveTransactionModel(
         transactions: transactions, savedNotes: notes, time: DateTime.now());
           await transactionService.saveFullTransaction(fullTransaction);
-  emit(state.copyWith(transactions: [],customerName: "Nama Pelanggan",customerId: null, customerPhone: null,tax: 0));
-  }
+    }
 
+    // Reset state after saving
+    emit(state.copyWith(
+      transactions: [],
+      customerName: "Nama Pelanggan",
+      customerId: null,
+      customerPhone: null,
+      tax: 0,
+    ));
+  }
   Future<List<SaveTransactionModel>> getFullTransactions() async {
     return await transactionService.getFullTransactions();
   }
@@ -136,7 +160,7 @@ class TransactionCubit extends Cubit<TransactionState> {
   void deselectVariant(SelectedVariant variant) {
     // Remove the variant by matching the name
     final updatedVariants = List<SelectedVariant>.from(state.selectedVariants)
-      ..removeWhere((v) => v.name == variant.name);
+      ..removeWhere((v) => v.id == variant.id);
 
     emit(state.copyWith(selectedVariants: updatedVariants));
     _updateTotalPrice(reduce: variant.price);
@@ -157,10 +181,7 @@ class TransactionCubit extends Cubit<TransactionState> {
     _updateTotalPrice(reduce: addition.price);
   }
 
-  void updateNotes(String notes) {
-    emit(state.copyWith(notes: notes));
-  }
-
+ 
   void addTransaction(TransactionModel transaction, double tax) {
     final updatedTransactions = List<TransactionModel>.from(state.transactions)
       ..add(transaction);

@@ -1,39 +1,9 @@
-import 'package:akib_pos/features/cashier/data/models/varian_option.dart';
 
-class SubVariantModel {
-  final int id;
-  final String subVariantType;
-  final List<VariantOption> options;
-
-  SubVariantModel({
-    required this.id,
-    required this.subVariantType,
-    required this.options,
-  });
-
-  factory SubVariantModel.fromJson(Map<String, dynamic> json) {
-    return SubVariantModel(
-      id: json['id'],
-      subVariantType: json['sub_variant_type'],
-      options: (json['options'] as List)
-          .map((i) => VariantOption.fromJson(i))
-          .toList(),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'sub_variant_type': subVariantType,
-      'options': options.map((e) => e.toJson()).toList(),
-    };
-  }
-}
 
 class VariantModel {
-  final int id;
-  final String variantType;
-  final List<SubVariantModel> subVariants;
+  int id;
+  String variantType;
+  List<SubVariant> subVariants;
 
   VariantModel({
     required this.id,
@@ -45,9 +15,7 @@ class VariantModel {
     return VariantModel(
       id: json['id'],
       variantType: json['variant_type'],
-      subVariants: (json['sub_variants'] as List)
-          .map((i) => SubVariantModel.fromJson(i))
-          .toList(),
+      subVariants: List<SubVariant>.from(json['sub_variants'].map((x) => SubVariant.fromJson(x))),
     );
   }
 
@@ -55,7 +23,63 @@ class VariantModel {
     return {
       'id': id,
       'variant_type': variantType,
-      'sub_variants': subVariants.map((e) => e.toJson()).toList(),
+      'sub_variants': List<dynamic>.from(subVariants.map((x) => x.toJson())),
+    };
+  }
+}
+
+class SubVariant {
+  int id;
+  String subVariantType;
+  List<VariantOption> options;
+
+  SubVariant({
+    required this.id,
+    required this.subVariantType,
+    required this.options,
+  });
+
+  factory SubVariant.fromJson(Map<String, dynamic> json) {
+    return SubVariant(
+      id: json['id'],
+      subVariantType: json['sub_variant_type'],
+      options: List<VariantOption>.from(json['options'].map((x) => VariantOption.fromJson(x))),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'sub_variant_type': subVariantType,
+      'options': List<dynamic>.from(options.map((x) => x.toJson())),
+    };
+  }
+}
+
+class VariantOption {
+  int id;
+  String name;
+  int price;
+
+  VariantOption({
+    required this.id,
+    required this.name,
+    required this.price,
+  });
+
+  factory VariantOption.fromJson(Map<String, dynamic> json) {
+    return VariantOption(
+      id: json['id'],
+      name: json['name'],
+      price: json['price'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'price': price,
     };
   }
 }

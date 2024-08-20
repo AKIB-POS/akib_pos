@@ -1,7 +1,7 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
-import 'package:akib_pos/features/cashier/data/models/full_transaction_models.dart';
+import 'package:akib_pos/features/cashier/data/models/save_transaction_model.dart';
 import 'package:akib_pos/features/cashier/data/models/transaction_model.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
