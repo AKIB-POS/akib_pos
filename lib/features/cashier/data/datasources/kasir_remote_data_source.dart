@@ -3,6 +3,7 @@ import 'package:akib_pos/api/urls.dart';
 import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/features/cashier/data/models/addition_model.dart';
 import 'package:akib_pos/features/cashier/data/models/category_model.dart';
+import 'package:akib_pos/features/cashier/data/models/expenditure_model.dart';
 import 'package:akib_pos/features/cashier/data/models/member_model.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
 import 'package:akib_pos/features/cashier/data/models/redeem_voucher_response.dart';
@@ -25,6 +26,7 @@ abstract class KasirRemoteDataSource {
   Future<void> postMember(String name, String phoneNumber, {String? email});
   Future<MemberModel> updateMember(MemberModel member);
   Future<double> getTaxAmount();
+  Future<void> postExpenditure(ExpenditureModel expenditure);
 }
 
 class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
@@ -35,6 +37,20 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
     required this.client,
     required this.sharedPrefsHelper,
   });
+
+   @override
+  Future<void> postExpenditure(ExpenditureModel expenditure) async {
+    final url = '${URLs.baseUrlMock}/expenditures';
+    final response = await client.post(
+      Uri.parse(url),
+      headers: _buildHeaders(),
+      body: jsonEncode(expenditure.toJson()),
+    );
+
+    if (response.statusCode != 201) {
+      throw ServerException();
+    }
+  }
 
   @override
   Future<double> getTaxAmount() async {

@@ -5,6 +5,7 @@ import 'package:akib_pos/features/cashier/data/datasources/kasir_local_data_sour
 import 'package:akib_pos/features/cashier/data/datasources/kasir_remote_data_source.dart';
 import 'package:akib_pos/features/cashier/data/models/addition_model.dart';
 import 'package:akib_pos/features/cashier/data/models/category_model.dart';
+import 'package:akib_pos/features/cashier/data/models/expenditure_model.dart';
 import 'package:akib_pos/features/cashier/data/models/member_model.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
 import 'package:akib_pos/features/cashier/data/models/redeem_voucher_response.dart';
@@ -24,6 +25,7 @@ abstract class KasirRepository {
   Future<Either<Failure, void>> postMember(String name, String phoneNumber, {String? email});
   Future<Either<Failure, MemberModel>> updateMember(MemberModel member);
   Future<Either<Failure, double>> getTaxAmount();
+   Future<Either<Failure, void>> postExpenditure(ExpenditureModel expenditure);
 }
 
 class KasirRepositoryImpl implements KasirRepository {
@@ -32,6 +34,16 @@ class KasirRepositoryImpl implements KasirRepository {
   KasirRepositoryImpl({
     required this.remoteDataSource,
   });
+
+   @override
+  Future<Either<Failure, void>> postExpenditure(ExpenditureModel expenditure) async {
+    try {
+      await remoteDataSource.postExpenditure(expenditure);
+      return Right(null);
+    } catch (error) {
+      return Left(ServerFailure());
+    }
+  }
 
   @override
   Future<Either<Failure, double>> getTaxAmount() async {

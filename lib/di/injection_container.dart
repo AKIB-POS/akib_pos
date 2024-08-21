@@ -3,6 +3,7 @@ import 'package:akib_pos/features/cashier/data/datasources/kasir_remote_data_sou
 import 'package:akib_pos/features/cashier/data/datasources/transaction_service.dart';
 import 'package:akib_pos/features/cashier/data/repositories/kasir_repository.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/expenditure/expenditure_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/member/member_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/printer/printer_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/product/product_bloc.dart';
@@ -33,6 +34,9 @@ Future<void> init() async {
   );
   sl.registerFactory(
     () => MemberCubit(repository: sl()),
+  );
+  sl.registerFactory(
+    () => ExpenditureCubit(repository: sl()),
   );
   sl.registerFactory(
     () => PrinterCubit(bluetooth: sl(),sharedPreferences: sl()),

@@ -28,7 +28,7 @@ class AppColors {
   // Success Colors
   static const Color successLighter = Color(0xFFD3FCD2);
   static const Color successLight = Color(0xFF76ED8B);
-  static const Color successMain = Color(0xFF20E56E);
+  static const Color successMain = Color(0xFF22C55E);
   static const Color successDark = Color(0xFF018767);
   static const Color successDarker = Color(0xFF045E49);
 

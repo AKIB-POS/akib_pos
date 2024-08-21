@@ -2,6 +2,7 @@ import 'package:akib_pos/features/cashier/data/repositories/kasir_repository.dar
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/expenditure_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/member/member_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/saved_transactions_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/voucher_dialog.dart';
@@ -149,11 +150,44 @@ class AppBarContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Cafe Arrazzaq', style: AppTextStyle.headline6),
-                const Text('Fadhil Muhaimin', style: AppTextStyle.body3),
+                Text('Syafii Qurani', style: AppTextStyle.headline6),
+                SizedBox(
+                  height: 4,
+                ),
+                Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        color: AppColors.successMain),
+                    child: Text('Kasir Aktif >',
+                        style:
+                            AppTextStyle.body3.copyWith(color: Colors.white))),
               ],
             ),
-            const SizedBox(width: 20),
+            const SizedBox(width: 10),
+            GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return ExpenditureDialog();
+                  },
+                );
+              },
+              child: Container(
+                height: 50,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white, // White background color
+                  borderRadius: BorderRadius.circular(4.0),
+                ),
+                child: SvgPicture.asset(
+                  "assets/icons/ic_expenditures.svg",
+                  height: 2.h,
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
             Expanded(
               child: SizedBox(
                 child: Center(
@@ -235,7 +269,6 @@ class AppBarContent extends StatelessWidget {
                 ),
               ),
             ),
-            
           ],
         ),
       ),
