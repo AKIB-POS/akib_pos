@@ -77,14 +77,14 @@ class _ExpenditureDialogState extends State<ExpenditureDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
       child: Container(
         height: MediaQuery.of(context).size.height * 0.7,
         child: Column(
           children: [
             Container(
               padding:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+                  const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16),
               decoration: AppThemes.topBoxDecorationDialog,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -129,6 +129,9 @@ class _ExpenditureDialogState extends State<ExpenditureDialog> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const SizedBox(height: 12),
+                          Text('Tanggal Transaksi', style: AppTextStyle.headline6),
+                          const SizedBox(height: 8),
                           TextFormField(
                             controller: _tanggalController,
                             decoration: AppThemes.inputDecorationStyle
@@ -141,7 +144,9 @@ class _ExpenditureDialogState extends State<ExpenditureDialog> {
                             readOnly: true,
                             onTap: () => _selectDate(context),
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 12),
+                          Text('Jumlah', style: AppTextStyle.headline6),
+                          const SizedBox(height: 8),
                           TextFormField(
                             controller: _jumlahController,
                             inputFormatters: <TextInputFormatter>[
@@ -160,7 +165,9 @@ class _ExpenditureDialogState extends State<ExpenditureDialog> {
                               return null;
                             },
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 12),
+                          Text('Kategori', style: AppTextStyle.headline6),
+                          const SizedBox(height: 8),
                           TextFormField(
                             controller: _kategoriController,
                             decoration: AppThemes.inputDecorationStyle
@@ -171,7 +178,9 @@ class _ExpenditureDialogState extends State<ExpenditureDialog> {
                               return null;
                             },
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 12),
+                          Text('Deskripsi', style: AppTextStyle.headline6),
+                          const SizedBox(height: 8),
                           TextFormField(
                             controller: _deskripsiController,
                             decoration: AppThemes.inputDecorationStyle
@@ -182,6 +191,7 @@ class _ExpenditureDialogState extends State<ExpenditureDialog> {
                               return null;
                             },
                           ),
+                          const SizedBox(height: 12),
                         ],
                       ),
                     ),

@@ -25,8 +25,8 @@ class AppThemes {
   static BoxDecoration topBoxDecorationDialog = BoxDecoration(
     color: Colors.white,
     borderRadius: const BorderRadius.only(
-      topLeft: Radius.circular(10),
-      topRight: Radius.circular(10),
+      topLeft: Radius.circular(8),
+      topRight: Radius.circular(8),
     ),
     boxShadow: [
       BoxShadow(
