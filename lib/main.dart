@@ -9,6 +9,7 @@ import 'package:akib_pos/features/cashier/presentation/bloc/product/product_bloc
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/process_transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/checkout/checkout_cubit.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
 import 'package:akib_pos/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -63,6 +64,9 @@ void main() async {
         BlocProvider(
             create: (context) =>
                 BadgeCubit(sl())), // Ensure this is provided here
+        BlocProvider(
+            create: (context) =>
+                CheckoutCubit(sl())), // Ensure this is provided here
         BlocProvider(
             create: (context) =>
                 MemberCubit(repository: sl())),

@@ -9,6 +9,7 @@ import 'package:akib_pos/features/cashier/presentation/bloc/printer/printer_cubi
 import 'package:akib_pos/features/cashier/presentation/bloc/product/product_bloc.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/checkout/checkout_cubit.dart';
 import 'package:akib_pos/util/shared_prefs_helper.dart';
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:get_it/get_it.dart';
@@ -37,6 +38,9 @@ Future<void> init() async {
   );
   sl.registerFactory(
     () => ExpenditureCubit(repository: sl()),
+  );
+  sl.registerFactory(
+    () => CheckoutCubit(sl()),
   );
   sl.registerFactory(
     () => PrinterCubit(bluetooth: sl(),sharedPreferences: sl()),

@@ -4,6 +4,7 @@ import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/features/cashier/data/models/addition_model.dart';
 import 'package:akib_pos/features/cashier/data/models/category_model.dart';
 import 'package:akib_pos/features/cashier/data/models/expenditure_model.dart';
+import 'package:akib_pos/features/cashier/data/models/full_transaction_model.dart';
 import 'package:akib_pos/features/cashier/data/models/member_model.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
 import 'package:akib_pos/features/cashier/data/models/redeem_voucher_response.dart';
@@ -27,6 +28,7 @@ abstract class KasirRemoteDataSource {
   Future<MemberModel> updateMember(MemberModel member);
   Future<double> getTaxAmount();
   Future<void> postExpenditure(ExpenditureModel expenditure);
+  Future<void> postTransaction(FullTransactionModel fullTransaction);
 }
 
 class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
@@ -37,6 +39,20 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
     required this.client,
     required this.sharedPrefsHelper,
   });
+
+   @override
+  Future<void> postTransaction(FullTransactionModel fullTransaction) async {
+    final url = '${URLs.baseUrlMock}/transactions';
+    final response = await client.post(
+      Uri.parse(url),
+      headers: _buildHeaders(),
+      body: jsonEncode(fullTransaction.toApiJson()), // Convert to JSON using toApiJson
+    );
+
+    if (response.statusCode != 201) {
+      throw ServerException(); // Handle failure by throwing an exception
+    }
+  }
 
    @override
   Future<void> postExpenditure(ExpenditureModel expenditure) async {

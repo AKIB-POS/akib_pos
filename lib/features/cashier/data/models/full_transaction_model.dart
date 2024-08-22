@@ -16,6 +16,7 @@ class FullTransactionModel {
   double? paymentAmount;
   final int companyId; // New field
   final int branchId;  // New field
+  final String orderType; // New field for order type
 
   FullTransactionModel({
     required this.transactions,
@@ -29,7 +30,8 @@ class FullTransactionModel {
     this.paymentMethod,
     this.paymentAmount,
     this.companyId = 1, // Default value
-    this.branchId = 1,  // Default value
+    this.branchId = 1, // Default value
+    required this.orderType, // Required field for order type
   });
 
   FullTransactionModel copyWith({
@@ -45,6 +47,7 @@ class FullTransactionModel {
     double? paymentAmount,
     int? companyId,
     int? branchId,
+    String? orderType, // Include new field in copyWith
   }) {
     return FullTransactionModel(
       transactions: transactions ?? this.transactions,
@@ -58,7 +61,8 @@ class FullTransactionModel {
       paymentMethod: paymentMethod ?? this.paymentMethod,
       paymentAmount: paymentAmount ?? this.paymentAmount,
       companyId: companyId ?? this.companyId, // Include new field
-      branchId: branchId ?? this.branchId,    // Include new field
+      branchId: branchId ?? this.branchId, // Include new field
+      orderType: orderType ?? this.orderType, // Include new field
     );
   }
 
@@ -76,7 +80,8 @@ class FullTransactionModel {
       'paymentMethod': paymentMethod,
       'paymentAmount': paymentAmount,
       'companyId': companyId, // Include in JSON output
-      'branchId': branchId,   // Include in JSON output
+      'branchId': branchId, // Include in JSON output
+      'orderType': orderType, // Include in JSON output
     };
   }
 
@@ -91,7 +96,8 @@ class FullTransactionModel {
       'paymentMethod': paymentMethod,
       'paymentAmount': paymentAmount,
       'companyId': companyId, // Include in API JSON output
-      'branchId': branchId,   // Include in API JSON output
+      'branchId': branchId, // Include in API JSON output
+      'orderType': orderType, // Include in API JSON output
     };
   }
 
@@ -110,7 +116,27 @@ class FullTransactionModel {
       paymentMethod: json['paymentMethod'],
       paymentAmount: json['paymentAmount'],
       companyId: json['companyId'] ?? 1, // Parse the new field, with default
-      branchId: json['branchId'] ?? 1,   // Parse the new field, with default
+      branchId: json['branchId'] ?? 1, // Parse the new field, with default
+      orderType: json['orderType'], // Parse the new field for order type
     );
+  }
+
+  @override
+  String toString() {
+    return 'FullTransactionModel{'
+        'transactions: $transactions, '
+        'totalPrice: $totalPrice, '
+        'discount: $discount, '
+        'tax: $tax, '
+        'voucher: $voucher, '
+        'customerId: $customerId, '
+        'customerName: $customerName, '
+        'customerPhone: $customerPhone, '
+        'paymentMethod: $paymentMethod, '
+        'paymentAmount: $paymentAmount, '
+        'companyId: $companyId, '
+        'branchId: $branchId, '
+        'orderType: $orderType'
+        '}';
   }
 }

@@ -1,16 +1,17 @@
 import 'dart:typed_data';
 
-import 'package:akib_pos/features/cashier/data/models/save_transaction_model.dart';
+import 'package:akib_pos/features/cashier/data/models/full_transaction_model.dart';
 import 'package:akib_pos/util/printerenum.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
-class TestPrint {
+class FinishedTransactionPrint {
   BlueThermalPrinter bluetooth = BlueThermalPrinter.instance;
 
-  void printTransaction(SaveTransactionModel transaction) async {
+  void printTransaction(FullTransactionModel transaction, String receivedAmount, String cashback) async {
 
     ByteData bytesAsset = await rootBundle.load("assets/images/akib.png");
     Uint8List imageBytesFromAsset = bytesAsset.buffer
@@ -48,7 +49,7 @@ class TestPrint {
 
     // Calculate values
     double subtotal = _calculateSubtotal(transaction);
-    double tax = _calculateTax(transaction);
+    double tax = _getTax(transaction);
     double discount = _calculateDiscount(transaction);
     double total = _calculateTotal(transaction);
 
@@ -62,18 +63,19 @@ class TestPrint {
     bluetooth.printCustom(
         "Instagram: @caffeearrazaq", Size.medium.val, Align.center.val);
     bluetooth.printNewLine();
-    bluetooth.printCustom(
-        "------Belum Lunas------", Size.bold.val, Align.center.val);
+    bluetooth.printCustom("--------------------------------", 1, 1);
+    bluetooth.printCustom("Lunas", Size.bold.val, Align.center.val);
+    bluetooth.printCustom("--------------------------------", 1, 1);
     bluetooth.printNewLine();
-
-    bluetooth.printCustom(
-        "Tanggal Transaksi: ${DateFormat('dd-MM-yyyy').format(transaction.time)}",
-        Size.medium.val,
-        Align.right.val);
+    bluetooth.printLeftRight(
+        transaction.orderType == 'take_away' ? "Take Away" : "Dine In","${DateFormat('dd-MM-yyyy').format(DateTime.now())}",
+        Size.bold.val,
+        );
     bluetooth.printNewLine();
+    bluetooth.printCustom("--------------------------------", 1, 1);
 
     for (var item in transaction.transactions) {
-      List<String> productNameLines = formatText(item.product.name, 13);
+      List<String> productNameLines = formatText(item.product.name, 15);
 
       // Print each line of the product name
       for (int i = 0; i < productNameLines.length; i++) {
@@ -91,12 +93,12 @@ class TestPrint {
       if (item.selectedVariants.isNotEmpty) {
         for (var variant in item.selectedVariants) {
           List<String> variantNameLines =
-              formatText("${variant.name}", 15);
+              formatText("${variant.name}", 13);
 
           for (int i = 0; i < variantNameLines.length; i++) {
             if (i == 0) {
               bluetooth.printLeftRight(
-                  "   ${variantNameLines[i]}","+Rp. ${variant.price}", Size.bold.val);
+                  "   ${variantNameLines[i]}","Rp. ${variant.price}", Size.bold.val);
             } else {
               // Print in a smaller size and align with the previous line
               bluetooth.printCustom(
@@ -108,13 +110,13 @@ class TestPrint {
 
       if (item.selectedAdditions.isNotEmpty) {
         for (var addition in item.selectedAdditions) {
-          List<String> additionNameLines = formatText(addition.name, 20);
+          List<String> additionNameLines = formatText(addition.name, 13);
 
           for (int i = 0; i < additionNameLines.length; i++) {
             if (i == 0) {
               bluetooth.printLeftRight(
                 "   ${additionNameLines[i]}",
-                "+Rp. ${addition.price}",
+                "Rp. ${addition.price}",
                 Size.bold.val,
               );
             } else {
@@ -126,32 +128,35 @@ class TestPrint {
       }
 
       if (item.notes.isNotEmpty) {
-        List<String> notesLines = formatText(item.notes, 20);
+        List<String> notesLines = formatText(item.notes, 15);
 
         for (int i = 0; i < notesLines.length; i++) {
           if (i == 0) {
             bluetooth.printCustom(
-                "  Catatan: ${notesLines[i]}", Size.medium.val, Align.left.val);
+                "    Catatan: ${notesLines[i]}", Size.medium.val, Align.left.val);
           } else {
             bluetooth.printCustom(
-                "  ${notesLines[i]}", Size.medium.val, Align.left.val);
+                "   ${notesLines[i]}", Size.medium.val, Align.left.val);
           }
         }
       }
 
       bluetooth.printNewLine();
     }
+    bluetooth.printCustom("--------------------------------", 1, 1);
+    bluetooth.printNewLine();
+    bluetooth.printLeftRight("Sub Total:", Utils.formatCurrencyDouble(subtotal), Size.bold.val);
+    bluetooth.printLeftRight("Pajak:", Utils.formatCurrencyDouble(tax), Size.bold.val);
+    bluetooth.printLeftRight("Diskon:", Utils.formatCurrencyDouble(discount), Size.bold.val);
+    bluetooth.printNewLine();
+    bluetooth.printLeftRight("Total:", Utils.formatCurrencyDouble(total), Size.bold.val);
+    bluetooth.printNewLine();
+    bluetooth.printLeftRight("Diterima:", "$receivedAmount", Size.bold.val);
+    bluetooth.printNewLine();
+    bluetooth.printLeftRight("Kembalian:", "$cashback", Size.bold.val);
+    bluetooth.printNewLine();
 
-    bluetooth.printNewLine();
-    bluetooth.printLeftRight("Sub Total:", "Rp. $subtotal", Size.bold.val);
-    bluetooth.printLeftRight("Pajak:", "Rp. $tax", Size.bold.val);
-    bluetooth.printLeftRight("Diskon:", "Rp. $discount", Size.bold.val);
-    bluetooth.printNewLine();
-    bluetooth.printLeftRight("Total:", "Rp. $total", Size.bold.val);
-    bluetooth.printNewLine();
-
-    bluetooth.printCustom(
-        "----------------------------", Size.medium.val, Align.center.val);
+    bluetooth.printCustom("--------------------------------", 1, 1);
     bluetooth.printCustom("Terima Kasih :)", Size.bold.val, Align.center.val);
     bluetooth.printCustom("Powered By AK Solutions", Size.bold.val, Align.center.val);
     bluetooth.printImageBytes(imageBytesFromAsset);
@@ -159,26 +164,39 @@ class TestPrint {
     bluetooth.paperCut();
   }
 
-  double _calculateSubtotal(SaveTransactionModel transaction) {
-    return transaction.transactions.fold(
-      0.0,
-      (total, item) => total + item.product.totalPrice!,
-    );
+   double _calculateSubtotal(FullTransactionModel state) {
+    return state.transactions.fold(
+        0, (total, transaction) => total + transaction.product.totalPrice!);
   }
 
-  double _calculateTax(SaveTransactionModel transaction) {
-    final subtotal = _calculateSubtotal(transaction);
-    return subtotal * (transaction.tax / 100);
+  double _calculateDiscount(FullTransactionModel state) {
+    final subtotal = _calculateSubtotal(state);
+    double discountAmount = state.discount;
+    if (state.voucher != null) {
+      if (state.voucher!.type == 'nominal') {
+        discountAmount += state.voucher!.amount;
+      } else if (state.voucher!.type == 'percentage') {
+        discountAmount += (subtotal * state.voucher!.amount / 100);
+      }
+    }
+    return discountAmount;
   }
 
-  double _calculateDiscount(SaveTransactionModel transaction) {
-    return transaction.discount ?? 0.0;
+
+  double _calculateTotal(FullTransactionModel state) {
+    final subtotal = _calculateSubtotal(state);
+    final discount = _calculateDiscount(state);
+    final totalAfterDiscount = subtotal - discount;
+    final tax = state.tax ;
+    return (totalAfterDiscount + tax);
   }
 
-  double _calculateTotal(SaveTransactionModel transaction) {
-    final subtotal = _calculateSubtotal(transaction);
-    final tax = _calculateTax(transaction);
-    final discount = _calculateDiscount(transaction);
-    return subtotal + tax - discount;
+  double _getTax(FullTransactionModel state) {
+    final subtotal = _calculateSubtotal(state);
+    final discount = _calculateDiscount(state);
+    final totalAfterDiscount = subtotal - discount;
+    final tax = state.tax;
+    print("apeni $subtotal $discount $totalAfterDiscount, $tax, ${state.tax}");
+    return tax;
   }
 }

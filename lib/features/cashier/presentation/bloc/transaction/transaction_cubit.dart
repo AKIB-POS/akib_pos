@@ -20,9 +20,10 @@ class TransactionState {
   final double discount;
   final double tax;
   final VoucherData? voucher;
-  final int? customerId; // Add customer ID
+  final int? customerId; 
   final String? customerName;
-  final String? customerPhone; // Add customer name
+  final String? customerPhone;
+  final String orderType; // New field to track order type
 
   TransactionState({
     required this.selectedVariants,
@@ -36,6 +37,7 @@ class TransactionState {
     this.customerId,
     this.customerName,
     this.customerPhone,
+    this.orderType = '', // Initialize order type as empty
   });
 
   TransactionState copyWith({
@@ -47,9 +49,10 @@ class TransactionState {
     double? discount,
     double? tax,
     VoucherData? voucher,
-    int? customerId, // Add customer ID
-    String? customerName, // Add customer name
-    String? customerPhone, // Add customer name
+    int? customerId, 
+    String? customerName, 
+    String? customerPhone,
+    String? orderType, // Include order type in copyWith
   }) {
     return TransactionState(
       selectedVariants: selectedVariants ?? this.selectedVariants,
@@ -60,13 +63,13 @@ class TransactionState {
       discount: discount ?? this.discount,
       tax: tax ?? this.tax,
       voucher: voucher ?? this.voucher,
-      customerId: customerId ?? this.customerId, // Assign customer ID
+      customerId: customerId ?? this.customerId,
       customerName: customerName ?? this.customerName,
-      customerPhone: customerPhone ?? this.customerPhone, // Assign customer name
+      customerPhone: customerPhone ?? this.customerPhone,
+      orderType: orderType ?? this.orderType, // Assign order type
     );
   }
 }
-
 class TransactionCubit extends Cubit<TransactionState> {
   final TransactionService transactionService;
 
@@ -83,6 +86,10 @@ class TransactionCubit extends Cubit<TransactionState> {
     emit(state.copyWith(customerId: customerId, customerName: customerName,customerPhone: customerPhone));
   }
 
+  void updateOrderType(String orderType) {
+    emit(state.copyWith(orderType: orderType));
+  }
+
  Future<void> saveFullTransaction(List<TransactionModel> transactions, String notes) async {
     if (state.customerId != null && 
         state.customerName != null && state.customerName!.isNotEmpty && 
@@ -97,13 +104,15 @@ class TransactionCubit extends Cubit<TransactionState> {
         customerId: state.customerId,
         customerName: state.customerName,
         customerPhone: state.customerPhone,
-        tax: state.tax
+        tax: state.tax,
+        orderType: state.orderType,
+
       );
 
       await transactionService.saveFullTransaction(fullTransaction);
     }else{
       SaveTransactionModel fullTransaction = SaveTransactionModel(
-        transactions: transactions, savedNotes: notes, time: DateTime.now(),tax: state.tax);
+        transactions: transactions, savedNotes: notes, time: DateTime.now(),tax: state.tax,orderType: state.orderType);
           await transactionService.saveFullTransaction(fullTransaction);
     }
 
@@ -145,6 +154,24 @@ class TransactionCubit extends Cubit<TransactionState> {
       transactions: state.transactions,
       discount: state.discount,
       tax: 0,
+    ));
+    print("terpanggil kah ${state.transactions}");
+  }
+
+  void resetAllState() {
+    emit(TransactionState(
+      selectedVariants: [],
+      selectedAdditions: [],
+      notes: '',
+      quantity: 1,
+      transactions: [],
+      discount: 0.0,
+      tax: 0.0,
+      orderType: '',
+      voucher: null,
+      customerId: null,
+      customerName: null,
+      customerPhone: null,
     ));
   }
 
@@ -228,7 +255,9 @@ class TransactionCubit extends Cubit<TransactionState> {
     final updatedTransactions = List<TransactionModel>.from(state.transactions)
       ..[index] = updatedTransaction;
     emit(state.copyWith(transactions: updatedTransactions));
+ 
     _updateTotalPrice(index: index); // Update the total price
+    print("apakahh di add ${state.quantity}");
   }
 
   void subtractQuantity(int index) {
@@ -292,6 +321,8 @@ class TransactionCubit extends Cubit<TransactionState> {
             ..[index] = updatedTransaction;
       emit(state.copyWith(transactions: updatedTransactions));
     }
+
+    print("apakahhh di updatetotal ${state.quantity}");
   }
 
   int _calculateTotalPrice(int quantity, List<SelectedVariant> variants,

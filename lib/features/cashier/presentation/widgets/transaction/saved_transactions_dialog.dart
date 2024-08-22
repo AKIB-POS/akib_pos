@@ -5,7 +5,7 @@ import 'package:akib_pos/features/cashier/data/models/save_transaction_model.dar
 import 'package:akib_pos/features/cashier/data/models/transaction_model.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
-import 'package:akib_pos/features/cashier/presentation/test_print.dart';
+import 'package:akib_pos/features/cashier/presentation/save_transaction_print.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -186,21 +186,8 @@ double _calculateSubtotal(SaveTransactionModel transaction) {
   );
 }
 
-double _calculateTax(SaveTransactionModel transaction) {
-  final subtotal = _calculateSubtotal(transaction);
-  return subtotal * (transaction.tax / 100);
-}
 
-double _calculateDiscount(SaveTransactionModel transaction) {
-  return transaction.discount ?? 0.0;
-}
 
-double _calculateTotal(SaveTransactionModel transaction) {
-  final subtotal = _calculateSubtotal(transaction);
-  final tax = _calculateTax(transaction);
-  final discount = _calculateDiscount(transaction);
-  return subtotal + tax - discount;
-}
 
 void _showTransactionDetailDialog(
     BuildContext context, SaveTransactionModel fullTransaction) {
@@ -339,7 +326,7 @@ void _showTransactionDetailDialog(
                         ),
                         onPressed: () async {
                           Navigator.of(context).pop();
-                          TestPrint testPrint = TestPrint();
+                          SavedTransactionPrint testPrint = SavedTransactionPrint();
                           testPrint.printTransaction(fullTransaction);
                         },
                         child: Text(

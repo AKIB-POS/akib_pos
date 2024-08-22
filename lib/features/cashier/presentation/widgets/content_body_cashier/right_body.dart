@@ -70,153 +70,193 @@ class RightBody extends StatelessWidget {
                     ),
                   );
                 }
-                return ListView.builder(
-                  itemCount: state.transactions.length,
-                  itemBuilder: (context, index) {
-                    final transaction = state.transactions[index];
-                    return Container(
-                      padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ExtendedImage.network(
-                                    transaction.product.imageUrl,
-                                    width: 80,
-                                    height: 80,
-                                    fit: BoxFit.fill,
-                                    cache: true,
-                                    shape: BoxShape.rectangle,
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(8.0)),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: AppColors.backgroundGrey,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: InkWell(
-                                      onTap: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return ProductDialog(
-                                              product: transaction.product,
-                                              editIndex: index,
-                                            );
-                                          },
-                                        );
-                                      },
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text('Edit',
-                                              style: AppTextStyle.subtitle2
-                                                  .copyWith(
-                                                      color: AppColors
-                                                          .primaryMain)),
-                                          const SizedBox(width: 4),
-                                          const Icon(
-                                            Icons.edit,
-                                            color: AppColors.primaryMain,
-                                            size: 16,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
+                return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 16),
+                        child: BlocBuilder<TransactionCubit, TransactionState>(
+                          builder: (context, state) {
+                            return Row(
+                              children: [
+                                _buildOptionButton(
+                                  context,
+                                  label: 'Dine In',
+                                  value: 'dine_in',
+                                  selected: state.orderType == 'dine_in',
+                                ),
+                                const SizedBox(width: 8),
+                                _buildOptionButton(
+                                  context,
+                                  label: 'Take Away',
+                                  value: 'take_away',
+                                  selected: state.orderType == 'take_away',
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: state.transactions.length,
+                        itemBuilder: (context, index) {
+                          final transaction = state.transactions[index];
+                          print("apakahh di right body ${transaction.quantity}");
+                          return Container(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(transaction.product.name,
-                                        style: AppTextStyle.headline6),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                        Utils.formatCurrency(transaction
-                                            .product.totalPrice
-                                            .toString()),
-                                        style: AppTextStyle.body3),
-                                    const SizedBox(height: 8),
-                                    Text('Catatan: ${transaction.notes}',
-                                        style: AppTextStyle.body3),
-                                    const SizedBox(height: 8),
                                     Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          'Variants: ${transaction.selectedVariants.map((v) => v.name).join(', ')}',
-                                          style: AppTextStyle.body3,
+                                        ExtendedImage.network(
+                                          transaction.product.imageUrl,
+                                          width: 80,
+                                          height: 80,
+                                          fit: BoxFit.fill,
+                                          cache: true,
+                                          shape: BoxShape.rectangle,
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(8.0)),
                                         ),
-                                        Text(
-                                          'Additions: ${transaction.selectedAdditions.map((a) => a.name).join(', ')}',
-                                          style: AppTextStyle.body3,
+                                        const SizedBox(height: 8),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: AppColors.backgroundGrey,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: InkWell(
+                                            onTap: () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return ProductDialog(
+                                                    product:
+                                                        transaction.product,
+                                                    editIndex: index,
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text('Edit',
+                                                    style: AppTextStyle
+                                                        .subtitle2
+                                                        .copyWith(
+                                                            color: AppColors
+                                                                .primaryMain)),
+                                                const SizedBox(width: 4),
+                                                const Icon(
+                                                  Icons.edit,
+                                                  color: AppColors.primaryMain,
+                                                  size: 16,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(transaction.product.name,
+                                              style: AppTextStyle.headline6),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                              Utils.formatCurrency(transaction
+                                                  .product.totalPrice
+                                                  .toString()),
+                                              style: AppTextStyle.body3),
+                                          const SizedBox(height: 8),
+                                          Text('Catatan: ${transaction.notes}',
+                                              style: AppTextStyle.body3),
+                                          const SizedBox(height: 8),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Variants: ${transaction.selectedVariants.map((v) => v.name).join(', ')}',
+                                                style: AppTextStyle.body3,
+                                              ),
+                                              Text(
+                                                'Additions: ${transaction.selectedAdditions.map((a) => a.name).join(', ')}',
+                                                style: AppTextStyle.body3,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            IconButton(
+                                              icon: SvgPicture.asset(
+                                                "assets/icons/ic_minus.svg",
+                                                height: 28,
+                                                width: 28,
+                                              ),
+                                              onPressed: () {
+                                                context
+                                                    .read<TransactionCubit>()
+                                                    .subtractQuantity(index);
+                                              },
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                                transaction.quantity.toString(),
+                                                style: AppTextStyle.headline6),
+                                            const SizedBox(width: 8),
+                                            IconButton(
+                                              icon: SvgPicture.asset(
+                                                "assets/icons/ic_plus.svg",
+                                                height: 28,
+                                                width: 28,
+                                              ),
+                                              onPressed: () {
+                                                context
+                                                    .read<TransactionCubit>()
+                                                    .addQuantity(index);
+                                              },
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
                                   ],
                                 ),
-                              ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      IconButton(
-                                        icon: SvgPicture.asset(
-                                          "assets/icons/ic_minus.svg",
-                                          height: 28,
-                                          width: 28,
-                                        ),
-                                        onPressed: () {
-                                          context
-                                              .read<TransactionCubit>()
-                                              .subtractQuantity(index);
-                                        },
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(transaction.quantity.toString(),
-                                          style: AppTextStyle.headline6),
-                                      const SizedBox(width: 8),
-                                      IconButton(
-                                        icon: SvgPicture.asset(
-                                          "assets/icons/ic_plus.svg",
-                                          height: 28,
-                                          width: 28,
-                                        ),
-                                        onPressed: () {
-                                          context
-                                              .read<TransactionCubit>()
-                                              .addQuantity(index);
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Divider(
-                            color: Colors.grey.withOpacity(0.5),
-                            height: 1,
-                          ),
-                        ],
+                                const SizedBox(height: 8),
+                                Divider(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  height: 1,
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
+                    ],
+                  ),
                 );
               },
             ),
@@ -318,7 +358,8 @@ class RightBody extends StatelessWidget {
           ),
           BlocBuilder<TransactionCubit, TransactionState>(
             builder: (context, state) {
-              final isEmpty = state.transactions.isEmpty;
+              final isEmpty =
+                  state.transactions.isEmpty || state.orderType.isEmpty;
               return Container(
                 color: Colors.white,
                 padding:
@@ -461,16 +502,19 @@ class RightBody extends StatelessWidget {
                                     // Show the PaymentDialog
                                     final fullTransaction =
                                         FullTransactionModel(
-                                            transactions: state.transactions,
-                                            discount: state.discount,
-                                            tax: _getTax(state),
-                                            voucher: state.voucher,
-                                            customerId: state.customerId,
-                                            customerName: state.customerName,
-                                            customerPhone: state.customerPhone,
-                                            totalPrice: _calculateTotal(context
-                                                .read<TransactionCubit>()
-                                                .state));
+                                      transactions: state.transactions,
+                                      discount: state.discount,
+                                      tax: _getTax(state),
+                                      voucher: state.voucher,
+                                      customerId: state.customerId,
+                                      customerName: state.customerName,
+                                      customerPhone: state.customerPhone,
+                                      totalPrice: _calculateTotal(context
+                                          .read<TransactionCubit>()
+                                          .state),
+                                      orderType:
+                                          state.orderType, // Include order type
+                                    );
 
                                     showDialog(
                                       context: context,
@@ -506,15 +550,55 @@ class RightBody extends StatelessWidget {
     );
   }
 
-  double _calculateSubtotal(TransactionState state) {
-    print("${state.transactions}");
+  Widget _buildOptionButton(BuildContext context,
+      {required String label, required String value, required bool selected}) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          context.read<TransactionCubit>().updateOrderType(value);
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: selected
+                ? AppColors.primaryMain.withOpacity(0.1)
+                : Colors.grey.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(4.0),
+            border: Border.all(
+              color: selected ? AppColors.primaryMain : Colors.grey,
+            ),
+          ),
+          child: Row(
+            children: [
+              Radio<String>(
+                value: value,
+                groupValue: context.read<TransactionCubit>().state.orderType,
+                onChanged: (value) {
+                  context.read<TransactionCubit>().updateOrderType(value!);
+                },
+                activeColor: AppColors.primaryMain,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: selected
+                    ? AppTextStyle.body3.copyWith(color: AppColors.primaryMain)
+                    : AppTextStyle.body3.copyWith(color: Colors.black),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  double  _calculateSubtotal(TransactionState state) {
     return state.transactions.fold(
         0, (total, transaction) => total + transaction.product.totalPrice!);
   }
 
   double _calculateDiscount(TransactionState state) {
     final subtotal = _calculateSubtotal(state);
-
     double discountAmount = state.discount;
     if (state.voucher != null) {
       if (state.voucher!.type == 'nominal') {
@@ -523,25 +607,22 @@ class RightBody extends StatelessWidget {
         discountAmount += (subtotal * state.voucher!.amount / 100);
       }
     }
-
     return discountAmount;
   }
 
   double _calculateTotal(TransactionState state) {
-    print("apa statenya ${state.transactions}");
     final subtotal = _calculateSubtotal(state);
     final discount = _calculateDiscount(state);
-    final totall = subtotal - discount;
-    final tax = state.tax / 100 * totall;
-    return (subtotal + tax);
+    final totalAfterDiscount = subtotal - discount;
+    final tax = state.tax / 100 * totalAfterDiscount;
+    return (totalAfterDiscount + tax);
   }
 
   double _getTax(TransactionState state) {
-    print("apa statenya ${state.transactions}");
     final subtotal = _calculateSubtotal(state);
     final discount = _calculateDiscount(state);
-    final totall = subtotal - discount;
-    final tax = state.tax / 100 * totall;
-    return (tax);
+    final totalAfterDiscount = subtotal - discount;
+    final tax = state.tax / 100 * totalAfterDiscount;
+    return tax;
   }
 }
