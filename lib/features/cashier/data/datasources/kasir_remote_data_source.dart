@@ -8,6 +8,7 @@ import 'package:akib_pos/features/cashier/data/models/close_cashier_response.dar
 import 'package:akib_pos/features/cashier/data/models/expenditure_model.dart';
 import 'package:akib_pos/features/cashier/data/models/full_transaction_model.dart';
 import 'package:akib_pos/features/cashier/data/models/member_model.dart';
+import 'package:akib_pos/features/cashier/data/models/open_cashier_model.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
 import 'package:akib_pos/features/cashier/data/models/redeem_voucher_response.dart';
 import 'package:akib_pos/features/cashier/data/models/sub_category_model.dart';
@@ -32,6 +33,7 @@ abstract class KasirRemoteDataSource {
   Future<void> postExpenditure(ExpenditureModel expenditure);
   Future<void> postTransaction(FullTransactionModel fullTransaction);
   Future<CloseCashierResponse> closeCashier();
+  Future<OpenCashierResponse> openCashier(OpenCashierRequest request);
 }
 
 class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
@@ -269,6 +271,24 @@ Future<http.Response> _getFromUrl(String url) async {
       throw ServerException();
     }
     return (jsonData['data'] as List).map((variant) => VariantModel.fromJson(variant)).toList();
+  }
+  
+   @override
+  Future<OpenCashierResponse> openCashier(OpenCashierRequest request) async {
+    final url = '${URLs.baseUrlMock}/open-cashier';
+    final response = await client.post(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(request.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      return OpenCashierResponse.fromJson(json.decode(response.body));
+    } else {
+      throw ServerException();
+    }
   }
   
   

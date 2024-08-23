@@ -5,6 +5,7 @@ import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transact
 import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/close_cashier_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/expenditure_dialog.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/open_cashier_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/member/member_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/saved_transactions_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/voucher_dialog.dart';
@@ -337,7 +338,14 @@ class AppBarContent extends StatelessWidget {
                 SizedBox(height: 16.0),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
+                    Navigator.of(context).pop(); 
+                    showDialog(
+  context: context,
+  builder: (BuildContext context) {
+    return OpenCashierDialog();
+  },
+  barrierDismissible: false, // This will make the dialog non-dismissible
+);// Close the dialog
                   },
                   child: Text("Tutup Pesan"),
                   style: ElevatedButton.styleFrom(

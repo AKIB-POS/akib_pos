@@ -6,6 +6,7 @@ import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.da
 import 'package:akib_pos/features/cashier/presentation/bloc/close_cashier/close_cashier_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/expenditure/expenditure_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/member/member_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/open_cashier/open_cashier_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/printer/printer_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/product/product_bloc.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
@@ -47,6 +48,9 @@ Future<void> init() async {
 
   sl.registerFactory(
     () => CloseCashierCubit(repository: sl()),
+  );
+  sl.registerFactory(
+    () => OpenCashierCubit(repository: sl()),
   );
 
   sl.registerFactory(

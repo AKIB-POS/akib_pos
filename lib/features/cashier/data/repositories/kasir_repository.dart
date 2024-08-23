@@ -9,6 +9,7 @@ import 'package:akib_pos/features/cashier/data/models/close_cashier_response.dar
 import 'package:akib_pos/features/cashier/data/models/expenditure_model.dart';
 import 'package:akib_pos/features/cashier/data/models/full_transaction_model.dart';
 import 'package:akib_pos/features/cashier/data/models/member_model.dart';
+import 'package:akib_pos/features/cashier/data/models/open_cashier_model.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
 import 'package:akib_pos/features/cashier/data/models/redeem_voucher_response.dart';
 import 'package:akib_pos/features/cashier/data/models/sub_category_model.dart';
@@ -30,6 +31,7 @@ abstract class KasirRepository {
   Future<Either<Failure, void>> postExpenditure(ExpenditureModel expenditure);
   Future<Either<Failure, void>> postTransaction(FullTransactionModel fullTransaction); 
   Future<Either<Failure, CloseCashierResponse>> closeCashier();
+  Future<Either<Failure, OpenCashierResponse>> openCashier(OpenCashierRequest request);
 }
 
 class KasirRepositoryImpl implements KasirRepository {
@@ -38,6 +40,16 @@ class KasirRepositoryImpl implements KasirRepository {
   KasirRepositoryImpl({
     required this.remoteDataSource,
   });
+
+  @override
+  Future<Either<Failure, OpenCashierResponse>> openCashier(OpenCashierRequest request) async {
+    try {
+      final response = await remoteDataSource.openCashier(request);
+      return Right(response);
+    } catch (e) {
+      return Left(ServerFailure());
+    }
+  }
 
    @override
   Future<Either<Failure, CloseCashierResponse>> closeCashier() async {
