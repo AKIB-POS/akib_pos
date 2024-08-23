@@ -38,6 +38,24 @@ class SubCategoryLoaded extends ProductState {
   List<Object> get props => [subCategories];
 }
 
+class AdditionLoaded extends ProductState {
+  final List<AdditionModel> additions;
+
+  AdditionLoaded({required this.additions});
+
+  @override
+  List<Object> get props => [additions];
+}
+
+class VariantLoaded extends ProductState {
+  final List<VariantModel> variants;
+
+  VariantLoaded({required this.variants});
+
+  @override
+  List<Object> get props => [variants];
+}
+
 class ProductError extends ProductState {
   final String message;
 
@@ -45,4 +63,14 @@ class ProductError extends ProductState {
 
   @override
   List<Object> get props => [message];
+}
+
+
+class TaxLoaded extends ProductState {
+  final double taxAmount;
+
+  const TaxLoaded({required this.taxAmount});
+
+  @override
+  List<Object> get props => [taxAmount];
 }

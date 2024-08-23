@@ -9,12 +9,12 @@ class DashboardPage extends StatelessWidget {
       right: true,
       minimum: EdgeInsets.only(left: 16),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: const Text('Dashboard'),
           leading: IconButton(
             icon: SvgPicture.asset(
-              "assets/icons/ic_burger_menu.svg",
-              
+              "assets/icons/ic_burger_menu.svg",              
             ),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
