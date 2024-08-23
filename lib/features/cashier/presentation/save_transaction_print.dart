@@ -54,7 +54,6 @@ class SavedTransactionPrint {
 
     // Start printing
     bluetooth.printNewLine();
-
     bluetooth.printCustom(
         "Caffee Arrazzaq", Size.boldLarge.val, Align.center.val);
     bluetooth.printCustom(

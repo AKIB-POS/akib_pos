@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:akib_pos/api/urls.dart';
 import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/features/cashier/data/models/addition_model.dart';
 import 'package:akib_pos/features/cashier/data/models/category_model.dart';
+import 'package:akib_pos/features/cashier/data/models/close_cashier_response.dart';
 import 'package:akib_pos/features/cashier/data/models/expenditure_model.dart';
 import 'package:akib_pos/features/cashier/data/models/full_transaction_model.dart';
 import 'package:akib_pos/features/cashier/data/models/member_model.dart';
@@ -29,6 +31,7 @@ abstract class KasirRemoteDataSource {
   Future<double> getTaxAmount();
   Future<void> postExpenditure(ExpenditureModel expenditure);
   Future<void> postTransaction(FullTransactionModel fullTransaction);
+  Future<CloseCashierResponse> closeCashier();
 }
 
 class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
@@ -39,6 +42,34 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
     required this.client,
     required this.sharedPrefsHelper,
   });
+
+   @override
+  Future<CloseCashierResponse> closeCashier() async {
+    final url = '${URLs.baseUrlMock}/close-cashier';  // Adjust the URL as necessary
+    final response = await client.get(Uri.parse(url), headers: _buildHeaders());
+
+    if (response.statusCode != 200) {
+      throw ServerException();
+    }
+
+    final Map<String, dynamic> jsonResponse = json.decode(response.body);
+    return CloseCashierResponse.fromJson(jsonResponse);
+  }
+
+  @override
+  Future<double> getTaxAmount() async {
+    final url = '${URLs.baseUrlMock}/tax';
+    final response = await client.get(Uri.parse(url), headers: _buildHeaders());
+
+    if (response.statusCode != 200) {
+      throw ServerException();
+    }
+
+    final Map<String, dynamic> jsonResponse = json.decode(response.body);
+    return jsonResponse['data']['amount'];
+  }
+
+   
 
    @override
   Future<void> postTransaction(FullTransactionModel fullTransaction) async {
@@ -68,18 +99,7 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
     }
   }
 
-  @override
-  Future<double> getTaxAmount() async {
-    final url = '${URLs.baseUrlMock}/tax';
-    final response = await client.get(Uri.parse(url), headers: _buildHeaders());
-
-    if (response.statusCode != 200) {
-      throw ServerException();
-    }
-
-    final Map<String, dynamic> jsonResponse = json.decode(response.body);
-    return jsonResponse['data']['amount'];
-  }
+  
 
   @override
   Future<void> postMember(String name, String phoneNumber, {String? email}) async {
@@ -175,6 +195,8 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
     return _parseVariantList(response);
   }
 
+ 
+
   Map<String, String> _buildHeaders() {
     final token = sharedPrefsHelper.getToken();
     return {
@@ -183,14 +205,22 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
     };
   }
 
-  Future<http.Response> _getFromUrl(String url) async {
-    final response = await client.get(Uri.parse(url), headers: _buildHeaders());
+Future<http.Response> _getFromUrl(String url) async {
+  try {
+    final response = await client
+        .get(Uri.parse(url), headers: _buildHeaders())
+        .timeout(Duration(seconds: 15)); // Set a 15-second timeout
 
     if (response.statusCode != 200) {
       throw ServerException();
     }
     return response;
+  } on TimeoutException catch (_) {
+    throw TimeoutException('The connection has timed out, Please try again!');
+  } catch (e) {
+    throw ServerException(); // Handle other potential errors
   }
+}
 
   Future<http.Response> _postFromUrl(String url) async {
     final response = await client.post(Uri.parse(url), headers: _buildHeaders());
@@ -240,4 +270,6 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
     }
     return (jsonData['data'] as List).map((variant) => VariantModel.fromJson(variant)).toList();
   }
+  
+  
 }

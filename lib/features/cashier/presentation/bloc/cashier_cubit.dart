@@ -15,12 +15,14 @@ class CashierCubit extends Cubit<CashierState> {
   final KasirLocalDataSource localDataSource;
   final ProductBloc productBloc;
 
-  CashierCubit({required this.localDataSource, required this.productBloc}) : super(CashierState()) {
-    loadData();
-  }
+  CashierCubit({required this.localDataSource, required this.productBloc}) : super(CashierState());
 
   Future<void> loadData() async {
-    emit(state.copyWith(isLoading: true));
+    // Reset the state to the initial state before reloading
+    emit(CashierState());
+
+    emit(state.copyWith(isLoading: true, error: null));
+
     try {
       await _fetchDataFromApi();
       final categories = await localDataSource.getCachedCategories();

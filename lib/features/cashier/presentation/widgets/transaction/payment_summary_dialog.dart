@@ -18,7 +18,7 @@ class PaymentSummaryDialog extends StatelessWidget {
   PaymentSummaryDialog({
     required this.paymentMethod,
     required this.totalAmount,
-    required this.receivedAmount, 
+    required this.receivedAmount,
     required this.transaction,
   });
 
@@ -117,61 +117,64 @@ class PaymentSummaryDialog extends StatelessWidget {
   }
 
   Widget _buildActions(BuildContext context) {
-  return Container(
-    decoration: AppThemes.bottomBoxDecorationDialog,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-    child: Row(
-      children: [
-        Expanded(
-          child: OutlinedButton(
-            onPressed: () {
-               FinishedTransactionPrint testPrint = FinishedTransactionPrint();
-                testPrint.printTransaction(transaction,Utils.formatCurrencyDouble(receivedAmount),Utils.formatCurrencyDouble(receivedAmount - totalAmount));
-            },
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(color: AppColors.primaryMain), // Warna border
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4), // Radius border
+    return Container(
+      decoration: AppThemes.bottomBoxDecorationDialog,
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton(
+              onPressed: () {
+                FinishedTransactionPrint testPrint = FinishedTransactionPrint();
+                testPrint.printTransaction(
+                    transaction,
+                    Utils.formatCurrencyDouble(receivedAmount),
+                    Utils.formatCurrencyDouble(receivedAmount - totalAmount));
+              },
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: AppColors.primaryMain), // Warna border
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4), // Radius border
+                ),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 16), // Padding vertikal
+                shadowColor: Colors.black.withOpacity(0.25), // Warna bayangan
+                elevation: 5, // Tingkat bayangan (elevasi)
+                backgroundColor: Colors.white, // Warna latar belakang
               ),
-              padding: const EdgeInsets.symmetric(vertical: 16), // Padding vertikal
-              shadowColor: Colors.black.withOpacity(0.25), // Warna bayangan
-              elevation: 5, // Tingkat bayangan (elevasi)
-              backgroundColor: Colors.white, // Warna latar belakang
-            ),
-            child: Text(
-              'Cetak',
-              style: AppTextStyle.headline5
-                  .copyWith(color: AppColors.primaryMain), // Warna teks
+              child: Text(
+                'Cetak',
+                style: AppTextStyle.headline5
+                    .copyWith(color: AppColors.primaryMain), // Warna teks
+              ),
             ),
           ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
-              // Optionally, redirect to a new transaction or reset page
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryMain, // Warna latar belakang
-              foregroundColor: Colors.white, // Warna teks
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4), // Radius border
+          const SizedBox(width: 8),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                // Optionally, redirect to a new transaction or reset page
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryMain, // Warna latar belakang
+                foregroundColor: Colors.white, // Warna teks
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4), // Radius border
+                ),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 16), // Padding vertikal
+                shadowColor: Colors.black.withOpacity(0.25), // Warna bayangan
+                elevation: 5, // Tingkat bayangan (elevasi)
               ),
-              padding: const EdgeInsets.symmetric(vertical: 16), // Padding vertikal
-              shadowColor: Colors.black.withOpacity(0.25), // Warna bayangan
-              elevation: 5, // Tingkat bayangan (elevasi)
-            ),
-            child: Text(
-              '+ Buat Transaksi Baru',
-              style: AppTextStyle.headline5.copyWith(color: Colors.white),
+              child: Text(
+                '+ Buat Transaksi Baru',
+                style: AppTextStyle.headline5.copyWith(color: Colors.white),
+              ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
-
+        ],
+      ),
+    );
+  }
 }

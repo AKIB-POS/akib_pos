@@ -5,6 +5,7 @@ import 'package:akib_pos/features/cashier/data/datasources/kasir_local_data_sour
 import 'package:akib_pos/features/cashier/data/datasources/kasir_remote_data_source.dart';
 import 'package:akib_pos/features/cashier/data/models/addition_model.dart';
 import 'package:akib_pos/features/cashier/data/models/category_model.dart';
+import 'package:akib_pos/features/cashier/data/models/close_cashier_response.dart';
 import 'package:akib_pos/features/cashier/data/models/expenditure_model.dart';
 import 'package:akib_pos/features/cashier/data/models/full_transaction_model.dart';
 import 'package:akib_pos/features/cashier/data/models/member_model.dart';
@@ -28,6 +29,7 @@ abstract class KasirRepository {
   Future<Either<Failure, double>> getTaxAmount();
   Future<Either<Failure, void>> postExpenditure(ExpenditureModel expenditure);
   Future<Either<Failure, void>> postTransaction(FullTransactionModel fullTransaction); 
+  Future<Either<Failure, CloseCashierResponse>> closeCashier();
 }
 
 class KasirRepositoryImpl implements KasirRepository {
@@ -36,6 +38,27 @@ class KasirRepositoryImpl implements KasirRepository {
   KasirRepositoryImpl({
     required this.remoteDataSource,
   });
+
+   @override
+  Future<Either<Failure, CloseCashierResponse>> closeCashier() async {
+    try {
+      final closeCashierResponse = await remoteDataSource.closeCashier();
+      return Right(closeCashierResponse);
+    } catch (error) {
+      return Left(ServerFailure());
+    }
+  }
+
+   @override
+  Future<Either<Failure, double>> getTaxAmount() async {
+    try {
+      final taxAmount = await remoteDataSource.getTaxAmount();
+      return Right(taxAmount);
+    } catch (error) {
+      return Left(ServerFailure());
+    }
+  }
+
 
   @override
   Future<Either<Failure, void>> postTransaction(FullTransactionModel fullTransaction) async {
@@ -56,16 +79,7 @@ class KasirRepositoryImpl implements KasirRepository {
     }
   }
 
-  @override
-  Future<Either<Failure, double>> getTaxAmount() async {
-    try {
-      final taxAmount = await remoteDataSource.getTaxAmount();
-      return Right(taxAmount);
-    } catch (error) {
-      return Left(ServerFailure());
-    }
-  }
-
+ 
   @override
   Future<Either<Failure, List<CategoryModel>>> getCategories() async {
     try {

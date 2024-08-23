@@ -2,6 +2,7 @@ import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/di/injection_container.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/close_cashier/close_cashier_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/expenditure/expenditure_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/member/member_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/printer/printer_cubit.dart';
@@ -70,6 +71,9 @@ void main() async {
         BlocProvider(
             create: (context) =>
                 MemberCubit(repository: sl())),
+        BlocProvider(
+            create: (context) =>
+                CloseCashierCubit(repository: sl())),
         BlocProvider(
             create: (context) =>
                 ExpenditureCubit(repository: sl())),
