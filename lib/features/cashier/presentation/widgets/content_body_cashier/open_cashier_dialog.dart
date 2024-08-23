@@ -15,151 +15,151 @@ class OpenCashierDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => OpenCashierCubit(repository: context.read<KasirRepository>()),
-      child: BlocBuilder<OpenCashierCubit, OpenCashierState>(
-        builder: (context, state) {
-          bool isLoading = state is OpenCashierLoading;
+    return BlocBuilder<OpenCashierCubit, OpenCashierState>(
+      builder: (context, state) {
+        bool isLoading = state is OpenCashierLoading;
 
-          return PopScope(
-            canPop: false, // Disable closing the dialog by back button
-            child: Dialog(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: SingleChildScrollView(
-                child: Container(
-                  width: 60.w,
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(height: 16.0),
-                      SvgPicture.asset(
-                        "assets/icons/ic_open_cashier.svg", // Replace with your image path
-                        height: 80.0,
-                        width: 80.0,
+        if (state is OpenCashierSuccess) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            context.read<OpenCashierCubit>().resetState(); // Reset the state
+            Navigator.of(context).pop(); // Close the dialog
+          });
+        }
+
+        return PopScope(
+          canPop: false, // Disable closing the dialog by back button
+          child: Dialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: SingleChildScrollView(
+              child: Container(
+                width: 60.w,
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 16.0),
+                    SvgPicture.asset(
+                      "assets/icons/ic_open_cashier.svg", // Replace with your image path
+                      height: 80.0,
+                      width: 80.0,
+                    ),
+                    const SizedBox(height: 16.0),
+                    const Text(
+                      "Halo, Syafii Qurani",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
                       ),
-                      const SizedBox(height: 16.0),
-                      const Text(
-                        "Halo, Syafii Qurani",
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8.0),
+                    const Text(
+                      "Sudah siap menerima pesanan?",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black54,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16.0),
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Kas Awal",
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
-                        textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 8.0),
-                      const Text(
-                        "Sudah siap menerima pesanan?",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.black54,
+                    ),
+                    const SizedBox(height: 8.0),
+                    TextField(
+                      controller: _controller,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[
+                        CurrencyTextInputFormatter.currency(
+                          locale: 'id',
+                          decimalDigits: 0,
+                          symbol: 'Rp.  ',
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16.0),
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Kas Awal",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                      ],
+                      decoration: AppThemes.inputDecorationStyle
+                          .copyWith(hintText: "Masukkan Kas Awal"),
+                      onChanged: (value) {
+                        context.read<OpenCashierCubit>().emit(
+                          value.isNotEmpty
+                              ? OpenCashierInitial()
+                              : OpenCashierLoading(), // Adjust the state as needed
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 24.0),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: (state is OpenCashierInitial && !isLoading)
+                            ? () {
+                                final request = OpenCashierRequest(
+                                  idUser: '12345',
+                                  datetime: DateTime.now().toIso8601String(),
+                                  jumlah: double.parse(
+                                    _controller.text.replaceAll(RegExp(r'[^0-9]'), ''),
+                                  ),
+                                  branchId: '6789',
+                                );
+                                context.read<OpenCashierCubit>().openCashier(request);
+                              }
+                            : null,
+                        style: ButtonStyle(
+                          backgroundColor: (state is OpenCashierInitial && !isLoading)
+                              ? const WidgetStatePropertyAll<Color>(AppColors.primaryMain)
+                              : const WidgetStatePropertyAll<Color>(Colors.grey),
+                          padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
+                            EdgeInsets.symmetric(vertical: 16),
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 8.0),
-                      TextField(
-                        controller: _controller,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: <TextInputFormatter>[
-                          CurrencyTextInputFormatter.currency(
-                            locale: 'id',
-                            decimalDigits: 0,
-                            symbol: 'Rp.  ',
-                          ),
-                        ],
-                        decoration: AppThemes.inputDecorationStyle
-                            .copyWith(hintText: "Masukkan Kas Awal"),
-                        onChanged: (value) {
-                          context.read<OpenCashierCubit>().emit(
-                            value.isNotEmpty
-                                ? OpenCashierInitial()
-                                : OpenCashierLoading(), // Adjust the state as needed
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 24.0),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: (state is OpenCashierInitial && !isLoading)
-                              ? () {
-                                  final request = OpenCashierRequest(
-                                    idUser: '12345',
-                                    datetime: DateTime.now().toIso8601String(),
-                                    jumlah: double.parse(
-                                      _controller.text.replaceAll(RegExp(r'[^0-9]'), ''),
-                                    ),
-                                    branchId: '6789',
-                                  );
-                                  context.read<OpenCashierCubit>().openCashier(request);
-                                }
-                              : null,
-                          style: ButtonStyle(
-                            backgroundColor: (state is OpenCashierInitial && !isLoading)
-                                ? WidgetStatePropertyAll<Color>(AppColors.primaryMain)
-                                : WidgetStatePropertyAll<Color>(Colors.grey),
-                            padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
-                              EdgeInsets.symmetric(vertical: 16),
-                            ),
-                            shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
+                          shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          child: isLoading
-                              ? SizedBox(
-                                  height: 24,
-                                  width: 24,
-                                  child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Text(
-                                  'Simpan',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                  ),
+                        ),
+                        child: isLoading
+                            ? const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                                  strokeWidth: 2,
                                 ),
-                        ),
+                              )
+                            : const Text(
+                                'Simpan',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
-                      if (state is OpenCashierSuccess) ...[
-                        const SizedBox(height: 16.0),
-                        Text(state.message),
-                      ],
-                      if (state is OpenCashierError) ...[
-                        const SizedBox(height: 16.0),
-                        Text(state.message, style: TextStyle(color: Colors.red)),
-                      ],
+                    ),
+                    if (state is OpenCashierError) ...[
+                      const SizedBox(height: 16.0),
+                      Text(state.message, style: const TextStyle(color: Colors.red)),
                     ],
-                  ),
+                  ],
                 ),
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }

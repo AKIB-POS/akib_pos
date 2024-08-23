@@ -15,7 +15,7 @@ class OpenCashierRequest {
     return {
       "id_user": idUser,
       "datetime": datetime,
-      "jumlah": jumlah,
+      "amount": jumlah,
       "branch_id": branchId,
     };
   }

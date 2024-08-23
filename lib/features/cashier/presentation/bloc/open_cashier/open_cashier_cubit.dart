@@ -17,7 +17,12 @@ class OpenCashierCubit extends Cubit<OpenCashierState> {
       (response) => emit(OpenCashierSuccess(response.message)),
     );
   }
+
+  void resetState() {
+    emit(OpenCashierInitial());
+  }
 }
+
 
 abstract class OpenCashierState {}
 

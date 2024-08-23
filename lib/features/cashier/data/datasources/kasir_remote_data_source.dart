@@ -284,7 +284,7 @@ Future<http.Response> _getFromUrl(String url) async {
       body: json.encode(request.toJson()),
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       return OpenCashierResponse.fromJson(json.decode(response.body));
     } else {
       throw ServerException();
