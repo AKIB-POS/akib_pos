@@ -28,7 +28,7 @@ class AppColors {
   // Success Colors
   static const Color successLighter = Color(0xFFD3FCD2);
   static const Color successLight = Color(0xFF76ED8B);
-  static const Color successMain = Color(0xFF20E56E);
+  static const Color successMain = Color(0xFF22C55E);
   static const Color successDark = Color(0xFF018767);
   static const Color successDarker = Color(0xFF045E49);
 
@@ -59,7 +59,10 @@ class AppColors {
   static const Color textGrey600 = Color(0xFF637381);
   static const Color textGrey700 = Color(0xFF454F5B);
   static const Color textGrey800 = Color(0xFF212B36);
+  static const Color fillColorInput = Color(0xFFF9FAFB);
+  static const Color borderColorInput = Color(0xFFDFE3E8);
 
   // Additional Colors
   static const Color black = Color(0xFF121212);
+  static const Color shadow = Color(0xFF323232);
 }
