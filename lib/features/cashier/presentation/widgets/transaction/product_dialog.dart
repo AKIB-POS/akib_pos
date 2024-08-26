@@ -11,6 +11,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ProductDialog extends StatefulWidget {
   final ProductModel product;
@@ -51,8 +52,6 @@ class _ProductDialogState extends State<ProductDialog> {
 
   @override
   Widget build(BuildContext context) {
-
-
     final additions = context.read<CashierCubit>().state.additions;
     final variants = context.read<CashierCubit>().state.variants;
     final tax = context.read<CashierCubit>().state.taxAmount;
@@ -76,8 +75,6 @@ class _ProductDialogState extends State<ProductDialog> {
             final currentQuantity = widget.editIndex != null
                 ? state.transactions[widget.editIndex!].quantity
                 : state.quantity;
-
-                      
 
             return Column(
               children: [
@@ -120,13 +117,11 @@ class _ProductDialogState extends State<ProductDialog> {
                                 widget.product.price * currentQuantity;
 
                             currentState.selectedVariants.forEach((variant) {
-                              totalPrice +=
-                                  variant.price * currentQuantity;
+                              totalPrice += variant.price * currentQuantity;
                             });
 
                             currentState.selectedAdditions.forEach((addition) {
-                              totalPrice +=
-                                  addition.price * currentQuantity;
+                              totalPrice += addition.price * currentQuantity;
                             });
 
                             // Buat model transaksi berdasarkan state terbaru
@@ -164,34 +159,60 @@ class _ProductDialogState extends State<ProductDialog> {
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              ExtendedImage.network(
-                                widget.product.imageUrl,
-                                width: 90,
-                                height: 90,
-                                fit: BoxFit.fill,
-                                cache: true,
-                                shape: BoxShape.rectangle,
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(8.0)),
-                              ),
-                              const SizedBox(width: 16),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(widget.product.name,
-                                      style: AppTextStyle.headline6),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                      Utils.formatCurrency(
-                                          widget.product.price.toString()),
-                                      style: AppTextStyle.body3),
-                                ],
-                              ),
-                            ],
-                          ),
+                          widget.product.imageUrl == '' ||
+                                  widget.product.imageUrl!.isEmpty
+                              ? ClipRRect(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(8.0)),
+                                  child: Image.asset(
+                                    'assets/images/no_imgproduk.png', // Gambar default jika URL null atau kosong
+                                    width: 90,
+                                    height: 90,
+                                    fit: BoxFit.fill,
+                                  ),
+                                )
+                              : ExtendedImage.network(
+                                  widget.product.imageUrl!,
+                                  width: 90,
+                                  height: 90,
+                                  fit: BoxFit.fill,
+                                  cache: true,
+                                  shape: BoxShape.rectangle,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(8.0)),
+                                  loadStateChanged: (ExtendedImageState state) {
+                                    switch (state.extendedImageLoadState) {
+                                      case LoadState.loading:
+                                        return Shimmer.fromColors(
+                                          baseColor: Colors.grey[300]!,
+                                          highlightColor: Colors.grey[100]!,
+                                          child: Container(
+                                            width: 90,
+                                            height: 90,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[300],
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                      Radius.circular(8.0)),
+                                            ),
+                                          ),
+                                        );
+                                      case LoadState.completed:
+                                        return null; // Menampilkan gambar asli jika berhasil
+                                      case LoadState.failed:
+                                        return ClipRRect(
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(8.0)),
+                                          child: Image.asset(
+                                            'assets/images/no_imgproduk.png', // Gambar default jika URL gagal dimuat
+                                            width: 90,
+                                            height: 90,
+                                            fit: BoxFit.fill,
+                                          ),
+                                        );
+                                    }
+                                  },
+                                ),
                           const SizedBox(height: 16),
                           if (productVariant.id != 0 || productAddition.id != 0)
                             Row(
@@ -303,7 +324,9 @@ class _ProductDialogState extends State<ProductDialog> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(subAddition.subAdditionType ?? "",
+                                              Text(
+                                                  subAddition.subAdditionType ??
+                                                      "",
                                                   style: AppTextStyle.headline6
                                                       .copyWith(
                                                           color: AppColors
@@ -514,12 +537,10 @@ class _ProductDialogState extends State<ProductDialog> {
                       // Ambil state terbaru dari cubit
                       final currentState = transactionCubit.state;
 
-                      print(
-                          "apakahh di product dialog  ${currentQuantity}");
+                      print("apakahh di product dialog  ${currentQuantity}");
 
                       // Hitung total harga berdasarkan kuantitas terbaru dan varian serta tambahan yang dipilih
-                      int totalPrice =
-                          widget.product.price * currentQuantity;
+                      int totalPrice = widget.product.price * currentQuantity;
 
                       currentState.selectedVariants.forEach((variant) {
                         totalPrice += variant.price * currentQuantity;
