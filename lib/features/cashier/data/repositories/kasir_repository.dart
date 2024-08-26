@@ -22,8 +22,8 @@ abstract class KasirRepository {
   Future<Either<Failure, List<SubCategoryModel>>> getSubCategories();
   Future<Either<Failure, List<VariantModel>>> getVariants();
   Future<Either<Failure, List<AdditionModel>>> getAdditions();
-   Future<Either<Failure, RedeemVoucherResponse>> redeemVoucher(String code);
-  Future<Either<Failure, List<MemberModel>>> getAllMembers(); // Tambahkan metode ini
+  Future<Either<Failure, RedeemVoucherResponse>> redeemVoucher(String code);
+  Future<Either<Failure, List<MemberModel>>> getAllMembers(); 
   Future<Either<Failure, List<MemberModel>>> searchMemberByName(String name);
   Future<Either<Failure, void>> postMember(String name, String phoneNumber, {String? email});
   Future<Either<Failure, MemberModel>> updateMember(MemberModel member);

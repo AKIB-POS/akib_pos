@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:akib_pos/api/urls.dart';
 import 'package:akib_pos/core/error/exceptions.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/cashier/data/models/addition_model.dart';
 import 'package:akib_pos/features/cashier/data/models/category_model.dart';
 import 'package:akib_pos/features/cashier/data/models/close_cashier_response.dart';
@@ -14,6 +15,7 @@ import 'package:akib_pos/features/cashier/data/models/redeem_voucher_response.da
 import 'package:akib_pos/features/cashier/data/models/sub_category_model.dart';
 import 'package:akib_pos/features/cashier/data/models/variant_model.dart';
 import 'package:akib_pos/util/shared_prefs_helper.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
 
@@ -38,16 +40,15 @@ abstract class KasirRemoteDataSource {
 
 class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
   final http.Client client;
-  final SharedPrefsHelper sharedPrefsHelper;
+  final AuthSharedPref sharedPrefsHelper = GetIt.instance<AuthSharedPref>();
 
   KasirRemoteDataSourceImpl({
     required this.client,
-    required this.sharedPrefsHelper,
   });
 
    @override
   Future<CloseCashierResponse> closeCashier() async {
-    final url = '${URLs.baseUrlMock}/close-cashier';  // Adjust the URL as necessary
+    final url = '${URLs.baseUrlProd}/close-cashier';  // Adjust the URL as necessary
     final response = await client.get(Uri.parse(url), headers: _buildHeaders());
 
     if (response.statusCode != 200) {
@@ -60,7 +61,7 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
 
   @override
   Future<double> getTaxAmount() async {
-    final url = '${URLs.baseUrlMock}/tax';
+    final url = '${URLs.baseUrlProd}/tax';
     final response = await client.get(Uri.parse(url), headers: _buildHeaders());
 
     if (response.statusCode != 200) {
@@ -75,7 +76,7 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
 
    @override
   Future<void> postTransaction(FullTransactionModel fullTransaction) async {
-    final url = '${URLs.baseUrlMock}/transactions';
+    final url = '${URLs.baseUrlProd}/transactions';
     final response = await client.post(
       Uri.parse(url),
       headers: _buildHeaders(),
@@ -89,7 +90,7 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
 
    @override
   Future<void> postExpenditure(ExpenditureModel expenditure) async {
-    final url = '${URLs.baseUrlMock}/expenditures';
+    final url = '${URLs.baseUrlProd}/expenditures';
     final response = await client.post(
       Uri.parse(url),
       headers: _buildHeaders(),
@@ -105,7 +106,7 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
 
   @override
   Future<void> postMember(String name, String phoneNumber, {String? email}) async {
-    final url = '${URLs.baseUrlMock}/members';
+    final url = '${URLs.baseUrlProd}/members';
     final response = await client.post(
       Uri.parse(url),
       headers: _buildHeaders(),
@@ -123,7 +124,7 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
 
   @override
   Future<MemberModel> updateMember(MemberModel member) async {
-    final url = '${URLs.baseUrlMock}/members/${member.id}';
+    final url = '${URLs.baseUrlProd}/members/${member.id}';
     final response = await client.put(
       Uri.parse(url),
       headers: _buildHeaders(),
@@ -139,13 +140,13 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
 
   @override
   Future<List<MemberModel>> getAllMembers() async {
-    final response = await _getFromUrl('${URLs.baseUrlMock}/members');
+    final response = await _getFromUrl('${URLs.baseUrlProd}/members');
     return _parseMemberList(response);
   }
 
   @override
   Future<List<MemberModel>> searchMemberByName(String name) async {
-    final response = await _getFromUrl('${URLs.baseUrlMock}/members?name=$name');
+    final response = await _getFromUrl('${URLs.baseUrlProd}/members?name=$name');
     return _parseMemberList(response);
   }
 
@@ -157,13 +158,13 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
 
   @override
   Future<List<ProductModel>> getAllProducts() async {
-    final response = await _getFromUrl('${URLs.baseUrlMock}/products');
+    final response = await _getFromUrl('${URLs.baseUrlProd}/products');
     return _parseProductList(response);
   }
 
   @override
   Future<RedeemVoucherResponse> redeemVoucher(String code) async {
-    final url = '${URLs.baseUrlMock}/redeem-voucher/$code';
+    final url = '${URLs.baseUrlProd}/redeem-voucher/$code';
     final response = await _postFromUrl(url);
 
     if (response.statusCode != 200) {
@@ -175,25 +176,25 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
 
   @override
   Future<List<CategoryModel>> getCategories() async {
-    final response = await _getFromUrl('${URLs.baseUrlMock}/categories');
+    final response = await _getFromUrl('${URLs.baseUrlProd}/categories');
     return _parseCategoryList(response);
   }
 
   @override
   Future<List<SubCategoryModel>> getSubCategories() async {
-    final response = await _getFromUrl('${URLs.baseUrlMock}/sub-categories');
+    final response = await _getFromUrl('${URLs.baseUrlProd}/sub-categories');
     return _parseSubCategoryList(response);
   }
 
   @override
   Future<List<AdditionModel>> getAdditions() async {
-    final response = await _getFromUrl('${URLs.baseUrlMock}/additions');
+    final response = await _getFromUrl('${URLs.baseUrlProd}/additions');
     return _parseAdditionList(response);
   }
 
   @override
   Future<List<VariantModel>> getVariants() async {
-    final response = await _getFromUrl('${URLs.baseUrlMock}/variants');
+    final response = await _getFromUrl('${URLs.baseUrlProd}/variants');
     return _parseVariantList(response);
   }
 
@@ -275,7 +276,7 @@ Future<http.Response> _getFromUrl(String url) async {
   
    @override
   Future<OpenCashierResponse> openCashier(OpenCashierRequest request) async {
-    final url = '${URLs.baseUrlMock}/open-cashier';
+    final url = '${URLs.baseUrlProd}/open-cashier';
     final response = await client.post(
       Uri.parse(url),
       headers: {

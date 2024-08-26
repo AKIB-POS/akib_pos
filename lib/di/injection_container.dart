@@ -71,12 +71,9 @@ Future<void> init() async {
   );
 
 
-
-
-
   // Data sources cashier
   sl.registerLazySingleton<KasirRemoteDataSource>(
-    () => KasirRemoteDataSourceImpl(client: sl(), sharedPrefsHelper: sl()),
+    () => KasirRemoteDataSourceImpl(client: sl(), ),
   );
  
 
