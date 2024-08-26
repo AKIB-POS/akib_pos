@@ -1,7 +1,7 @@
 import 'dart:async';
 
+import 'package:akib_pos/features/auth/presentation/pages/auth_page.dart';
 import 'package:akib_pos/features/home/home_screen.dart';
-import 'package:akib_pos/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 
 
@@ -17,10 +17,12 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Timer(const Duration(seconds: 2), () {
+      // TODO: Check Authenticated User
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+          // MaterialPageRoute(builder: (context) => HomeScreen()),
+          MaterialPageRoute(builder: (context) => AuthPage()),
         );
       }
     });
@@ -28,11 +30,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double width  = MediaQuery.of(context).size.width;
+    double height  = MediaQuery.of(context).size.height;
+    bool isPortrait = false;
+    if(height > width) isPortrait = true;
+
     return Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
-        ),
+      body: Container(
+        width: double.infinity,
+          child: Image.asset('assets/identity/splash_screen.png', fit: isPortrait ? BoxFit.cover : BoxFit.fitWidth,)
       ),
     );
   }

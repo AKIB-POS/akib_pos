@@ -4,29 +4,33 @@ class AuthState extends Equatable {
   final bool isLoading;
   final bool hasError;
   final String errorMessage;
-  final AuthResponse? authResponse;
+  final LoginResponse? loginResponse;
+  final bool? registerResponse;
 
   const AuthState({
     this.isLoading = false,
     this.hasError = false,
     this.errorMessage = '',
-    this.authResponse,
+    this.loginResponse,
+    this.registerResponse,
   });
 
   AuthState copyWith({
     bool? isLoading,
     bool? hasError,
     String? errorMessage,
-    AuthResponse? authResponse,
+    LoginResponse? loginResponse,
+    bool? registerResponse
   }) {
     return AuthState(
       isLoading: isLoading ?? this.isLoading,
       hasError: hasError ?? this.hasError,
       errorMessage: errorMessage ?? this.errorMessage,
-      authResponse: authResponse ?? this.authResponse,
+      loginResponse: loginResponse ?? this.loginResponse,
+      registerResponse: registerResponse ?? this.registerResponse,
     );
   }
 
   @override
-  List<Object?> get props => [isLoading, hasError, errorMessage, authResponse];
+  List<Object?> get props => [isLoading, hasError, errorMessage, loginResponse, registerResponse];
 }
