@@ -661,7 +661,7 @@ class _AuthPage extends State<AuthPage> {
         children: [
           Text("Halaman Perusahaan", style: AppTextStyle.headline6,),
           const SizedBox(height: 12,),
-          const Text("Nama Perushaan ", style: AppTextStyle.body2,),
+          const Text("Nama Perusahaan ", style: AppTextStyle.body2,),
           const SizedBox(height: 8,),
           FormBuilderTextField(
               name: 'companyName',
@@ -678,7 +678,7 @@ class _AuthPage extends State<AuthPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("*Email Perushaan ", style: AppTextStyle.body2,),
+                      const Text("*Email Perusahaan ", style: AppTextStyle.body2,),
                       const SizedBox(height: 8,),
                       FormBuilderTextField(
                           name: 'companyEmail',
@@ -703,7 +703,7 @@ class _AuthPage extends State<AuthPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Nomor Perushaan ", style: AppTextStyle.body2,),
+                      const Text("Nomor Perusahaan ", style: AppTextStyle.body2,),
                       const SizedBox(height: 8,),
                       FormBuilderTextField(
                           name: 'companyPhone',
