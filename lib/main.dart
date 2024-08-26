@@ -1,5 +1,6 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/di/injection_container.dart';
+import 'package:akib_pos/features/auth/presentation/bloc/auth/auth_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/close_cashier/close_cashier_cubit.dart';
@@ -49,6 +50,11 @@ void main() async {
             ..add(FetchAdditionsEvent())
             ..add(FetchVariantsEvent()),
         ),
+        // BlocProvider(
+        //   create: (context) => AuthBloc(
+        //      sl(),
+        //   ),
+        // ),
         BlocProvider(
           create: (context) => CashierCubit(
             localDataSource: sl(),
@@ -82,6 +88,9 @@ void main() async {
         BlocProvider(
             create: (context) =>
                 ExpenditureCubit(repository: sl())),
+        BlocProvider(
+            create: (context) =>
+                AuthCubit(sl())),
         BlocProvider(
             create: (context) =>
                 PrinterCubit(bluetooth: sl(),sharedPreferences: sl())),

@@ -1,17 +1,46 @@
-import 'package:akib_pos/features/auth/data/datasources/remote_auth_data_sources.dart';
+import 'package:akib_pos/core/error/failures.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
+import 'package:akib_pos/features/auth/data/datasources/remote_data_source/remote_auth_data_sources.dart';
 import 'package:akib_pos/features/auth/data/models/login_response.dart';
+import 'package:dartz/dartz.dart';
 
 
-class AuthRepository {
+abstract class AuthRepository {
+  Future<Either<Failure, LoginResponse>> login(String email, String password);
+  
+  Future<Either<Failure, bool>> register({
+    required String username,
+    required String email,
+    required String password,
+    required String passwordConfirmation,
+    String phone,
+    String companyName,
+    String? companyEmail,
+    String companyPhone,
+    String companyAddress,
+  });
+}
+
+
+class AuthRepositoryImpl implements AuthRepository {
   final RemoteAuthDataSource _remoteDataSource;
+  final AuthSharedPref _authSharedPref;
 
-  AuthRepository(this._remoteDataSource);
+  AuthRepositoryImpl(this._remoteDataSource, this._authSharedPref);
 
-  Future<LoginResponse> login(String email, String password) async {
-    return await _remoteDataSource.login(email: email, password: password);
+  @override
+  Future<Either<Failure, LoginResponse>> login(String email, String password) async {
+    try {
+      final response = await _remoteDataSource.login(email: email, password: password);
+      await _authSharedPref.saveLoginResponse(response);
+      return Right(response);
+    } catch (e) {
+      return Left(ServerFailure());
+    }
   }
 
-  Future<bool> register({
+  @override
+  Future<Either<Failure, bool>> register({
     required String username,
     required String email,
     required String password,
@@ -20,9 +49,10 @@ class AuthRepository {
     String companyName = "-",
     String? companyEmail,
     String companyPhone = "-",
-    String companyAddress = "-"
-    }) async {
-    return await _remoteDataSource.register(
+    String companyAddress = "-",
+  }) async {
+    try {
+      final response = await _remoteDataSource.register(
         email: email,
         password: password,
         passwordConfirmation: passwordConfirmation,
@@ -31,7 +61,11 @@ class AuthRepository {
         companyName: companyName,
         companyEmail: companyEmail ?? email,
         companyAddress: companyAddress,
-        companyPhone: companyPhone
-    );
+        companyPhone: companyPhone,
+      );
+      return Right(response);
+    } catch (e) {
+      return Left(ServerFailure());
+    }
   }
 }

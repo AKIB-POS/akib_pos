@@ -1,19 +1,39 @@
+import 'package:akib_pos/api/urls.dart';
 import 'package:akib_pos/features/auth/data/models/login_response.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-class RemoteAuthDataSource {
-  final String baseUrl;
+abstract class RemoteAuthDataSource {
+  Future<LoginResponse> login({required String email, required String password});
+  Future<bool> register({
+    required String username,
+    required String email,
+    required String password,
+    required String passwordConfirmation,
+    String phone,
+    String companyName,
+    String? companyEmail,
+    String companyPhone,
+    String companyAddress,
+  });
+  Future<bool> forgotPassword({required String email});
+}
 
-  RemoteAuthDataSource(this.baseUrl);
+class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
+  final http.Client client;
+  RemoteAuthDataSourceImpl({
+     required this.client,
+  });
 
+  @override
   Future<LoginResponse> login({required String email, required String password}) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/api/login'),
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: {
+      Uri.parse('${URLs.baseUrlProd}/login'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
         'email': email,
-        'password': password,
-      },
+        'password': password
+      }),
     );
 
     if (response.statusCode == 200) {
@@ -23,6 +43,7 @@ class RemoteAuthDataSource {
     }
   }
 
+  @override
   Future<bool> register({
     required String username,
     required String email,
@@ -35,7 +56,7 @@ class RemoteAuthDataSource {
     String companyAddress = "-"
   }) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/api/register'),
+      Uri.parse('${URLs.baseUrlProd}/register'),
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
       body: {
         'name': username,
@@ -57,9 +78,10 @@ class RemoteAuthDataSource {
     }
   }
 
+  @override
   Future<bool> forgotPassword({required String email}) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/api/forgotPassword'),
+      Uri.parse('${URLs.baseUrlProd}/forgotPassword'),
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
       body: {
         'email': email,

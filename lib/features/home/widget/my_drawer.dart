@@ -1,9 +1,12 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
+import 'package:akib_pos/features/auth/presentation/pages/auth_page.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get_it/get_it.dart';
 import 'package:sizer/sizer.dart';
 
 class MyDrawer extends StatelessWidget {
@@ -11,6 +14,8 @@ class MyDrawer extends StatelessWidget {
   final List<String> iconTitles = ["assets/icons/ic_dashboard.svg", "assets/icons/ic_kasir.svg", "assets/icons/ic_hrd.svg", "assets/icons/ic_stockist.svg", "assets/icons/ic_pengaturan.svg"];
   final String cafeName = "Cafe Arrazzaq";
   final String ownerName = "Fadhil Muhaimin";
+
+  final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
 
   @override
   Widget build(BuildContext context) {
@@ -67,8 +72,14 @@ class MyDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.logout),
             title: Text('Logout'),
-            onTap: () {
+            onTap: () async {
               // Handle logout logic
+              await _authSharedPref.clearLoginResponse(); // Clear login data
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => AuthPage()), // Navigate to login page
+                (Route<dynamic> route) => false, // Remove all previous routes
+              );
             },
           ),
         ],
@@ -107,9 +118,9 @@ class CustomDrawerHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height : 200,
+      height: 200,
       child: DrawerHeader(
-        padding: EdgeInsets.only(bottom: 10,left: 20,right: 20),
+        padding: EdgeInsets.only(bottom: 10, left: 20, right: 20),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [

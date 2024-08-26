@@ -1,3 +1,7 @@
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
+import 'package:akib_pos/features/auth/data/datasources/remote_data_source/remote_auth_data_sources.dart';
+import 'package:akib_pos/features/auth/data/repositories/auth_repository.dart';
+import 'package:akib_pos/features/auth/presentation/bloc/auth/auth_cubit.dart';
 import 'package:akib_pos/features/cashier/data/datasources/kasir_local_data_source.dart';
 import 'package:akib_pos/features/cashier/data/datasources/kasir_remote_data_source.dart';
 import 'package:akib_pos/features/cashier/data/datasources/transaction_service.dart';
@@ -25,6 +29,7 @@ Future<void> init() async {
   sl.registerFactory(
     () => ProductBloc(kasirRepository: sl(), localDataSource: sl()),
   );
+
   sl.registerFactory(
     () => VoucherCubit(sl()),
   );
@@ -52,20 +57,28 @@ Future<void> init() async {
   sl.registerFactory(
     () => OpenCashierCubit(repository: sl()),
   );
-
+  
   sl.registerFactory(
     () => PrinterCubit(bluetooth: sl(),sharedPreferences: sl()),
   );
+
+ 
+
 
   // Repository
   sl.registerLazySingleton<KasirRepository>(
     () => KasirRepositoryImpl(remoteDataSource: sl(),),
   );
 
-  // Data sources
+
+
+
+
+  // Data sources cashier
   sl.registerLazySingleton<KasirRemoteDataSource>(
     () => KasirRemoteDataSourceImpl(client: sl(), sharedPrefsHelper: sl()),
   );
+ 
 
   sl.registerLazySingleton<KasirLocalDataSource>(
     () => KasirLocalDataSource(sharedPreferences: sl()),
@@ -73,6 +86,27 @@ Future<void> init() async {
   sl.registerLazySingleton<TransactionService>(
     () => TransactionService(sharedPreferences: sl()),
   );
+
+
+  //Features Auth
+  //Cubit/bloc auth
+  sl.registerFactory(
+    () => AuthCubit(sl()),
+  );
+
+  // data source auth
+ sl.registerLazySingleton<RemoteAuthDataSource>(
+    () => RemoteAuthDataSourceImpl(client: sl(),),
+  );
+  sl.registerLazySingleton(() => AuthSharedPref(sl()));
+
+
+
+  //repository auth
+  sl.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(sl(),sl()),
+  );
+
 
   //! Core
   sl.registerLazySingleton<SharedPrefsHelper>(
@@ -83,5 +117,5 @@ Future<void> init() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => http.Client());
-    sl.registerLazySingleton(() => BlueThermalPrinter.instance);
+  sl.registerLazySingleton(() => BlueThermalPrinter.instance);
 }
