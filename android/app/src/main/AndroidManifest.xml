@@ -19,9 +19,9 @@
          devices. -->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <application
-        android:label="akib_pos"
+        android:label="AK Solutions"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         
         <activity
             android:name=".MainActivity"

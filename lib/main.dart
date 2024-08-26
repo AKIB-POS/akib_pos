@@ -120,7 +120,7 @@ class MyApp extends StatelessWidget {
     return Sizer(
       builder: (context, orientation, deviceType) {
         return MaterialApp(
-          title: 'Multi-Module App',
+          title: 'AK Solutions',
           theme: ThemeData(
             textSelectionTheme: TextSelectionThemeData(
               cursorColor:
