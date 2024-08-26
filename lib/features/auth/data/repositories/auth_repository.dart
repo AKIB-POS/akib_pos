@@ -1,3 +1,4 @@
+import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/core/error/failures.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/auth/data/datasources/remote_data_source/remote_auth_data_sources.dart';
@@ -34,6 +35,8 @@ class AuthRepositoryImpl implements AuthRepository {
       final response = await _remoteDataSource.login(email: email, password: password);
       await _authSharedPref.saveLoginResponse(response);
       return Right(response);
+    } on GeneralException catch (e) {
+      return Left(GeneralFailure(e.message));
     } catch (e) {
       return Left(ServerFailure());
     }
@@ -64,6 +67,8 @@ class AuthRepositoryImpl implements AuthRepository {
         companyPhone: companyPhone,
       );
       return Right(response);
+    } on GeneralException catch (e) {
+      return Left(GeneralFailure(e.message));
     } catch (e) {
       return Left(ServerFailure());
     }

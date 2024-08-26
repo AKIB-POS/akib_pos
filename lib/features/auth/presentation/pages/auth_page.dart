@@ -32,6 +32,11 @@ class _AuthPage extends State<AuthPage> {
   int currentSteps = 0;
 
   bool _passwordVisible = false;
+  bool _isLoading = false;
+
+  void _unfocusAllFields() {
+    FocusScope.of(context).unfocus();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,59 +45,86 @@ class _AuthPage extends State<AuthPage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: BlocListener<AuthCubit, AuthState>(
-          listener: (context, state) {
-            if (state is AuthLoading) {
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (_) => Center(child: CircularProgressIndicator()),
-              );
-            } else if (state is AuthError) {
-              Navigator.pop(context); // Tutup indikator loading
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message)),
-              );
-            } else if (state is AuthLoginSuccess) {
-              _navigateToHome(context);
-            } else if (state is AuthRegisterSuccess) {
-              Navigator.pop(context); // Tutup indikator loading
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Registrasi berhasil, silakan login")),
-              );
-              setState(() {
-                currentPage = "Login"; // Berpindah ke halaman login setelah registrasi sukses
-              });
-            }
-          },
-          child: isTablet ? landscapeView() : verticalView(),
+        child: Stack(
+          children: [
+            BlocListener<AuthCubit, AuthState>(
+              listener: (context, state) {
+                if (state is AuthLoading) {
+                  setState(() {
+                    _isLoading = true;
+                  });
+                  _unfocusAllFields();
+                } else if (state is AuthError) {
+                  setState(() {
+                    _isLoading = false;
+                  });
+                  _unfocusAllFields();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(state.message),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                } else if (state is AuthLoginSuccess) {
+                  setState(() {
+                    _isLoading = false;
+                  });
+                  _navigateToHome(context);
+                } else if (state is AuthRegisterSuccess) {
+                  setState(() {
+                    _isLoading = false;
+                  });
+                  _unfocusAllFields();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Registrasi berhasil, silakan login")),
+                  );
+                  setState(() {
+                    currentPage = "Login";
+                  });
+                }
+              },
+              child: isTablet ? landscapeView() : verticalView(),
+            ),
+            if (_isLoading)
+              Center(
+                child: Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    borderRadius:  BorderRadius.circular(20),color: Colors.white,
+                  ),
+                  child: const CircularProgressIndicator(),
+                ),
+              ),
+          ],
         ),
       ),
     );
   }
 
   void _navigateToHome(BuildContext context) {
-    // Tutup keyboard jika terbuka
-    FocusScope.of(context).unfocus();
-
-    // Tunggu sebentar sebelum pindah halaman untuk memastikan keyboard sudah tertutup
+    _unfocusAllFields();
     Future.delayed(Duration(milliseconds: 100), () {
-      Navigator.pop(context); // Tutup indikator loading
+      Navigator.pop(context); // Close the loading indicator
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomeScreen()), // Atau rute yang sesuai
+        MaterialPageRoute(builder: (context) => HomeScreen()),
       );
     });
   }
 
-  // Fungsi login yang terhubung dengan AuthCubit
   void _login(BuildContext context) {
+    _unfocusAllFields();
+
     if (_formKey.currentState?.saveAndValidate() ?? false) {
+      setState(() {
+        _isLoading = true;
+      });
       final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
 
       context.read<AuthCubit>().login(email, password);
     } else {
+      _unfocusAllFields();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Harap mengisi data yang diperlukan")),
       );
@@ -171,9 +203,12 @@ class _AuthPage extends State<AuthPage> {
                     if (value == null || value.isEmpty) {
                       return 'Harap isi Email/Username';
                     }
+                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                      return 'Harap masukkan email yang valid';
+                    }
                     return null;
                   },
-                  keyboardType: TextInputType.text,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: AppThemes.inputDecorationStyle.copyWith(hintText: "Email atau Username"),
                 ),
                 const SizedBox(height: 12),
@@ -259,7 +294,7 @@ class _AuthPage extends State<AuthPage> {
                       borderRadius: BorderRadius.circular(4.0),
                     ),
                   ),
-                  onPressed: () => _login(context),
+                  onPressed: _isLoading ? null : () => _login(context),
                   child: Container(
                     width: double.infinity,
                     alignment: Alignment.center,
@@ -274,7 +309,6 @@ class _AuthPage extends State<AuthPage> {
                 ),
                 TextButton(
                   onPressed: () {
-                    // Pindah ke halaman register
                     setState(() {
                       currentSteps = 0;
                       currentPage = currentPage == "Login" ? "Register" : "Login";

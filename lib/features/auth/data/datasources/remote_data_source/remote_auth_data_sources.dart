@@ -1,4 +1,5 @@
 import 'package:akib_pos/api/urls.dart';
+import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/features/auth/data/models/login_response.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:http/http.dart' as http;
@@ -21,8 +22,9 @@ abstract class RemoteAuthDataSource {
 
 class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
   final http.Client client;
+
   RemoteAuthDataSourceImpl({
-     required this.client,
+    required this.client,
   });
 
   @override
@@ -32,14 +34,15 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'email': email,
-        'password': password
+        'password': password,
       }),
     );
 
     if (response.statusCode == 200) {
       return LoginResponse.fromJson(jsonDecode(response.body));
     } else {
-      throw Exception('Failed to login');
+      final errorResponse = jsonDecode(response.body);
+      throw GeneralException(errorResponse['message'] ?? 'Failed to login');
     }
   }
 
@@ -53,7 +56,7 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
     String companyName = "-",
     String? companyEmail,
     String companyPhone = "-",
-    String companyAddress = "-"
+    String companyAddress = "-",
   }) async {
     final response = await http.post(
       Uri.parse('${URLs.baseUrlProd}/register'),
@@ -74,7 +77,8 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
     if (response.statusCode == 200) {
       return true;
     } else {
-      throw Exception('Failed to register');
+      final errorResponse = jsonDecode(response.body);
+      throw GeneralException(errorResponse['message'] ?? 'Failed to register');
     }
   }
 
@@ -91,7 +95,8 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
     if (response.statusCode == 200) {
       return true;
     } else {
-      throw Exception('Failed to send reset password link');
+      final errorResponse = jsonDecode(response.body);
+      throw GeneralException(errorResponse['message'] ?? 'Failed to send reset password link');
     }
   }
 }

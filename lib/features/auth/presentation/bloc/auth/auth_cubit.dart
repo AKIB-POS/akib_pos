@@ -1,3 +1,4 @@
+import 'package:akib_pos/core/error/failures.dart';
 import 'package:akib_pos/features/auth/data/models/login_response.dart';
 import 'package:akib_pos/features/auth/data/repositories/auth_repository.dart';
 import 'package:equatable/equatable.dart';
@@ -14,7 +15,13 @@ class AuthCubit extends Cubit<AuthState> {
     final result = await _authRepository.login(email, password);
 
     result.fold(
-      (failure) => emit(AuthError("Failed to login: ${failure}")),
+      (failure) {
+        if (failure is GeneralFailure) {
+          emit(AuthError(failure.message));
+        } else {
+          emit(AuthError("Failed to login"));
+        }
+      },
       (response) => emit(AuthLoginSuccess(response)),
     );
   }
@@ -45,11 +52,18 @@ class AuthCubit extends Cubit<AuthState> {
     );
 
     result.fold(
-      (failure) => emit(AuthError("Failed to register: ${failure}")),
+      (failure) {
+        if (failure is GeneralFailure) {
+          emit(AuthError(failure.message));
+        } else {
+          emit(AuthError("Failed to register"));
+        }
+      },
       (response) => emit(AuthRegisterSuccess(response)),
     );
   }
 }
+
 
 abstract class AuthState extends Equatable {
   const AuthState();
