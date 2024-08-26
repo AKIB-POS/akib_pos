@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 class AppThemes {
   //static final ThemeData appTheme = ThemeData()
   //static final ThemeData appTheme = ThemeData()
-
   static BoxDecoration bottomBoxDecorationDialog = BoxDecoration(
     color: Colors.white,
     borderRadius: const BorderRadius.only(
