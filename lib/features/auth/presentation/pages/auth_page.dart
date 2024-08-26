@@ -102,14 +102,13 @@ class _AuthPage extends State<AuthPage> {
                 } else if (state is AuthRegisterSuccess) {
                   setState(() {
                     _isLoading = false;
+                     currentPage = "Login";
+                     print("apakahhh $currentPage");
                   });
-                  _unfocusAllFields();
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("Registrasi berhasil, silakan login")),
                   );
-                  setState(() {
-                    currentPage = "Login";
-                  });
+                
                 }
               },
               child: isTablet ? landscapeView() : verticalView(),
@@ -132,13 +131,12 @@ class _AuthPage extends State<AuthPage> {
 
   void _navigateToHome(BuildContext context) {
     _unfocusAllFields();
-    Future.delayed(Duration(milliseconds: 100), () {
-      Navigator.pop(context); // Close the loading indicator
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
       );
-    });
+   
   }
 
   void _login(BuildContext context) {

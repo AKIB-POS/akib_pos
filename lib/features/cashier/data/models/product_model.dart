@@ -64,21 +64,21 @@ class ProductModel {
   }
 
   // Factory method to create a ProductModel from JSON
-  factory ProductModel.fromJson(Map<String, dynamic> json) {
-    return ProductModel(
-      id: json['id'],
-      name: json['name'],
-      description: json['description'],
-      price: int.parse(json['price']),
-      stock: int.parse(json['stock']),
-      imageUrl: json['imageUrl'],
-      categoryId: json['category_id'],
-      subCategoryId: json['sub_category_id'],
-      variantId: json['variant_id'] != null ? json['variant_id'] : null,
-      additionId: json['addition_id'] != null ? json['addition_id'] : null,
-      totalPrice: json['total_price'] != null ? int.parse(json['total_price']) : null,
-    );
-  }
+ factory ProductModel.fromJson(Map<String, dynamic> json) {
+  return ProductModel(
+    id: json['id'],
+    name: json['name'],
+    description: json['description'] ?? '',  // Handle null description
+    price: json['price'],
+    stock: json['stock'],
+    imageUrl: json['imageUrl'] ?? '',  // Handle null imageUrl
+    categoryId: json['category_id'],
+    subCategoryId: json['sub_category_id'],
+    variantId: json['variant_id'],  // variantId can be null
+    additionId: json['addition_id'],  // additionId can be null
+    totalPrice: json['total_price'] != null ? int.parse(json['total_price']) : null,
+  );
+}
 
   // Method to convert ProductModel to JSON
   Map<String, dynamic> toJson() {
@@ -86,8 +86,8 @@ class ProductModel {
       'id': id,
       'name': name,
       'description': description,
-      'price': price.toString(),
-      'stock': stock.toString(),
+      'price': price,
+      'stock': stock,
       'imageUrl': imageUrl,
       'category_id': categoryId,
       'sub_category_id': subCategoryId,

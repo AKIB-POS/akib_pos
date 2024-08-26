@@ -48,7 +48,7 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
 
    @override
   Future<CloseCashierResponse> closeCashier() async {
-    final url = '${URLs.baseUrlProd}/close-cashier';  // Adjust the URL as necessary
+    final url = '${URLs.baseUrlProd}/close-cashier'; 
     final response = await client.get(Uri.parse(url), headers: _buildHeaders());
 
     if (response.statusCode != 200) {
@@ -260,9 +260,11 @@ Future<http.Response> _getFromUrl(String url) async {
 
   List<AdditionModel> _parseAdditionList(http.Response response) {
     final jsonData = json.decode(response.body);
+    print("apanyaa $jsonData" );
     if (jsonData['data'] == null) {
       throw ServerException();
     }
+    print("errornyaa ${(jsonData['data'] as List).map((addition) => AdditionModel.fromJson(addition)).toList()}");
     return (jsonData['data'] as List).map((addition) => AdditionModel.fromJson(addition)).toList();
   }
 

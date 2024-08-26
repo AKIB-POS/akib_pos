@@ -23,7 +23,7 @@ abstract class KasirRepository {
   Future<Either<Failure, List<VariantModel>>> getVariants();
   Future<Either<Failure, List<AdditionModel>>> getAdditions();
   Future<Either<Failure, RedeemVoucherResponse>> redeemVoucher(String code);
-  Future<Either<Failure, List<MemberModel>>> getAllMembers(); 
+  Future<Either<Failure, List<MemberModel>>> getAllMembers(); // Tambahkan metode ini
   Future<Either<Failure, List<MemberModel>>> searchMemberByName(String name);
   Future<Either<Failure, void>> postMember(String name, String phoneNumber, {String? email});
   Future<Either<Failure, MemberModel>> updateMember(MemberModel member);
@@ -96,6 +96,7 @@ class KasirRepositoryImpl implements KasirRepository {
   Future<Either<Failure, List<CategoryModel>>> getCategories() async {
     try {
       final categories = await remoteDataSource.getCategories();
+      print("apaaanya $categories");
       return Right(categories);
     } catch (error) {
       return Left(ServerFailure());

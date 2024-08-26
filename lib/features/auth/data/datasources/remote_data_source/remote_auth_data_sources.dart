@@ -74,7 +74,7 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
       },
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       return true;
     } else {
       final errorResponse = jsonDecode(response.body);

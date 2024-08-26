@@ -145,7 +145,7 @@ class _ProductDialogState extends State<ProductDialog> {
                                   widget.editIndex!, transaction);
                             } else {
                               // Tambahkan transaksi baru jika tidak mengedit
-                              transactionCubit.addTransaction(transaction, tax);
+                              // transactionCubit.addTransaction(transaction, tax);
                             }
 
                             print('Transaction details: $transaction');
@@ -303,7 +303,7 @@ class _ProductDialogState extends State<ProductDialog> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(subAddition.subAdditionType,
+                                              Text(subAddition.subAdditionType ?? "",
                                                   style: AppTextStyle.headline6
                                                       .copyWith(
                                                           color: AppColors

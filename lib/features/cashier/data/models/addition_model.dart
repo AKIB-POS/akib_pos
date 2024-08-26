@@ -1,9 +1,9 @@
 import 'package:akib_pos/features/cashier/data/models/addition_option.dart';
 
 class AdditionModel {
-  int id;
-  String additionType;
-  List<SubAddition> subAdditions;
+  final int id;
+  final String additionType;
+  final List<SubAddition> subAdditions;
 
   AdditionModel({
     required this.id,
@@ -13,9 +13,10 @@ class AdditionModel {
 
   factory AdditionModel.fromJson(Map<String, dynamic> json) {
     return AdditionModel(
-      id: json['id'],
-      additionType: json['addition_type'],
-      subAdditions: List<SubAddition>.from(json['sub_additions'].map((x) => SubAddition.fromJson(x))),
+      id: json['id'] ?? 0,
+      additionType: json['addition_type'] ?? '',
+      subAdditions: List<SubAddition>.from(
+          json['sub_additions'].map((x) => SubAddition.fromJson(x))),
     );
   }
 
@@ -29,9 +30,9 @@ class AdditionModel {
 }
 
 class SubAddition {
-  int id;
-  String subAdditionType;
-  List<AdditionOption> options;
+  final int id;
+  final String subAdditionType;
+  final List<AdditionOption> options;
 
   SubAddition({
     required this.id,
@@ -41,9 +42,10 @@ class SubAddition {
 
   factory SubAddition.fromJson(Map<String, dynamic> json) {
     return SubAddition(
-      id: json['id'],
-      subAdditionType: json['sub_addition_type'],
-      options: List<AdditionOption>.from(json['options'].map((x) => AdditionOption.fromJson(x))),
+      id: json['id'] ?? 0,
+      subAdditionType: json['sub_addition_type'] ?? '',
+      options: List<AdditionOption>.from(
+          json['options'].map((x) => AdditionOption.fromJson(x))),
     );
   }
 
@@ -57,9 +59,9 @@ class SubAddition {
 }
 
 class AdditionOption {
-  int id;
-  String name;
-  int price;
+  final int id;
+  final String name;
+  final int price;
 
   AdditionOption({
     required this.id,
@@ -69,9 +71,9 @@ class AdditionOption {
 
   factory AdditionOption.fromJson(Map<String, dynamic> json) {
     return AdditionOption(
-      id: json['id'],
-      name: json['name'],
-      price: json['price'],
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      price: json['price'] ?? 0,
     );
   }
 
