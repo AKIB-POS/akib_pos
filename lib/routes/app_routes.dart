@@ -1,6 +1,7 @@
 
 
 
+import 'package:akib_pos/features/accounting/presentation/pages/accounting_page.dart';
 import 'package:akib_pos/features/cashier/presentation/pages/cashier_page.dart';
 import 'package:akib_pos/features/cashier/presentation/pages/cashier_page.dart';
 import 'package:akib_pos/features/dashboard/presentation/pages/dashboard_page.dart';
@@ -12,8 +13,8 @@ import 'package:flutter/material.dart';
 
 class AppRoutes {
   static const String initialRoute = '/';
-  static List<Widget> pages = [DashboardPage(), CashierPage(), HrdPage(), StockistPage(), SettingsPage()];
-  static List<String> pageTitles = ["Dashboard", "Kasir", "HRD", "Stockist", "Pengaturan"];
+  static List<Widget> pages = [DashboardPage(), CashierPage(), HrdPage(), AccountingPage(), StockistPage(), SettingsPage()];
+  static List<String> pageTitles = ["Dashboard", "Kasir", "HRD", "Akunting", "Stockist", "Pengaturan"];
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {

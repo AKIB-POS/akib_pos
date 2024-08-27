@@ -10,8 +10,8 @@ import 'package:get_it/get_it.dart';
 import 'package:sizer/sizer.dart';
 
 class MyDrawer extends StatelessWidget {
-  final List<String> menuTitles = ["Dashboard", "Kasir", "HRD", "Stockist", "Settings"];
-  final List<String> iconTitles = ["assets/icons/ic_dashboard.svg", "assets/icons/ic_kasir.svg", "assets/icons/ic_hrd.svg", "assets/icons/ic_stockist.svg", "assets/icons/ic_pengaturan.svg"];
+  final List<String> menuTitles = ["Dashboard", "Kasir", "HRD", "Akunting", "Stockist", "Settings"];
+  final List<String> iconTitles = ["assets/icons/ic_dashboard.svg", "assets/icons/ic_kasir.svg", "assets/icons/ic_hrd.svg", "assets/icons/ic_akunting.svg", "assets/icons/ic_stockist.svg", "assets/icons/ic_pengaturan.svg"];
   final String cafeName = "Cafe Arrazzaq";
   final String ownerName = "Fadhil Muhaimin";
 
