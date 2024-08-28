@@ -1,22 +1,28 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/cashier/data/models/close_cashier_response.dart';
+import 'package:akib_pos/features/cashier/data/models/open_cashier_model.dart';
 import 'package:akib_pos/features/cashier/data/repositories/kasir_repository.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/close_cashier/close_cashier_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/post_close_cashier/post_close_cashier_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/open_cashier_dialog.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 
 class CloseCashierDialog extends StatelessWidget {
+  final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
+
   @override
   Widget build(BuildContext context) {
     final closeCashierCubit = context.read<CloseCashierCubit>();
-    closeCashierCubit
-        .closeCashier(); // Trigger fetching data when the dialog opens
+    closeCashierCubit.closeCashier(); // Trigger fetching data when the dialog opens
 
     return Dialog(
       backgroundColor: Colors.white,
@@ -52,6 +58,31 @@ class CloseCashierDialog extends StatelessWidget {
   }
 
   Widget _buildDialog(BuildContext context, CloseCashierResponse response) {
+    return BlocBuilder<PostCloseCashierCubit, PostCloseCashierState>(
+      builder: (context, postState) {
+        if (postState is PostCloseCashierLoading) {
+          return Container(
+            width: MediaQuery.of(context).size.width * 0.95,
+            height: MediaQuery.of(context).size.height * 0.95,
+            padding: const EdgeInsets.all(16),
+            child: const Center(child: CircularProgressIndicator()),
+          );
+        } else if (postState is PostCloseCashierSuccess) {
+          Navigator.of(context).pop(); // Close the dialog after success
+          return Container(); // Or you can return a success message
+        } else if (postState is PostCloseCashierError) {
+          return Container(
+            padding: const EdgeInsets.all(16),
+            child: Center(child: Text(postState.message)),
+          );
+        }
+
+        return _buildDialogContent(context, response);
+      },
+    );
+  }
+
+  Widget _buildDialogContent(BuildContext context, CloseCashierResponse response) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.95,
       height: 200.h,
@@ -86,10 +117,8 @@ class CloseCashierDialog extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _buildSummaryColumn("Nama Kasir", response.data.cashierName),
-                _buildSummaryColumn(
-                    "Mulai Buka Kasir", response.data.cashierOpenTime),
-                _buildSummaryColumn(
-                    "Waktu Tutup Kasir", response.data.cashierCloseTime),
+                _buildSummaryColumn("Mulai Buka Kasir", response.data.cashierOpenTime),
+                _buildSummaryColumn("Waktu Tutup Kasir", response.data.cashierCloseTime),
               ],
             ),
           ),
@@ -98,49 +127,29 @@ class CloseCashierDialog extends StatelessWidget {
           ),
           Row(
             children: [
-              const SizedBox(
-                width: 16,
-              ),
+              const SizedBox(width: 16),
               Expanded(
-                child: _buildSummaryColumnBorder("Kas Awal",
-                    Utils.formatCurrencyDouble(response.data.initialCash)),
+                child: _buildSummaryColumnBorder("Kas Awal", Utils.formatCurrencyDouble(response.data.initialCash)),
               ),
-              const SizedBox(
-                width: 16,
-              ),
+              const SizedBox(width: 16),
               Expanded(
-                child: _buildSummaryColumnBorder(
-                    "Pengeluaran Outlet",
-                    Utils.formatCurrencyDouble(
-                        response.data.outletExpenditure)),
+                child: _buildSummaryColumnBorder("Pengeluaran Outlet", Utils.formatCurrencyDouble(response.data.outletExpenditure)),
               ),
-              const SizedBox(
-                width: 16,
-              ),
+              const SizedBox(width: 16),
             ],
           ),
-          const SizedBox(
-            height: 16,
-          ),
+          const SizedBox(height: 16),
           Row(
             children: [
-              const SizedBox(
-                width: 16,
-              ),
+              const SizedBox(width: 16),
               Expanded(
-                child: _buildSummaryColumnBorder("Pembayaran Tunai",
-                    Utils.formatCurrencyDouble(response.data.cashPayment)),
+                child: _buildSummaryColumnBorder("Pembayaran Tunai", Utils.formatCurrencyDouble(response.data.cashPayment)),
               ),
-              const SizedBox(
-                width: 16,
-              ),
+              const SizedBox(width: 16),
               Expanded(
-                child: _buildSummaryColumnBorder("Pembayaran Non Tunai",
-                    Utils.formatCurrencyDouble(response.data.nonCashPayment)),
+                child: _buildSummaryColumnBorder("Pembayaran Non Tunai", Utils.formatCurrencyDouble(response.data.nonCashPayment)),
               ),
-              const SizedBox(
-                width: 16,
-              ),
+              const SizedBox(width: 16),
             ],
           ),
           const SizedBox(height: 16),
@@ -148,8 +157,7 @@ class CloseCashierDialog extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 16),
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image:
-                    ExtendedAssetImageProvider("assets/images/bg_payment.png"),
+                image: ExtendedAssetImageProvider("assets/images/bg_payment.png"),
                 fit: BoxFit.fitWidth,
               ),
             ),
@@ -160,18 +168,12 @@ class CloseCashierDialog extends StatelessWidget {
                 const SizedBox(height: 16),
                 const Text(
                   'Total Uang Tunai',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   Utils.formatCurrencyDouble(response.data.totalCash),
-                  style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 const SizedBox(height: 16),
               ],
@@ -180,22 +182,23 @@ class CloseCashierDialog extends StatelessWidget {
           Spacer(),
           Container(
             decoration: AppThemes.bottomBoxDecorationDialog,
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
             child: Row(
               children: [
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).pop(); // Close the dialog
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return OpenCashierDialog();
-                        },
-                        barrierDismissible:
-                            false, // This will make the dialog non-dismissible
+                      final request = OpenCashierRequest(
+                        idUser: _authSharedPref.getUserId().toString(),
+                        datetime: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                        jumlah: response.data.totalCash,
+                        branchId: _authSharedPref.getBranchId().toString(),
+                        status: "close",
                       );
+
+                      final closeCashierCubit = context.read<PostCloseCashierCubit>();
+                      closeCashierCubit.postCloseCashier(request);
+                      closeCashierCubit.resetState();
                     },
                     child: const Text("Tutup Kasir"),
                     style: ElevatedButton.styleFrom(
@@ -221,9 +224,7 @@ class CloseCashierDialog extends StatelessWidget {
       child: Column(
         children: [
           Text(label, style: const TextStyle(fontSize: 10)),
-          Text(value,
-              style:
-                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -233,15 +234,14 @@ class CloseCashierDialog extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
-          border: Border.all(color: AppColors.backgroundGrey, width: 1),
-          borderRadius: BorderRadius.circular(4),
-          color: Colors.white),
+        border: Border.all(color: AppColors.backgroundGrey, width: 1),
+        borderRadius: BorderRadius.circular(4),
+        color: Colors.white,
+      ),
       child: Column(
         children: [
           Text(label, style: const TextStyle(fontSize: 16)),
-          Text(value,
-              style:
-                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         ],
       ),
     );

@@ -2,15 +2,17 @@ import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/a
 import 'package:akib_pos/features/auth/data/datasources/remote_data_source/remote_auth_data_sources.dart';
 import 'package:akib_pos/features/auth/data/repositories/auth_repository.dart';
 import 'package:akib_pos/features/auth/presentation/bloc/auth/auth_cubit.dart';
-import 'package:akib_pos/features/cashier/data/datasources/kasir_local_data_source.dart';
+import 'package:akib_pos/features/cashier/data/datasources/local/cashier_shared_pref.dart';
+import 'package:akib_pos/features/cashier/data/datasources/local/kasir_local_data_source.dart';
 import 'package:akib_pos/features/cashier/data/datasources/kasir_remote_data_source.dart';
-import 'package:akib_pos/features/cashier/data/datasources/transaction_service.dart';
+import 'package:akib_pos/features/cashier/data/datasources/local/transaction_service.dart';
 import 'package:akib_pos/features/cashier/data/repositories/kasir_repository.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/close_cashier/close_cashier_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/expenditure/expenditure_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/member/member_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/open_cashier/open_cashier_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/post_close_cashier/post_close_cashier_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/printer/printer_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/product/product_bloc.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
@@ -55,6 +57,9 @@ Future<void> init() async {
     () => CloseCashierCubit(repository: sl()),
   );
   sl.registerFactory(
+    () => PostCloseCashierCubit(repository: sl()),
+  );
+  sl.registerFactory(
     () => OpenCashierCubit(repository: sl()),
   );
   
@@ -79,6 +84,10 @@ Future<void> init() async {
 
   sl.registerLazySingleton<KasirLocalDataSource>(
     () => KasirLocalDataSource(sharedPreferences: sl()),
+  );
+  
+  sl.registerLazySingleton<CashierSharedPref>(
+    () => CashierSharedPref(sharedPreferences: sl()),
   );
   sl.registerLazySingleton<TransactionService>(
     () => TransactionService(sharedPreferences: sl()),

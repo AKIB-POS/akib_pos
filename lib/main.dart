@@ -7,6 +7,7 @@ import 'package:akib_pos/features/cashier/presentation/bloc/close_cashier/close_
 import 'package:akib_pos/features/cashier/presentation/bloc/expenditure/expenditure_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/member/member_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/open_cashier/open_cashier_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/post_close_cashier/post_close_cashier_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/printer/printer_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/product/product_bloc.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/process_transaction_cubit.dart';
@@ -82,6 +83,9 @@ void main() async {
         BlocProvider(
             create: (context) =>
                 CloseCashierCubit(repository: sl())),
+        BlocProvider(
+            create: (context) =>
+                PostCloseCashierCubit(repository: sl())),
         BlocProvider(
             create: (context) =>
                 OpenCashierCubit(repository: sl())),

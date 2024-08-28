@@ -1,8 +1,9 @@
+import 'package:akib_pos/features/cashier/data/datasources/local/cashier_shared_pref.dart';
 import 'package:akib_pos/features/cashier/data/models/open_cashier_model.dart';
 import 'package:akib_pos/features/cashier/data/repositories/kasir_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dartz/dartz.dart';
-
+import 'package:get_it/get_it.dart';
 class OpenCashierCubit extends Cubit<OpenCashierState> {
   final KasirRepository repository;
 
@@ -14,7 +15,13 @@ class OpenCashierCubit extends Cubit<OpenCashierState> {
 
     result.fold(
       (failure) => emit(OpenCashierError('Gagal membuka kasir')),
-      (response) => emit(OpenCashierSuccess(response.message)),
+      (response) async {
+        // Set shared preference bahwa kasir sudah dibuka
+        final cashierSharedPref = GetIt.instance<CashierSharedPref>();
+        await cashierSharedPref.setCashierIsOpen(true);
+
+        emit(OpenCashierSuccess(response.message));
+      },
     );
   }
 

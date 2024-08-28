@@ -8,6 +8,8 @@ import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:extended_image/extended_image.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
 
 class MenuGrid extends StatelessWidget {
@@ -18,10 +20,42 @@ class MenuGrid extends StatelessWidget {
     return BlocBuilder<CashierCubit, CashierState>(
       builder: (context, state) {
         final menuItems = context.read<CashierCubit>().filteredItems;
+
+        if (menuItems.isEmpty) {
+          return Container(
+            alignment: Alignment.center, // Center the content in the container
+            padding:  EdgeInsets.only(bottom: 15.h),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: 8.h,
+                ),
+                SvgPicture.asset(
+                  "assets/images/empty_product.svg",
+                  height: 12.h,
+                  width: 12.h,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Belum Ada Produk',
+                  style: AppTextStyle.headline5,
+                ),
+                const Text(
+                  'Tambah produk terlebih dahulu untuk\nbisa mengatur sesuai kebutuhan',
+                  style: AppTextStyle.body3,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          );
+        }
+
         return GridView.builder(
           padding: const EdgeInsets.only(right: 8),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4, // Update to 4 columns
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
             crossAxisSpacing: 8.0,
             mainAxisSpacing: 8.0,
             childAspectRatio: 0.8,
@@ -67,15 +101,56 @@ class MenuCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ExtendedImage.network(
-              item.imageUrl,
-              width: double.infinity,
-              height: 11.h,
-              fit: BoxFit.fill,
-              cache: true,
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.all(Radius.circular(8.0)),
-            ),
+            item.imageUrl == '' || item.imageUrl!.isEmpty
+                ? ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                    child: Image.asset(
+                      'assets/images/no_imgproduk.png',
+                      width: double.infinity,
+                      fit: BoxFit.fill,
+                      height: 11.h,
+                    ),
+                  )
+                : ExtendedImage.network(
+                    item.imageUrl!,
+                    width: double.infinity,
+                    fit: BoxFit.fill,
+                    height: 11.h,
+                    cache: true,
+                    shape: BoxShape.rectangle,
+                    borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                    loadStateChanged: (ExtendedImageState state) {
+                      switch (state.extendedImageLoadState) {
+                        case LoadState.loading:
+                          return Shimmer.fromColors(
+                            baseColor: Colors.grey[300]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: Container(
+                              width: double.infinity,
+                              height: 11.h,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(8.0)),
+                              ),
+                            ),
+                          );
+                        case LoadState.completed:
+                          return null;
+                        case LoadState.failed:
+                          return ClipRRect(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8.0)),
+                            child: Image.asset(
+                              'assets/images/no_imgproduk.png',
+                              width: 90,
+                              height: 90,
+                              fit: BoxFit.fill,
+                            ),
+                          );
+                      }
+                    },
+                  ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

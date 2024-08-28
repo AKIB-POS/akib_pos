@@ -159,7 +159,9 @@ class _ProductDialogState extends State<ProductDialog> {
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
-                          widget.product.imageUrl == '' ||
+                          Row(
+                            children: [
+                              widget.product.imageUrl == '' ||
                                   widget.product.imageUrl!.isEmpty
                               ? ClipRRect(
                                   borderRadius: const BorderRadius.all(
@@ -213,6 +215,21 @@ class _ProductDialogState extends State<ProductDialog> {
                                     }
                                   },
                                 ),
+                                const SizedBox(width: 16),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(widget.product.name,
+                                      style: AppTextStyle.headline6),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                      Utils.formatCurrency(
+                                          widget.product.price.toString()),
+                                      style: AppTextStyle.body3),
+                                ],
+                              ),
+                            ]
+                          ),
                           const SizedBox(height: 16),
                           if (productVariant.id != 0 || productAddition.id != 0)
                             Row(

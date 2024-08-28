@@ -1,5 +1,5 @@
 import 'package:akib_pos/core/error/failures.dart';
-import 'package:akib_pos/features/cashier/data/datasources/kasir_local_data_source.dart';
+import 'package:akib_pos/features/cashier/data/datasources/local/kasir_local_data_source.dart';
 import 'package:akib_pos/features/cashier/data/models/addition_model.dart';
 import 'package:akib_pos/features/cashier/data/models/category_model.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
