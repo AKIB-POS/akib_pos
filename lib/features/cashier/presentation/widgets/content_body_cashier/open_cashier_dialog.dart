@@ -1,5 +1,6 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_themes.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/cashier/data/models/open_cashier_model.dart';
 import 'package:akib_pos/features/cashier/data/repositories/kasir_repository.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/open_cashier/open_cashier_cubit.dart';
@@ -8,10 +9,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get_it/get_it.dart';
+import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 
 class OpenCashierDialog extends StatelessWidget {
   final TextEditingController _controller = TextEditingController();
+  final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +30,9 @@ class OpenCashierDialog extends StatelessWidget {
           });
         }
 
-        return PopScope(
-          canPop: false, // Disable closing the dialog by back button
+        return WillPopScope(
+          onWillPop: () async =>
+              false, // Disable closing the dialog by back button
           child: Dialog(
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
@@ -94,39 +99,40 @@ class OpenCashierDialog extends StatelessWidget {
                       ],
                       decoration: AppThemes.inputDecorationStyle
                           .copyWith(hintText: "Masukkan Kas Awal"),
-                      onChanged: (value) {
-                        context.read<OpenCashierCubit>().emit(
-                          value.isNotEmpty
-                              ? OpenCashierInitial()
-                              : OpenCashierLoading(), // Adjust the state as needed
-                        );
-                      },
                     ),
                     const SizedBox(height: 24.0),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: (state is OpenCashierInitial && !isLoading)
-                            ? () {
+                        onPressed: isLoading
+                            ? null
+                            : () {
                                 final request = OpenCashierRequest(
-                                  idUser: '12345',
-                                  datetime: DateTime.now().toIso8601String(),
-                                  jumlah: double.parse(
-                                    _controller.text.replaceAll(RegExp(r'[^0-9]'), ''),
-                                  ),
-                                  branchId: '6789',
+                                  idUser:
+                                      _authSharedPref.getUserId().toString(),
+                                  datetime: DateFormat('yyyy-MM-dd HH:mm:ss')
+                                      .format(DateTime.now()),
+                                  jumlah: double.parse(_controller.text
+                                      .replaceAll(RegExp(r'[^0-9]'), '')),
+                                  branchId:
+                                      _authSharedPref.getBranchId().toString(),
+                                  status: "open",
                                 );
-                                context.read<OpenCashierCubit>().openCashier(request);
-                              }
-                            : null,
+                                context
+                                    .read<OpenCashierCubit>()
+                                    .openCashier(request);
+                              },
                         style: ButtonStyle(
-                          backgroundColor: (state is OpenCashierInitial && !isLoading)
-                              ? const WidgetStatePropertyAll<Color>(AppColors.primaryMain)
-                              : const WidgetStatePropertyAll<Color>(Colors.grey),
-                          padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
-                            EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: isLoading
+                              ? MaterialStateProperty.all<Color>(Colors.grey)
+                              : MaterialStateProperty.all<Color>(
+                                  AppColors.primaryMain),
+                          padding:
+                              MaterialStateProperty.all<EdgeInsetsGeometry>(
+                            const EdgeInsets.symmetric(vertical: 16),
                           ),
-                          shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -137,7 +143,8 @@ class OpenCashierDialog extends StatelessWidget {
                                 height: 24,
                                 width: 24,
                                 child: CircularProgressIndicator(
-                                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
                                   strokeWidth: 2,
                                 ),
                               )
@@ -151,7 +158,8 @@ class OpenCashierDialog extends StatelessWidget {
                     ),
                     if (state is OpenCashierError) ...[
                       const SizedBox(height: 16.0),
-                      Text(state.message, style: const TextStyle(color: Colors.red)),
+                      Text(state.message,
+                          style: const TextStyle(color: Colors.red)),
                     ],
                   ],
                 ),

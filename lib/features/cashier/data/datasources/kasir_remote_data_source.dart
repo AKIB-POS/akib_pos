@@ -18,8 +18,6 @@ import 'package:akib_pos/util/shared_prefs_helper.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
-
-
 abstract class KasirRemoteDataSource {
   Future<List<ProductModel>> getAllProducts();
   Future<List<CategoryModel>> getCategories();
@@ -36,6 +34,7 @@ abstract class KasirRemoteDataSource {
   Future<void> postTransaction(FullTransactionModel fullTransaction);
   Future<CloseCashierResponse> closeCashier();
   Future<OpenCashierResponse> openCashier(OpenCashierRequest request);
+  Future<PostCloseCashierResponse> postCloseCashier(OpenCashierRequest request);
 }
 
 class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
@@ -45,10 +44,60 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
   KasirRemoteDataSourceImpl({
     required this.client,
   });
+  @override
+ Future<PostCloseCashierResponse> postCloseCashier(
+    OpenCashierRequest request) async {
+  final token = sharedPrefsHelper.getToken();
+  final url = '${URLs.baseUrlProd}/close-cashier';
 
-   @override
+  final response = await client.post(
+    Uri.parse(url),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+    body: json.encode(request.toJson()),
+  );
+
+  if (response.statusCode == 200) {
+    return PostCloseCashierResponse.fromJson(json.decode(response.body));
+  } else {
+    throw ServerException();
+  }
+}
+
+  @override
+  Future<OpenCashierResponse> openCashier(OpenCashierRequest request) async {
+    const url = '${URLs.baseUrlProd}/open-cashier';
+    final token = sharedPrefsHelper.getToken();
+    try {
+      final response = await client.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode(request.toJson()),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Jika permintaan berhasil
+        return OpenCashierResponse.fromJson(json.decode(response.body));
+      } else {
+        // Tangani status kode lainnya, mungkin ada redirect atau masalah lain
+        throw Exception(
+            'Failed to open cashier with status code ${response.statusCode}');
+      }
+    } catch (e) {
+      // Tangani error lain yang mungkin terjadi
+      throw Exception('Failed to open cashier: $e');
+    }
+  }
+
+  @override
   Future<CloseCashierResponse> closeCashier() async {
-    final url = '${URLs.baseUrlProd}/close-cashier'; 
+    final url =
+        '${URLs.baseUrlProd}/close-cashier/${sharedPrefsHelper.getUserId()}';
     final response = await client.get(Uri.parse(url), headers: _buildHeaders());
 
     if (response.statusCode != 200) {
@@ -72,15 +121,14 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
     return jsonResponse['data']['amount'];
   }
 
-   
-
-   @override
+  @override
   Future<void> postTransaction(FullTransactionModel fullTransaction) async {
     final url = '${URLs.baseUrlProd}/transactions';
     final response = await client.post(
       Uri.parse(url),
       headers: _buildHeaders(),
-      body: jsonEncode(fullTransaction.toApiJson()), // Convert to JSON using toApiJson
+      body: jsonEncode(
+          fullTransaction.toApiJson()), // Convert to JSON using toApiJson
     );
 
     if (response.statusCode != 201) {
@@ -88,7 +136,7 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
     }
   }
 
-   @override
+  @override
   Future<void> postExpenditure(ExpenditureModel expenditure) async {
     final url = '${URLs.baseUrlProd}/expenditures';
     final response = await client.post(
@@ -102,10 +150,9 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
     }
   }
 
-  
-
   @override
-  Future<void> postMember(String name, String phoneNumber, {String? email}) async {
+  Future<void> postMember(String name, String phoneNumber,
+      {String? email}) async {
     final url = '${URLs.baseUrlProd}/members';
     final response = await client.post(
       Uri.parse(url),
@@ -146,14 +193,17 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
 
   @override
   Future<List<MemberModel>> searchMemberByName(String name) async {
-    final response = await _getFromUrl('${URLs.baseUrlProd}/members?name=$name');
+    final response =
+        await _getFromUrl('${URLs.baseUrlProd}/members?name=$name');
     return _parseMemberList(response);
   }
 
   List<MemberModel> _parseMemberList(http.Response response) {
     final Map<String, dynamic> decodedResponse = json.decode(response.body);
     final List<dynamic> membersJson = decodedResponse['data'];
-    return membersJson.map<MemberModel>((json) => MemberModel.fromJson(json)).toList();
+    return membersJson
+        .map<MemberModel>((json) => MemberModel.fromJson(json))
+        .toList();
   }
 
   @override
@@ -164,8 +214,17 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
 
   @override
   Future<RedeemVoucherResponse> redeemVoucher(String code) async {
-    final url = '${URLs.baseUrlProd}/redeem-voucher/$code';
-    final response = await _postFromUrl(url);
+    // final url = '${URLs.baseUrlProd}/redeem-voucher/$code';
+    // final response = await _postFromUrl(url)
+    // ;
+    const url = '${URLs.baseUrlProd}/redeem-voucher';
+    final response = await client.post(
+      Uri.parse(url),
+      headers: _buildHeaders(),
+      body: jsonEncode({
+        'code': code,
+      }),
+    );
 
     if (response.statusCode != 200) {
       throw ServerException();
@@ -198,8 +257,6 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
     return _parseVariantList(response);
   }
 
- 
-
   Map<String, String> _buildHeaders() {
     final token = sharedPrefsHelper.getToken();
     return {
@@ -208,25 +265,26 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
     };
   }
 
-Future<http.Response> _getFromUrl(String url) async {
-  try {
-    final response = await client
-        .get(Uri.parse(url), headers: _buildHeaders())
-        .timeout(Duration(seconds: 15)); // Set a 15-second timeout
+  Future<http.Response> _getFromUrl(String url) async {
+    try {
+      final response = await client
+          .get(Uri.parse(url), headers: _buildHeaders())
+          .timeout(Duration(seconds: 15)); // Set a 15-second timeout
 
-    if (response.statusCode != 200) {
-      throw ServerException();
+      if (response.statusCode != 200) {
+        throw ServerException();
+      }
+      return response;
+    } on TimeoutException catch (_) {
+      throw TimeoutException('The connection has timed out, Please try again!');
+    } catch (e) {
+      throw ServerException(); // Handle other potential errors
     }
-    return response;
-  } on TimeoutException catch (_) {
-    throw TimeoutException('The connection has timed out, Please try again!');
-  } catch (e) {
-    throw ServerException(); // Handle other potential errors
   }
-}
 
   Future<http.Response> _postFromUrl(String url) async {
-    final response = await client.post(Uri.parse(url), headers: _buildHeaders());
+    final response =
+        await client.post(Uri.parse(url), headers: _buildHeaders());
 
     if (response.statusCode != 200) {
       throw ServerException();
@@ -239,7 +297,9 @@ Future<http.Response> _getFromUrl(String url) async {
     if (jsonData['data'] == null) {
       throw ServerException();
     }
-    return (jsonData['data'] as List).map((product) => ProductModel.fromJson(product)).toList();
+    return (jsonData['data'] as List)
+        .map((product) => ProductModel.fromJson(product))
+        .toList();
   }
 
   List<CategoryModel> _parseCategoryList(http.Response response) {
@@ -247,7 +307,9 @@ Future<http.Response> _getFromUrl(String url) async {
     if (jsonData['data'] == null) {
       throw ServerException();
     }
-    return (jsonData['data'] as List).map((category) => CategoryModel.fromJson(category)).toList();
+    return (jsonData['data'] as List)
+        .map((category) => CategoryModel.fromJson(category))
+        .toList();
   }
 
   List<SubCategoryModel> _parseSubCategoryList(http.Response response) {
@@ -255,17 +317,22 @@ Future<http.Response> _getFromUrl(String url) async {
     if (jsonData['data'] == null) {
       throw ServerException();
     }
-    return (jsonData['data'] as List).map((subCategory) => SubCategoryModel.fromJson(subCategory)).toList();
+    return (jsonData['data'] as List)
+        .map((subCategory) => SubCategoryModel.fromJson(subCategory))
+        .toList();
   }
 
   List<AdditionModel> _parseAdditionList(http.Response response) {
     final jsonData = json.decode(response.body);
-    print("apanyaa $jsonData" );
+    print("apanyaa $jsonData");
     if (jsonData['data'] == null) {
       throw ServerException();
     }
-    print("errornyaa ${(jsonData['data'] as List).map((addition) => AdditionModel.fromJson(addition)).toList()}");
-    return (jsonData['data'] as List).map((addition) => AdditionModel.fromJson(addition)).toList();
+    print(
+        "errornyaa ${(jsonData['data'] as List).map((addition) => AdditionModel.fromJson(addition)).toList()}");
+    return (jsonData['data'] as List)
+        .map((addition) => AdditionModel.fromJson(addition))
+        .toList();
   }
 
   List<VariantModel> _parseVariantList(http.Response response) {
@@ -273,26 +340,8 @@ Future<http.Response> _getFromUrl(String url) async {
     if (jsonData['data'] == null) {
       throw ServerException();
     }
-    return (jsonData['data'] as List).map((variant) => VariantModel.fromJson(variant)).toList();
+    return (jsonData['data'] as List)
+        .map((variant) => VariantModel.fromJson(variant))
+        .toList();
   }
-  
-   @override
-  Future<OpenCashierResponse> openCashier(OpenCashierRequest request) async {
-    final url = '${URLs.baseUrlProd}/open-cashier';
-    final response = await client.post(
-      Uri.parse(url),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode(request.toJson()),
-    );
-
-    if (response.statusCode == 201) {
-      return OpenCashierResponse.fromJson(json.decode(response.body));
-    } else {
-      throw ServerException();
-    }
-  }
-  
-  
 }

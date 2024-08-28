@@ -13,32 +13,29 @@ class LeftBody extends StatelessWidget {
     return BlocBuilder<CashierCubit, CashierState>(
       builder: (context, state) {
         if (state.isLoading) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
         if (state.error != null) {
           return Center(
-            child: Container(
-              color: Colors.white,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(state.error!, style: AppTextStyle.headline5),
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                                backgroundColor:AppColors.primaryMain,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4.0),
-                                ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(state.error!, style: AppTextStyle.headline5),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                              backgroundColor:AppColors.primaryMain,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4.0),
                               ),
-                    onPressed: () {
-                      context.read<CashierCubit>().loadData();
-                    },
-                    child: Text('Muat Ulang Data'),
-                  ),
-                ],
-              ),
+                            ),
+                  onPressed: () {
+                    context.read<CashierCubit>().loadData();
+                  },
+                  child: const Text('Muat Ulang Data'),
+                ),
+              ],
             ),
           );
         }
@@ -63,13 +60,13 @@ class LeftBody extends StatelessWidget {
                         builder: (context, state) {
                           return state.selectedCategory != 0
                               ? SubCategoryList(categoryId: state.selectedCategory)
-                              : SizedBox.shrink();
+                              : const SizedBox.shrink();
                         },
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Expanded(
                   child: MenuGrid(),
                 ),

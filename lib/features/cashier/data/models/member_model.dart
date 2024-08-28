@@ -28,7 +28,7 @@ class MemberModel {
     return {
       'id': id,
       'name': name,
-      'phone_number': phoneNumber,
+      'phone': phoneNumber,
       'email': email,
     };
   }

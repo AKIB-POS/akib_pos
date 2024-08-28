@@ -15,6 +15,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
 
 class RightBody extends StatelessWidget {
@@ -104,7 +105,8 @@ class RightBody extends StatelessWidget {
                         itemCount: state.transactions.length,
                         itemBuilder: (context, index) {
                           final transaction = state.transactions[index];
-                          print("apakahh di right body ${transaction.quantity}");
+                          print(
+                              "apakahh di right body ${transaction.quantity}");
                           return Container(
                             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                             child: Column(
@@ -117,16 +119,74 @@ class RightBody extends StatelessWidget {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        ExtendedImage.network(
-                                          transaction.product.imageUrl,
-                                          width: 80,
-                                          height: 80,
-                                          fit: BoxFit.fill,
-                                          cache: true,
-                                          shape: BoxShape.rectangle,
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(8.0)),
-                                        ),
+                                        transaction.product.imageUrl == '' ||
+                                                transaction
+                                                    .product.imageUrl!.isEmpty
+                                            ? ClipRRect(
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(8.0)),
+                                                child: Image.asset(
+                                                  'assets/images/no_imgproduk.png', // Gambar default jika URL null atau kosong
+                                                  width: 80,
+                                                  height: 80,
+                                                  fit: BoxFit.fill,
+                                                ),
+                                              )
+                                            : ExtendedImage.network(
+                                                transaction.product.imageUrl!,
+                                                width: 80,
+                                                height: 80,
+                                                fit: BoxFit.fill,
+                                                cache: true,
+                                                shape: BoxShape.rectangle,
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(8.0)),
+                                                loadStateChanged:
+                                                    (ExtendedImageState state) {
+                                                  switch (state
+                                                      .extendedImageLoadState) {
+                                                    case LoadState.loading:
+                                                      return Shimmer.fromColors(
+                                                        baseColor:
+                                                            Colors.grey[300]!,
+                                                        highlightColor:
+                                                            Colors.grey[100]!,
+                                                        child: Container(
+                                                          width: 80,
+                                                          height: 80,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Colors
+                                                                .grey[300],
+                                                            borderRadius:
+                                                                const BorderRadius
+                                                                    .all(
+                                                                    Radius.circular(
+                                                                        8.0)),
+                                                          ),
+                                                        ),
+                                                      );
+                                                    case LoadState.completed:
+                                                      return null; // Menampilkan gambar asli jika berhasil
+                                                    case LoadState.failed:
+                                                      return ClipRRect(
+                                                        borderRadius:
+                                                            const BorderRadius
+                                                                .all(
+                                                                Radius.circular(
+                                                                    8.0)),
+                                                        child: Image.asset(
+                                                          'assets/images/no_imgproduk.png', // Gambar default jika URL gagal dimuat
+                                                          width: 80,
+                                                          height: 80,
+                                                          fit: BoxFit.fill,
+                                                        ),
+                                                      );
+                                                  }
+                                                },
+                                              ),
                                         const SizedBox(height: 8),
                                         Container(
                                           decoration: BoxDecoration(
@@ -592,7 +652,7 @@ class RightBody extends StatelessWidget {
     );
   }
 
-  double  _calculateSubtotal(TransactionState state) {
+  double _calculateSubtotal(TransactionState state) {
     return state.transactions.fold(
         0, (total, transaction) => total + transaction.product.totalPrice!);
   }

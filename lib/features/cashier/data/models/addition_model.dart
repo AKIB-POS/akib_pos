@@ -31,7 +31,7 @@ class AdditionModel {
 
 class SubAddition {
   final int id;
-  final String subAdditionType;
+  final String? subAdditionType;
   final List<AdditionOption> options;
 
   SubAddition({
