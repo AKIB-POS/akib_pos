@@ -496,38 +496,7 @@ class RightBody extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(
-                          flex: 1,
-                          child: GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return PrinterManagementDialog();
-                                },
-                              );
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 12),
-                              decoration: BoxDecoration(
-                                border:
-                                    Border.all(color: AppColors.primaryMain),
-                                color: Colors.white, // White background color
-                                borderRadius: BorderRadius.circular(
-                                    4.0), // Border radius of 4
-                              ),
-                              child: SvgPicture.asset(
-                                "assets/icons/ic_print.svg",
-                                height: 2.h,
-                                colorFilter: ColorFilter.mode(
-                                    AppColors.primaryMain, BlendMode.srcIn),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Expanded(
-                          flex: 3,
+                          flex: 5,
                           child: OutlinedButton(
                             style: OutlinedButton.styleFrom(
                               padding: EdgeInsets.symmetric(vertical: 12),
@@ -559,11 +528,6 @@ class RightBody extends StatelessWidget {
                                                 .saveFullTransaction(
                                                     transactions, notes);
                                             // Get the saved full transactions count and update the badge count
-                                            List<SaveTransactionModel>
-                                                savedFullTransactions =
-                                                await context
-                                                    .read<TransactionCubit>()
-                                                    .getFullTransactions();
                                             context
                                                 .read<BadgeCubit>()
                                                 .updateBadgeCount();

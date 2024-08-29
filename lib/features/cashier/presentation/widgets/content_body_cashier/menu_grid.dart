@@ -176,7 +176,7 @@ class MenuCard extends StatelessWidget {
                     fit: BoxFit.fill,
                     height: 11.h,
                     clearMemoryCacheWhenDispose: true,
-                    cache: false,
+                    cache: true,
                     shape: BoxShape.rectangle,
                     borderRadius: const BorderRadius.all(Radius.circular(8.0)),
                     loadStateChanged: (ExtendedImageState state) {
