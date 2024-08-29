@@ -339,13 +339,6 @@ class AppBarContent extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).pop(); 
-                    showDialog(
-  context: context,
-  builder: (BuildContext context) {
-    return OpenCashierDialog();
-  },
-  barrierDismissible: false, // This will make the dialog non-dismissible
-);// Close the dialog
                   },
                   child: Text("Tutup Pesan"),
                   style: ElevatedButton.styleFrom(

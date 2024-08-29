@@ -52,62 +52,61 @@ class MenuGrid extends StatelessWidget {
     );
   }
 
-Widget _buildClosedCashierView(BuildContext context) {
-  return SingleChildScrollView(
-    child: Container(
-      alignment: Alignment.center,
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom + 15.h,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(
-            height: 8.h,
-          ),
-          SvgPicture.asset(
-            "assets/icons/ic_open_cashier.svg",
-            height: 12.h,
-            width: 12.h,
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Kasir Ditutup',
-            style: AppTextStyle.headline5,
-          ),
-          const Text(
-            'Silahkan Buka Kasir Untuk Memulai',
-            style: AppTextStyle.body3,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryMain,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4.0),
-              ),
+  Widget _buildClosedCashierView(BuildContext context) {
+    return SingleChildScrollView(
+      child: Container(
+        alignment: Alignment.center,
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom + 15.h,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: 8.h,
             ),
-            onPressed: () {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return OpenCashierDialog();
-                  },
-                );
-              });
-            },
-            child: const Text('Buka Kasir'),
-          ),
-        ],
+            SvgPicture.asset(
+              "assets/icons/ic_open_cashier.svg",
+              height: 12.h,
+              width: 12.h,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Kasir Ditutup',
+              style: AppTextStyle.headline5,
+            ),
+            const Text(
+              'Silahkan Buka Kasir Untuk Memulai',
+              style: AppTextStyle.body3,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryMain,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4.0),
+                ),
+              ),
+              onPressed: () {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return OpenCashierDialog();
+                    },
+                  );
+                });
+              },
+              child: const Text('Buka Kasir'),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget _buildEmptyMenuView() {
     return Container(
@@ -149,6 +148,7 @@ Widget _buildClosedCashierView(BuildContext context) {
     );
   }
 }
+
 class MenuCard extends StatelessWidget {
   final ProductModel item;
 
@@ -167,22 +167,16 @@ class MenuCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            item.imageUrl == '' || item.imageUrl!.isEmpty
-                ? ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                    child: Image.asset(
-                      'assets/images/no_imgproduk.png',
-                      width: double.infinity,
-                      fit: BoxFit.fill,
-                      height: 11.h,
-                    ),
-                  )
-                : ExtendedImage.network(
-                    item.imageUrl!,
+          
+              ExtendedImage.network(
+                    item.imageUrl != null && item.imageUrl.isNotEmpty
+                        ? item.imageUrl!
+                        : 'assets/images/no_imgproduk.png', // Placeholder URL atau path lokal
                     width: double.infinity,
                     fit: BoxFit.fill,
                     height: 11.h,
-                    cache: true,
+                    clearMemoryCacheWhenDispose: true,
+                    cache: false,
                     shape: BoxShape.rectangle,
                     borderRadius: const BorderRadius.all(Radius.circular(8.0)),
                     loadStateChanged: (ExtendedImageState state) {
@@ -204,14 +198,15 @@ class MenuCard extends StatelessWidget {
                         case LoadState.completed:
                           return null;
                         case LoadState.failed:
+                      
                           return ClipRRect(
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(8.0)),
                             child: Image.asset(
                               'assets/images/no_imgproduk.png',
-                              width: 90,
-                              height: 90,
+                              width: double.infinity,
                               fit: BoxFit.fill,
+                              height: 11.h,
                             ),
                           );
                       }
@@ -238,8 +233,3 @@ class MenuCard extends StatelessWidget {
     );
   }
 }
-
-
-
-
-

@@ -66,6 +66,7 @@ class _LeftBodyState extends State<LeftBody> {
         }
 
         return RefreshIndicator(
+          color: AppColors.primaryMain,
           onRefresh: () async {
             await context.read<CashierCubit>().loadData();
           },

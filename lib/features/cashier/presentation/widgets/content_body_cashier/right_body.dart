@@ -8,6 +8,7 @@ import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.da
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/process_transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/printer_management_dialog.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/transaction/confirm_remove_transaction_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/payment_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/product_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/save_transaction_dialog.dart';
@@ -22,8 +23,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
 
 class RightBody extends StatelessWidget {
-
-    final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
+  final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -81,7 +81,7 @@ class RightBody extends StatelessWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 16),
+                            horizontal: 16, vertical: 12),
                         child: BlocBuilder<TransactionCubit, TransactionState>(
                           builder: (context, state) {
                             return Row(
@@ -281,10 +281,33 @@ class RightBody extends StatelessWidget {
                                                 height: 28,
                                                 width: 28,
                                               ),
-                                              onPressed: () {
-                                                context
-                                                    .read<TransactionCubit>()
-                                                    .subtractQuantity(index);
+                                              onPressed: () async {
+                                                // Cek apakah quantity saat ini adalah 1
+                                                if (transaction.quantity == 1) {
+                                                  // Tampilkan dialog konfirmasi
+                                                  final bool? confirmDelete =
+                                                      await showDialog<bool>(
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return const ConfirmRemoveTransactionDialog();
+                                                    },
+                                                  );
+
+                                                  // Jika pengguna menekan "Ya, Hapus", lanjutkan pengurangan quantity
+                                                  if (confirmDelete == true) {
+                                                    context
+                                                        .read<
+                                                            TransactionCubit>()
+                                                        .subtractQuantity(
+                                                            index);
+                                                  }
+                                                } else {
+                                                  // Jika quantity lebih dari 1, langsung kurangi quantity
+                                                  context
+                                                      .read<TransactionCubit>()
+                                                      .subtractQuantity(index);
+                                                }
                                               },
                                             ),
                                             const SizedBox(width: 8),
@@ -403,7 +426,8 @@ class RightBody extends StatelessWidget {
                                 children: [
                                   Text('Pajak(PPN) (${state.tax}%)',
                                       style: AppTextStyle.body3),
-                                  Text("${Utils.formatCurrencyDouble(_getTax(state))}",
+                                  Text(
+                                      "${Utils.formatCurrencyDouble(_getTax(state))}",
                                       style: AppTextStyle.body3),
                                 ],
                               ),
@@ -484,7 +508,7 @@ class RightBody extends StatelessWidget {
                             },
                             child: Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 8),
+                                  horizontal: 8, vertical: 12),
                               decoration: BoxDecoration(
                                 border:
                                     Border.all(color: AppColors.primaryMain),
@@ -506,6 +530,7 @@ class RightBody extends StatelessWidget {
                           flex: 3,
                           child: OutlinedButton(
                             style: OutlinedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 12),
                               side: BorderSide(
                                 color: isEmpty
                                     ? Colors.grey
@@ -532,7 +557,7 @@ class RightBody extends StatelessWidget {
                                             await context
                                                 .read<TransactionCubit>()
                                                 .saveFullTransaction(
-                                                    transactions, notes,state.customerName);
+                                                    transactions, notes);
                                             // Get the saved full transactions count and update the badge count
                                             List<SaveTransactionModel>
                                                 savedFullTransactions =
@@ -579,8 +604,11 @@ class RightBody extends StatelessWidget {
                                           .state),
                                       orderType:
                                           state.orderType, // Include order type
-                                    cashRegisterId: _authSharedPref.getCachedCashRegisterId(),
-                                    createdAt: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+                                      cashRegisterId: _authSharedPref
+                                          .getCachedCashRegisterId(),
+                                      createdAt:
+                                          DateFormat('yyyy-MM-dd HH:mm:ss')
+                                              .format(DateTime.now()),
                                     );
 
                                     showDialog(
@@ -593,6 +621,7 @@ class RightBody extends StatelessWidget {
                                     );
                                   },
                             style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 12),
                               backgroundColor:
                                   isEmpty ? Colors.grey : AppColors.primaryMain,
                               foregroundColor: Colors.white,
@@ -625,7 +654,7 @@ class RightBody extends StatelessWidget {
           context.read<TransactionCubit>().updateOrderType(value);
         },
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
           decoration: BoxDecoration(
             color: selected
                 ? AppColors.primaryMain.withOpacity(0.1)
@@ -686,12 +715,12 @@ class RightBody extends StatelessWidget {
   }
 
   double _getTax(TransactionState state) {
-  final subtotal = _calculateSubtotal(state);
-  final discount = _calculateDiscount(state);
-  final totalAfterDiscount = subtotal - discount;
-  final tax = state.tax / 100 * totalAfterDiscount;
+    final subtotal = _calculateSubtotal(state);
+    final discount = _calculateDiscount(state);
+    final totalAfterDiscount = subtotal - discount;
+    final tax = state.tax / 100 * totalAfterDiscount;
 
-  // Membatasi angka di belakang koma menjadi 1 digit
-  return double.parse(tax.toStringAsFixed(1));
-}
+    // Membatasi angka di belakang koma menjadi 1 digit
+    return double.parse(tax.toStringAsFixed(1));
+  }
 }
