@@ -90,7 +90,7 @@ class TransactionCubit extends Cubit<TransactionState> {
     emit(state.copyWith(orderType: orderType));
   }
 
- Future<void> saveFullTransaction(List<TransactionModel> transactions, String notes) async {
+ Future<void> saveFullTransaction(List<TransactionModel> transactions, String notes, String? customerName) async {
     if (state.customerId != null && 
         state.customerName != null && state.customerName!.isNotEmpty && 
         state.customerPhone != null && state.customerPhone!.isNotEmpty &&
@@ -102,7 +102,7 @@ class TransactionCubit extends Cubit<TransactionState> {
         time: DateTime.now(),
         discount: state.discount,
         customerId: state.customerId,
-        customerName: state.customerName,
+        customerName: customerName,
         customerPhone: state.customerPhone,
         tax: state.tax,
         orderType: state.orderType,
@@ -117,13 +117,7 @@ class TransactionCubit extends Cubit<TransactionState> {
     }
 
     // Reset state after saving
-    emit(state.copyWith(
-      transactions: [],
-      customerName: "Nama Pelanggan",
-      customerId: null,
-      customerPhone: null,
-      tax: 0,
-    ));
+    resetState();
   }
   Future<List<SaveTransactionModel>> getFullTransactions() async {
     return await transactionService.getFullTransactions();

@@ -14,6 +14,11 @@ class KasirLocalDataSource {
   KasirLocalDataSource({required this.sharedPreferences});
 
   // Methods to clear cache for products, categories, sub-categories, additions, and variants
+   static const String cashRegisterStatusKey = 'CACHED_CASH_REGISTER_STATUS';
+
+   Future<void> clearCashRegisterStatusCache() async {
+    await sharedPreferences.remove(cashRegisterStatusKey);
+  }
   Future<void> clearProductsCache() async {
     await sharedPreferences.remove('CACHED_PRODUCTS');
   }
@@ -34,6 +39,7 @@ class KasirLocalDataSource {
     await sharedPreferences.remove('CACHED_VARIANTS');
   }
 
+
   Future<void> clearCache() async {
     await clearProductsCache();
     await clearCategoriesCache();
@@ -41,12 +47,20 @@ class KasirLocalDataSource {
     await clearAdditionsCache();
     await clearVariantsCache();
     await clearTaxAmountCache();
+     await clearCashRegisterStatusCache(); 
   }
 
   // Methods to cache products, categories, sub-categories, additions,variants, and tax amount
 
    Future<void> clearTaxAmountCache() async {
     await sharedPreferences.remove('CACHED_TAX_AMOUNT');
+  }
+
+  Future<String?> getCachedCashRegisterStatus() async {
+    return sharedPreferences.getString(cashRegisterStatusKey);
+  }
+Future<void> cacheCashRegisterStatus(String status) async {
+    await sharedPreferences.setString(cashRegisterStatusKey, status);
   }
 
   // Method to cache tax amount

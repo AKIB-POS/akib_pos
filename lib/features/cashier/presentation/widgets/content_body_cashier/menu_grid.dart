@@ -3,6 +3,7 @@ import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/cashier/data/models/menu_item_exmpl.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/open_cashier_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/product_dialog.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
@@ -21,35 +22,13 @@ class MenuGrid extends StatelessWidget {
       builder: (context, state) {
         final menuItems = context.read<CashierCubit>().filteredItems;
 
+        // Cek apakah status kasir "close"
+        if (state.cashRegisterStatus == "close") {
+          return _buildClosedCashierView(context);
+        }
+
         if (menuItems.isEmpty) {
-          return Container(
-            alignment: Alignment.center, // Center the content in the container
-            padding:  EdgeInsets.only(bottom: 15.h),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: 8.h,
-                ),
-                SvgPicture.asset(
-                  "assets/images/empty_product.svg",
-                  height: 12.h,
-                  width: 12.h,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Belum Ada Produk',
-                  style: AppTextStyle.headline5,
-                ),
-                const Text(
-                  'Tambah produk terlebih dahulu untuk\nbisa mengatur sesuai kebutuhan',
-                  style: AppTextStyle.body3,
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          );
+          return _buildEmptyMenuView();
         }
 
         return GridView.builder(
@@ -73,6 +52,94 @@ class MenuGrid extends StatelessWidget {
     );
   }
 
+Widget _buildClosedCashierView(BuildContext context) {
+  return SingleChildScrollView(
+    child: Container(
+      alignment: Alignment.center,
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom + 15.h,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            height: 8.h,
+          ),
+          SvgPicture.asset(
+            "assets/icons/ic_open_cashier.svg",
+            height: 12.h,
+            width: 12.h,
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Kasir Ditutup',
+            style: AppTextStyle.headline5,
+          ),
+          const Text(
+            'Silahkan Buka Kasir Untuk Memulai',
+            style: AppTextStyle.body3,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryMain,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4.0),
+              ),
+            ),
+            onPressed: () {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return OpenCashierDialog();
+                  },
+                );
+              });
+            },
+            child: const Text('Buka Kasir'),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+
+  Widget _buildEmptyMenuView() {
+    return Container(
+      alignment: Alignment.center,
+      padding: EdgeInsets.only(bottom: 15.h),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            height: 8.h,
+          ),
+          SvgPicture.asset(
+            "assets/images/empty_product.svg",
+            height: 12.h,
+            width: 12.h,
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Belum Ada Produk',
+            style: AppTextStyle.headline5,
+          ),
+          const Text(
+            'Tambah produk terlebih dahulu untuk\nbisa mengatur sesuai kebutuhan',
+            style: AppTextStyle.body3,
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showProductDialog(BuildContext context, ProductModel product) {
     showDialog(
       context: context,
@@ -82,7 +149,6 @@ class MenuGrid extends StatelessWidget {
     );
   }
 }
-
 class MenuCard extends StatelessWidget {
   final ProductModel item;
 
@@ -172,3 +238,8 @@ class MenuCard extends StatelessWidget {
     );
   }
 }
+
+
+
+
+

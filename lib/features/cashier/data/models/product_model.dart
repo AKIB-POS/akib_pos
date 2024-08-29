@@ -60,6 +60,7 @@ class ProductModel {
     return {
       'id': id,
       'price': price,
+      'total_price': totalPrice?.toString(),
     };
   }
 

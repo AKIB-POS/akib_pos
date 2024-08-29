@@ -17,9 +17,6 @@ class OpenCashierCubit extends Cubit<OpenCashierState> {
       (failure) => emit(OpenCashierError('Gagal membuka kasir')),
       (response) async {
         // Set shared preference bahwa kasir sudah dibuka
-        final cashierSharedPref = GetIt.instance<CashierSharedPref>();
-        await cashierSharedPref.setCashierIsOpen(true);
-
         emit(OpenCashierSuccess(response.message));
       },
     );

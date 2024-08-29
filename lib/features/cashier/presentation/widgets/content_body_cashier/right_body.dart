@@ -1,5 +1,6 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/cashier/data/models/full_transaction_model.dart';
 import 'package:akib_pos/features/cashier/data/models/save_transaction_model.dart';
 import 'package:akib_pos/features/cashier/data/models/transaction_model.dart';
@@ -15,10 +16,14 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get_it/get_it.dart';
+import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
 
 class RightBody extends StatelessWidget {
+
+    final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -396,9 +401,9 @@ class RightBody extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text('Pajak(PPN)',
+                                  Text('Pajak(PPN) (${state.tax}%)',
                                       style: AppTextStyle.body3),
-                                  Text("${state.tax}%",
+                                  Text("${Utils.formatCurrencyDouble(_getTax(state))}",
                                       style: AppTextStyle.body3),
                                 ],
                               ),
@@ -527,7 +532,7 @@ class RightBody extends StatelessWidget {
                                             await context
                                                 .read<TransactionCubit>()
                                                 .saveFullTransaction(
-                                                    transactions, notes);
+                                                    transactions, notes,state.customerName);
                                             // Get the saved full transactions count and update the badge count
                                             List<SaveTransactionModel>
                                                 savedFullTransactions =
@@ -574,6 +579,8 @@ class RightBody extends StatelessWidget {
                                           .state),
                                       orderType:
                                           state.orderType, // Include order type
+                                    cashRegisterId: _authSharedPref.getCachedCashRegisterId(),
+                                    createdAt: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
                                     );
 
                                     showDialog(
@@ -679,10 +686,12 @@ class RightBody extends StatelessWidget {
   }
 
   double _getTax(TransactionState state) {
-    final subtotal = _calculateSubtotal(state);
-    final discount = _calculateDiscount(state);
-    final totalAfterDiscount = subtotal - discount;
-    final tax = state.tax / 100 * totalAfterDiscount;
-    return tax;
-  }
+  final subtotal = _calculateSubtotal(state);
+  final discount = _calculateDiscount(state);
+  final totalAfterDiscount = subtotal - discount;
+  final tax = state.tax / 100 * totalAfterDiscount;
+
+  // Membatasi angka di belakang koma menjadi 1 digit
+  return double.parse(tax.toStringAsFixed(1));
+}
 }

@@ -6,6 +6,14 @@ abstract class ProductState extends Equatable {
   @override
   List<Object> get props => [];
 }
+class CashRegisterStatusLoaded extends ProductState {
+  final CashRegisterStatusResponse status;
+
+  CashRegisterStatusLoaded({required this.status});
+
+  @override
+  List<Object> get props => [status];
+}
 
 class ProductInitial extends ProductState {}
 

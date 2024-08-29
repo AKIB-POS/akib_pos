@@ -72,7 +72,7 @@ Future<void> init() async {
 
   // Repository
   sl.registerLazySingleton<KasirRepository>(
-    () => KasirRepositoryImpl(remoteDataSource: sl(),),
+    () => KasirRepositoryImpl(remoteDataSource: sl(), authSharedPref: sl(),),
   );
 
 
@@ -86,9 +86,7 @@ Future<void> init() async {
     () => KasirLocalDataSource(sharedPreferences: sl()),
   );
   
-  sl.registerLazySingleton<CashierSharedPref>(
-    () => CashierSharedPref(sharedPreferences: sl()),
-  );
+  
   sl.registerLazySingleton<TransactionService>(
     () => TransactionService(sharedPreferences: sl()),
   );

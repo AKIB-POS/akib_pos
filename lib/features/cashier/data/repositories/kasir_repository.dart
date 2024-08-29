@@ -1,9 +1,11 @@
 
 import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/core/error/failures.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/cashier/data/datasources/local/kasir_local_data_source.dart';
 import 'package:akib_pos/features/cashier/data/datasources/kasir_remote_data_source.dart';
 import 'package:akib_pos/features/cashier/data/models/addition_model.dart';
+import 'package:akib_pos/features/cashier/data/models/cash_register_status_response.dart';
 import 'package:akib_pos/features/cashier/data/models/category_model.dart';
 import 'package:akib_pos/features/cashier/data/models/close_cashier_response.dart';
 import 'package:akib_pos/features/cashier/data/models/expenditure_model.dart';
@@ -33,11 +35,30 @@ abstract class KasirRepository {
   Future<Either<Failure, CloseCashierResponse>> closeCashier();
   Future<Either<Failure, OpenCashierResponse>> openCashier(OpenCashierRequest request);
 Future<Either<Failure, PostCloseCashierResponse>> postCloseCashier(OpenCashierRequest request);
+  Future<Either<Failure, CashRegisterStatusResponse>> getCashRegisterStatus();
 
 }
 
 class KasirRepositoryImpl implements KasirRepository {
   final KasirRemoteDataSource remoteDataSource;
+  final AuthSharedPref authSharedPref;
+  
+ KasirRepositoryImpl({
+    required this.remoteDataSource,
+       required this.authSharedPref,
+  });
+
+  
+   @override
+  Future<Either<Failure, CashRegisterStatusResponse>> getCashRegisterStatus() async {
+    try {
+      final response = await remoteDataSource.getCashRegisterStatus();
+      return Right(response);
+    } catch (e) {
+      return Left(ServerFailure());
+    }
+  }
+
 
   @override
   Future<Either<Failure, PostCloseCashierResponse>> postCloseCashier(OpenCashierRequest request) async {
@@ -52,16 +73,17 @@ class KasirRepositoryImpl implements KasirRepository {
   Future<Either<Failure, OpenCashierResponse>> openCashier(OpenCashierRequest request) async {
     try {
       final response = await remoteDataSource.openCashier(request);
+
+      // Cache cash_register_id setelah open cashier berhasil
+      await authSharedPref.cacheCashRegisterId(response.cashRegisterId);
+
       return Right(response);
     } catch (e) {
       return Left(ServerFailure());
     }
   }
 
-  KasirRepositoryImpl({
-    required this.remoteDataSource,
-  });
-
+ 
 
 
    @override

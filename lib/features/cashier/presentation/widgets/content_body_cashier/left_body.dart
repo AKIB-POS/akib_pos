@@ -3,11 +3,23 @@ import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/category_drop_down.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/menu_grid.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/open_cashier_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/sub_category_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class LeftBody extends StatelessWidget {
+class LeftBody extends StatefulWidget {
+  @override
+  State<LeftBody> createState() => _LeftBodyState();
+}
+
+class _LeftBodyState extends State<LeftBody> {
+
+  @override
+  void initState() {
+    context.read<CashierCubit>().loadData();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CashierCubit, CashierState>(
@@ -24,12 +36,12 @@ class LeftBody extends StatelessWidget {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                              backgroundColor:AppColors.primaryMain,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4.0),
-                              ),
-                            ),
+                    backgroundColor: AppColors.primaryMain,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4.0),
+                    ),
+                  ),
                   onPressed: () {
                     context.read<CashierCubit>().loadData();
                   },
@@ -39,6 +51,20 @@ class LeftBody extends StatelessWidget {
             ),
           );
         }
+
+        // Periksa status kasir hanya jika data sudah dimuat dan status tidak null
+        if (state.cashRegisterStatus == "close") {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return OpenCashierDialog();
+              },
+              barrierDismissible: false, // Tidak bisa ditutup dengan klik luar
+            );
+          });
+        }
+
         return RefreshIndicator(
           onRefresh: () async {
             await context.read<CashierCubit>().loadData();
