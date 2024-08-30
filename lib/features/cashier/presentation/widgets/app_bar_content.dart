@@ -95,7 +95,7 @@ class AppBarContent extends StatelessWidget {
                 ),
                 const SizedBox(height: 0.5),
                 Visibility(
-                  visible: customerPhone != null && customerPhone.isNotEmpty,
+                  visible: customerPhone == "null" ? false : true,
                   child: Text(
                     customerPhone ?? '',
                     style: AppTextStyle.body3

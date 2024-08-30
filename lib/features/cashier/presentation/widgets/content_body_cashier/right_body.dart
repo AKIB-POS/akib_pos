@@ -522,15 +522,18 @@ class RightBody extends StatelessWidget {
                                                     .read<TransactionCubit>()
                                                     .state
                                                     .transactions;
-
+                                            double disc = context.read<TransactionCubit>().state.discount;
+                                            String? name = context.read<TransactionCubit>().state.customerName;
+                                            String? telp = context.read<TransactionCubit>().state.customerPhone;
+                                            int? id = context.read<TransactionCubit>().state.customerId;
+                                                    
                                             await context
                                                 .read<TransactionCubit>()
                                                 .saveFullTransaction(
-                                                    transactions, notes);
-                                            // Get the saved full transactions count and update the badge count
+                                                    transactions, notes,disc,name,telp,id);                    
                                             context
                                                 .read<BadgeCubit>()
-                                                .updateBadgeCount();
+                                                .updateBadgeCount();   
                                           },
                                         );
                                       },
