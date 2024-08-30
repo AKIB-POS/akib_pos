@@ -117,13 +117,14 @@ class TransactionCubit extends Cubit<TransactionState> {
     }
 
     // Reset state after saving
-    emit(state.copyWith(
-      transactions: [],
-      customerName: "Nama Pelanggan",
-      customerId: null,
-      customerPhone: null,
-      tax: 0,
-    ));
+    // emit(state.copyWith(
+    //   transactions: [],
+    //   customerName: "Nama Pelanggan",
+    //   customerId: null,
+    //   customerPhone: null,
+    //   tax: 0,
+    // ));
+    resetAllState();
   }
   Future<List<SaveTransactionModel>> getFullTransactions() async {
     return await transactionService.getFullTransactions();

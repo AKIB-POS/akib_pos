@@ -283,7 +283,7 @@ class RightBody extends StatelessWidget {
                                               ),
                                               onPressed: () async {
                                                 // Cek apakah quantity saat ini adalah 1
-                                                if (transaction.quantity == 1) {
+                                                if (transaction.quantity == 1 && state.transactions.length == 1) {
                                                   // Tampilkan dialog konfirmasi
                                                   final bool? confirmDelete =
                                                       await showDialog<bool>(

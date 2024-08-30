@@ -154,48 +154,69 @@ class AppBarContent extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             // Wrap GestureDetector with BlocBuilder
-            BlocBuilder<BadgeCubit, int>(
-              builder: (context, badgeCount) {
-                // Enable GestureDetector only if badgeCount is 0
-                return GestureDetector(
-                  onTap: () {
-                    if (badgeCount > 0) {
-                      _showWarningDialog(context, badgeCount);
-                    } else {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return CloseCashierDialog();
-                        },
-                      );
-                    }
-                  }, // Disable tap if badgeCount is not 0
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        _shortenText(
-                            _authSharedPref.getCompanyName() ?? "", 13),
-                        style: AppTextStyle.headline6,
-                      ),
-                      SizedBox(
-                        height: 4,
-                      ),
-                      Container(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
+            BlocBuilder<CashierCubit, CashierState>(
+              builder: (context, cashierState) {
+                return BlocBuilder<TransactionCubit, TransactionState>(
+                  builder: (context, transactionState) {
+                    // Menentukan apakah tombol aktif atau tidak
+                    bool isKasirActive =
+                        cashierState.cashRegisterStatus != "close";
+                    bool hasTransactions =
+                        transactionState.transactions.isNotEmpty;
+
+                    // Jika kasir tutup atau ada transaksi, tombol menjadi tidak aktif
+                    bool isButtonEnabled = isKasirActive && !hasTransactions;
+
+                    return GestureDetector(
+                      onTap: () {
+                        if (!isButtonEnabled) {
+                          if (hasTransactions) {
+                            _showWarningDialog(
+                                context, transactionState.transactions.length);
+                          }
+                        } else {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return isKasirActive
+                                  ? CloseCashierDialog()
+                                  : OpenCashierDialog();
+                            },
+                          );
+                        }
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            _shortenText(
+                              _authSharedPref.getCompanyName() ?? "",
+                              13,
+                            ),
+                            style: AppTextStyle.headline6,
+                          ),
+                          SizedBox(height: 4),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(4),
-                              color: badgeCount == 0
+                              color: isButtonEnabled
                                   ? AppColors.successMain
                                   : Colors
-                                      .grey), // Change color based on condition
-                          child: Text('Kasir Aktif >',
+                                      .grey, // Ubah warna berdasarkan kondisi
+                            ),
+                            child: Text(
+                              isKasirActive ? 'Kasir Aktif >' : 'Kasir Tutup >',
                               style: AppTextStyle.body3
-                                  .copyWith(color: Colors.white))),
-                    ],
-                  ),
+                                  .copyWith(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 );
               },
             ),
