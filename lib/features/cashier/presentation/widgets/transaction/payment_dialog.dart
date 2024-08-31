@@ -1,5 +1,6 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_themes.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/cashier/data/models/full_transaction_model.dart';
 import 'package:akib_pos/features/cashier/data/repositories/kasir_repository.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
@@ -13,6 +14,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
 class PaymentDialog extends StatefulWidget {
   final FullTransactionModel fullTransaction;
@@ -79,6 +81,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
 
     widget.fullTransaction.paymentMethod = paymentMethod;
     widget.fullTransaction.paymentAmount = paymentAmount;
+    // widget.fullTransaction.cashRegisterId = _authSharedPref.getCachedCashRegisterId();
 
     context.read<CheckoutCubit>().processPayment(widget.fullTransaction);
   }

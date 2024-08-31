@@ -28,7 +28,14 @@ class MemberModel {
     return {
       'id': id,
       'name': name,
-      'phone': phoneNumber,
+      'phone_number': phoneNumber,
+      'email': email,
+    };
+  }
+  Map<String, dynamic> toUpdateJson() {
+    return {
+      'name': name,
+      'phone_number': phoneNumber,
       'email': email,
     };
   }

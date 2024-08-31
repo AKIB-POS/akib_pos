@@ -14,9 +14,11 @@ class FullTransactionModel {
   final String? customerPhone;
   String? paymentMethod;
   double? paymentAmount;
-  final int companyId; // New field
-  final int branchId;  // New field
-  final String orderType; // New field for order type
+  final int companyId;
+  final int branchId;
+  final String orderType;
+  final int? cashRegisterId;
+  final String? createdAt; // New field for created_at
 
   FullTransactionModel({
     required this.transactions,
@@ -29,9 +31,11 @@ class FullTransactionModel {
     this.customerPhone,
     this.paymentMethod,
     this.paymentAmount,
-    this.companyId = 1, // Default value
-    this.branchId = 1, // Default value
-    required this.orderType, // Required field for order type
+    this.companyId = 1,
+    this.branchId = 1,
+    required this.orderType,
+    this.cashRegisterId,
+    this.createdAt, // Initialize the new field
   });
 
   FullTransactionModel copyWith({
@@ -47,7 +51,9 @@ class FullTransactionModel {
     double? paymentAmount,
     int? companyId,
     int? branchId,
-    String? orderType, // Include new field in copyWith
+    String? orderType,
+    int? cashRegisterId,
+    String? createdAt, // Include new field in copyWith
   }) {
     return FullTransactionModel(
       transactions: transactions ?? this.transactions,
@@ -60,13 +66,14 @@ class FullTransactionModel {
       customerPhone: customerPhone ?? this.customerPhone,
       paymentMethod: paymentMethod ?? this.paymentMethod,
       paymentAmount: paymentAmount ?? this.paymentAmount,
-      companyId: companyId ?? this.companyId, // Include new field
-      branchId: branchId ?? this.branchId, // Include new field
-      orderType: orderType ?? this.orderType, // Include new field
+      companyId: companyId ?? this.companyId,
+      branchId: branchId ?? this.branchId,
+      orderType: orderType ?? this.orderType,
+      cashRegisterId: cashRegisterId ?? this.cashRegisterId,
+      createdAt: createdAt ?? this.createdAt, // Include new field
     );
   }
 
-  // General JSON serialization for full object data
   Map<String, dynamic> toJson() {
     return {
       'transactions': transactions.map((t) => t.toJson()).toList(),
@@ -79,25 +86,28 @@ class FullTransactionModel {
       'customerPhone': customerPhone,
       'paymentMethod': paymentMethod,
       'paymentAmount': paymentAmount,
-      'companyId': companyId, // Include in JSON output
-      'branchId': branchId, // Include in JSON output
-      'orderType': orderType, // Include in JSON output
+      'companyId': companyId,
+      'branchId': branchId,
+      'orderType': orderType,
+      'cash_register_id': cashRegisterId,
+      'created_at': createdAt, // Include in JSON output
     };
   }
 
-  // JSON serialization tailored for API request
   Map<String, dynamic> toApiJson() {
     return {
-      'transactions': transactions.map((t) => t.toApiJson()).toList(), // Use toApiJson of TransactionModel
+      'transactions': transactions.map((t) => t.toApiJson()).toList(),
       'totalPrice': totalPrice,
       'discount': discount,
       'tax': tax,
       'customerId': customerId,
       'paymentMethod': paymentMethod,
       'paymentAmount': paymentAmount,
-      'companyId': companyId, // Include in API JSON output
-      'branchId': branchId, // Include in API JSON output
-      'orderType': orderType, // Include in API JSON output
+      'companyId': companyId,
+      'branchId': branchId,
+      'orderType': orderType,
+      'cash_register_id': cashRegisterId,
+      'created_at': createdAt, // Include in API JSON output
     };
   }
 
@@ -115,9 +125,11 @@ class FullTransactionModel {
       customerPhone: json['customerPhone'],
       paymentMethod: json['paymentMethod'],
       paymentAmount: json['paymentAmount'],
-      companyId: json['companyId'] ?? 1, // Parse the new field, with default
-      branchId: json['branchId'] ?? 1, // Parse the new field, with default
-      orderType: json['orderType'], // Parse the new field for order type
+      companyId: json['companyId'] ?? 1,
+      branchId: json['branchId'] ?? 1,
+      orderType: json['orderType'],
+      cashRegisterId: json['cash_register_id'],
+      createdAt: json['created_at'], // Parse the new field
     );
   }
 
@@ -136,7 +148,9 @@ class FullTransactionModel {
         'paymentAmount: $paymentAmount, '
         'companyId: $companyId, '
         'branchId: $branchId, '
-        'orderType: $orderType'
+        'orderType: $orderType, '
+        'cashRegisterId: $cashRegisterId, '
+        'createdAt: $createdAt'
         '}';
   }
 }

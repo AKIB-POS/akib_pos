@@ -60,6 +60,7 @@ class ProductModel {
     return {
       'id': id,
       'price': price,
+      'total_price': totalPrice?.toString(),
     };
   }
 
@@ -71,7 +72,7 @@ class ProductModel {
     description: json['description'] ?? '',  // Handle null description
     price: json['price'],
     stock: json['stock'],
-    imageUrl: json['imageUrl'] ?? '',  // Handle null imageUrl
+    imageUrl: json['image_url'] ?? '',  // Handle null imageUrl
     categoryId: json['category_id'],
     subCategoryId: json['sub_category_id'],
     variantId: json['variant_id'],  // variantId can be null
@@ -88,7 +89,7 @@ class ProductModel {
       'description': description,
       'price': price,
       'stock': stock,
-      'imageUrl': imageUrl,
+      'image_url': imageUrl,
       'category_id': categoryId,
       'sub_category_id': subCategoryId,
       'variant_id': variantId,

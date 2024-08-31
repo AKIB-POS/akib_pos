@@ -14,8 +14,17 @@ class CloseCashierCubit extends Cubit<CloseCashierState> {
     emit(CloseCashierLoading());
     final result = await repository.closeCashier();
     result.fold(
-      (failure) => emit(CloseCashierError("Failed to close cashier")),
-      (data) => emit(CloseCashierLoaded(data)),
+      (failure) {
+        emit(CloseCashierError("Failed to close cashier"));
+        resetState(); // Reset state setelah error
+      },
+      (data) {
+        emit(CloseCashierLoaded(data));
+      },
     );
+  }
+
+  void resetState() {
+    emit(CloseCashierInitial());
   }
 }

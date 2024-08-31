@@ -1,12 +1,14 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/cashier/data/models/expenditure_model.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/expenditure/expenditure_cubit.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
 class ExpenditureDialog extends StatefulWidget {
   @override
@@ -14,6 +16,7 @@ class ExpenditureDialog extends StatefulWidget {
 }
 
 class _ExpenditureDialogState extends State<ExpenditureDialog> {
+      final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
   final _formKey = GlobalKey<FormState>();
   final _tanggalController = TextEditingController();
   final _jumlahController = TextEditingController();
@@ -61,12 +64,14 @@ class _ExpenditureDialogState extends State<ExpenditureDialog> {
   void _submit() {
     if (_formKey.currentState?.validate() ?? false) {
       final expenditure = ExpenditureModel(
-        tanggal: _tanggalController.text,
-        jumlah: int.tryParse(
+        date: _tanggalController.text,
+        amount: int.tryParse(
                   _jumlahController.text.replaceAll(RegExp(r'[^0-9]'), ''))
-              ?.toInt() ?? 0,
-        kategori: _kategoriController.text,
-        deskripsi: _deskripsiController.text,
+              ?.toDouble() ?? 0,
+        category: _kategoriController.text,
+        branchId: _authSharedPref.getBranchId() ??0,
+        description: _deskripsiController.text,
+        cashRegisterId: _authSharedPref.getCachedCashRegisterId() ?? 0,
       );
 
       context.read<ExpenditureCubit>().submitExpenditure(expenditure);

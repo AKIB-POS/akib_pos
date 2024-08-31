@@ -1,5 +1,6 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/cashier/data/models/full_transaction_model.dart';
 import 'package:akib_pos/features/cashier/data/models/save_transaction_model.dart';
 import 'package:akib_pos/features/cashier/data/models/transaction_model.dart';
@@ -7,6 +8,7 @@ import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.da
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/process_transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/printer_management_dialog.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/transaction/confirm_remove_transaction_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/payment_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/product_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/save_transaction_dialog.dart';
@@ -15,10 +17,13 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get_it/get_it.dart';
+import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
 
 class RightBody extends StatelessWidget {
+  final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -76,7 +81,7 @@ class RightBody extends StatelessWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 16),
+                            horizontal: 16, vertical: 12),
                         child: BlocBuilder<TransactionCubit, TransactionState>(
                           builder: (context, state) {
                             return Row(
@@ -276,10 +281,33 @@ class RightBody extends StatelessWidget {
                                                 height: 28,
                                                 width: 28,
                                               ),
-                                              onPressed: () {
-                                                context
-                                                    .read<TransactionCubit>()
-                                                    .subtractQuantity(index);
+                                              onPressed: () async {
+                                                // Cek apakah quantity saat ini adalah 1
+                                                if (transaction.quantity == 1 && state.transactions.length == 1) {
+                                                  // Tampilkan dialog konfirmasi
+                                                  final bool? confirmDelete =
+                                                      await showDialog<bool>(
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return const ConfirmRemoveTransactionDialog();
+                                                    },
+                                                  );
+
+                                                  // Jika pengguna menekan "Ya, Hapus", lanjutkan pengurangan quantity
+                                                  if (confirmDelete == true) {
+                                                    context
+                                                        .read<
+                                                            TransactionCubit>()
+                                                        .subtractQuantity(
+                                                            index);
+                                                  }
+                                                } else {
+                                                  // Jika quantity lebih dari 1, langsung kurangi quantity
+                                                  context
+                                                      .read<TransactionCubit>()
+                                                      .subtractQuantity(index);
+                                                }
                                               },
                                             ),
                                             const SizedBox(width: 8),
@@ -396,9 +424,10 @@ class RightBody extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text('Pajak(PPN)',
+                                  Text('Pajak(PPN) (${state.tax}%)',
                                       style: AppTextStyle.body3),
-                                  Text("${state.tax}%",
+                                  Text(
+                                      "${Utils.formatCurrencyDouble(_getTax(state))}",
                                       style: AppTextStyle.body3),
                                 ],
                               ),
@@ -467,40 +496,10 @@ class RightBody extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(
-                          flex: 1,
-                          child: GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return PrinterManagementDialog();
-                                },
-                              );
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 8),
-                              decoration: BoxDecoration(
-                                border:
-                                    Border.all(color: AppColors.primaryMain),
-                                color: Colors.white, // White background color
-                                borderRadius: BorderRadius.circular(
-                                    4.0), // Border radius of 4
-                              ),
-                              child: SvgPicture.asset(
-                                "assets/icons/ic_print.svg",
-                                height: 2.h,
-                                colorFilter: ColorFilter.mode(
-                                    AppColors.primaryMain, BlendMode.srcIn),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Expanded(
-                          flex: 3,
+                          flex: 5,
                           child: OutlinedButton(
                             style: OutlinedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 12),
                               side: BorderSide(
                                 color: isEmpty
                                     ? Colors.grey
@@ -523,20 +522,18 @@ class RightBody extends StatelessWidget {
                                                     .read<TransactionCubit>()
                                                     .state
                                                     .transactions;
-
+                                            double disc = context.read<TransactionCubit>().state.discount;
+                                            String? name = context.read<TransactionCubit>().state.customerName;
+                                            String? telp = context.read<TransactionCubit>().state.customerPhone;
+                                            int? id = context.read<TransactionCubit>().state.customerId;
+                                                    
                                             await context
                                                 .read<TransactionCubit>()
                                                 .saveFullTransaction(
-                                                    transactions, notes);
-                                            // Get the saved full transactions count and update the badge count
-                                            List<SaveTransactionModel>
-                                                savedFullTransactions =
-                                                await context
-                                                    .read<TransactionCubit>()
-                                                    .getFullTransactions();
+                                                    transactions, notes,disc,name,telp,id);                    
                                             context
                                                 .read<BadgeCubit>()
-                                                .updateBadgeCount();
+                                                .updateBadgeCount();   
                                           },
                                         );
                                       },
@@ -574,6 +571,11 @@ class RightBody extends StatelessWidget {
                                           .state),
                                       orderType:
                                           state.orderType, // Include order type
+                                      cashRegisterId: _authSharedPref
+                                          .getCachedCashRegisterId(),
+                                      createdAt:
+                                          DateFormat('yyyy-MM-dd HH:mm:ss')
+                                              .format(DateTime.now()),
                                     );
 
                                     showDialog(
@@ -586,6 +588,7 @@ class RightBody extends StatelessWidget {
                                     );
                                   },
                             style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 12),
                               backgroundColor:
                                   isEmpty ? Colors.grey : AppColors.primaryMain,
                               foregroundColor: Colors.white,
@@ -618,7 +621,7 @@ class RightBody extends StatelessWidget {
           context.read<TransactionCubit>().updateOrderType(value);
         },
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
           decoration: BoxDecoration(
             color: selected
                 ? AppColors.primaryMain.withOpacity(0.1)
@@ -683,6 +686,8 @@ class RightBody extends StatelessWidget {
     final discount = _calculateDiscount(state);
     final totalAfterDiscount = subtotal - discount;
     final tax = state.tax / 100 * totalAfterDiscount;
-    return tax;
+
+    // Membatasi angka di belakang koma menjadi 1 digit
+    return double.parse(tax.toStringAsFixed(1));
   }
 }

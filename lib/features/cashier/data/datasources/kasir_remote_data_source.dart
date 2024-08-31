@@ -4,6 +4,7 @@ import 'package:akib_pos/api/urls.dart';
 import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/cashier/data/models/addition_model.dart';
+import 'package:akib_pos/features/cashier/data/models/cash_register_status_response.dart';
 import 'package:akib_pos/features/cashier/data/models/category_model.dart';
 import 'package:akib_pos/features/cashier/data/models/close_cashier_response.dart';
 import 'package:akib_pos/features/cashier/data/models/expenditure_model.dart';
@@ -35,6 +36,7 @@ abstract class KasirRemoteDataSource {
   Future<CloseCashierResponse> closeCashier();
   Future<OpenCashierResponse> openCashier(OpenCashierRequest request);
   Future<PostCloseCashierResponse> postCloseCashier(OpenCashierRequest request);
+  Future<CashRegisterStatusResponse> getCashRegisterStatus();
 }
 
 class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
@@ -44,27 +46,43 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
   KasirRemoteDataSourceImpl({
     required this.client,
   });
-  @override
- Future<PostCloseCashierResponse> postCloseCashier(
-    OpenCashierRequest request) async {
-  final token = sharedPrefsHelper.getToken();
+Future<PostCloseCashierResponse> postCloseCashier(OpenCashierRequest request) async {
   final url = '${URLs.baseUrlProd}/close-cashier';
 
   final response = await client.post(
     Uri.parse(url),
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
-    },
+    headers: _buildHeaders(), // Use the same _buildHeaders() method
     body: json.encode(request.toJson()),
-  );
+  ).timeout(Duration(seconds: 30));
 
-  if (response.statusCode == 200) {
+  if (response.statusCode == 201) {
     return PostCloseCashierResponse.fromJson(json.decode(response.body));
   } else {
     throw ServerException();
   }
 }
+
+
+ @override
+  Future<CashRegisterStatusResponse> getCashRegisterStatus( ) async {
+    final token = sharedPrefsHelper.getToken();
+    final branch_id = sharedPrefsHelper.getBranchId();
+    final url = '${URLs.baseUrlProd}/cash-register/status?branch_id=$branch_id';
+
+    final response = await client.get(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return CashRegisterStatusResponse.fromJson(json.decode(response.body));
+    } else {
+      throw ServerException();
+    }
+  }
 
   @override
   Future<OpenCashierResponse> openCashier(OpenCashierRequest request) async {
@@ -97,7 +115,7 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
   @override
   Future<CloseCashierResponse> closeCashier() async {
     final url =
-        '${URLs.baseUrlProd}/close-cashier/${sharedPrefsHelper.getUserId()}';
+        '${URLs.baseUrlProd}/close-cashier/${sharedPrefsHelper.getCachedCashRegisterId()}';
     final response = await client.get(Uri.parse(url), headers: _buildHeaders());
 
     if (response.statusCode != 200) {
@@ -138,7 +156,7 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
 
   @override
   Future<void> postExpenditure(ExpenditureModel expenditure) async {
-    final url = '${URLs.baseUrlProd}/expenditures';
+    final url = '${URLs.baseUrlProd}/expenses';
     final response = await client.post(
       Uri.parse(url),
       headers: _buildHeaders(),
@@ -175,10 +193,10 @@ class KasirRemoteDataSourceImpl implements KasirRemoteDataSource {
     final response = await client.put(
       Uri.parse(url),
       headers: _buildHeaders(),
-      body: json.encode(member.toJson()),
+      body: json.encode(member.toUpdateJson()),
     );
 
-    if (response.statusCode != 201) {
+    if (response.statusCode != 200) {
       throw ServerException();
     }
 

@@ -4,7 +4,7 @@ import 'package:akib_pos/common/app_themes.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/member/member_cubit.dart';
 import 'package:d_info/d_info.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';// Pastikan untuk mengimpor MemberCubit
+import 'package:flutter_bloc/flutter_bloc.dart'; // Pastikan untuk mengimpor MemberCubit
 
 class AddMemberDialog extends StatefulWidget {
   final VoidCallback onSuccess;
@@ -42,8 +42,8 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
   }
 
   void _validateForm() {
-    final isFormValid = _nameController.text.isNotEmpty &&
-        _phoneController.text.isNotEmpty;
+    final isFormValid =
+        _nameController.text.isNotEmpty && _phoneController.text.isNotEmpty;
     setState(() {
       _isButtonEnabled = isFormValid;
     });
@@ -74,7 +74,9 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
             _isLoading = false;
           });
           _closeKeyboard();
-          DInfo.toastError('Gagal menambahkan member',);
+          DInfo.toastError(
+            'Gagal menambahkan member',
+          );
         }
       },
       child: Dialog(
@@ -142,6 +144,17 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                           decoration: AppThemes.inputDecorationStyle.copyWith(
                             hintText: 'Email (Opsional)',
                           ),
+                          validator: (value) {
+                            if (value != null && value.isNotEmpty) {
+                              // Regex untuk validasi format email
+                              final emailRegex =
+                                  RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+                              if (!emailRegex.hasMatch(value)) {
+                                return 'Format email tidak valid';
+                              }
+                            }
+                            return null;
+                          },
                         ),
                       ],
                     ),
@@ -150,7 +163,8 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
               ),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: const BorderRadius.only(
@@ -168,10 +182,9 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                 ),
                 child: ElevatedButton(
                   style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(
-                        _isButtonEnabled
-                            ? AppColors.primaryMain
-                            : Colors.grey), // Tombol di-disable ketika tidak valid
+                    backgroundColor: WidgetStatePropertyAll(_isButtonEnabled
+                        ? AppColors.primaryMain
+                        : Colors.grey), // Tombol di-disable ketika tidak valid
                     padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
                       EdgeInsets.symmetric(vertical: 8),
                     ),

@@ -1,39 +1,39 @@
 class ExpenditureModel {
-  final String tanggal;
-  final int jumlah;
-  final String kategori;
-  final String deskripsi;
-  final int companyId;
+  final String date;
+  final double amount;
+  final String category;
+  final String description;
   final int branchId;
+  final int cashRegisterId; // New field for cash register ID
 
   ExpenditureModel({
-    required this.tanggal,
-    required this.jumlah,
-    required this.kategori,
-    required this.deskripsi,
-    this.companyId = 0,
+    required this.date,
+    required this.amount,
+    required this.category,
+    required this.description,
     this.branchId = 0,
+    this.cashRegisterId = 0, // Initialize the new field
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'tanggal': tanggal,
-      'jumlah': jumlah,
-      'kategori': kategori,
-      'deskripsi': deskripsi,
-      'company_Id': companyId,
-      'branch_Id': branchId,
+      'date': date,
+      'amount': amount,
+      'category': category,
+      'description': description,
+      'branch_id': branchId, // Corrected JSON key
+      'cash_register_id': cashRegisterId, // Include in JSON output
     };
   }
 
   factory ExpenditureModel.fromJson(Map<String, dynamic> json) {
     return ExpenditureModel(
-      tanggal: json['tanggal'],
-      jumlah: json['jumlah'],
-      kategori: json['kategori'],
-      deskripsi: json['deskripsi'],
-      companyId: json['company_Id'],
-      branchId: json['branch_Id'],
+      date: json['date'],
+      amount: double.parse(json['amount']), // Parsing the amount as double
+      category: json['category'],
+      description: json['description'],
+      branchId: json['branch_id'], // Corrected JSON key
+      cashRegisterId: json['cash_register_id'], // Parse the new field
     );
   }
 }

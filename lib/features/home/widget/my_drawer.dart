@@ -12,14 +12,12 @@ import 'package:sizer/sizer.dart';
 class MyDrawer extends StatelessWidget {
   final List<String> menuTitles = ["Dashboard", "Kasir", "HRD", "Akunting", "Stockist", "Settings"];
   final List<String> iconTitles = ["assets/icons/ic_dashboard.svg", "assets/icons/ic_kasir.svg", "assets/icons/ic_hrd.svg", "assets/icons/ic_akunting.svg", "assets/icons/ic_stockist.svg", "assets/icons/ic_pengaturan.svg"];
-  final String cafeName = "Cafe Arrazzaq";
-  final String ownerName = "Fadhil Muhaimin";
 
   final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
 
   @override
   Widget build(BuildContext context) {
-    String cafeInitials = getInitials(cafeName);
+    String cafeInitials = getInitials(_authSharedPref.getCompanyName() ?? "");
     return Drawer(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
@@ -30,8 +28,8 @@ class MyDrawer extends StatelessWidget {
       child: Column(
         children: [
           CustomDrawerHeader(
-            cafeName: cafeName,
-            ownerName: ownerName,
+            cafeName: _authSharedPref.getCompanyName() ?? "",
+            ownerName: _authSharedPref.getEmployeeName() ?? "",
             cafeInitials: cafeInitials,
             iconPath: "assets/icons/ic_app.svg", // Replace with your icon asset
           ),

@@ -18,15 +18,16 @@ class PostCloseCashierCubit extends Cubit<PostCloseCashierState> {
     final result = await repository.postCloseCashier(request);
 
     result.fold(
-      (failure) => emit(PostCloseCashierError('Gagal menutup kasir')),
+      (failure) {
+        emit(PostCloseCashierError('Gagal menutup kasir'));
+        resetState(); // Reset state setelah error
+      },
       (response) async {
         // Set shared preference bahwa kasir sudah ditutup
-        final authSharedPref = GetIt.instance<AuthSharedPref>();
-        final cashierSaredPref = GetIt.instance<CashierSharedPref>();
-        await cashierSaredPref.setCashierIsOpen(false);
-
-        await authSharedPref.clearLoginResponse(); 
+    
+        
         emit(PostCloseCashierSuccess(response.message));
+        
       },
     );
   }
@@ -35,3 +36,4 @@ class PostCloseCashierCubit extends Cubit<PostCloseCashierState> {
     emit(PostCloseCashierInitial());
   }
 }
+

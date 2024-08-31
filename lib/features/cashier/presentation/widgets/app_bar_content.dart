@@ -1,3 +1,4 @@
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/cashier/data/repositories/kasir_repository.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/close_cashier/close_cashier_cubit.dart';
@@ -6,6 +7,7 @@ import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubi
 import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/close_cashier_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/expenditure_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/open_cashier_dialog.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/printer_management_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/member/member_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/saved_transactions_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/voucher_dialog.dart';
@@ -13,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get_it/get_it.dart';
 import 'package:sizer/sizer.dart';
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
@@ -21,6 +24,7 @@ import 'package:badges/badges.dart' as badges;
 class AppBarContent extends StatelessWidget {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +95,7 @@ class AppBarContent extends StatelessWidget {
                 ),
                 const SizedBox(height: 0.5),
                 Visibility(
-                  visible: customerPhone != null && customerPhone.isNotEmpty,
+                  visible: customerPhone == "null" ? false : true,
                   child: Text(
                     customerPhone ?? '',
                     style: AppTextStyle.body3
@@ -149,50 +153,97 @@ class AppBarContent extends StatelessWidget {
               },
             ),
             const SizedBox(width: 10),
-
             // Wrap GestureDetector with BlocBuilder
-            BlocBuilder<BadgeCubit, int>(
-              builder: (context, badgeCount) {
-                // Enable GestureDetector only if badgeCount is 0
-                return GestureDetector(
-                  onTap: () {
-                    if (badgeCount > 0) {
-                      _showWarningDialog(context, badgeCount);
-                    } else {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return CloseCashierDialog();
-                        },
-                      );
-                    }
-                  }, // Disable tap if badgeCount is not 0
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Syafii Qurani', style: AppTextStyle.headline6),
-                      SizedBox(
-                        height: 4,
-                      ),
-                      Container(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
+            BlocBuilder<CashierCubit, CashierState>(
+              builder: (context, cashierState) {
+                return BlocBuilder<TransactionCubit, TransactionState>(
+                  builder: (context, transactionState) {
+                    // Menentukan apakah tombol aktif atau tidak
+                    bool isKasirActive =
+                        cashierState.cashRegisterStatus != "close";
+                    bool hasTransactions =
+                        transactionState.transactions.isNotEmpty;
+
+                    // Jika kasir tutup atau ada transaksi, tombol menjadi tidak aktif
+                    bool isButtonEnabled = isKasirActive && !hasTransactions;
+
+                    return GestureDetector(
+                      onTap: () {
+                        if (!isButtonEnabled) {
+                          if (hasTransactions) {
+                            _showWarningDialog(
+                                context, transactionState.transactions.length);
+                          }
+                        } else {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return isKasirActive
+                                  ? CloseCashierDialog()
+                                  : OpenCashierDialog();
+                            },
+                          );
+                        }
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            _shortenText(
+                              _authSharedPref.getEmployeeName() ?? "",
+                              13,
+                            ),
+                            style: AppTextStyle.headline6,
+                          ),
+                          SizedBox(height: 4),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(4),
-                              color: badgeCount == 0
+                              color: isButtonEnabled
                                   ? AppColors.successMain
                                   : Colors
-                                      .grey), // Change color based on condition
-                          child: Text('Kasir Aktif >',
+                                      .grey, // Ubah warna berdasarkan kondisi
+                            ),
+                            child: Text(
+                              isKasirActive ? 'Kasir Aktif >' : 'Kasir Tutup >',
                               style: AppTextStyle.body3
-                                  .copyWith(color: Colors.white))),
-                    ],
-                  ),
+                                  .copyWith(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 );
               },
             ),
 
+            const SizedBox(width: 10),
+            GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return PrinterManagementDialog();
+                  },
+                );
+              },
+              child: Container(
+                height: 50,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white, // White background color
+                  borderRadius: BorderRadius.circular(4.0),
+                ),
+                child: SvgPicture.asset(
+                  "assets/icons/ic_print.svg",
+                  height: 2.h,
+                ),
+              ),
+            ),
             const SizedBox(width: 10),
             GestureDetector(
               onTap: () {
@@ -338,14 +389,7 @@ class AppBarContent extends StatelessWidget {
                 SizedBox(height: 16.0),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); 
-                    showDialog(
-  context: context,
-  builder: (BuildContext context) {
-    return OpenCashierDialog();
-  },
-  barrierDismissible: false, // This will make the dialog non-dismissible
-);// Close the dialog
+                    Navigator.of(context).pop();
                   },
                   child: Text("Tutup Pesan"),
                   style: ElevatedButton.styleFrom(
@@ -367,5 +411,13 @@ class AppBarContent extends StatelessWidget {
   void _performSearch(BuildContext context, String text) {
     BlocProvider.of<CashierCubit>(context).updateSearchText(text);
     _focusNode.unfocus();
+  }
+}
+
+String _shortenText(String text, int maxLength) {
+  if (text.length > maxLength) {
+    return text.substring(0, maxLength) + '...';
+  } else {
+    return text;
   }
 }

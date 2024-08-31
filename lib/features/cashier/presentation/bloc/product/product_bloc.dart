@@ -1,6 +1,7 @@
 import 'package:akib_pos/core/error/failures.dart';
 import 'package:akib_pos/features/cashier/data/datasources/local/kasir_local_data_source.dart';
 import 'package:akib_pos/features/cashier/data/models/addition_model.dart';
+import 'package:akib_pos/features/cashier/data/models/cash_register_status_response.dart';
 import 'package:akib_pos/features/cashier/data/models/category_model.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
 import 'package:akib_pos/features/cashier/data/models/sub_category_model.dart';
@@ -27,7 +28,19 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     on<FetchAdditionsEvent>(_onFetchAdditions);
     on<FetchVariantsEvent>(_onFetchVariants);
     on<FetchTaxEvent>(_onFetchTax);
+    on<FetchCashRegisterStatusEvent>(_onFetchCashRegisterStatus);
   }
+
+
+Future<void> _onFetchCashRegisterStatus(
+    FetchCashRegisterStatusEvent event, Emitter<ProductState> emit) async {
+  emit(ProductLoading());
+  final failureOrStatus = await kasirRepository.getCashRegisterStatus();
+  failureOrStatus.fold(
+    (failure) => emit(ProductError(message: _mapFailureToMessage(failure))),
+    (status) => emit(CashRegisterStatusLoaded(status: status)),
+  );
+}
 
 
  Future<void> _onFetchProducts(FetchProductsEvent event, Emitter<ProductState> emit) async {

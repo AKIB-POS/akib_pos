@@ -20,7 +20,7 @@ class TransactionState {
   final double discount;
   final double tax;
   final VoucherData? voucher;
-  final int? customerId; 
+  final int? customerId;
   final String? customerName;
   final String? customerPhone;
   final String orderType; // New field to track order type
@@ -49,8 +49,8 @@ class TransactionState {
     double? discount,
     double? tax,
     VoucherData? voucher,
-    int? customerId, 
-    String? customerName, 
+    int? customerId,
+    String? customerName,
     String? customerPhone,
     String? orderType, // Include order type in copyWith
   }) {
@@ -70,6 +70,7 @@ class TransactionState {
     );
   }
 }
+
 class TransactionCubit extends Cubit<TransactionState> {
   final TransactionService transactionService;
 
@@ -82,38 +83,50 @@ class TransactionCubit extends Cubit<TransactionState> {
           transactions: [],
         ));
 
-  void updateCustomer(int customerId, String customerName, String customerPhone) {
-    emit(state.copyWith(customerId: customerId, customerName: customerName,customerPhone: customerPhone));
+  void updateCustomer(
+      int customerId, String customerName, String customerPhone) {
+    emit(state.copyWith(
+        customerId: customerId,
+        customerName: customerName,
+        customerPhone: customerPhone));
   }
 
   void updateOrderType(String orderType) {
     emit(state.copyWith(orderType: orderType));
   }
 
- Future<void> saveFullTransaction(List<TransactionModel> transactions, String notes) async {
-    if (state.customerId != null && 
-        state.customerName != null && state.customerName!.isNotEmpty && 
-        state.customerPhone != null && state.customerPhone!.isNotEmpty &&
-        state.discount > 0) {
-        
+  Future<void> saveFullTransaction(List<TransactionModel> transactions, String notes, double discount, String? name, String? telp, int? id) async {
+
+    print("berapakahe $discount");
+    print("berapakahe $name");
+    print("berapakahe $id");
+    print("berapakahe $telp");
+    if (id != null &&
+        name != null &&
+        telp != null) {
       SaveTransactionModel fullTransaction = SaveTransactionModel(
         transactions: transactions,
         savedNotes: notes,
         time: DateTime.now(),
-        discount: state.discount,
-        customerId: state.customerId,
-        customerName: state.customerName,
-        customerPhone: state.customerPhone,
+        discount: discount,
+        customerId: id,
+        customerName: name,
+        customerPhone: telp,
         tax: state.tax,
         orderType: state.orderType,
-
       );
+        print("berapakahe1 $telp");
 
       await transactionService.saveFullTransaction(fullTransaction);
-    }else{
+    } else {
       SaveTransactionModel fullTransaction = SaveTransactionModel(
-        transactions: transactions, savedNotes: notes, time: DateTime.now(),tax: state.tax,orderType: state.orderType);
-          await transactionService.saveFullTransaction(fullTransaction);
+          transactions: transactions,
+          savedNotes: notes,
+          time: DateTime.now(),
+          tax: state.tax,
+          discount: discount,
+          orderType: state.orderType);
+      await transactionService.saveFullTransaction(fullTransaction);
     }
 
     // Reset state after saving
@@ -121,10 +134,13 @@ class TransactionCubit extends Cubit<TransactionState> {
       transactions: [],
       customerName: "Nama Pelanggan",
       customerId: null,
-      customerPhone: null,
+      customerPhone: "null",
       tax: 0,
+      discount: 0,
     ));
+    // resetAllState();
   }
+
   Future<List<SaveTransactionModel>> getFullTransactions() async {
     return await transactionService.getFullTransactions();
   }
@@ -132,7 +148,14 @@ class TransactionCubit extends Cubit<TransactionState> {
   Future<void> loadFullTransactions(
       SaveTransactionModel fullTransaction) async {
     final allTransactions = fullTransaction.transactions;
-    emit(state.copyWith(transactions: allTransactions, tax: fullTransaction.tax,discount: fullTransaction.discount));
+    emit(state.copyWith(
+        transactions: allTransactions,
+        tax: fullTransaction.tax,
+        discount: fullTransaction.discount,
+        customerName: fullTransaction.customerName,
+        customerId: fullTransaction.customerId,
+        customerPhone: fullTransaction.customerPhone,
+        ));
   }
 
   Future<void> removeFullTransaction(
@@ -209,11 +232,10 @@ class TransactionCubit extends Cubit<TransactionState> {
     _updateTotalPrice(reduce: addition.price);
   }
 
- 
   void addTransaction(TransactionModel transaction, double tax) {
     final updatedTransactions = List<TransactionModel>.from(state.transactions)
       ..add(transaction);
-    emit(state.copyWith(transactions: updatedTransactions,tax: tax));
+    emit(state.copyWith(transactions: updatedTransactions, tax: tax));
     _updateTotalPrice();
   }
 
@@ -228,10 +250,9 @@ class TransactionCubit extends Cubit<TransactionState> {
     final updatedTransactions = List<TransactionModel>.from(state.transactions)
       ..removeAt(index);
     emit(state.copyWith(transactions: updatedTransactions));
-    if(state.transactions.isEmpty){
+    if (state.transactions.isEmpty) {
       resetState();
     }
-    
   }
 
   void setInitialStateForEdit(TransactionModel transaction) {
@@ -255,7 +276,7 @@ class TransactionCubit extends Cubit<TransactionState> {
     final updatedTransactions = List<TransactionModel>.from(state.transactions)
       ..[index] = updatedTransaction;
     emit(state.copyWith(transactions: updatedTransactions));
- 
+
     _updateTotalPrice(index: index); // Update the total price
     print("apakahh di add ${state.quantity}");
   }
@@ -290,8 +311,6 @@ class TransactionCubit extends Cubit<TransactionState> {
     emit(state.copyWith(discount: discount));
     _updateTotalPrice();
   }
-
-  
 
   void _updateTotalPrice({int? index, int reduce = 0}) {
     if (state.transactions.isEmpty) return;
