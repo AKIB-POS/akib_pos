@@ -80,7 +80,15 @@ class _VoucherDialogState extends State<VoucherDialog> {
                     BlocProvider.of<TransactionCubit>(context).updateVoucher(state.voucher.data);
 
                     // Show snackbar
-                    DInfo.snackBarSuccess(context, "Berhasil Menerapkan Diskon");
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Berhasil Menerapkan Diskon',
+                        ),
+                        backgroundColor: AppColors.successMain,
+                        duration: Duration(milliseconds:1000),
+                      ),
+                    );
                     setState(() {
                       _isButtonDisabled = true;
                     });
@@ -189,7 +197,15 @@ class _VoucherDialogState extends State<VoucherDialog> {
                               );
                               BlocProvider.of<TransactionCubit>(context).updateVoucher(voucher);
 
-                              DInfo.snackBarSuccess(context, "Berhasil Menerapkan Diskon");
+                               ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Berhasil Menerapkan Diskon',
+                        ),
+                        backgroundColor: AppColors.successMain,
+                        duration: Duration(milliseconds: 1000),
+                      ),
+                    );
                               Navigator.of(context).pop(); // Close the dialog
                             } else {
                               BlocProvider.of<VoucherCubit>(context).redeemVoucher(_voucherController.text);
