@@ -193,10 +193,10 @@ Future<PostCloseCashierResponse> postCloseCashier(OpenCashierRequest request) as
     final response = await client.put(
       Uri.parse(url),
       headers: _buildHeaders(),
-      body: json.encode(member.toJson()),
+      body: json.encode(member.toUpdateJson()),
     );
 
-    if (response.statusCode != 201) {
+    if (response.statusCode != 200) {
       throw ServerException();
     }
 

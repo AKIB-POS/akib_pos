@@ -63,9 +63,9 @@ class OpenCashierDialog extends StatelessWidget {
                     width: 80.0,
                   ),
                   const SizedBox(height: 16.0),
-                  const Text(
-                    "Halo, Syafii Qurani",
-                    style: TextStyle(
+                   Text(
+                    "Halo, ${_authSharedPref.getCompanyName() ?? ""}",
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,

@@ -191,7 +191,7 @@ class AppBarContent extends StatelessWidget {
                         children: [
                           Text(
                             _shortenText(
-                              _authSharedPref.getCompanyName() ?? "",
+                              _authSharedPref.getEmployeeName() ?? "",
                               13,
                             ),
                             style: AppTextStyle.headline6,
