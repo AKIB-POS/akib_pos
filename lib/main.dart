@@ -1,5 +1,7 @@
 import 'package:akib_pos/common/app_colors.dart';
+import 'package:akib_pos/di/accounting_injection.dart';
 import 'package:akib_pos/di/injection_container.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/transaction_summary_cubit.dart';
 import 'package:akib_pos/features/auth/presentation/bloc/auth/auth_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
@@ -24,6 +26,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 import 'package:akib_pos/di/injection_container.dart' as di;
+import 'package:akib_pos/di/accounting_injection.dart' as accounting;
 import 'firebase_options.dart';
 
 void main() async {
@@ -31,8 +34,11 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-   await _requestPermissions(); 
+  await _requestPermissions(); 
+  //for auth and cashier injection initialization
   await di.init();
+  //for accounting injection initialization
+  await accounting.initAccountingModule();
 
   runApp(
     MultiBlocProvider(
@@ -51,11 +57,6 @@ void main() async {
             ..add(FetchAdditionsEvent())
             ..add(FetchVariantsEvent()),
         ),
-        // BlocProvider(
-        //   create: (context) => AuthBloc(
-        //      sl(),
-        //   ),
-        // ),
         BlocProvider(
           create: (context) => CashierCubit(
             localDataSource: sl(),
@@ -98,6 +99,13 @@ void main() async {
         BlocProvider(
             create: (context) =>
                 PrinterCubit(bluetooth: sl(),sharedPreferences: sl())),
+
+
+        //for accounting
+        BlocProvider(
+          create: (context) => TransactionSummaryCubit(repository: accountingInjection()),
+        ),
+
       ],
       child: MyApp(),
     ),

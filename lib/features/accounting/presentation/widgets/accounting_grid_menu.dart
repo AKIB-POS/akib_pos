@@ -1,3 +1,4 @@
+import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:sizer/sizer.dart';
@@ -18,6 +19,8 @@ class AccountingGridMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return GridView.builder(
       padding: EdgeInsets.all(16),
+      shrinkWrap: true, // Tambahkan ini agar GridView mengukur tinggi berdasarkan isinya
+      physics: NeverScrollableScrollPhysics(), 
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2, // 2 cards per row
         crossAxisSpacing: 8,
@@ -65,7 +68,7 @@ class AccountingMenuItem extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold), // Sesuaikan ukuran teks dengan Sizer
+                    style: AppTextStyle.headline5, // Sesuaikan ukuran teks dengan Sizer
                   ),
                   Spacer(),
                   Row(

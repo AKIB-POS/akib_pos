@@ -9,7 +9,7 @@ class AppColors {
   static const Color primaryMain = Color.fromRGBO(244, 96, 63, 1);
   static const Color primaryDark = Color(0xFFB81003);
   static const Color primaryDarker = Color(0xFF560000);
-  static const Color primaryBackgorund = Color(0xFFFFE6DF);
+  static const Color primaryBackgorund = Color(0xFFFEF4F2);
 
   // Secondary Colors
   static const Color secondaryLighter = Color(0xFFE0FFFE);

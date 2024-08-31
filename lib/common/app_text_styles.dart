@@ -108,6 +108,12 @@ class AppTextStyle {
     fontWeight: FontWeight.w400,
     letterSpacing: 0,
   );
+  static const TextStyle bigCaptionBold = TextStyle(
+    fontSize: 15.0,
+    height: 1.5, // Line height of 18 divided by font size of 12
+    fontWeight: FontWeight.bold,
+    letterSpacing: 0,
+  );
 
   static const TextStyle button = TextStyle(
     fontSize: 20.0,
