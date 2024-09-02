@@ -1,5 +1,5 @@
 import 'package:akib_pos/common/app_text_styles.dart';
-import 'package:akib_pos/features/accounting/presentation/pages/transaction_report/transaction_report.dart';
+import 'package:akib_pos/features/accounting/presentation/pages/transaction_report.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:sizer/sizer.dart';

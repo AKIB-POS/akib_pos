@@ -2,6 +2,7 @@ import 'package:akib_pos/features/accounting/data/datasources/accounting_remote_
 import 'package:akib_pos/features/accounting/data/datasources/local/employee_shared_pref.dart';
 import 'package:akib_pos/features/accounting/data/repositories/accounting_repository.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/employee_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/transaction_list_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report_interaction_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_summary_cubit.dart';
@@ -25,6 +26,9 @@ Future<void> initAccountingModule() async {
 
   accountingInjection.registerFactory(
     () => TransactionSummaryCubit(repository: accountingInjection()),
+  );
+  accountingInjection.registerFactory(
+    () => TransactionListCubit(repository: accountingInjection()),
   );
 
   accountingInjection.registerFactory(

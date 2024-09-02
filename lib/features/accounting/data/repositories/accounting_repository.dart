@@ -2,6 +2,7 @@ import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/core/error/failures.dart';
 import 'package:akib_pos/features/accounting/data/datasources/accounting_remote_data_source.dart';
 import 'package:akib_pos/features/accounting/data/datasources/local/employee_shared_pref.dart';
+import 'package:akib_pos/features/accounting/data/models/accounting_transaction_reporrt_model.dart';
 import 'package:akib_pos/features/accounting/data/models/employee.dart';
 import 'package:akib_pos/features/accounting/data/models/transaction_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/transcation_summary_response.dart';
@@ -17,6 +18,20 @@ abstract class AccountingRepository {
     required int employeeId,
     required String date,
   });
+
+  Future<Either<Failure, AccountingTransactionListResponse>> getTopTransactions({
+    required int branchId,
+    required int companyId,
+    required int employeeId,
+    required String date,
+  });
+
+  Future<Either<Failure, AccountingTransactionListResponse>> getDiscountTransactions({
+    required int branchId,
+    required int companyId,
+    required int employeeId,
+    required String date,
+  });
 }
 
 class AccountingRepositoryImpl implements AccountingRepository {
@@ -24,11 +39,67 @@ class AccountingRepositoryImpl implements AccountingRepository {
   final EmployeeSharedPref employeeSharedPref;
   final Connectivity connectivity;
 
+  
+
   AccountingRepositoryImpl({
     required this.remoteDataSource,
     required this.employeeSharedPref,
     required this.connectivity,
     });
+
+
+
+  @override
+  Future<Either<Failure, AccountingTransactionListResponse>> getTopTransactions({
+    required int branchId,
+    required int companyId,
+    required int employeeId,
+    required String date,
+  }) async {
+    try {
+      final response = await remoteDataSource.getTopTransactions(
+        branchId: branchId,
+        companyId: companyId,
+        employeeId: employeeId,
+        date: date,
+      );
+      return Right(response);
+    } catch (e) {
+      if (e is GeneralException) {
+        return Left(GeneralFailure(e.message));
+      } else if (e is ServerException) {
+        return Left(ServerFailure());
+      } else {
+        return Left(GeneralFailure("Unexpected error occurred"));
+      }
+    }
+  }
+
+  @override
+  Future<Either<Failure, AccountingTransactionListResponse>> getDiscountTransactions({
+    required int branchId,
+    required int companyId,
+    required int employeeId,
+    required String date,
+  }) async {
+    try {
+      final response = await remoteDataSource.getDiscountTransactions(
+        branchId: branchId,
+        companyId: companyId,
+        employeeId: employeeId,
+        date: date,
+      );
+      return Right(response);
+    } catch (e) {
+      if (e is GeneralException) {
+        return Left(GeneralFailure(e.message));
+      } else if (e is ServerException) {
+        return Left(ServerFailure());
+      } else {
+        return Left(GeneralFailure("Unexpected error occurred"));
+      }
+    }
+  }
 
     @override
   Future<Either<Failure, TransactionReportModel>> getTodayTransactionReport({

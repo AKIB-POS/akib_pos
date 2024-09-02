@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:akib_pos/api/urls.dart';
 import 'package:akib_pos/core/error/exceptions.dart';
+import 'package:akib_pos/features/accounting/data/models/accounting_transaction_reporrt_model.dart';
 import 'package:akib_pos/features/accounting/data/models/employee.dart';
 import 'package:akib_pos/features/accounting/data/models/transaction_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/transcation_summary_response.dart';
@@ -17,6 +18,20 @@ abstract class AccountingRemoteDataSource {
     required int employeeId,
     required String date,
   });
+
+  Future<AccountingTransactionListResponse> getTopTransactions({
+    required int branchId,
+    required int companyId,
+    required int employeeId,
+    required String date,
+  });
+
+  Future<AccountingTransactionListResponse> getDiscountTransactions({
+    required int branchId,
+    required int companyId,
+    required int employeeId,
+    required String date,
+  });
 }
 
 class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
@@ -26,6 +41,60 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
   AccountingRemoteDataSourceImpl({
     required this.client,
   });
+
+  @override
+  Future<AccountingTransactionListResponse> getTopTransactions({
+    required int branchId,
+    required int companyId,
+    required int employeeId,
+    required String date,
+  }) async {
+    final url = '${URLs.baseUrlMock}/today-top-transaction-report';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branch_id': branchId.toString(),
+        'company_id': companyId.toString(),
+        'employee_id': employeeId.toString(),
+        'date': date,
+      }),
+      headers: _buildHeaders(),
+    ).timeout(Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      return AccountingTransactionListResponse.fromJson(json.decode(response.body));
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+  @override
+  Future<AccountingTransactionListResponse> getDiscountTransactions({
+    required int branchId,
+    required int companyId,
+    required int employeeId,
+    required String date,
+  }) async {
+    final url = '${URLs.baseUrlMock}/today-discount-transaction-report';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branch_id': branchId.toString(),
+        'company_id': companyId.toString(),
+        'employee_id': employeeId.toString(),
+        'date': date,
+      }),
+      headers: _buildHeaders(),
+    ).timeout(Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      return AccountingTransactionListResponse.fromJson(json.decode(response.body));
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
 
   @override
   Future<TransactionReportModel> getTodayTransactionReport({

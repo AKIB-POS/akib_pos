@@ -1,4 +1,5 @@
 import 'package:akib_pos/core/error/failures.dart';
+import 'package:akib_pos/features/accounting/data/models/accounting_transaction_reporrt_model.dart';
 import 'package:akib_pos/features/accounting/data/models/transaction_report_model.dart';
 import 'package:akib_pos/features/accounting/data/repositories/accounting_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,14 +26,10 @@ class TransactionReportCubit extends Cubit<TransactionReportState> {
 
     result.fold(
       (failure) {
-        if (failure is GeneralFailure) {
-          emit(TransactionReportError(failure.message));
-        } else {
-          emit(TransactionReportError('Failed to fetch transaction report.'));
-        }
+        emit(TransactionReportError(failure is GeneralFailure ? failure.message : 'Failed to fetch transaction report.'));
       },
       (report) {
-        emit(TransactionReportSuccess(report));
+        emit(TodayTransactionReportSuccess(report));
       },
     );
   }
@@ -44,10 +41,22 @@ class TransactionReportInitial extends TransactionReportState {}
 
 class TransactionReportLoading extends TransactionReportState {}
 
-class TransactionReportSuccess extends TransactionReportState {
+class TodayTransactionReportSuccess extends TransactionReportState {
   final TransactionReportModel report;
 
-  TransactionReportSuccess(this.report);
+  TodayTransactionReportSuccess(this.report);
+}
+
+class Top10TransactionsSuccess extends TransactionReportState {
+  final List<AccountingTransactionReportModel> transactions;
+
+  Top10TransactionsSuccess(this.transactions);
+}
+
+class DiscountTransactionsSuccess extends TransactionReportState {
+  final List<AccountingTransactionReportModel> transactions;
+
+  DiscountTransactionsSuccess(this.transactions);
 }
 
 class TransactionReportError extends TransactionReportState {
