@@ -39,3 +39,4 @@ static String formatNumberDouble(double input) {
   return formatter.format(input).trim(); // Menggunakan trim() untuk menghilangkan spasi ekstra
 }
 }
+

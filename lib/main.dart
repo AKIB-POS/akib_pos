@@ -1,6 +1,9 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/di/accounting_injection.dart';
 import 'package:akib_pos/di/injection_container.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/employee_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report_interaction_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_summary_cubit.dart';
 import 'package:akib_pos/features/auth/presentation/bloc/auth/auth_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
@@ -104,6 +107,15 @@ void main() async {
         //for accounting
         BlocProvider(
           create: (context) => TransactionSummaryCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => EmployeeCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => TransactionReportInteractionCubit(employeeSharedPref: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => TransactionReportCubit(repository: accountingInjection()),
         ),
 
       ],

@@ -1,4 +1,5 @@
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/features/accounting/presentation/pages/transaction_report/transaction_report.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:sizer/sizer.dart';
@@ -18,20 +19,32 @@ class AccountingGridMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       shrinkWrap: true, // Tambahkan ini agar GridView mengukur tinggi berdasarkan isinya
-      physics: NeverScrollableScrollPhysics(), 
+      physics: const NeverScrollableScrollPhysics(), 
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2, // 2 cards per row
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
-        childAspectRatio: 1.26
+        childAspectRatio: 1.26,
       ),
       itemCount: menuItems.length,
       itemBuilder: (context, index) {
-        return AccountingMenuItem(
-          title: menuItems[index]["title"]!,
-          iconPath: menuItems[index]["icon"]!,
+        return GestureDetector(
+          onTap: () {
+            if (index == 0) { // Jika item pertama diklik
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>  TransactionReport(),
+                ),
+              );
+            }
+          },
+          child: AccountingMenuItem(
+            title: menuItems[index]["title"]!,
+            iconPath: menuItems[index]["icon"]!,
+          ),
         );
       },
     );
@@ -68,18 +81,21 @@ class AccountingMenuItem extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: AppTextStyle.headline5, // Sesuaikan ukuran teks dengan Sizer
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ), // Sesuaikan ukuran teks dengan Sizer atau AppTextStyle jika ada
                   ),
-                  Spacer(),
+                  const Spacer(),
                   Row(
                     children: [
-                      Spacer(),
-                       SvgPicture.asset(
-                    iconPath,
-                    height: 40, // Sesuaikan ukuran ikon
-                    width: 40,
-                  ),
-                    ]
+                      const Spacer(),
+                      SvgPicture.asset(
+                        iconPath,
+                        height: 40, // Sesuaikan ukuran ikon
+                        width: 40,
+                      ),
+                    ],
                   )
                 ],
               ),
