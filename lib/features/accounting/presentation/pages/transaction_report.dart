@@ -9,7 +9,7 @@ import 'package:akib_pos/features/accounting/presentation/pages/accounting_page.
 import 'package:akib_pos/features/accounting/presentation/widgets/transaction_report/customer_transaction.dart';
 import 'package:akib_pos/features/accounting/presentation/widgets/transaction_report/summary_transaction.dart';
 import 'package:akib_pos/features/accounting/presentation/widgets/transaction_report/transaction_report_top.dart';
-import 'package:akib_pos/features/accounting/presentation/widgets/transaction_report_item.dart';
+import 'package:akib_pos/features/accounting/presentation/widgets/transaction_report/transaction_report_item.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:extended_image/extended_image.dart';
@@ -104,7 +104,7 @@ class _TransactionReportState extends State<TransactionReport> {
                     child: CalendarDatePicker(
                       initialDate: selectedDate,
                       firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
+                      lastDate: DateTime.now(),
                       onDateChanged: (DateTime date) {
                         selectedDate = date;
                       },

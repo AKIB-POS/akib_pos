@@ -35,7 +35,7 @@ class AppColors {
   // Warning Colors
   static const Color warningLighter = Color(0xFFFFF5CC);
   static const Color warningLight = Color(0xFFFFD666);
-  static const Color warningMain = Color(0xFFFAAD00);
+  static const Color warningMain = Color(0xFFFFAB00);
   static const Color warningDark = Color(0xFF876000);
   static const Color warningDarker = Color(0xFF7A4A00);
 

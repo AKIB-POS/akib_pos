@@ -4,10 +4,13 @@ import 'package:akib_pos/features/accounting/data/models/accounting_transaction_
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_list_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report_interaction_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/widgets/shimmer_widget.dart';
+import 'package:akib_pos/features/accounting/presentation/widgets/transaction_report/accounting_transaction_customer_card.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:sizer/sizer.dart';
 
 
 class CustomerTransaction extends StatelessWidget {
@@ -63,7 +66,7 @@ class CustomerTransaction extends StatelessWidget {
           BlocBuilder<TransactionListCubit, TransactionReportState>(
             builder: (context, state) {
               if (state is TransactionReportLoading) {
-                return Center(child: CircularProgressIndicator());
+                return _buildShimmerList();
               } else if (state is TransactionReportError) {
                 return Center(child: Text(state.message));
               } else if (state is Top10TransactionsSuccess || state is DiscountTransactionsSuccess) {
@@ -143,16 +146,24 @@ class CustomerTransaction extends StatelessWidget {
   Widget _buildTransactionList(List<AccountingTransactionReportModel> transactions) {
     return ListView.builder(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: transactions.length,
       itemBuilder: (context, index) {
         final transaction = transactions[index];
-        return Card(
-          child: ListTile(
-            title: Text(transaction.transactionCode),
-            subtitle: Text(transaction.customerName ?? 'Unknown Customer'),
-            trailing: Text('Rp ${transaction.price.toStringAsFixed(2)}'),
-          ),
+        return AccountingTransactionCustomerCard(transaction: transaction);
+      },
+    );
+  }
+
+  Widget _buildShimmerList() {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 5, // Simulate 5 shimmer items
+      itemBuilder: (context, index) {
+        return  ShimmerWidget.rectangular(
+          width: double.infinity,
+          height: 10.h, // Adjust this to match your card height
         );
       },
     );

@@ -1,6 +1,15 @@
 
 import 'package:intl/intl.dart';
 class Utils{
+
+  static String formatCurrencyDouble(double input) {
+    final NumberFormat formatter = NumberFormat.currency(
+      locale: 'id',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    );
+    return formatter.format(input);
+  }
   static String formatCurrency(String input) {
   int value = int.parse(input);
   final NumberFormat formatter = NumberFormat.currency(
@@ -10,14 +19,7 @@ class Utils{
   );
   return formatter.format(value);
 }
-static String formatCurrencyDouble(double input) {
-    final NumberFormat formatter = NumberFormat.currency(
-      locale: 'id',
-      symbol: 'Rp ',
-      decimalDigits: 0,
-    );
-    return formatter.format(input);
-  }
+
 
   static String formatNumber(String input) {
   int value = int.parse(input);
