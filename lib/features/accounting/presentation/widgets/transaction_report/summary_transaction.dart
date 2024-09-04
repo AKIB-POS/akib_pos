@@ -21,14 +21,14 @@ class SummaryTransaction extends StatelessWidget {
             padding: const EdgeInsets.only(top: 16),
             child: Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     children: [
                       Expanded(
                         child: TransactionReportItem(
                           title: 'Kas Awal',
-                          isLoading: true, // Loading shimmer
+                          isLoading: true, // Loading shimmer–
                         ),
                       ),
                       SizedBox(width: 8),
@@ -41,9 +41,9 @@ class SummaryTransaction extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                const SizedBox(height: 8),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     children: [
                       Expanded(
@@ -66,7 +66,7 @@ class SummaryTransaction extends StatelessWidget {
                 Container(
                   width: double.infinity,
                   height: 20,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(20),
@@ -92,7 +92,7 @@ class SummaryTransaction extends StatelessWidget {
                               state.report.openingCash),
                         ),
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: TransactionReportItem(
                           title: 'Pengeluaran Outlet',
@@ -103,7 +103,7 @@ class SummaryTransaction extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
@@ -115,7 +115,7 @@ class SummaryTransaction extends StatelessWidget {
                               state.report.cashPayment),
                         ),
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: TransactionReportItem(
                           title: 'Pembayaran\nNon Tunai',
@@ -130,7 +130,7 @@ class SummaryTransaction extends StatelessWidget {
                 Container(
                   width: double.infinity,
                   height: 20,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(20),

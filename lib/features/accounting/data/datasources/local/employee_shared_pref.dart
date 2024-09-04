@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:akib_pos/features/accounting/data/models/employee.dart';
+import 'package:akib_pos/features/accounting/data/models/transaction_report/employee.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EmployeeSharedPref {

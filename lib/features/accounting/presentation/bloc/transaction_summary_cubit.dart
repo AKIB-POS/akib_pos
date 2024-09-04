@@ -1,5 +1,5 @@
 import 'package:akib_pos/core/error/failures.dart';
-import 'package:akib_pos/features/accounting/data/models/transcation_summary_response.dart';
+import 'package:akib_pos/features/accounting/data/models/transaction_report/transcation_summary_response.dart';
 import 'package:akib_pos/features/accounting/data/repositories/accounting_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

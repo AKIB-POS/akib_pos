@@ -1,9 +1,9 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/accounting/data/models/accounting_transaction_reporrt_model.dart';
-import 'package:akib_pos/features/accounting/presentation/bloc/transaction_list_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/transaction_list_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report_cubit.dart';
-import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report_interaction_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/transaction_report_interaction_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/widgets/shimmer_widget.dart';
 import 'package:akib_pos/features/accounting/presentation/widgets/transaction_report/accounting_transaction_customer_card.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';

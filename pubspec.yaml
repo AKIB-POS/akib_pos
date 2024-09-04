@@ -63,6 +63,7 @@ dependencies:
   currency_text_input_formatter: ^2.2.3
   blue_thermal_printer: ^1.2.3
   permission_handler: ^11.3.1
+  syncfusion_flutter_datepicker: ^26.2.12
 
 dev_dependencies:
   flutter_test:

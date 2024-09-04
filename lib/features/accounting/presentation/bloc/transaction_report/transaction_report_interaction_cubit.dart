@@ -1,5 +1,5 @@
 import 'package:akib_pos/features/accounting/data/datasources/local/employee_shared_pref.dart';
-import 'package:akib_pos/features/accounting/data/models/employee.dart';
+import 'package:akib_pos/features/accounting/data/models/transaction_report/employee.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 

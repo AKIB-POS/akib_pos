@@ -1,4 +1,5 @@
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/features/accounting/presentation/pages/sales_report.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/transaction_report.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -16,6 +17,33 @@ class AccountingGridMenu extends StatelessWidget {
     {"title": "Manajemen\nAset", "icon": "assets/icons/accounting/ic_arus_kas.svg"},
   ];
 
+  void onItemTap(int index, BuildContext context) {
+  switch (index) {
+    case 0:
+      // If the first item is clicked
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TransactionReport(),
+        ),
+      );
+      break;
+    case 1:
+      // If the second item is clicked (you can replace this with your desired action)
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SalesReport(), // Replace with your page
+        ),
+      );
+      break;
+    // Add more cases as needed
+    default:
+      // Handle any other cases or do nothing
+      break;
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
@@ -32,14 +60,7 @@ class AccountingGridMenu extends StatelessWidget {
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () {
-            if (index == 0) { // Jika item pertama diklik
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>  TransactionReport(),
-                ),
-              );
-            }
+            onItemTap(index, context);
           },
           child: AccountingMenuItem(
             title: menuItems[index]["title"]!,
@@ -105,4 +126,8 @@ class AccountingMenuItem extends StatelessWidget {
       ),
     );
   }
+
+  // Assuming you have a list or some identifier to handle the different cases
+
+
 }

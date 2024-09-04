@@ -1,10 +1,12 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/di/accounting_injection.dart';
 import 'package:akib_pos/di/injection_container.dart';
-import 'package:akib_pos/features/accounting/presentation/bloc/employee_cubit.dart';
-import 'package:akib_pos/features/accounting/presentation/bloc/transaction_list_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/date_range_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_report_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/employee_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/transaction_list_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report_cubit.dart';
-import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report_interaction_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/transaction_report_interaction_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_summary_cubit.dart';
 import 'package:akib_pos/features/auth/presentation/bloc/auth/auth_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
@@ -120,6 +122,12 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => TransactionReportCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => DateRangeCubit(),
+        ),
+        BlocProvider(
+          create: (context) => SalesReportCubit(repository: accountingInjection()),
         ),
 
       ],

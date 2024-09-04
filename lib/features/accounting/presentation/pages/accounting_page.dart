@@ -1,6 +1,6 @@
 import 'package:akib_pos/common/app_colors.dart';
-import 'package:akib_pos/features/accounting/data/models/employee.dart';
-import 'package:akib_pos/features/accounting/presentation/bloc/employee_cubit.dart';
+import 'package:akib_pos/features/accounting/data/models/transaction_report/employee.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/employee_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_summary_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/widgets/accounting_grid_menu.dart';
 import 'package:akib_pos/features/accounting/presentation/widgets/appbar_accounting_page.dart';

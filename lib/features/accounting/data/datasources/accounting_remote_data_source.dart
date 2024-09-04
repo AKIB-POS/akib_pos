@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'package:akib_pos/api/urls.dart';
 import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/features/accounting/data/models/accounting_transaction_reporrt_model.dart';
-import 'package:akib_pos/features/accounting/data/models/employee.dart';
-import 'package:akib_pos/features/accounting/data/models/transaction_report_model.dart';
-import 'package:akib_pos/features/accounting/data/models/transcation_summary_response.dart';
+import 'package:akib_pos/features/accounting/data/models/sales_report/sales_report_model.dart';
+import 'package:akib_pos/features/accounting/data/models/transaction_report/employee.dart';
+import 'package:akib_pos/features/accounting/data/models/transaction_report/transaction_report_model.dart';
+import 'package:akib_pos/features/accounting/data/models/transaction_report/transcation_summary_response.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
@@ -32,6 +33,12 @@ abstract class AccountingRemoteDataSource {
     required int employeeId,
     required String date,
   });
+
+  Future<SalesReportModel> getSalesReportSummary({
+    required int branchId,
+    required int companyId,
+    required String date,
+  });
 }
 
 class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
@@ -42,6 +49,33 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required this.client,
   });
 
+
+  @override
+  Future<SalesReportModel> getSalesReportSummary({
+    required int branchId,
+    required int companyId,
+    required String date,
+  }) async {
+    const url = '${URLs.baseUrlMock}/sales-report-summary';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branch_id': branchId.toString(),
+        'company_id': companyId.toString(),
+        'date': date,
+      }),
+      headers: _buildHeaders(),
+    ).timeout(Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      return SalesReportModel.fromJson(json.decode(response.body)['data']);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+
   @override
   Future<AccountingTransactionListResponse> getTopTransactions({
     required int branchId,
@@ -49,7 +83,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int employeeId,
     required String date,
   }) async {
-    final url = '${URLs.baseUrlMock}/today-top-transaction-report';
+    const url = '${URLs.baseUrlMock}/today-top-transaction-report';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),
@@ -76,7 +110,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int employeeId,
     required String date,
   }) async {
-    final url = '${URLs.baseUrlMock}/today-discount-transaction-report';
+    const url = '${URLs.baseUrlMock}/today-discount-transaction-report';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),
@@ -103,7 +137,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int employeeId,
     required String date,
   }) async {
-    final url = '${URLs.baseUrlMock}/today-transaction-report';
+    const url = '${URLs.baseUrlMock}/today-transaction-report';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),
