@@ -15,7 +15,7 @@ class SalesSummary extends StatelessWidget {
         if (state is SalesReportLoading) {
           return Container(
             color: AppColors.backgroundGrey,
-            padding: const EdgeInsets.only(top: 16),
+            padding: const EdgeInsets.symmetric(vertical: 16),
             child: Column(
               children: [
                 const Padding(
@@ -38,7 +38,9 @@ class SalesSummary extends StatelessWidget {
                     ],
                   ),
                 ),
+                
               ],
+              
             ),
           );
         } else if (state is SalesReportSuccess) {
@@ -66,6 +68,16 @@ class SalesSummary extends StatelessWidget {
                       ),
                     ],
                   ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 20),
+                  width: double.infinity,
+                  height: 20,
+                  decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20))),
                 ),
               ],
             ),

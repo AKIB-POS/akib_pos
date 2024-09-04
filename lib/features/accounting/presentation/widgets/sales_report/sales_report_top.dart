@@ -5,6 +5,7 @@ import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 
 class SalesReportTop extends StatelessWidget {
   final Function onDateTap;
@@ -90,24 +91,54 @@ class SalesReportTop extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       BlocBuilder<DateRangeCubit, String>(
-                        builder: (context, state) {
-  // Pisahkan rentang tanggal menjadi tanggal awal dan akhir
-  final dates = state.split(' - '); 
-  final startDate = dates[0];
-  final endDate = dates[1];
+  builder: (context, state) {
+    // Pisahkan rentang tanggal menjadi tanggal awal dan akhir
+    final dates = state.split(' - ');
+    final startDate = DateTime.parse(dates[0]);
+    final endDate = DateTime.parse(dates[1]);
 
-  // Periksa apakah tanggal awal dan akhir sama
-  final displayedDate = (startDate == endDate) ? startDate : state;
+    // Dapatkan tanggal hari ini
+    final today = DateTime.now();
+    final formattedToday = DateTime(today.year, today.month, today.day);
+    final formattedEndDate = DateTime(endDate.year, endDate.month, endDate.day);
 
-  return Text(
-    displayedDate,
-    style: TextStyle(
-      color: AppColors.primaryMain,
-      fontWeight: FontWeight.bold,
-    ),
-  );
-},
-                      ),
+    // Hitung selisih hari antara startDate dan endDate
+    final difference = formattedEndDate.difference(startDate).inDays + 1; // Adding 1 to count both startDate and endDate
+
+    // Periksa apakah rentang tanggal adalah 7 atau 30 hari terakhir
+    final isLast7Days = difference == 8 && formattedEndDate.isAtSameMomentAs(formattedToday);
+    final isLast30Days = difference == 31 && formattedEndDate.isAtSameMomentAs(formattedToday);
+
+    // Function to format date to 'd MMMM yyyy' (e.g., 8 Januari 2024)
+    String formatDate(DateTime date) {
+      return DateFormat('d MMMM yyyy', 'id').format(date);
+    }
+
+    // Tampilkan label atau rentang tanggal
+    String displayedDate;
+    if (isLast7Days) {
+      displayedDate = "7 Hari Terakhir";
+    } else if (isLast30Days) {
+      displayedDate = "30 Hari Terakhir";
+    } else {
+      // Format start and end dates if they are different
+      if (dates[0] == dates[1]) {
+        displayedDate = formatDate(startDate); // Single date
+      } else {
+        displayedDate = "${formatDate(startDate)} - ${formatDate(endDate)}"; // Custom range
+      }
+    }
+
+    return Text(
+      displayedDate,
+      style: const TextStyle(
+        color: AppColors.primaryMain,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  },
+),
+
                       SvgPicture.asset(
                         'assets/icons/accounting/ic_calendar.svg',
                         height: 20,

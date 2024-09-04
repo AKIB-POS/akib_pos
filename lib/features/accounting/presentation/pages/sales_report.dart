@@ -1,7 +1,10 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/features/accounting/data/models/sales_report/sold_product_model.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/date_range_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_product_report_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_report_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/widgets/sales_report/product_sold_card.dart';
 import 'package:akib_pos/features/accounting/presentation/widgets/sales_report/sales_report_top.dart';
 import 'package:akib_pos/features/accounting/presentation/widgets/sales_report/sales_summary.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
@@ -31,15 +34,16 @@ class _SalesReportState extends State<SalesReport> {
     branchId = _authSharedPref.getBranchId() ?? 0;
     companyId = _authSharedPref.getCompanyId() ?? 0;
 
-    _fetchSalesReport(DateFormat('yyyy-MM-dd').format(DateTime.now()));
+    _fetchSalesReport();
+    _fetchSoldProducts();
     super.initState();
   }
 
-  void _fetchSalesReport(String date) {
+  void _fetchSalesReport() {
     final dateRange = context
         .read<DateRangeCubit>()
         .state; // Dapatkan rentang tanggal dari cubit
-  
+
     // Gunakan startDate dan endDate untuk memanggil cubit
     context.read<SalesReportCubit>().fetchSalesReport(
           branchId: branchId,
@@ -48,14 +52,24 @@ class _SalesReportState extends State<SalesReport> {
         );
   }
 
+  void _fetchSoldProducts() {
+    final dateRange = context.read<DateRangeCubit>().state;
+    context.read<SalesProductReportCubit>().fetchSoldProducts(
+          branchId: branchId,
+          companyId: companyId,
+          date: dateRange,
+        );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: RefreshIndicator(
+        color: AppColors.primaryMain,
         onRefresh: () async {
-          _fetchSalesReport(DateFormat('yyyy-MM-dd')
-              .format(customStartDate ?? DateTime.now()));
+          _fetchSalesReport();
+          _fetchSoldProducts();
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -65,6 +79,8 @@ class _SalesReportState extends State<SalesReport> {
                 onDateTap: () => _selectDate(context),
               ),
               const SalesSummary(), // Memanggil widget SalesSummary
+              const ProductSoldCard()
+
             ],
           ),
         ),
@@ -72,6 +88,7 @@ class _SalesReportState extends State<SalesReport> {
     );
   }
 
+ 
   void _selectDate(BuildContext context) async {
     await showModalBottomSheet(
       shape: const RoundedRectangleBorder(
@@ -202,10 +219,10 @@ class _SalesReportState extends State<SalesReport> {
                                 } else {
                                   endDateFirstDate = startDate;
                                   endDateLastDate = startDate
-                                          .add(Duration(days: 30))
+                                          .add(const Duration(days: 30))
                                           .isAfter(today)
                                       ? today
-                                      : startDate.add(Duration(days: 30));
+                                      : startDate.add(const Duration(days: 30));
                                 }
 
                                 // Memanggil dialog untuk memilih tanggal akhir
@@ -267,7 +284,8 @@ class _SalesReportState extends State<SalesReport> {
                           }
 
                           // Setelah memilih rentang tanggal, muat ulang data
-                          _fetchSalesReport(cubit.state);
+                          _fetchSalesReport();
+                          _fetchSoldProducts();
                         },
                         child: const Text(
                           'Terapkan',
@@ -293,7 +311,7 @@ class _SalesReportState extends State<SalesReport> {
       builder: (BuildContext context) {
         return Theme(
           data: ThemeData.light().copyWith(
-            colorScheme: ColorScheme.light(
+            colorScheme: const ColorScheme.light(
               primary: AppColors.primaryMain,
             ),
           ),

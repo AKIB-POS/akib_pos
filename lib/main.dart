@@ -2,6 +2,7 @@ import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/di/accounting_injection.dart';
 import 'package:akib_pos/di/injection_container.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/date_range_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_product_report_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_report_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/employee_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/transaction_list_cubit.dart';
@@ -34,17 +35,24 @@ import 'package:sizer/sizer.dart';
 import 'package:akib_pos/di/injection_container.dart' as di;
 import 'package:akib_pos/di/accounting_injection.dart' as accounting;
 import 'firebase_options.dart';
+import 'package:intl/date_symbol_data_local.dart';  // <-- This line imports the initializeDateFormatting function
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  initializeDateFormatting('id', null).then((_) {
+    runApp(MyApp());
+  });
   await _requestPermissions(); 
   //for auth and cashier injection initialization
   await di.init();
   //for accounting injection initialization
   await accounting.initAccountingModule();
+
+
 
   runApp(
     MultiBlocProvider(
@@ -128,6 +136,9 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => SalesReportCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => SalesProductReportCubit(repository: accountingInjection()),
         ),
 
       ],

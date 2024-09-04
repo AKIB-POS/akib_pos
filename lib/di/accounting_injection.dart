@@ -1,6 +1,7 @@
 import 'package:akib_pos/features/accounting/data/datasources/accounting_remote_data_source.dart';
 import 'package:akib_pos/features/accounting/data/datasources/local/employee_shared_pref.dart';
 import 'package:akib_pos/features/accounting/data/repositories/accounting_repository.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_product_report_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_report_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/employee_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/transaction_list_cubit.dart';
@@ -34,6 +35,10 @@ Future<void> initAccountingModule() async {
 
   accountingInjection.registerFactory(
     () => TransactionReportInteractionCubit(employeeSharedPref: accountingInjection())
+  );
+
+  accountingInjection.registerFactory(
+    () => SalesProductReportCubit(repository: accountingInjection()),
   );
 
 

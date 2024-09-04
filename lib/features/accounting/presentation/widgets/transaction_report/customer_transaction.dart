@@ -1,6 +1,7 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/accounting/data/models/accounting_transaction_reporrt_model.dart';
+import 'package:akib_pos/features/accounting/data/models/sales_report/sold_product_model.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/transaction_list_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/transaction_report_interaction_cubit.dart';
@@ -10,6 +11,7 @@ import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/a
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 
 
@@ -142,6 +144,8 @@ class CustomerTransaction extends StatelessWidget {
       ),
     );
   }
+
+  
 
   Widget _buildTransactionList(List<AccountingTransactionReportModel> transactions) {
     return ListView.builder(
