@@ -1,4 +1,5 @@
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/features/accounting/presentation/pages/purchasing_report.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/sales_report.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/transaction_report.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +35,14 @@ class AccountingGridMenu extends StatelessWidget {
         context,
         MaterialPageRoute(
           builder: (context) => SalesReport(), // Replace with your page
+        ),
+      );
+    case 2:
+      // If the second item is clicked (you can replace this with your desired action)
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PurchasingReport(), // Replace with your page
         ),
       );
       break;

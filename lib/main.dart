@@ -1,6 +1,8 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/di/accounting_injection.dart';
 import 'package:akib_pos/di/injection_container.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/date_range_pruchase_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/total_purchase_model.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/date_range_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_product_report_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_report_cubit.dart';
@@ -140,7 +142,12 @@ void main() async {
         BlocProvider(
           create: (context) => SalesProductReportCubit(repository: accountingInjection()),
         ),
-
+        BlocProvider(
+          create: (context) => DateRangePurchaseCubit(),
+        ),
+        BlocProvider(
+          create: (context) => TotalPurchaseCubit(repository: accountingInjection()),
+        ),
       ],
       child: MyApp(),
     ),
