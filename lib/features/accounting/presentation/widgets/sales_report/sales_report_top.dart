@@ -31,7 +31,7 @@ class SalesReportTop extends StatelessWidget {
                 Navigator.of(context).pop();
               },
             ),
-            leadingWidth: 20,
+            titleSpacing: 0,
             title: const Text(
               'Laporan Penjualan',
               style: AppTextStyle.headline5,

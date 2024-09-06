@@ -1,3 +1,4 @@
+import 'package:akib_pos/features/accounting/presentation/pages/asset_management/asset_management.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/cash_flow_report.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/expenditure_report.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/purchasing_report.dart';
@@ -40,6 +41,7 @@ class AccountingGridMenu extends StatelessWidget {
           builder: (context) => const SalesReport(), // Replace with your page
         ),
       );
+      break;
     case 2:
       // If the second item is clicked (you can replace this with your desired action)
       Navigator.push(
@@ -48,6 +50,7 @@ class AccountingGridMenu extends StatelessWidget {
           builder: (context) => const PurchasingReport(), // Replace with your page
         ),
       );
+      break;
     case 3:
       // If the second item is clicked (you can replace this with your desired action)
       Navigator.push(
@@ -56,12 +59,22 @@ class AccountingGridMenu extends StatelessWidget {
           builder: (context) => const ExpenditureReport(), // Replace with your page
         ),
       );
+      break;
     case 6:
       // If the second item is clicked (you can replace this with your desired action)
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => const CashFlowReport(), // Replace with your page
+        ),
+      );
+      break;
+    case 8:
+      // If the second item is clicked (you can replace this with your desired action)
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const AssetManagement(), // Replace with your page
         ),
       );
       break;

@@ -3,6 +3,7 @@ import 'package:akib_pos/core/error/failures.dart';
 import 'package:akib_pos/features/accounting/data/datasources/accounting_remote_data_source.dart';
 import 'package:akib_pos/features/accounting/data/datasources/local/employee_shared_pref.dart';
 import 'package:akib_pos/features/accounting/data/models/accounting_transaction_reporrt_model.dart';
+import 'package:akib_pos/features/accounting/data/models/asset_management/pending_asset_model.dart';
 import 'package:akib_pos/features/accounting/data/models/cash_flow_report/cash_flow_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/expenditure_report/purchased_product_model.dart';
 import 'package:akib_pos/features/accounting/data/models/expenditure_report/total_expenditure.dart';
@@ -77,6 +78,12 @@ abstract class AccountingRepository {
   });
 
   Future<Either<Failure, CashFlowReportModel>> getCashFlowReport(int branchId, int companyId, String date);
+
+
+  Future<Either<Failure, List<PendingAssetModel>>> getPendingAssets({
+    required int branchId,
+    required int companyId,
+  });
   
 }
 
@@ -92,6 +99,25 @@ class AccountingRepositoryImpl implements AccountingRepository {
     required this.employeeSharedPref,
     required this.connectivity,
     });
+
+
+   @override
+  Future<Either<Failure, List<PendingAssetModel>>> getPendingAssets({
+    required int branchId,
+    required int companyId,
+  }) async {
+    try {
+      final pendingAssets = await remoteDataSource.getPendingAssets(
+        branchId: branchId,
+        companyId: companyId,
+      );
+      return Right(pendingAssets);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
 
   @override

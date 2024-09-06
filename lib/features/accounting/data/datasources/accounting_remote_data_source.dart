@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:akib_pos/api/urls.dart';
 import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/features/accounting/data/models/accounting_transaction_reporrt_model.dart';
+import 'package:akib_pos/features/accounting/data/models/asset_management/pending_asset_model.dart';
 import 'package:akib_pos/features/accounting/data/models/cash_flow_report/cash_flow_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/expenditure_report/purchased_product_model.dart';
 import 'package:akib_pos/features/accounting/data/models/expenditure_report/total_expenditure.dart';
@@ -78,6 +79,11 @@ abstract class AccountingRemoteDataSource {
 
   Future<CashFlowReportModel> getCashFlowReport(int branchId, int companyId, String date);
 
+   Future<List<PendingAssetModel>> getPendingAssets({
+    required int branchId,
+    required int companyId,
+  });
+
 }
 
 class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
@@ -87,6 +93,33 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
   AccountingRemoteDataSourceImpl({
     required this.client,
   });
+
+
+  @override
+  Future<List<PendingAssetModel>> getPendingAssets({
+    required int branchId,
+    required int companyId,
+  }) async {
+    const url = '${URLs.baseUrlMock}/pending-assets';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branch_id': branchId.toString(),
+        'company_id': companyId.toString(),
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return (jsonResponse['data'] as List)
+          .map((item) => PendingAssetModel.fromJson(item))
+          .toList();
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
 
   @override
   Future<CashFlowReportModel> getCashFlowReport(int branchId, int companyId, String date) async {

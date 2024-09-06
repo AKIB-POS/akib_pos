@@ -32,7 +32,7 @@ class PurchasingReportTop extends StatelessWidget {
                 Navigator.of(context).pop();
               },
             ),
-            leadingWidth: 20,
+            titleSpacing: 0,
             title: const Text(
               'Laporan Pembelian',
               style: AppTextStyle.headline5,

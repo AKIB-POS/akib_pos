@@ -31,7 +31,7 @@ class ExpenditureReportTop extends StatelessWidget {
                 Navigator.of(context).pop();
               },
             ),
-            leadingWidth: 20,
+            titleSpacing: 0,
             title: const Text(
               'Laporan Pengeluaran',
               style: AppTextStyle.headline5,

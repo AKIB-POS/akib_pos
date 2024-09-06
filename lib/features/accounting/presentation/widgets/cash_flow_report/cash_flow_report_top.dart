@@ -31,7 +31,7 @@ class CashFlowReportTop extends StatelessWidget {
                 Navigator.of(context).pop();
               },
             ),
-            leadingWidth: 20,
+            titleSpacing: 0,
             title: const Text(
               'Arus Kas',
               style: AppTextStyle.headline5,
