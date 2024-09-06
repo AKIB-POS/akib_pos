@@ -1,5 +1,6 @@
 import 'package:akib_pos/features/accounting/data/datasources/accounting_remote_data_source.dart';
 import 'package:akib_pos/features/accounting/data/datasources/local/employee_shared_pref.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/active_asset_cubit.dart';
 import 'package:akib_pos/features/accounting/data/repositories/accounting_repository.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/pending_asset_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/cash_flow_report/cash_flow_report_cubit.dart';
@@ -69,6 +70,9 @@ Future<void> initAccountingModule() async {
   );
   accountingInjection.registerFactory(
     () => PendingAssetCubit(accountingInjection()),
+  );
+  accountingInjection.registerFactory(
+    () => ActiveAssetCubit(accountingInjection()),
   );
 
   // Repository

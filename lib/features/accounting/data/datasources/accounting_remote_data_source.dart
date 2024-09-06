@@ -4,6 +4,7 @@ import 'package:akib_pos/api/urls.dart';
 import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/features/accounting/data/models/accounting_transaction_reporrt_model.dart';
 import 'package:akib_pos/features/accounting/data/models/asset_management/pending_asset_model.dart';
+import 'package:akib_pos/features/accounting/data/models/asset_management/sold_asset_model.dart';
 import 'package:akib_pos/features/accounting/data/models/cash_flow_report/cash_flow_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/expenditure_report/purchased_product_model.dart';
 import 'package:akib_pos/features/accounting/data/models/expenditure_report/total_expenditure.dart';
@@ -14,6 +15,7 @@ import 'package:akib_pos/features/accounting/data/models/transaction_report/empl
 import 'package:akib_pos/features/accounting/data/models/transaction_report/transaction_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/transaction_report/transcation_summary_response.dart';
 import 'package:akib_pos/features/accounting/data/models/purchasing_report/total_purchase_model.dart';
+import 'package:akib_pos/features/accounting/data/models/asset_management/active_asset_model.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
@@ -84,6 +86,16 @@ abstract class AccountingRemoteDataSource {
     required int companyId,
   });
 
+  Future<List<ActiveAssetModel>> getActiveAssets({
+    required int branchId,
+    required int companyId,
+  });
+
+   Future<List<SoldAssetModel>> getSoldAssets({
+    required int branchId,
+    required int companyId,
+  });
+
 }
 
 class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
@@ -93,6 +105,58 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
   AccountingRemoteDataSourceImpl({
     required this.client,
   });
+
+
+  @override
+  Future<List<SoldAssetModel>> getSoldAssets({
+    required int branchId,
+    required int companyId,
+  }) async {
+    const url = '${URLs.baseUrlMock}/sold-assets';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branch_id': branchId.toString(),
+        'company_id': companyId.toString(),
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body)['data'] as List;
+      return jsonResponse.map((asset) => SoldAssetModel.fromJson(asset)).toList();
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+
+  @override
+  Future<List<ActiveAssetModel>> getActiveAssets({
+    required int branchId,
+    required int companyId,
+  }) async {
+    const url = '${URLs.baseUrlMock}/active-assets';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branch_id': branchId.toString(),
+        'company_id': companyId.toString(),
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return (jsonResponse['data'] as List)
+          .map((e) => ActiveAssetModel.fromJson(e))
+          .toList();
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
 
 
   @override

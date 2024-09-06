@@ -1,3 +1,4 @@
+import 'package:akib_pos/core/error/failures.dart';
 import 'package:akib_pos/features/accounting/data/models/asset_management/pending_asset_model.dart';
 import 'package:akib_pos/features/accounting/data/repositories/accounting_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,8 +21,16 @@ class PendingAssetCubit extends Cubit<PendingAssetState> {
     );
 
     result.fold(
-      (failure) => emit(PendingAssetError('Failed to load pending assets')),
-      (pendingAssets) => emit(PendingAssetLoaded(pendingAssets)),
+      (failure) {
+        if (failure is GeneralFailure) {
+          emit(PendingAssetError(failure.message));
+        } else {
+          emit(PendingAssetError('Failed to fetch active assets.'));
+        }
+      },
+      (activeAssets) {
+        emit(PendingAssetLoaded(activeAssets));
+      },
     );
   }
 }

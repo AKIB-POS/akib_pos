@@ -4,6 +4,7 @@ import 'package:akib_pos/features/accounting/data/datasources/accounting_remote_
 import 'package:akib_pos/features/accounting/data/datasources/local/employee_shared_pref.dart';
 import 'package:akib_pos/features/accounting/data/models/accounting_transaction_reporrt_model.dart';
 import 'package:akib_pos/features/accounting/data/models/asset_management/pending_asset_model.dart';
+import 'package:akib_pos/features/accounting/data/models/asset_management/sold_asset_model.dart';
 import 'package:akib_pos/features/accounting/data/models/cash_flow_report/cash_flow_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/expenditure_report/purchased_product_model.dart';
 import 'package:akib_pos/features/accounting/data/models/expenditure_report/total_expenditure.dart';
@@ -14,6 +15,7 @@ import 'package:akib_pos/features/accounting/data/models/transaction_report/empl
 import 'package:akib_pos/features/accounting/data/models/transaction_report/transaction_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/transaction_report/transcation_summary_response.dart';
 import 'package:akib_pos/features/accounting/data/models/purchasing_report/total_purchase_model.dart';
+import 'package:akib_pos/features/accounting/data/models/asset_management/active_asset_model.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dartz/dartz.dart';
 
@@ -84,7 +86,19 @@ abstract class AccountingRepository {
     required int branchId,
     required int companyId,
   });
+
+
+   Future<Either<Failure, List<ActiveAssetModel>>> getActiveAssets({
+    required int branchId,
+    required int companyId,
+  });
   
+
+  Future<Either<Failure, List<SoldAssetModel>>> getSoldAssets({
+    required int branchId,
+    required int companyId,
+  });
+
 }
 
 class AccountingRepositoryImpl implements AccountingRepository {
@@ -99,6 +113,44 @@ class AccountingRepositoryImpl implements AccountingRepository {
     required this.employeeSharedPref,
     required this.connectivity,
     });
+
+
+    @override
+  Future<Either<Failure, List<SoldAssetModel>>> getSoldAssets({
+    required int branchId,
+    required int companyId,
+  }) async {
+    try {
+      final soldAssets = await remoteDataSource.getSoldAssets(
+        branchId: branchId,
+        companyId: companyId,
+      );
+      return Right(soldAssets);
+    } on ServerException {
+      return Left(ServerFailure()); // Custom failure handler
+    } catch (e) {
+      return Left(GeneralFailure(e.toString())); // Catch any unexpected error
+    }
+  }
+
+    @override
+  Future<Either<Failure, List<ActiveAssetModel>>> getActiveAssets({
+    required int branchId,
+    required int companyId,
+  }) async {
+    try {
+      final activeAssets = await remoteDataSource.getActiveAssets(
+        branchId: branchId,
+        companyId: companyId,
+      );
+      return Right(activeAssets);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
 
 
    @override

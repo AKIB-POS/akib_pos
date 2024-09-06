@@ -2,6 +2,7 @@ import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/accounting/data/models/purchasing_report/purchasing_item_model.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/accounting_page.dart';
+import 'package:akib_pos/features/accounting/presentation/pages/asset_management/active_asset.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/asset_management/pending_asset.dart';
 import 'package:flutter/material.dart';
 
@@ -34,13 +35,13 @@ class AssetManagement extends StatelessWidget {
             _buildMenuItem(
               context,
               title: 'Aset Tertunda',
-              onTap: () => _navigateToPage(context,  PendingAssetPage()),
+              onTap: () => _navigateToPage(context,  const PendingAssetPage()),
             ),
             const SizedBox(height: 16),
             _buildMenuItem(
               context,
               title: 'Aset Aktif',
-              onTap: () => _navigateToPage(context,  AccountingPage()),
+              onTap: () => _navigateToPage(context,  const ActiveAssetPage()),
             ),
             const SizedBox(height: 16),
             _buildMenuItem(
