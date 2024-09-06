@@ -3,6 +3,9 @@ import 'package:akib_pos/core/error/failures.dart';
 import 'package:akib_pos/features/accounting/data/datasources/accounting_remote_data_source.dart';
 import 'package:akib_pos/features/accounting/data/datasources/local/employee_shared_pref.dart';
 import 'package:akib_pos/features/accounting/data/models/accounting_transaction_reporrt_model.dart';
+import 'package:akib_pos/features/accounting/data/models/cash_flow_report/cash_flow_report_model.dart';
+import 'package:akib_pos/features/accounting/data/models/expenditure_report/purchased_product_model.dart';
+import 'package:akib_pos/features/accounting/data/models/expenditure_report/total_expenditure.dart';
 import 'package:akib_pos/features/accounting/data/models/purchasing_report/purchasing_item_model.dart';
 import 'package:akib_pos/features/accounting/data/models/sales_report/sales_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/sales_report/sold_product_model.dart';
@@ -60,6 +63,21 @@ abstract class AccountingRepository {
     required int companyId,
     required String date,
   });
+
+  Future<Either<Failure, TotalExpenditureModel>> getTotalExpenditure({
+    required int branchId,
+    required int companyId,
+    required String date,
+  });
+
+  Future<Either<Failure, List<PurchasedProductModel>>> getPurchasedProducts({
+    required int branchId,
+    required int companyId,
+    required String date,
+  });
+
+  Future<Either<Failure, CashFlowReportModel>> getCashFlowReport(int branchId, int companyId, String date);
+  
 }
 
 class AccountingRepositoryImpl implements AccountingRepository {
@@ -74,6 +92,67 @@ class AccountingRepositoryImpl implements AccountingRepository {
     required this.employeeSharedPref,
     required this.connectivity,
     });
+
+
+  @override
+  Future<Either<Failure, CashFlowReportModel>> getCashFlowReport(int branchId, int companyId, String date) async {
+    try {
+      final cashFlowReport = await remoteDataSource.getCashFlowReport(branchId, companyId, date);
+      return Right(cashFlowReport);
+    } on ServerException {
+      return Left(ServerFailure()); // Custom failure handler
+    } catch (e) {
+      return Left(GeneralFailure(e.toString())); // Catch any unexpected error
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<PurchasedProductModel>>> getPurchasedProducts({
+    required int branchId,
+    required int companyId,
+    required String date,
+  }) async {
+    try {
+      final response = await remoteDataSource.getPurchasedProducts(
+        branchId: branchId,
+        companyId: companyId,
+        date: date,
+      );
+      return Right(response);
+    } catch (e) {
+      if (e is GeneralException) {
+        return Left(GeneralFailure(e.message));
+      } else if (e is ServerException) {
+        return Left(ServerFailure());
+      } else {
+        return Left(GeneralFailure("Unexpected error occurred"));
+      }
+    }
+  }
+
+  @override
+  Future<Either<Failure, TotalExpenditureModel>> getTotalExpenditure({
+    required int branchId,
+    required int companyId,
+    required String date,
+  }) async {
+    try {
+      final response = await remoteDataSource.getTotalExpenditure(
+        branchId: branchId,
+        companyId: companyId,
+        date: date,
+      );
+      return Right(response);
+    } catch (e) {
+      if (e is GeneralException) {
+        return Left(GeneralFailure(e.message));
+      } else if (e is ServerException) {
+        return Left(ServerFailure());
+      } else {
+        return Left(GeneralFailure("Unexpected error occurred"));
+      }
+    }
+  }
 
 
   @override

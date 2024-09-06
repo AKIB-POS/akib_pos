@@ -1,6 +1,9 @@
 import 'package:akib_pos/features/accounting/data/datasources/accounting_remote_data_source.dart';
 import 'package:akib_pos/features/accounting/data/datasources/local/employee_shared_pref.dart';
 import 'package:akib_pos/features/accounting/data/repositories/accounting_repository.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/cash_flow_report/cash_flow_report_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/expenditure_report/purchased_product_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/expenditure_report/total_expenditure_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/purchase_list_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/total_purchase_model.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_product_report_cubit.dart';
@@ -19,7 +22,6 @@ Future<void> initAccountingModule() async {
   //! Features - Accounting
   // Cubit
 
-
   accountingInjection.registerFactory(
     () => EmployeeCubit(repository: accountingInjection()),
   );
@@ -28,7 +30,6 @@ Future<void> initAccountingModule() async {
     () => TransactionReportCubit(repository: accountingInjection()),
   );
 
-
   accountingInjection.registerFactory(
     () => TransactionSummaryCubit(repository: accountingInjection()),
   );
@@ -36,21 +37,25 @@ Future<void> initAccountingModule() async {
     () => TransactionListCubit(repository: accountingInjection()),
   );
 
-  accountingInjection.registerFactory(
-    () => TransactionReportInteractionCubit(employeeSharedPref: accountingInjection())
-  );
+  accountingInjection.registerFactory(() => TransactionReportInteractionCubit(
+      employeeSharedPref: accountingInjection()));
 
   accountingInjection.registerFactory(
     () => SalesProductReportCubit(repository: accountingInjection()),
   );
 
+  accountingInjection.registerFactory(
+    () => PurchasedProductCubit(repository: accountingInjection()),
+  );
 
+  accountingInjection.registerFactory(
+      () => CashFlowReportCubit(repository: accountingInjection()));
 
   accountingInjection.registerFactory(
     () => SalesReportCubit(repository: accountingInjection()),
   );
 
-   accountingInjection.registerFactory(
+  accountingInjection.registerFactory(
     () => TotalPurchaseCubit(repository: accountingInjection()),
   );
 
@@ -58,6 +63,9 @@ Future<void> initAccountingModule() async {
     () => PurchaseListCubit(repository: accountingInjection()),
   );
 
+  accountingInjection.registerFactory(
+    () => TotalExpenditureCubit(repository: accountingInjection()),
+  );
 
   // Repository
   accountingInjection.registerLazySingleton<AccountingRepository>(
@@ -76,6 +84,4 @@ Future<void> initAccountingModule() async {
   accountingInjection.registerLazySingleton<EmployeeSharedPref>(
     () => EmployeeSharedPref(accountingInjection()),
   );
-
-
 }

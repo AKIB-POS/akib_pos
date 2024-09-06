@@ -1,25 +1,25 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
-import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/date_range_pruchase_cubit.dart';
-import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/purchase_list_cubit.dart';
-import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/total_purchase_model.dart';
-import 'package:akib_pos/features/accounting/presentation/widgets/purchasing_report/purchase_list_card.dart';
-import 'package:akib_pos/features/accounting/presentation/widgets/purchasing_report/purchasing_report_summary.dart';
-import 'package:akib_pos/features/accounting/presentation/widgets/purchasing_report/purchasing_report_top.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/cash_flow_report/cash_flow_report_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/cash_flow_report/date_range_cash_flow_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/widgets/cash_flow_report/cash_flow_report_top.dart';
+import 'package:akib_pos/features/accounting/presentation/widgets/cash_flow_report/final_cash_balance_widget.dart';
+import 'package:akib_pos/features/accounting/presentation/widgets/cash_flow_report/financing_activity_widget.dart';
+import 'package:akib_pos/features/accounting/presentation/widgets/cash_flow_report/investment_activity_widget.dart';
+import 'package:akib_pos/features/accounting/presentation/widgets/cash_flow_report/operational_activity_widget.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:intl/intl.dart';
 
-class PurchasingReport extends StatefulWidget {
-  const PurchasingReport({super.key});
+class CashFlowReport extends StatefulWidget {
+  const CashFlowReport({super.key});
 
   @override
-  State<PurchasingReport> createState() => _PurchasingReportState();
+  State<CashFlowReport> createState() => _CashFlowReportState();
 }
 
-class _PurchasingReportState extends State<PurchasingReport> {
+class _CashFlowReportState extends State<CashFlowReport> {
   late final AuthSharedPref _authSharedPref;
   late final int branchId;
   late final int companyId;
@@ -28,64 +28,53 @@ class _PurchasingReportState extends State<PurchasingReport> {
 
   @override
   void initState() {
-    _authSharedPref = GetIt.instance<AuthSharedPref>();
+     _authSharedPref = GetIt.instance<AuthSharedPref>();
     branchId = _authSharedPref.getBranchId() ?? 0;
     companyId = _authSharedPref.getCompanyId() ?? 0;
-
-    _fetchTotalPurchase();
-    _fetchPurchaseList();
+    _fetchCashFlowReport();
     super.initState();
   }
 
-  void _fetchTotalPurchase() {
-    final dateRange = context.read<DateRangePurchaseCubit>().state; // Dapatkan rentang tanggal dari cubit
+  void _fetchCashFlowReport() {
+    final dateRange = context
+        .read<DateRangeCashFlowCubit>()
+        .state; // Dapatkan rentang tanggal dari cubit
 
-    context.read<TotalPurchaseCubit>().fetchTotalPurchase(
-          branchId: branchId,
-          companyId: companyId,
-          date: dateRange, // Gunakan tanggal dari rentang yang dipilih
-        );
-  }
-  void _fetchPurchaseList() {
-    final dateRange = context.read<DateRangePurchaseCubit>().state; // Dapatkan rentang tanggal dari cubit
-
-    context.read<PurchaseListCubit>().fetchTotalPurchaseList(
-          branchId: branchId,
-          companyId: companyId,
-          date: dateRange, // Gunakan tanggal dari rentang yang dipilih
+    context.read<CashFlowReportCubit>().fetchCashFlowReport(
+          branchId,
+          companyId,
+          dateRange, // Gunakan tanggal dari rentang yang dipilih
         );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.backgroundGrey,
       body: RefreshIndicator(
         color: AppColors.primaryMain,
         onRefresh: () async {
-          _fetchTotalPurchase();
-          _fetchPurchaseList();
+          _fetchCashFlowReport();
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              PurchasingReportTop(
+              CashFlowReportTop(
                 onDateTap: () => _selectDate(context),
               ),
-              const PurchasingReportSummary(),
-              const Padding(
-                padding: EdgeInsets.only(left: 16,bottom: 16),
-                child: Text("Laporan Pembelian",style: AppTextStyle.headline5,),
-              ),
-              PurchaseListCard()
+              const OperasionalActivityWidget(),
+              const InvestmentActivityWidget(),
+              const FinancingActivityWidget(),
+              const FinalCashBalanceWidget(),
             ],
           ),
         ),
       ),
     );
   }
+
+ 
 
   void _selectDate(BuildContext context) async {
     await showModalBottomSheet(
@@ -99,7 +88,7 @@ class _PurchasingReportState extends State<PurchasingReport> {
       builder: (context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
-            final cubit = context.read<DateRangePurchaseCubit>();
+            final cubit = context.read<DateRangeCashFlowCubit>();
             DateRangeOption tempSelectedOption = cubit.selectedOption;
             return Container(
               width: double.infinity,
@@ -282,8 +271,7 @@ class _PurchasingReportState extends State<PurchasingReport> {
                           }
 
                           // Setelah memilih rentang tanggal, muat ulang data
-                          _fetchTotalPurchase();
-                          _fetchPurchaseList();
+                          _fetchCashFlowReport();
                         },
                         child: const Text(
                           'Terapkan',
@@ -299,8 +287,6 @@ class _PurchasingReportState extends State<PurchasingReport> {
       },
     );
   }
-
-
 
   Future<DateTime?> _selectCustomDate(BuildContext context,
       DateTime initialDate, DateTime firstDate, DateTime lastDate) async {
@@ -362,11 +348,9 @@ class _PurchasingReportState extends State<PurchasingReport> {
     return selectedDate;
   }
 
-
-   String _formatDate(DateTime date) {
+  String _formatDate(DateTime date) {
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
-
 
   String _getOptionTitle(DateRangeOption option) {
     switch (option) {
@@ -380,4 +364,6 @@ class _PurchasingReportState extends State<PurchasingReport> {
         return 'Pilih Tanggal Sendiri';
     }
   }
+  
+ 
 }

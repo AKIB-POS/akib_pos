@@ -1,25 +1,24 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
-import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/date_range_pruchase_cubit.dart';
-import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/purchase_list_cubit.dart';
-import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/total_purchase_model.dart';
-import 'package:akib_pos/features/accounting/presentation/widgets/purchasing_report/purchase_list_card.dart';
-import 'package:akib_pos/features/accounting/presentation/widgets/purchasing_report/purchasing_report_summary.dart';
-import 'package:akib_pos/features/accounting/presentation/widgets/purchasing_report/purchasing_report_top.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/expenditure_report/date_range_expenditure_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/expenditure_report/purchased_product_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/expenditure_report/total_expenditure_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/widgets/expenditure_report/expenditure_report_summary.dart';
+import 'package:akib_pos/features/accounting/presentation/widgets/expenditure_report/expenditure_report_top.dart';
+import 'package:akib_pos/features/accounting/presentation/widgets/expenditure_report/purchase_product_card.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:intl/intl.dart';
 
-class PurchasingReport extends StatefulWidget {
-  const PurchasingReport({super.key});
+class ExpenditureReport extends StatefulWidget {
+  const ExpenditureReport({super.key});
 
   @override
-  State<PurchasingReport> createState() => _PurchasingReportState();
+  State<ExpenditureReport> createState() => _ExpenditureReportState();
 }
 
-class _PurchasingReportState extends State<PurchasingReport> {
+class _ExpenditureReportState extends State<ExpenditureReport> {
   late final AuthSharedPref _authSharedPref;
   late final int branchId;
   late final int companyId;
@@ -32,24 +31,26 @@ class _PurchasingReportState extends State<PurchasingReport> {
     branchId = _authSharedPref.getBranchId() ?? 0;
     companyId = _authSharedPref.getCompanyId() ?? 0;
 
-    _fetchTotalPurchase();
-    _fetchPurchaseList();
+    _fetchTotalExpenditure();
+    _fetchPurchasedProduct();
+
     super.initState();
   }
 
-  void _fetchTotalPurchase() {
-    final dateRange = context.read<DateRangePurchaseCubit>().state; // Dapatkan rentang tanggal dari cubit
+  void _fetchTotalExpenditure() {
+    final dateRange = context.read<DateRangeExpenditureCubit>().state; // Dapatkan rentang tanggal dari cubit
 
-    context.read<TotalPurchaseCubit>().fetchTotalPurchase(
+    context.read<TotalExpenditureCubit>().fetchTotalExpenditure(
           branchId: branchId,
           companyId: companyId,
           date: dateRange, // Gunakan tanggal dari rentang yang dipilih
         );
   }
-  void _fetchPurchaseList() {
-    final dateRange = context.read<DateRangePurchaseCubit>().state; // Dapatkan rentang tanggal dari cubit
 
-    context.read<PurchaseListCubit>().fetchTotalPurchaseList(
+  void _fetchPurchasedProduct() {
+    final dateRange = context.read<DateRangeExpenditureCubit>().state; // Dapatkan rentang tanggal dari cubit
+
+    context.read<PurchasedProductCubit>().fetchPurchasedProducts(
           branchId: branchId,
           companyId: companyId,
           date: dateRange, // Gunakan tanggal dari rentang yang dipilih
@@ -63,23 +64,23 @@ class _PurchasingReportState extends State<PurchasingReport> {
       body: RefreshIndicator(
         color: AppColors.primaryMain,
         onRefresh: () async {
-          _fetchTotalPurchase();
-          _fetchPurchaseList();
+          _fetchTotalExpenditure();
+          _fetchPurchasedProduct();
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              PurchasingReportTop(
+              ExpenditureReportTop(
                 onDateTap: () => _selectDate(context),
               ),
-              const PurchasingReportSummary(),
+              const ExpenditureReportSummary(),
               const Padding(
                 padding: EdgeInsets.only(left: 16,bottom: 16),
-                child: Text("Laporan Pembelian",style: AppTextStyle.headline5,),
+                child: Text("Produk Dibeli",style: AppTextStyle.headline5,),
               ),
-              PurchaseListCard()
+              const PurchasedProductCard()
             ],
           ),
         ),
@@ -87,7 +88,8 @@ class _PurchasingReportState extends State<PurchasingReport> {
     );
   }
 
-  void _selectDate(BuildContext context) async {
+
+ void _selectDate(BuildContext context) async {
     await showModalBottomSheet(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
@@ -99,7 +101,7 @@ class _PurchasingReportState extends State<PurchasingReport> {
       builder: (context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
-            final cubit = context.read<DateRangePurchaseCubit>();
+            final cubit = context.read<DateRangeExpenditureCubit>();
             DateRangeOption tempSelectedOption = cubit.selectedOption;
             return Container(
               width: double.infinity,
@@ -282,8 +284,8 @@ class _PurchasingReportState extends State<PurchasingReport> {
                           }
 
                           // Setelah memilih rentang tanggal, muat ulang data
-                          _fetchTotalPurchase();
-                          _fetchPurchaseList();
+                          _fetchPurchasedProduct();
+                          _fetchTotalExpenditure();
                         },
                         child: const Text(
                           'Terapkan',
@@ -299,8 +301,6 @@ class _PurchasingReportState extends State<PurchasingReport> {
       },
     );
   }
-
-
 
   Future<DateTime?> _selectCustomDate(BuildContext context,
       DateTime initialDate, DateTime firstDate, DateTime lastDate) async {
@@ -362,11 +362,9 @@ class _PurchasingReportState extends State<PurchasingReport> {
     return selectedDate;
   }
 
-
-   String _formatDate(DateTime date) {
+  String _formatDate(DateTime date) {
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
-
 
   String _getOptionTitle(DateRangeOption option) {
     switch (option) {

@@ -1,6 +1,11 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/di/accounting_injection.dart';
 import 'package:akib_pos/di/injection_container.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/cash_flow_report/cash_flow_report_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/cash_flow_report/date_range_cash_flow_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/expenditure_report/date_range_expenditure_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/expenditure_report/purchased_product_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/expenditure_report/total_expenditure_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/date_range_pruchase_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/purchase_list_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/total_purchase_model.dart';
@@ -151,6 +156,21 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => PurchaseListCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => DateRangeExpenditureCubit(),
+        ),
+        BlocProvider(
+          create: (context) => TotalExpenditureCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => PurchasedProductCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => DateRangeCashFlowCubit(),
+        ),
+        BlocProvider(
+          create: (context) => CashFlowReportCubit(repository: accountingInjection()),
         ),
       ],
       child: MyApp(),

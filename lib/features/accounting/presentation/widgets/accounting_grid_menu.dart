@@ -1,22 +1,25 @@
-import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/features/accounting/presentation/pages/cash_flow_report.dart';
+import 'package:akib_pos/features/accounting/presentation/pages/expenditure_report.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/purchasing_report.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/sales_report.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/transaction_report.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:sizer/sizer.dart';
 
 class AccountingGridMenu extends StatelessWidget {
   final List<Map<String, String>> menuItems = [
     {"title": "Laporan\nTransaksi", "icon": "assets/icons/accounting/ic_arus_kas.svg"},
-    {"title": "Laporan\nPenjualan", "icon": "assets/icons/accounting/ic_arus_kas.svg"},
-    {"title": "Laporan\nPembelian", "icon": "assets/icons/accounting/ic_arus_kas.svg"},
-    {"title": "Laba\nRugi", "icon": "assets/icons/accounting/ic_arus_kas.svg"},
-    {"title": "Neraca\nKeuangan", "icon": "assets/icons/accounting/ic_arus_kas.svg"},
+    {"title": "Laporan\nPenjualan", "icon": "assets/icons/accounting/ic_laporan_penjualan.svg"},
+    {"title": "Laporan\nPembelian", "icon": "assets/icons/accounting/ic_laporan_pembelian.svg"},
+    {"title": "Laporan\nPengeluaran", "icon": "assets/icons/accounting/ic_laporan_pengeluaran.svg"},
+    {"title": "Laba\nRugi", "icon": "assets/icons/accounting/ic_laba_rugi.svg"},
+    {"title": "Neraca\nKeuangan", "icon": "assets/icons/accounting/ic_neraca_keuangan.svg"},
     {"title": "Arus\nKas", "icon": "assets/icons/accounting/ic_arus_kas.svg"},
-    {"title": "Manajemen\nNilai Pajak", "icon": "assets/icons/accounting/ic_arus_kas.svg"},
-    {"title": "Manajemen\nAset", "icon": "assets/icons/accounting/ic_arus_kas.svg"},
+    {"title": "Manajemen\nNilai Pajak", "icon": "assets/icons/accounting/ic_manajemen_pajak.svg"},
+    {"title": "Manajemen\nAset", "icon": "assets/icons/accounting/ic_manajemen_aset.svg"},
   ];
+
+   AccountingGridMenu({super.key});
 
   void onItemTap(int index, BuildContext context) {
   switch (index) {
@@ -34,7 +37,7 @@ class AccountingGridMenu extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => SalesReport(), // Replace with your page
+          builder: (context) => const SalesReport(), // Replace with your page
         ),
       );
     case 2:
@@ -42,7 +45,23 @@ class AccountingGridMenu extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => PurchasingReport(), // Replace with your page
+          builder: (context) => const PurchasingReport(), // Replace with your page
+        ),
+      );
+    case 3:
+      // If the second item is clicked (you can replace this with your desired action)
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const ExpenditureReport(), // Replace with your page
+        ),
+      );
+    case 6:
+      // If the second item is clicked (you can replace this with your desired action)
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const CashFlowReport(), // Replace with your page
         ),
       );
       break;

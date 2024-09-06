@@ -1,17 +1,16 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
-import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/date_range_pruchase_cubit.dart';
-import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/date_range_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/cash_flow_report/date_range_cash_flow_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 
-class PurchasingReportTop extends StatelessWidget {
+class CashFlowReportTop extends StatelessWidget {
   final Function onDateTap;
 
-  const PurchasingReportTop({
+  const CashFlowReportTop({
     Key? key,
     required this.onDateTap,
   }) : super(key: key);
@@ -34,7 +33,7 @@ class PurchasingReportTop extends StatelessWidget {
             ),
             leadingWidth: 20,
             title: const Text(
-              'Laporan Pembelian',
+              'Arus Kas',
               style: AppTextStyle.headline5,
             ),
             actions: [
@@ -89,7 +88,7 @@ class PurchasingReportTop extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      BlocBuilder<DateRangePurchaseCubit, String>(
+                      BlocBuilder<DateRangeCashFlowCubit, String>(
                         builder: (context, state) {
                           final dates = state.split(' - ');
                           final startDate = DateTime.parse(dates[0]);
@@ -97,22 +96,15 @@ class PurchasingReportTop extends StatelessWidget {
 
                           // Dapatkan tanggal hari ini
                           final today = DateTime.now();
-                          final formattedToday =
-                              DateTime(today.year, today.month, today.day);
-                          final formattedEndDate = DateTime(
-                              endDate.year, endDate.month, endDate.day);
+                          final formattedToday = DateTime(today.year, today.month, today.day);
+                          final formattedEndDate = DateTime(endDate.year, endDate.month, endDate.day);
 
                           // Hitung selisih hari antara startDate dan endDate
-                          final difference = formattedEndDate
-                                  .difference(startDate)
-                                  .inDays +
-                              1; // Adding 1 to count both startDate and endDate
+                          final difference = formattedEndDate.difference(startDate).inDays + 1;
 
                           // Periksa apakah rentang tanggal adalah 7 atau 30 hari terakhir
-                          final isLast7Days = difference == 8 &&
-                              formattedEndDate.isAtSameMomentAs(formattedToday);
-                          final isLast30Days = difference == 31 &&
-                              formattedEndDate.isAtSameMomentAs(formattedToday);
+                          final isLast7Days = difference == 8 && formattedEndDate.isAtSameMomentAs(formattedToday);
+                          final isLast30Days = difference == 31 && formattedEndDate.isAtSameMomentAs(formattedToday);
 
                           // Function to format date to 'd MMMM yyyy' (e.g., 8 Januari 2024)
                           String formatDate(DateTime date) {
@@ -126,13 +118,10 @@ class PurchasingReportTop extends StatelessWidget {
                           } else if (isLast30Days) {
                             displayedDate = "30 Hari Terakhir";
                           } else {
-                            // Format start and end dates if they are different
                             if (dates[0] == dates[1]) {
-                              displayedDate =
-                                  formatDate(startDate); // Single date
+                              displayedDate = formatDate(startDate); // Single date
                             } else {
-                              displayedDate =
-                                  "${formatDate(startDate)} - ${formatDate(endDate)}"; // Custom range
+                              displayedDate = "${formatDate(startDate)} - ${formatDate(endDate)}"; // Custom range
                             }
                           }
 

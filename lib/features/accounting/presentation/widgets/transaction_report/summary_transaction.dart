@@ -27,7 +27,7 @@ class SummaryTransaction extends StatelessWidget {
                     children: [
                       Expanded(
                         child: TransactionReportItem(
-                          title: 'Kas Awal',
+                          title: "Kas\nAwal",
                           isLoading: true, // Loading shimmer–
                         ),
                       ),
@@ -55,7 +55,7 @@ class SummaryTransaction extends StatelessWidget {
                       SizedBox(width: 8),
                       Expanded(
                         child: TransactionReportItem(
-                          title: 'Pembayaran\nNon Tunai',
+                          title: 'PembayaranNon Tunai',
                           isLoading: true, // Loading shimmer
                         ),
                       ),
@@ -87,7 +87,7 @@ class SummaryTransaction extends StatelessWidget {
                     children: [
                       Expanded(
                         child: TransactionReportItem(
-                          title: 'Kas Awal',
+                          title: 'Kas\nAwal',
                           amount: Utils.formatCurrencyDouble(
                               state.report.openingCash),
                         ),

@@ -30,9 +30,7 @@ class TransactionReportItem extends StatelessWidget {
           children: [
             Text(
               title,
-              style: AppTextStyle.body3.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: AppTextStyle.headline5
             ),
             const SizedBox(height: 20),
             isLoading

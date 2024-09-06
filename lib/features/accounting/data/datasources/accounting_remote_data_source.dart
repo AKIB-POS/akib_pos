@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:akib_pos/api/urls.dart';
 import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/features/accounting/data/models/accounting_transaction_reporrt_model.dart';
+import 'package:akib_pos/features/accounting/data/models/cash_flow_report/cash_flow_report_model.dart';
+import 'package:akib_pos/features/accounting/data/models/expenditure_report/purchased_product_model.dart';
+import 'package:akib_pos/features/accounting/data/models/expenditure_report/total_expenditure.dart';
 import 'package:akib_pos/features/accounting/data/models/purchasing_report/purchasing_item_model.dart';
 import 'package:akib_pos/features/accounting/data/models/sales_report/sales_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/sales_report/sold_product_model.dart';
@@ -60,6 +63,21 @@ abstract class AccountingRemoteDataSource {
     required int companyId,
     required String date,
   });
+
+  Future<TotalExpenditureModel> getTotalExpenditure({
+    required int branchId,
+    required int companyId,
+    required String date,
+  });
+
+  Future<List<PurchasedProductModel>> getPurchasedProducts({
+    required int branchId,
+    required int companyId,
+    required String date,
+  });
+
+  Future<CashFlowReportModel> getCashFlowReport(int branchId, int companyId, String date);
+
 }
 
 class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
@@ -69,6 +87,80 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
   AccountingRemoteDataSourceImpl({
     required this.client,
   });
+
+  @override
+  Future<CashFlowReportModel> getCashFlowReport(int branchId, int companyId, String date) async {
+    const url = '${URLs.baseUrlMock}/cash-flow-report';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branch_id': branchId.toString(),
+        'company_id': companyId.toString(),
+        'date': date,
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+      return CashFlowReportModel.fromJson(jsonResponse['data']);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+    @override
+  Future<List<PurchasedProductModel>> getPurchasedProducts({
+    required int branchId,
+    required int companyId,
+    required String date,
+  }) async {
+    const url = '${URLs.baseUrlMock}/purchased-products';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branch_id': branchId.toString(),
+        'company_id': companyId.toString(),
+        'date': date,
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body)['data'];
+      return data.map((item) => PurchasedProductModel.fromJson(item)).toList();
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+
+  @override
+  Future<TotalExpenditureModel> getTotalExpenditure({
+    required int branchId,
+    required int companyId,
+    required String date,
+  }) async {
+    const url = '${URLs.baseUrlMock}/total-expenditure';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branch_id': branchId.toString(),
+        'company_id': companyId.toString(),
+        'date': date,
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      return TotalExpenditureModel.fromJson(json.decode(response.body)['data']);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
 
 
    @override
