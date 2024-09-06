@@ -74,11 +74,16 @@ class _SalesReportState extends State<SalesReport> {
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SalesReportTop(
                 onDateTap: () => _selectDate(context),
               ),
               const SalesSummary(), // Memanggil widget SalesSummary
+              const Padding(
+                padding: EdgeInsets.only(left: 16,bottom: 16),
+                child: Text("Produk Terjual",style: AppTextStyle.headline5,),
+              ),
               const ProductSoldCard()
 
             ],

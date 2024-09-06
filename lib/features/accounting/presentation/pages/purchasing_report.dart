@@ -1,6 +1,9 @@
 import 'package:akib_pos/common/app_colors.dart';
+import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/date_range_pruchase_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/purchase_list_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/total_purchase_model.dart';
+import 'package:akib_pos/features/accounting/presentation/widgets/purchasing_report/purchase_list_card.dart';
 import 'package:akib_pos/features/accounting/presentation/widgets/purchasing_report/purchasing_report_summary.dart';
 import 'package:akib_pos/features/accounting/presentation/widgets/purchasing_report/purchasing_report_top.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
@@ -30,6 +33,7 @@ class _PurchasingReportState extends State<PurchasingReport> {
     companyId = _authSharedPref.getCompanyId() ?? 0;
 
     _fetchTotalPurchase();
+    _fetchPurchaseList();
     super.initState();
   }
 
@@ -37,6 +41,15 @@ class _PurchasingReportState extends State<PurchasingReport> {
     final dateRange = context.read<DateRangePurchaseCubit>().state; // Dapatkan rentang tanggal dari cubit
 
     context.read<TotalPurchaseCubit>().fetchTotalPurchase(
+          branchId: branchId,
+          companyId: companyId,
+          date: dateRange, // Gunakan tanggal dari rentang yang dipilih
+        );
+  }
+  void _fetchPurchaseList() {
+    final dateRange = context.read<DateRangePurchaseCubit>().state; // Dapatkan rentang tanggal dari cubit
+
+    context.read<PurchaseListCubit>().fetchTotalPurchaseList(
           branchId: branchId,
           companyId: companyId,
           date: dateRange, // Gunakan tanggal dari rentang yang dipilih
@@ -51,15 +64,22 @@ class _PurchasingReportState extends State<PurchasingReport> {
         color: AppColors.primaryMain,
         onRefresh: () async {
           _fetchTotalPurchase();
+          _fetchPurchaseList();
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               PurchasingReportTop(
                 onDateTap: () => _selectDate(context),
               ),
               const PurchasingReportSummary(),
+              const Padding(
+                padding: EdgeInsets.only(left: 16,bottom: 16),
+                child: Text("Laporan Pembelian",style: AppTextStyle.headline5,),
+              ),
+              PurchaseListCard()
             ],
           ),
         ),

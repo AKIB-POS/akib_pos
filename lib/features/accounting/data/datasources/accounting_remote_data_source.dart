@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:akib_pos/api/urls.dart';
 import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/features/accounting/data/models/accounting_transaction_reporrt_model.dart';
+import 'package:akib_pos/features/accounting/data/models/purchasing_report/purchasing_item_model.dart';
 import 'package:akib_pos/features/accounting/data/models/sales_report/sales_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/sales_report/sold_product_model.dart';
 import 'package:akib_pos/features/accounting/data/models/transaction_report/employee.dart';
@@ -54,6 +55,11 @@ abstract class AccountingRemoteDataSource {
     required String date,
   });
   
+  Future<List<PurchaseItemModel>> getTotalPurchaseList({
+    required int branchId,
+    required int companyId,
+    required String date,
+  });
 }
 
 class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
@@ -64,6 +70,34 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required this.client,
   });
 
+
+   @override
+  Future<List<PurchaseItemModel>> getTotalPurchaseList({
+    required int branchId,
+    required int companyId,
+    required String date,
+  }) async {
+    const url = '${URLs.baseUrlMock}/total-purchase-list';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branch_id': branchId.toString(),
+        'company_id': companyId.toString(),
+        'date': date,
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      var data = (json.decode(response.body)['data'] as List)
+          .map((purchase) => PurchaseItemModel.fromJson(purchase))
+          .toList();
+      return data;
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
     @override
   Future<TotalPurchaseModel> getTotalPurchase({
     required int branchId,

@@ -3,6 +3,7 @@ import 'package:akib_pos/core/error/failures.dart';
 import 'package:akib_pos/features/accounting/data/datasources/accounting_remote_data_source.dart';
 import 'package:akib_pos/features/accounting/data/datasources/local/employee_shared_pref.dart';
 import 'package:akib_pos/features/accounting/data/models/accounting_transaction_reporrt_model.dart';
+import 'package:akib_pos/features/accounting/data/models/purchasing_report/purchasing_item_model.dart';
 import 'package:akib_pos/features/accounting/data/models/sales_report/sales_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/sales_report/sold_product_model.dart';
 import 'package:akib_pos/features/accounting/data/models/transaction_report/employee.dart';
@@ -53,6 +54,12 @@ abstract class AccountingRepository {
     required int companyId,
     required String date,
   });
+
+  Future<Either<Failure, List<PurchaseItemModel>>> getTotalPurchaseList({
+    required int branchId,
+    required int companyId,
+    required String date,
+  });
 }
 
 class AccountingRepositoryImpl implements AccountingRepository {
@@ -68,6 +75,30 @@ class AccountingRepositoryImpl implements AccountingRepository {
     required this.connectivity,
     });
 
+
+  @override
+  Future<Either<Failure, List<PurchaseItemModel>>> getTotalPurchaseList({
+    required int branchId,
+    required int companyId,
+    required String date,
+  }) async {
+    try {
+      final response = await remoteDataSource.getTotalPurchaseList(
+        branchId: branchId,
+        companyId: companyId,
+        date: date,
+      );
+      return Right(response);
+    } catch (e) {
+      if (e is GeneralException) {
+        return Left(GeneralFailure(e.message));
+      } else if (e is ServerException) {
+        return Left(ServerFailure());
+      } else {
+        return Left(GeneralFailure("Unexpected error occurred"));
+      }
+    }
+  }
 
 
   @override
