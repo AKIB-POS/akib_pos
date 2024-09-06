@@ -3,6 +3,7 @@ import 'package:akib_pos/di/accounting_injection.dart';
 import 'package:akib_pos/di/injection_container.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/active_asset_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/pending_asset_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/sold_asset_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/cash_flow_report/cash_flow_report_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/cash_flow_report/date_range_cash_flow_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/expenditure_report/date_range_expenditure_cubit.dart';
@@ -179,6 +180,9 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => ActiveAssetCubit(accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => SoldAssetCubit(repository:accountingInjection()),
         ),
       ],
       child: MyApp(),

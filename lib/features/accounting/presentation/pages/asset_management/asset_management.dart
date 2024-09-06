@@ -4,6 +4,7 @@ import 'package:akib_pos/features/accounting/data/models/purchasing_report/purch
 import 'package:akib_pos/features/accounting/presentation/pages/accounting_page.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/asset_management/active_asset.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/asset_management/pending_asset.dart';
+import 'package:akib_pos/features/accounting/presentation/pages/asset_management/sold_asset.dart';
 import 'package:flutter/material.dart';
 
 class AssetManagement extends StatelessWidget {
@@ -47,7 +48,7 @@ class AssetManagement extends StatelessWidget {
             _buildMenuItem(
               context,
               title: 'Dijual/Dilepas',
-              onTap: () => _navigateToPage(context,  AccountingPage()),
+              onTap: () => _navigateToPage(context,  const SoldAssetPage()),
             ),
             const SizedBox(height: 16),
             _buildMenuItem(
