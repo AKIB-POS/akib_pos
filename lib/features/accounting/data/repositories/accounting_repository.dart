@@ -8,6 +8,7 @@ import 'package:akib_pos/features/accounting/data/models/asset_management/sold_a
 import 'package:akib_pos/features/accounting/data/models/cash_flow_report/cash_flow_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/expenditure_report/purchased_product_model.dart';
 import 'package:akib_pos/features/accounting/data/models/expenditure_report/total_expenditure.dart';
+import 'package:akib_pos/features/accounting/data/models/financial_balance_report/financial_balance_model.dart';
 import 'package:akib_pos/features/accounting/data/models/purchasing_report/purchasing_item_model.dart';
 import 'package:akib_pos/features/accounting/data/models/sales_report/sales_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/sales_report/sold_product_model.dart';
@@ -99,6 +100,13 @@ abstract class AccountingRepository {
     required int companyId,
   });
 
+
+  Future<Either<Failure, FinancialBalanceModel>> getFinancialBalance({
+    required int branchId,
+    required int companyId,
+    required String date,
+  });
+
 }
 
 class AccountingRepositoryImpl implements AccountingRepository {
@@ -113,6 +121,28 @@ class AccountingRepositoryImpl implements AccountingRepository {
     required this.employeeSharedPref,
     required this.connectivity,
     });
+
+
+
+  @override
+  Future<Either<Failure, FinancialBalanceModel>> getFinancialBalance({
+    required int branchId,
+    required int companyId,
+    required String date,
+  }) async {
+    try {
+      final financialBalance = await remoteDataSource.getFinancialBalance(
+        branchId: branchId,
+        companyId: companyId,
+        date: date,
+      );
+      return Right(financialBalance);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
 
     @override

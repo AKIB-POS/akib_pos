@@ -9,6 +9,8 @@ import 'package:akib_pos/features/accounting/presentation/bloc/cash_flow_report/
 import 'package:akib_pos/features/accounting/presentation/bloc/expenditure_report/date_range_expenditure_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/expenditure_report/purchased_product_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/expenditure_report/total_expenditure_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/financial_balance_report/date_range_financial_balance_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/financial_balance_report/financial_balance_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/date_range_pruchase_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/purchase_list_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/total_purchase_model.dart';
@@ -183,6 +185,13 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => SoldAssetCubit(repository:accountingInjection()),
+        ),
+
+        BlocProvider(
+          create: (context) => DateRangeFinancialBalanceCubit(),
+        ),
+         BlocProvider(
+          create: (context) => FinancialBalanceCubit(repository: accountingInjection()),
         ),
       ],
       child: MyApp(),

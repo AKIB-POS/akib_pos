@@ -6,6 +6,7 @@ import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/
 import 'package:akib_pos/features/accounting/presentation/bloc/cash_flow_report/cash_flow_report_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/expenditure_report/purchased_product_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/expenditure_report/total_expenditure_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/financial_balance_report/financial_balance_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/purchase_list_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/total_purchase_model.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_product_report_cubit.dart';
@@ -73,6 +74,10 @@ Future<void> initAccountingModule() async {
   );
   accountingInjection.registerFactory(
     () => ActiveAssetCubit(accountingInjection()),
+  );
+
+  accountingInjection.registerFactory(
+    () => FinancialBalanceCubit(repository: accountingInjection()),
   );
 
   // Repository
