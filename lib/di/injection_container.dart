@@ -27,6 +27,15 @@ import 'package:http/http.dart' as http;
 final sl = GetIt.instance;
 
 Future<void> init() async {
+
+ //! External
+  final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerLazySingleton(() => sharedPreferences);
+  sl.registerLazySingleton(() => http.Client());
+  sl.registerLazySingleton(() => BlueThermalPrinter.instance);
+  // Connectivity
+  sl.registerLazySingleton(() => Connectivity());
+
   //! Features - Kasir
   // Bloc
   sl.registerFactory(
@@ -118,11 +127,5 @@ Future<void> init() async {
     () => SharedPrefsHelper(sl()),
   );
 
-  //! External
-  final sharedPreferences = await SharedPreferences.getInstance();
-  sl.registerLazySingleton(() => sharedPreferences);
-  sl.registerLazySingleton(() => http.Client());
-  sl.registerLazySingleton(() => BlueThermalPrinter.instance);
-  // Connectivity
-  sl.registerLazySingleton(() => Connectivity());
+  
 }

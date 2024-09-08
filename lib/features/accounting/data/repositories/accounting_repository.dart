@@ -12,6 +12,7 @@ import 'package:akib_pos/features/accounting/data/models/financial_balance_repor
 import 'package:akib_pos/features/accounting/data/models/purchasing_report/purchasing_item_model.dart';
 import 'package:akib_pos/features/accounting/data/models/sales_report/sales_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/sales_report/sold_product_model.dart';
+import 'package:akib_pos/features/accounting/data/models/tax_management_and_tax_services/service_charge_model.dart';
 import 'package:akib_pos/features/accounting/data/models/transaction_report/employee.dart';
 import 'package:akib_pos/features/accounting/data/models/transaction_report/transaction_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/transaction_report/transcation_summary_response.dart';
@@ -21,23 +22,27 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class AccountingRepository {
-  Future<Either<Failure, TransactionSummaryResponse>> getTodayTransactionSummary(int branchId, int companyId);
-   Future<Either<Failure, EmployeeListResponse>> getAllEmployees(int branchId, int companyId);
-   Future<Either<Failure, TransactionReportModel>> getTodayTransactionReport({
+  Future<Either<Failure, TransactionSummaryResponse>>
+      getTodayTransactionSummary(int branchId, int companyId);
+  Future<Either<Failure, EmployeeListResponse>> getAllEmployees(
+      int branchId, int companyId);
+  Future<Either<Failure, TransactionReportModel>> getTodayTransactionReport({
     required int branchId,
     required int companyId,
     required int employeeId,
     required String date,
   });
 
-  Future<Either<Failure, AccountingTransactionListResponse>> getTopTransactions({
+  Future<Either<Failure, AccountingTransactionListResponse>>
+      getTopTransactions({
     required int branchId,
     required int companyId,
     required int employeeId,
     required String date,
   });
 
-  Future<Either<Failure, AccountingTransactionListResponse>> getDiscountTransactions({
+  Future<Either<Failure, AccountingTransactionListResponse>>
+      getDiscountTransactions({
     required int branchId,
     required int companyId,
     required int employeeId,
@@ -80,26 +85,23 @@ abstract class AccountingRepository {
     required String date,
   });
 
-  Future<Either<Failure, CashFlowReportModel>> getCashFlowReport(int branchId, int companyId, String date);
-
+  Future<Either<Failure, CashFlowReportModel>> getCashFlowReport(
+      int branchId, int companyId, String date);
 
   Future<Either<Failure, List<PendingAssetModel>>> getPendingAssets({
     required int branchId,
     required int companyId,
   });
 
-
-   Future<Either<Failure, List<ActiveAssetModel>>> getActiveAssets({
+  Future<Either<Failure, List<ActiveAssetModel>>> getActiveAssets({
     required int branchId,
     required int companyId,
   });
-  
 
   Future<Either<Failure, List<SoldAssetModel>>> getSoldAssets({
     required int branchId,
     required int companyId,
   });
-
 
   Future<Either<Failure, FinancialBalanceModel>> getFinancialBalance({
     required int branchId,
@@ -107,6 +109,10 @@ abstract class AccountingRepository {
     required String date,
   });
 
+  Future<Either<Failure, ServiceChargeModel>> getServiceCharge({
+    required int branchId,
+    required int companyId,
+  });
 }
 
 class AccountingRepositoryImpl implements AccountingRepository {
@@ -114,15 +120,29 @@ class AccountingRepositoryImpl implements AccountingRepository {
   final EmployeeSharedPref employeeSharedPref;
   final Connectivity connectivity;
 
-  
-
   AccountingRepositoryImpl({
     required this.remoteDataSource,
     required this.employeeSharedPref,
     required this.connectivity,
-    });
+  });
 
-
+  @override
+  Future<Either<Failure, ServiceChargeModel>> getServiceCharge({
+    required int branchId,
+    required int companyId,
+  }) async {
+    try {
+      final serviceCharge = await remoteDataSource.getServiceCharge(
+        branchId: branchId,
+        companyId: companyId,
+      );
+      return Right(serviceCharge);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
   @override
   Future<Either<Failure, FinancialBalanceModel>> getFinancialBalance({
@@ -144,8 +164,7 @@ class AccountingRepositoryImpl implements AccountingRepository {
     }
   }
 
-
-    @override
+  @override
   Future<Either<Failure, List<SoldAssetModel>>> getSoldAssets({
     required int branchId,
     required int companyId,
@@ -163,7 +182,7 @@ class AccountingRepositoryImpl implements AccountingRepository {
     }
   }
 
-    @override
+  @override
   Future<Either<Failure, List<ActiveAssetModel>>> getActiveAssets({
     required int branchId,
     required int companyId,
@@ -181,9 +200,7 @@ class AccountingRepositoryImpl implements AccountingRepository {
     }
   }
 
-
-
-   @override
+  @override
   Future<Either<Failure, List<PendingAssetModel>>> getPendingAssets({
     required int branchId,
     required int companyId,
@@ -201,11 +218,12 @@ class AccountingRepositoryImpl implements AccountingRepository {
     }
   }
 
-
   @override
-  Future<Either<Failure, CashFlowReportModel>> getCashFlowReport(int branchId, int companyId, String date) async {
+  Future<Either<Failure, CashFlowReportModel>> getCashFlowReport(
+      int branchId, int companyId, String date) async {
     try {
-      final cashFlowReport = await remoteDataSource.getCashFlowReport(branchId, companyId, date);
+      final cashFlowReport =
+          await remoteDataSource.getCashFlowReport(branchId, companyId, date);
       return Right(cashFlowReport);
     } on ServerException {
       return Left(ServerFailure()); // Custom failure handler
@@ -262,7 +280,6 @@ class AccountingRepositoryImpl implements AccountingRepository {
     }
   }
 
-
   @override
   Future<Either<Failure, List<PurchaseItemModel>>> getTotalPurchaseList({
     required int branchId,
@@ -286,7 +303,6 @@ class AccountingRepositoryImpl implements AccountingRepository {
       }
     }
   }
-
 
   @override
   Future<Either<Failure, TotalPurchaseModel>> getTotalPurchase({
@@ -312,8 +328,7 @@ class AccountingRepositoryImpl implements AccountingRepository {
     }
   }
 
-
-    @override
+  @override
   Future<Either<Failure, List<SoldProductModel>>> getSoldProducts({
     required int branchId,
     required int companyId,
@@ -337,8 +352,7 @@ class AccountingRepositoryImpl implements AccountingRepository {
     }
   }
 
-
-    @override
+  @override
   Future<Either<Failure, SalesReportModel>> getSalesReportSummary({
     required int branchId,
     required int companyId,
@@ -362,10 +376,9 @@ class AccountingRepositoryImpl implements AccountingRepository {
     }
   }
 
-
-
   @override
-  Future<Either<Failure, AccountingTransactionListResponse>> getTopTransactions({
+  Future<Either<Failure, AccountingTransactionListResponse>>
+      getTopTransactions({
     required int branchId,
     required int companyId,
     required int employeeId,
@@ -391,7 +404,8 @@ class AccountingRepositoryImpl implements AccountingRepository {
   }
 
   @override
-  Future<Either<Failure, AccountingTransactionListResponse>> getDiscountTransactions({
+  Future<Either<Failure, AccountingTransactionListResponse>>
+      getDiscountTransactions({
     required int branchId,
     required int companyId,
     required int employeeId,
@@ -416,7 +430,7 @@ class AccountingRepositoryImpl implements AccountingRepository {
     }
   }
 
-    @override
+  @override
   Future<Either<Failure, TransactionReportModel>> getTodayTransactionReport({
     required int branchId,
     required int companyId,
@@ -450,7 +464,8 @@ class AccountingRepositoryImpl implements AccountingRepository {
   }
 
   @override
-  Future<Either<Failure, EmployeeListResponse>> getAllEmployees(int branchId, int companyId) async {
+  Future<Either<Failure, EmployeeListResponse>> getAllEmployees(
+      int branchId, int companyId) async {
     try {
       // Check connectivity status
       final connectivityResult = await connectivity.checkConnectivity();
@@ -468,7 +483,8 @@ class AccountingRepositoryImpl implements AccountingRepository {
         }
       } else {
         // If online, fetch new data from API
-        final response = await remoteDataSource.getAllEmployees(branchId, companyId);
+        final response =
+            await remoteDataSource.getAllEmployees(branchId, companyId);
 
         // Clear existing data in shared preferences
         await employeeSharedPref.clearEmployeeList();
@@ -492,9 +508,11 @@ class AccountingRepositoryImpl implements AccountingRepository {
   }
 
   @override
-  Future<Either<Failure, TransactionSummaryResponse>> getTodayTransactionSummary(int branchId, int companyId) async {
+  Future<Either<Failure, TransactionSummaryResponse>>
+      getTodayTransactionSummary(int branchId, int companyId) async {
     try {
-      final response = await remoteDataSource.getTodayTransactionSummary(branchId, companyId);
+      final response = await remoteDataSource.getTodayTransactionSummary(
+          branchId, companyId);
       return Right(response);
     } catch (e) {
       if (e is GeneralException) {

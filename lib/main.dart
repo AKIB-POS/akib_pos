@@ -17,6 +17,7 @@ import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report
 import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/date_range_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_product_report_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_report_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/tax_management_and_tax_services/service_charge_subit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/employee_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/transaction_list_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report_cubit.dart';
@@ -56,16 +57,14 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  initializeDateFormatting('id', null).then((_) {
-    runApp(MyApp());
-  });
+
+    await initializeDateFormatting('id', null);
+  
   await _requestPermissions(); 
   //for auth and cashier injection initialization
   await di.init();
   //for accounting injection initialization
   await accounting.initAccountingModule();
-
-
 
   runApp(
     MultiBlocProvider(
@@ -192,6 +191,9 @@ void main() async {
         ),
          BlocProvider(
           create: (context) => FinancialBalanceCubit(repository: accountingInjection()),
+        ),
+         BlocProvider(
+          create: (context) => ServiceChargeCubit(repository: accountingInjection()),
         ),
       ],
       child: MyApp(),

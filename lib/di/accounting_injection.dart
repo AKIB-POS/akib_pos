@@ -11,6 +11,7 @@ import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report
 import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/total_purchase_model.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_product_report_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_report_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/tax_management_and_tax_services/service_charge_subit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/employee_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/transaction_list_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report_cubit.dart';
@@ -78,6 +79,9 @@ Future<void> initAccountingModule() async {
 
   accountingInjection.registerFactory(
     () => FinancialBalanceCubit(repository: accountingInjection()),
+  );
+  accountingInjection.registerFactory(
+    () => ServiceChargeCubit(repository: accountingInjection()),
   );
 
   // Repository
