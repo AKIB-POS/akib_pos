@@ -37,30 +37,6 @@ class FinancialBalanceReportTop extends StatelessWidget {
               style: AppTextStyle.headline5,
             ),
             actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 16.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  child: Row(
-                    children: [
-                      const Text(
-                        'Download',
-                        style: TextStyle(color: Colors.black),
-                      ),
-                      const SizedBox(width: 4),
-                      SvgPicture.asset(
-                        'assets/icons/accounting/ic_download.svg',
-                        height: 20,
-                        width: 20,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ],
           ),
           nameDate(context),
