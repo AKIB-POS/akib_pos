@@ -85,29 +85,12 @@ class _PendingAssetPageState extends State<PendingAssetPage> {
     return ListView.builder(
       itemCount: 5,
       itemBuilder: (context, index) {
-        return _shimmerCard();
+        return Utils.buildLoadingCardShimmer();
       },
     );
   }
 
-  // Widget untuk menampilkan shimmer card
-  Widget _shimmerCard() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
-        child: Container(
-          width: double.infinity,
-          height: 100,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.white,
-          ),
-        ),
-      ),
-    );
-  }
+
 
   // Widget untuk menampilkan list Pending Asset
   Widget _buildPendingAssetList(List<PendingAssetModel> assets) {

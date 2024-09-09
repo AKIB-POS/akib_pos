@@ -7,24 +7,6 @@ import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 class Utils{
 
-  static String formatCurrencyDouble(double input) {
-    final NumberFormat formatter = NumberFormat.currency(
-      locale: 'id',
-      symbol: 'Rp ',
-      decimalDigits: 0,
-    );
-    return formatter.format(input);
-  }
-  static String formatCurrency(String input) {
-  int value = int.parse(input);
-  final NumberFormat formatter = NumberFormat.currency(
-    locale: 'id',
-    symbol: 'Rp ',
-    decimalDigits: 0,
-  );
-  return formatter.format(value);
-}
-
 static  buildLoadingCardShimmer() {
     return Container(
       padding: const EdgeInsets.only(bottom: 16),
@@ -68,6 +50,25 @@ static  buildLoadingCardShimmer() {
       ),
     );
   }
+  static String formatCurrencyDouble(double input) {
+    final NumberFormat formatter = NumberFormat.currency(
+      locale: 'id',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    );
+    return formatter.format(input);
+  }
+  static String formatCurrency(String input) {
+  int value = int.parse(input);
+  final NumberFormat formatter = NumberFormat.currency(
+    locale: 'id',
+    symbol: 'Rp ',
+    decimalDigits: 0,
+  );
+  return formatter.format(value);
+}
+
+
 
 
   static String formatNumber(String input) {

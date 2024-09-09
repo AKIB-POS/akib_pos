@@ -82,31 +82,12 @@ class _ActiveAssetPageState extends State<ActiveAssetPage> {
   }
 
   // Widget untuk menampilkan loading shimmer
-  Widget _buildLoadingShimmer() {
+   Widget _buildLoadingShimmer() {
     return ListView.builder(
       itemCount: 5,
       itemBuilder: (context, index) {
-        return _shimmerCard();
+        return Utils.buildLoadingCardShimmer();
       },
-    );
-  }
-
-  // Widget untuk menampilkan shimmer card
-  Widget _shimmerCard() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
-        child: Container(
-          width: double.infinity,
-          height: 100,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.white,
-          ),
-        ),
-      ),
     );
   }
 
@@ -140,13 +121,25 @@ class _ActiveAssetPageState extends State<ActiveAssetPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 8),
-                _buildItemRow("Detail Aset", "${asset.assetAccountNumber} ${asset.assetName}"),
+                _buildItemRow("Detail Aset",
+                    "${asset.assetAccountNumber} ${asset.assetName}"),
                 const SizedBox(height: 8),
                 _buildItemRow("Akun Aset", asset.assetAccountCode),
                 const SizedBox(height: 16),
-                _buildCostRow("Biaya Akumulasi", asset.accumulatedCost),
-                const SizedBox(height: 8),
-                _buildCostRow("Nilai Buku", asset.bookValue),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                  decoration: BoxDecoration(
+                      color: AppColors.textGrey200,
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Column(
+                    children: [
+                      _buildCostRow("Biaya Akumulasi", asset.accumulatedCost),
+                      const SizedBox(height: 8),
+                      _buildCostRow("Nilai Buku", asset.bookValue),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -196,28 +189,20 @@ class _ActiveAssetPageState extends State<ActiveAssetPage> {
 
   // Widget untuk menampilkan biaya akumulasi dan nilai buku
   Widget _buildCostRow(String title, double value) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: AppColors.textGrey200,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: AppTextStyle.caption.copyWith(color: AppColors.textGrey800),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: AppTextStyle.caption.copyWith(color: AppColors.textGrey800),
+        ),
+        Text(
+          Utils.formatCurrencyDouble(value),
+          style: AppTextStyle.bigCaptionBold.copyWith(
+            fontWeight: FontWeight.bold,
           ),
-          Text(
-            Utils.formatCurrencyDouble(value),
-            style: AppTextStyle.bigCaptionBold.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

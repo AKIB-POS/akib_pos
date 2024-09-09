@@ -18,6 +18,7 @@ import 'package:akib_pos/features/accounting/data/models/transaction_report/tran
 import 'package:akib_pos/features/accounting/data/models/transaction_report/transcation_summary_response.dart';
 import 'package:akib_pos/features/accounting/data/models/purchasing_report/total_purchase_model.dart';
 import 'package:akib_pos/features/accounting/data/models/asset_management/active_asset_model.dart';
+import 'package:akib_pos/features/accounting/data/models/asset_management/asset_depreciation_model.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
@@ -130,6 +131,11 @@ abstract class AccountingRemoteDataSource {
     required double amount,
   });
 
+    Future<List<AssetsDepreciationModel>> getAssetsDepreciation({
+    required int branchId,
+    required int companyId,
+  });
+
 }
 
 class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
@@ -139,6 +145,30 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
   AccountingRemoteDataSourceImpl({
     required this.client,
   });
+
+  @override
+  Future<List<AssetsDepreciationModel>> getAssetsDepreciation({
+    required int branchId,
+    required int companyId,
+  }) async {
+    const url = '${URLs.baseUrlMock}/assets-depreciation';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branch_id': branchId.toString(),
+        'company_id': companyId.toString(),
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body)['data'] as List;
+      return jsonResponse.map((e) => AssetsDepreciationModel.fromJson(e)).toList();
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
 
   @override
   Future<TaxChargeModel> getTaxCharge({

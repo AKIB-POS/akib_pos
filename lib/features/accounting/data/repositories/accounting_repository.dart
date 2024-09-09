@@ -19,6 +19,7 @@ import 'package:akib_pos/features/accounting/data/models/transaction_report/tran
 import 'package:akib_pos/features/accounting/data/models/transaction_report/transcation_summary_response.dart';
 import 'package:akib_pos/features/accounting/data/models/purchasing_report/total_purchase_model.dart';
 import 'package:akib_pos/features/accounting/data/models/asset_management/active_asset_model.dart';
+import 'package:akib_pos/features/accounting/data/models/asset_management/asset_depreciation_model.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dartz/dartz.dart';
 
@@ -131,6 +132,11 @@ abstract class AccountingRepository {
     required int companyId,
     required double amount,
   });
+
+  Future<Either<Failure, List<AssetsDepreciationModel>>> getAssetsDepreciation({
+    required int branchId,
+    required int companyId,
+  });
 }
 
 class AccountingRepositoryImpl implements AccountingRepository {
@@ -143,6 +149,22 @@ class AccountingRepositoryImpl implements AccountingRepository {
     required this.employeeSharedPref,
     required this.connectivity,
   });
+
+  @override
+  Future<Either<Failure, List<AssetsDepreciationModel>>> getAssetsDepreciation({
+    required int branchId,
+    required int companyId,
+  }) async {
+    try {
+      final depreciation = await remoteDataSource.getAssetsDepreciation(branchId: branchId,companyId: companyId);
+      return Right(depreciation);
+    } on ServerException {
+      return Left(ServerFailure()); // Menggunakan failure handler yang sudah ada
+    } catch (e) {
+      return Left(GeneralFailure(e.toString())); // Catch any unexpected error
+    }
+  }
+
 
   @override
   Future<Either<Failure, TaxChargeModel>> getTaxCharge({

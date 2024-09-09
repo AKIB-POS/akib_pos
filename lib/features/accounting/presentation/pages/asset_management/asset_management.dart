@@ -3,6 +3,7 @@ import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/accounting/data/models/purchasing_report/purchasing_item_model.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/accounting_page.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/asset_management/active_asset.dart';
+import 'package:akib_pos/features/accounting/presentation/pages/asset_management/asset_depreciation.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/asset_management/pending_asset.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/asset_management/sold_asset.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +55,7 @@ class AssetManagement extends StatelessWidget {
             _buildMenuItem(
               context,
               title: 'Penyusutan',
-              onTap: () => _navigateToPage(context, AccountingPage()),
+              onTap: () => _navigateToPage(context, const AssetDepreciationPage()),
             ),
           ],
         ),
