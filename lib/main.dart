@@ -17,7 +17,10 @@ import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report
 import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/date_range_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_product_report_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_report_cubit.dart';
-import 'package:akib_pos/features/accounting/presentation/bloc/tax_management_and_tax_services/service_charge_subit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/tax_management_and_tax_services/service_charge_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/tax_management_and_tax_services/service_charge_setting_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/tax_management_and_tax_services/tax_management_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/tax_management_and_tax_services/tax_management_setting_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/employee_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/transaction_list_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report_cubit.dart';
@@ -194,6 +197,15 @@ void main() async {
         ),
          BlocProvider(
           create: (context) => ServiceChargeCubit(repository: accountingInjection()),
+        ),
+         BlocProvider(
+          create: (context) => ServiceChargeSettingCubit(repository: accountingInjection()),
+        ),
+         BlocProvider(
+          create: (context) => TaxManagementCubit(repository: accountingInjection()),
+        ),
+         BlocProvider(
+          create: (context) => TaxManagementSettingCubit(repository: accountingInjection()),
         ),
       ],
       child: MyApp(),

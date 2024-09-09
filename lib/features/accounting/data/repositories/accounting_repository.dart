@@ -13,6 +13,7 @@ import 'package:akib_pos/features/accounting/data/models/purchasing_report/purch
 import 'package:akib_pos/features/accounting/data/models/sales_report/sales_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/sales_report/sold_product_model.dart';
 import 'package:akib_pos/features/accounting/data/models/tax_management_and_tax_services/service_charge_model.dart';
+import 'package:akib_pos/features/accounting/data/models/tax_management_and_tax_services/tax_charge_model.dart';
 import 'package:akib_pos/features/accounting/data/models/transaction_report/employee.dart';
 import 'package:akib_pos/features/accounting/data/models/transaction_report/transaction_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/transaction_report/transcation_summary_response.dart';
@@ -113,6 +114,23 @@ abstract class AccountingRepository {
     required int branchId,
     required int companyId,
   });
+
+  Future<Either<Failure, void>> setServiceCharge({
+    required int branchId,
+    required int companyId,
+    required double amount,
+  });
+
+  Future<Either<Failure, TaxChargeModel>> getTaxCharge({
+    required int branchId,
+    required int companyId,
+  });
+
+  Future<Either<Failure, void>> setTaxCharge({
+    required int branchId,
+    required int companyId,
+    required double amount,
+  });
 }
 
 class AccountingRepositoryImpl implements AccountingRepository {
@@ -125,6 +143,64 @@ class AccountingRepositoryImpl implements AccountingRepository {
     required this.employeeSharedPref,
     required this.connectivity,
   });
+
+  @override
+  Future<Either<Failure, TaxChargeModel>> getTaxCharge({
+    required int branchId,
+    required int companyId,
+  }) async {
+    try {
+      final taxCharge = await remoteDataSource.getTaxCharge(
+        branchId: branchId,
+        companyId: companyId,
+      );
+      return Right(taxCharge);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> setTaxCharge({
+    required int branchId,
+    required int companyId,
+    required double amount,
+  }) async {
+    try {
+      await remoteDataSource.setTaxCharge(
+        branchId: branchId,
+        companyId: companyId,
+        amount: amount,
+      );
+      return const Right(null);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> setServiceCharge({
+    required int branchId,
+    required int companyId,
+    required double amount,
+  }) async {
+    try {
+      await remoteDataSource.setServiceCharge(
+        branchId: branchId,
+        companyId: companyId,
+        amount: amount,
+      );
+      return const Right(null);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
   @override
   Future<Either<Failure, ServiceChargeModel>> getServiceCharge({

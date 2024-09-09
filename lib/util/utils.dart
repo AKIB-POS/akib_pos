@@ -1,5 +1,8 @@
 
+import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 class Utils{
@@ -86,5 +89,63 @@ static String formatNumberDouble(double input) {
   );
   return formatter.format(input).trim(); // Menggunakan trim() untuk menghilangkan spasi ekstra
 }
+
+static void showCustomInfoDialog(BuildContext context, String title, String content) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    title, // Menggunakan judul dari parameter
+                    style: AppTextStyle.headline5, // Gaya teks untuk judul
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Menutup dialog
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              // SvgPicture.asset(
+              //   'assets/icons/accounting/ic_info.svg',
+              //   height: 80,
+              //   width: 80,
+              // ), // Gambar SVG di dalam dialog
+              // const SizedBox(height: 16),
+              Container(
+                width: double.infinity, // Membuat lebar container maksimal
+                child: Text(
+                  content,
+                  style: AppTextStyle.bigCaptionBold.copyWith(fontWeight: FontWeight.normal), // Gaya teks untuk konten
+                  textAlign: TextAlign.justify, // Meratakan teks kanan-kiri
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }
+
+
+
+}
+
+
 

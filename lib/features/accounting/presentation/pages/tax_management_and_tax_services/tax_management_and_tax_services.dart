@@ -3,6 +3,7 @@ import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/asset_management/active_asset.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/asset_management/pending_asset.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/tax_management_and_tax_services/services_charge_page.dart';
+import 'package:akib_pos/features/accounting/presentation/pages/tax_management_and_tax_services/tax_management_page.dart';
 import 'package:flutter/material.dart';
 
 class TaxManagementAndTaxServices extends StatelessWidget {
@@ -21,9 +22,9 @@ class TaxManagementAndTaxServices extends StatelessWidget {
             Navigator.of(context).pop();
           },
         ),
-        leadingWidth: 20,
+        titleSpacing: 0,
         title: const Text(
-          'Management Aset',
+          'Management Pajak & Layanan',
           style: AppTextStyle.headline5
         ),
       ),
@@ -33,8 +34,8 @@ class TaxManagementAndTaxServices extends StatelessWidget {
           children: [
             _buildMenuItem(
               context,
-              title: 'Manajemen pajak',
-              onTap: () => _navigateToPage(context,  const PendingAssetPage()),
+              title: 'Manajemen Pajak ',
+              onTap: () => _navigateToPage(context,  const TaxManagementPage()),
             ),
             const SizedBox(height: 16),
             _buildMenuItem(

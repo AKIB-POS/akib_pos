@@ -23,7 +23,7 @@ class AssetManagement extends StatelessWidget {
             Navigator.of(context).pop();
           },
         ),
-        leadingWidth: 20,
+        titleSpacing: 0,
         title: const Text(
           'Management Aset',
           style: AppTextStyle.headline5

@@ -62,9 +62,9 @@ class AppTextStyle {
   );
 
   static TextStyle subtitle3 = TextStyle(
-    fontSize: 3.sp,
-    height: 1.57, // Line height of 22 divided by font size of 14
-    fontWeight: FontWeight.w700,
+    fontSize: 14.0,
+    height: 1.5, // Line height of 30 divided by font size of 20
+    fontWeight: FontWeight.w800,
     letterSpacing: 0,
   );
 

@@ -1,22 +1,22 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
-import 'package:akib_pos/features/accounting/presentation/bloc/tax_management_and_tax_services/service_charge_setting_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/tax_management_and_tax_services/tax_management_setting_cubit.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
-class ServiceChargeSettingPage extends StatefulWidget {
+class TaxManagementSettingPage extends StatefulWidget {
   final double? initialPercentage;
 
-  const ServiceChargeSettingPage({Key? key, this.initialPercentage}) : super(key: key);
+  const TaxManagementSettingPage({Key? key, this.initialPercentage}) : super(key: key);
 
   @override
-  _ServiceChargeSettingPageState createState() => _ServiceChargeSettingPageState();
+  _TaxManagementSettingPageState createState() => _TaxManagementSettingPageState();
 }
 
-class _ServiceChargeSettingPageState extends State<ServiceChargeSettingPage> {
+class _TaxManagementSettingPageState extends State<TaxManagementSettingPage> {
   late TextEditingController _percentageController;
   late final int branchId;
   late final int companyId;
@@ -55,33 +55,32 @@ class _ServiceChargeSettingPageState extends State<ServiceChargeSettingPage> {
           },
         ),
         title: const Text(
-          'Atur Biaya Pelayanan',
+          'Atur Pajak',
           style: AppTextStyle.headline5,
         ),
       ),
-      body: BlocListener<ServiceChargeSettingCubit, ServiceChargeSettingState>(
+      body: BlocListener<TaxManagementSettingCubit, TaxManagementSettingState>(
         listener: (context, state) {
-          if (state is ServiceChargeSettingSuccess) {
+          if (state is TaxManagementSettingSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
-              
-              SnackBar(content: Text(state.message),backgroundColor: AppColors.successMain,),
+              SnackBar(content: Text(state.message), backgroundColor: AppColors.successMain),
             );
             Navigator.of(context).pop();
-          } else if (state is ServiceChargeSettingError) {
+          } else if (state is TaxManagementSettingError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message),backgroundColor: AppColors.errorMain,),
+              SnackBar(content: Text(state.message), backgroundColor: AppColors.errorMain),
             );
           }
         },
         child: Padding(
-          padding: const EdgeInsets.only(top: 16,),
+          padding: const EdgeInsets.only(top: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 16),
                 child: Text(
-                  "Persentase Pelayanan",
+                  "Presentase Pajak",
                   style: AppTextStyle.caption.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -102,9 +101,9 @@ class _ServiceChargeSettingPageState extends State<ServiceChargeSettingPage> {
               ),
               const SizedBox(height: 16),
               Spacer(),
-              BlocBuilder<ServiceChargeSettingCubit, ServiceChargeSettingState>(
+              BlocBuilder<TaxManagementSettingCubit, TaxManagementSettingState>(
                 builder: (context, state) {
-                  if (state is ServiceChargeSettingLoading) {
+                  if (state is TaxManagementSettingLoading) {
                     // Ganti teks tombol dengan CircularProgressIndicator saat loading
                     return Container(
                       width: double.infinity,
@@ -177,26 +176,18 @@ class _ServiceChargeSettingPageState extends State<ServiceChargeSettingPage> {
   }
 
   void _submit() {
-  // Ganti koma dengan titik pada inputan pengguna
-  final inputText = _percentageController.text.replaceAll(',', '.');
-  
-  // Lakukan parsing ke double
-  final amount = double.tryParse(inputText);
-  
-  if (amount != null) {
-    // Jika parsing berhasil, lanjutkan pemanggilan API
-    context.read<ServiceChargeSettingCubit>().setServiceCharge(
-          branchId: branchId,
-          companyId: companyId,
-          amount: amount,
-        );
-  } else {
-    // Tampilkan pesan error jika input tidak valid
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Masukkan persentase yang valid")),
-    );
+    final inputText = _percentageController.text.replaceAll(',', '.');
+    final amount = double.tryParse(inputText);
+    if (amount != null) {
+      context.read<TaxManagementSettingCubit>().setTaxCharge(
+            branchId: branchId,
+            companyId: companyId,
+            amount: amount,
+          );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Masukkan persentase yang valid")),
+      );
+    }
   }
 }
-
-}
-

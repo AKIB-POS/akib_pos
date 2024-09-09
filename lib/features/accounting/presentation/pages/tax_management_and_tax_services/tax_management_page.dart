@@ -1,35 +1,37 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
-import 'package:akib_pos/features/accounting/presentation/bloc/tax_management_and_tax_services/service_charge_cubit.dart';
-import 'package:akib_pos/features/accounting/presentation/pages/tax_management_and_tax_services/service_charge_setting_page.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/tax_management_and_tax_services/tax_management_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/pages/tax_management_and_tax_services/tax_management_setting_page.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
 
-class ServiceChargePage extends StatefulWidget {
-  const ServiceChargePage({super.key});
+class TaxManagementPage extends StatefulWidget {
+  const TaxManagementPage({Key? key}) : super(key: key);
 
   @override
-  _ServiceChargePageState createState() => _ServiceChargePageState();
+  _TaxManagementPageState createState() => _TaxManagementPageState();
 }
 
-class _ServiceChargePageState extends State<ServiceChargePage> {
+class _TaxManagementPageState extends State<TaxManagementPage> {
   late final AuthSharedPref _authSharedPref;
   late final int branchId;
   late final int companyId;
+
   @override
   void initState() {
     super.initState();
-    // Panggil cubit untuk fetch data saat initState
+    _fetchData();
+  }
+
+  void _fetchData() {
     _authSharedPref = GetIt.instance<AuthSharedPref>();
     branchId = _authSharedPref.getBranchId() ?? 0;
     companyId = _authSharedPref.getCompanyId() ?? 0;
-    context.read<ServiceChargeCubit>().fetchServiceCharge(branchId, companyId);
+    context.read<TaxManagementCubit>().fetchTaxCharge(branchId, companyId);
   }
 
   @override
@@ -48,65 +50,69 @@ class _ServiceChargePageState extends State<ServiceChargePage> {
           },
         ),
         title: const Text(
-          'Manajemen Biaya Layanan',
+          'Manajemen Pajak',
           style: AppTextStyle.headline5,
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            GestureDetector(
-              onTap: () {
-                Utils.showCustomInfoDialog(
-                  context,
-                  'Informasi Biaya Layanan',
-                  'Jika Anda menetapkan biaya layanan, biaya tersebut akan muncul secara terpisah pada struk. Jika tidak diatur atau nilainya 0, maka biaya layanan sudah termasuk dalam harga produk.',
-                );
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  const Text(
-                    "Info Biaya Layanan",
-                    style: TextStyle(color: AppColors.primaryMain),
-                  ),
-                  SvgPicture.asset("assets/icons/accounting/ic_info.svg")
-                ],
+      body: RefreshIndicator(
+        onRefresh: () async {
+          _fetchData();
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Utils.showCustomInfoDialog(
+                    context,
+                    'Informasi Pajak',
+                    'Jika Anda menetapkan nilai pajak, pajak akan dicantumkan secara terpisah pada struk pembelian. Jika tidak diatur atau nilainya 0, maka harga produk yang tercantum di struk sudah termasuk pajak.',
+                  );
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    const Text(
+                      "Info Pajak",
+                      style: TextStyle(color: AppColors.primaryMain),
+                    ),
+                    SvgPicture.asset("assets/icons/accounting/ic_info.svg")
+                  ],
+                ),
               ),
-            ),
-            BlocBuilder<ServiceChargeCubit, ServiceChargeState>(
-              builder: (context, state) {
-                if (state is ServiceChargeLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is ServiceChargeLoaded) {
-                  final serviceChargePercentage =
-                      state.serviceCharge.serviceChargePercentage;
-                  if (serviceChargePercentage == null ||
-                      serviceChargePercentage == 0) {
-                    return _buildEmptyServiceCharge(
-                        context); // Jika nilai serviceChargePercentage null
-                  } else {
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: _buildServiceChargeInfo(
-                          context, serviceChargePercentage),
-                    ); // Jika ada nilai serviceChargePercentage
+              BlocBuilder<TaxManagementCubit, TaxManagementState>(
+                builder: (context, state) {
+                  if (state is TaxManagementLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is TaxManagementLoaded) {
+                    final taxChargePercentage =
+                        state.taxCharge.taxChargePercentage;
+                    if (taxChargePercentage == null ||
+                        taxChargePercentage == 0) {
+                      return _buildEmptyTaxCharge(
+                          context); // Jika nilai taxCharge null
+                    } else {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child:
+                            _buildTaxChargeInfo(context, taxChargePercentage),
+                      ); // Jika ada nilai
+                    }
+                  } else if (state is TaxManagementError) {
+                    return Center(child: Text("Error: ${state.message}"));
                   }
-                } else if (state is ServiceChargeError) {
-                  return Center(child: Text("Error: ${state.message}"));
-                }
-                return const SizedBox.shrink(); // Default state
-              },
-            ),
-          ],
+                  return const SizedBox.shrink(); // Default state
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // Jika service charge null
-  Widget _buildEmptyServiceCharge(BuildContext context) {
+  Widget _buildEmptyTaxCharge(BuildContext context) {
     return Container(
       width: double.maxFinite,
       padding: EdgeInsets.symmetric(vertical: 16),
@@ -118,32 +124,17 @@ class _ServiceChargePageState extends State<ServiceChargePage> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SvgPicture.asset(
-            'assets/images/empty_product.svg',
-            height: 100,
-          ),
+          SvgPicture.asset('assets/images/empty_product.svg', height: 100),
           const SizedBox(height: 16),
-          Text(
-            'Biaya Pelayanan Belum Diatur',
-            style: AppTextStyle.subtitle3,
-          ),
+          Text('Pajak Belum Diatur', style: AppTextStyle.subtitle3),
           const SizedBox(height: 8),
           Text(
-            'Biaya Pelayanan akan aktif ketika\nanda mengaturnya',
+            'Pajak akan aktif ketika\nanda mengaturnya',
             textAlign: TextAlign.center,
             style: AppTextStyle.caption,
           ),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () {
-              // Arahkan ke halaman pengaturan layanan
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ServiceChargeSettingPage(),
-                ),
-              );
-            },
             style: ElevatedButton.styleFrom(
               foregroundColor: Colors.white, // Warna latar belakang
               backgroundColor: AppColors.primaryMain, // Warna teks dan ikon
@@ -156,16 +147,22 @@ class _ServiceChargePageState extends State<ServiceChargePage> {
                     14, // Padding horizontal, atur lebih kecil sesuai kebutuhan
               ),
             ),
-            child: const Text("Atur Biaya Layanan"),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TaxManagementSettingPage(),
+                ),
+              );
+            },
+            child: const Text("Atur Pajak"),
           ),
         ],
       ),
     );
   }
 
-  // Jika service charge sudah diatur
-  Widget _buildServiceChargeInfo(
-      BuildContext context, double serviceChargePercentage) {
+  Widget _buildTaxChargeInfo(BuildContext context, double taxChargePercentage) {
     return Container(
       width: double.maxFinite,
       padding: const EdgeInsets.all(16),
@@ -174,7 +171,6 @@ class _ServiceChargePageState extends State<ServiceChargePage> {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -193,22 +189,14 @@ class _ServiceChargePageState extends State<ServiceChargePage> {
                 ),
               ),
               const SizedBox(height: 16),
-              Text(
-                'Biaya Pelayanan',
-                style: AppTextStyle.subtitle3,
-              ),
+              Text('Pajak', style: AppTextStyle.subtitle3),
               const SizedBox(height: 8),
               Row(
                 children: [
+                  Text('Presentase Pajak:', style: AppTextStyle.caption),
+                  const SizedBox(width: 2),
                   Text(
-                    'Presentase Pelayanan:',
-                    style: AppTextStyle.caption,
-                  ),
-                  SizedBox(
-                    width: 2,
-                  ),
-                  Text(
-                    '${serviceChargePercentage.toStringAsFixed(0)}%',
+                    '${taxChargePercentage.toStringAsFixed(0)}%',
                     style: AppTextStyle.caption
                         .copyWith(fontWeight: FontWeight.bold),
                   ),
@@ -217,17 +205,6 @@ class _ServiceChargePageState extends State<ServiceChargePage> {
             ],
           ),
           ElevatedButton(
-            onPressed: () {
-              // Arahkan ke halaman pengaturan untuk mengedit
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ServiceChargeSettingPage(
-                    initialPercentage: serviceChargePercentage,
-                  ),
-                ),
-              );
-            },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white, // Warna latar belakang
               foregroundColor: AppColors.primaryMain, // Warna teks dan ikon
@@ -244,6 +221,16 @@ class _ServiceChargePageState extends State<ServiceChargePage> {
                     14, // Padding horizontal, atur lebih kecil sesuai kebutuhan
               ),
             ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TaxManagementSettingPage(
+                    initialPercentage: taxChargePercentage,
+                  ),
+                ),
+              );
+            },
             child: const Row(
               mainAxisSize: MainAxisSize.min, // Membuat tombol sesuai konten
               children: [
