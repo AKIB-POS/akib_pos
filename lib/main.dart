@@ -12,6 +12,9 @@ import 'package:akib_pos/features/accounting/presentation/bloc/expenditure_repor
 import 'package:akib_pos/features/accounting/presentation/bloc/expenditure_report/total_expenditure_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/financial_balance_report/date_range_financial_balance_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/financial_balance_report/financial_balance_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/profit_loss/date_range_profit_loss_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/profit_loss/profit_loss_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/profit_loss/profit_loss_details_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/date_range_pruchase_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/purchase_list_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/total_purchase_model.dart';
@@ -170,6 +173,15 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => TotalExpenditureCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => DateRangeProfitLossCubit(),
+        ),
+        BlocProvider(
+          create: (context) => ProfitLossCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => ProfitLossDetailsCubit(),
         ),
         BlocProvider(
           create: (context) => PurchasedProductCubit(repository: accountingInjection()),

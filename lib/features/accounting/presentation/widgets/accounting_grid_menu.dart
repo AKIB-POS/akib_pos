@@ -2,6 +2,7 @@ import 'package:akib_pos/features/accounting/presentation/pages/asset_management
 import 'package:akib_pos/features/accounting/presentation/pages/cash_flow_report.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/expenditure_report.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/financial_balance_report.dart';
+import 'package:akib_pos/features/accounting/presentation/pages/profit_loss_page.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/purchasing_report.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/sales_report.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/tax_management_and_tax_services/tax_management_and_tax_services.dart';
@@ -59,6 +60,15 @@ class AccountingGridMenu extends StatelessWidget {
         context,
         MaterialPageRoute(
           builder: (context) => const ExpenditureReport(), // Replace with your page
+        ),
+      );
+      break;
+    case 4:
+      // If the second item is clicked (you can replace this with your desired action)
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const ProfitLossPage(), // Replace with your page
         ),
       );
       break;

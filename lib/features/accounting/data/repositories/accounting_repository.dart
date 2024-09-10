@@ -9,6 +9,7 @@ import 'package:akib_pos/features/accounting/data/models/cash_flow_report/cash_f
 import 'package:akib_pos/features/accounting/data/models/expenditure_report/purchased_product_model.dart';
 import 'package:akib_pos/features/accounting/data/models/expenditure_report/total_expenditure.dart';
 import 'package:akib_pos/features/accounting/data/models/financial_balance_report/financial_balance_model.dart';
+import 'package:akib_pos/features/accounting/data/models/profit_loss/profit_loss_model.dart';
 import 'package:akib_pos/features/accounting/data/models/purchasing_report/purchasing_item_model.dart';
 import 'package:akib_pos/features/accounting/data/models/sales_report/sales_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/sales_report/sold_product_model.dart';
@@ -137,6 +138,11 @@ abstract class AccountingRepository {
     required int branchId,
     required int companyId,
   });
+  Future<Either<Failure, ProfitLossModel>> getProfitLoss({
+    required int branchId,
+    required int companyId,
+    required String date,
+  });
 }
 
 class AccountingRepositoryImpl implements AccountingRepository {
@@ -149,6 +155,23 @@ class AccountingRepositoryImpl implements AccountingRepository {
     required this.employeeSharedPref,
     required this.connectivity,
   });
+
+
+  @override
+  Future<Either<Failure, ProfitLossModel>> getProfitLoss({
+    required int branchId,
+    required int companyId,
+    required String date,
+  }) async {
+    try {
+      final profitLoss = await remoteDataSource.getProfitLoss(branchId: branchId, companyId: companyId, date: date);
+      return Right(profitLoss);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
   @override
   Future<Either<Failure, List<AssetsDepreciationModel>>> getAssetsDepreciation({

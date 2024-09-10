@@ -8,6 +8,7 @@ import 'package:akib_pos/features/accounting/data/models/cash_flow_report/cash_f
 import 'package:akib_pos/features/accounting/data/models/expenditure_report/purchased_product_model.dart';
 import 'package:akib_pos/features/accounting/data/models/expenditure_report/total_expenditure.dart';
 import 'package:akib_pos/features/accounting/data/models/financial_balance_report/financial_balance_model.dart';
+import 'package:akib_pos/features/accounting/data/models/profit_loss/profit_loss_model.dart';
 import 'package:akib_pos/features/accounting/data/models/purchasing_report/purchasing_item_model.dart';
 import 'package:akib_pos/features/accounting/data/models/sales_report/sales_report_model.dart';
 import 'package:akib_pos/features/accounting/data/models/sales_report/sold_product_model.dart';
@@ -136,6 +137,13 @@ abstract class AccountingRemoteDataSource {
     required int companyId,
   });
 
+
+  Future<ProfitLossModel> getProfitLoss({
+    required int branchId,
+    required int companyId,
+    required String date,
+  });
+
 }
 
 class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
@@ -145,6 +153,34 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
   AccountingRemoteDataSourceImpl({
     required this.client,
   });
+
+
+  @override
+  Future<ProfitLossModel> getProfitLoss({
+    required int branchId,
+    required int companyId,
+    required String date,
+  }) async {
+    const url = '${URLs.baseUrlMock}/profit-loss';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branch_id': branchId.toString(),
+        'company_id': companyId.toString(),
+        'date': date,
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return ProfitLossModel.fromJson(jsonResponse['data']);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
 
   @override
   Future<List<AssetsDepreciationModel>> getAssetsDepreciation({
