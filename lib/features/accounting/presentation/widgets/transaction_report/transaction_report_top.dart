@@ -32,7 +32,7 @@ class TransactionReportTop extends StatelessWidget {
                 Navigator.of(context).pop();
               },
             ),
-            leadingWidth: 20,
+            titleSpacing: 0,
             title: const Text(
               'Laporan Transaksi',
               style: AppTextStyle.headline5,

@@ -1,3 +1,4 @@
+import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -30,7 +31,7 @@ class TransactionReportItem extends StatelessWidget {
           children: [
             Text(
               title,
-              style: AppTextStyle.headline5
+              style: AppTextStyle.caption
             ),
             const SizedBox(height: 20),
             isLoading
@@ -45,11 +46,7 @@ class TransactionReportItem extends StatelessWidget {
                   )
                 : Text(
                     amount ?? '',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
-                      fontSize: 12,
-                    ),
+                    style: AppTextStyle.headline5.copyWith(color: AppColors.successMain)
                   ),
           ],
         ),
