@@ -20,12 +20,22 @@ import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubi
 import 'package:akib_pos/features/cashier/presentation/checkout/checkout_cubit.dart';
 import 'package:akib_pos/util/shared_prefs_helper.dart';
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 final sl = GetIt.instance;
 
 Future<void> init() async {
+
+ //! External
+  final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerLazySingleton(() => sharedPreferences);
+  sl.registerLazySingleton(() => http.Client());
+  sl.registerLazySingleton(() => BlueThermalPrinter.instance);
+  // Connectivity
+  sl.registerLazySingleton(() => Connectivity());
+
   //! Features - Kasir
   // Bloc
   sl.registerFactory(
@@ -117,9 +127,5 @@ Future<void> init() async {
     () => SharedPrefsHelper(sl()),
   );
 
-  //! External
-  final sharedPreferences = await SharedPreferences.getInstance();
-  sl.registerLazySingleton(() => sharedPreferences);
-  sl.registerLazySingleton(() => http.Client());
-  sl.registerLazySingleton(() => BlueThermalPrinter.instance);
+  
 }

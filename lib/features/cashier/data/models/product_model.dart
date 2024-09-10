@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 class ProductModel {
   final int id;
   final String name;
-  final String description;
+  final String? description;
   final int price;
   final int stock;
   final String imageUrl;

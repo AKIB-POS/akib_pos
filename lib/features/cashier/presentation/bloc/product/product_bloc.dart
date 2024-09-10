@@ -100,8 +100,6 @@ Future<void> _onFetchCashRegisterStatus(
     switch (failure.runtimeType) {
       case ServerFailure:
         return 'Server Failure';
-      case CacheFailure:
-        return 'Cache Failure';
       case NetworkFailure:
         return 'Network Failure';
       default:

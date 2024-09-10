@@ -61,6 +61,13 @@ Future<PostCloseCashierResponse> postCloseCashier(OpenCashierRequest request) as
     throw ServerException();
   }
 }
+Map<String, String> _buildHeaders() {
+    final token = sharedPrefsHelper.getToken();
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+  }
 
 
  @override
@@ -275,13 +282,7 @@ Future<PostCloseCashierResponse> postCloseCashier(OpenCashierRequest request) as
     return _parseVariantList(response);
   }
 
-  Map<String, String> _buildHeaders() {
-    final token = sharedPrefsHelper.getToken();
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
-    };
-  }
+  
 
   Future<http.Response> _getFromUrl(String url) async {
     try {

@@ -34,7 +34,7 @@ class AppBarAccountingContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Fadhil Muhaimin', style: AppTextStyle.headline5),
+              Text(_authSharedPref.getEmployeeName() ?? "", style: AppTextStyle.headline5),
               SizedBox(
                 height: 4,
               ),

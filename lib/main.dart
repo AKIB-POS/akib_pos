@@ -1,5 +1,35 @@
 import 'package:akib_pos/common/app_colors.dart';
+import 'package:akib_pos/di/accounting_injection.dart';
 import 'package:akib_pos/di/injection_container.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/active_asset_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/asset_depreciation_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/pending_asset_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/sold_asset_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/cash_flow_report/cash_flow_report_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/cash_flow_report/date_range_cash_flow_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/expenditure_report/date_range_expenditure_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/expenditure_report/purchased_product_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/expenditure_report/total_expenditure_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/financial_balance_report/date_range_financial_balance_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/financial_balance_report/financial_balance_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/profit_loss/date_range_profit_loss_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/profit_loss/profit_loss_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/profit_loss/profit_loss_details_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/date_range_pruchase_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/purchase_list_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/purchasing_report/total_purchase_model.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/date_range_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_product_report_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_report_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/tax_management_and_tax_services/service_charge_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/tax_management_and_tax_services/service_charge_setting_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/tax_management_and_tax_services/tax_management_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/tax_management_and_tax_services/tax_management_setting_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/employee_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/transaction_list_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/transaction_report_interaction_cubit.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/transaction_summary_cubit.dart';
 import 'package:akib_pos/features/auth/presentation/bloc/auth/auth_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
@@ -24,15 +54,24 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 import 'package:akib_pos/di/injection_container.dart' as di;
+import 'package:akib_pos/di/accounting_injection.dart' as accounting;
 import 'firebase_options.dart';
+import 'package:intl/date_symbol_data_local.dart';  // <-- This line imports the initializeDateFormatting function
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-   await _requestPermissions(); 
+
+    await initializeDateFormatting('id', null);
+  
+  await _requestPermissions(); 
+  //for auth and cashier injection initialization
   await di.init();
+  //for accounting injection initialization
+  await accounting.initAccountingModule();
 
   runApp(
     MultiBlocProvider(
@@ -51,11 +90,6 @@ void main() async {
             ..add(FetchAdditionsEvent())
             ..add(FetchVariantsEvent()),
         ),
-        // BlocProvider(
-        //   create: (context) => AuthBloc(
-        //      sl(),
-        //   ),
-        // ),
         BlocProvider(
           create: (context) => CashierCubit(
             localDataSource: sl(),
@@ -98,6 +132,97 @@ void main() async {
         BlocProvider(
             create: (context) =>
                 PrinterCubit(bluetooth: sl(),sharedPreferences: sl())),
+
+
+        //for accounting
+        BlocProvider(
+          create: (context) => TransactionSummaryCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => EmployeeCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => TransactionReportInteractionCubit(employeeSharedPref: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => TransactionListCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => TransactionReportCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => DateRangeCubit(),
+        ),
+        BlocProvider(
+          create: (context) => SalesReportCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => SalesProductReportCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => DateRangePurchaseCubit(),
+        ),
+        BlocProvider(
+          create: (context) => TotalPurchaseCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => PurchaseListCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => DateRangeExpenditureCubit(),
+        ),
+        BlocProvider(
+          create: (context) => TotalExpenditureCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => DateRangeProfitLossCubit(),
+        ),
+        BlocProvider(
+          create: (context) => ProfitLossCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => ProfitLossDetailsCubit(),
+        ),
+        BlocProvider(
+          create: (context) => PurchasedProductCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => DateRangeCashFlowCubit(),
+        ),
+        BlocProvider(
+          create: (context) => CashFlowReportCubit(repository: accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => PendingAssetCubit(accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => ActiveAssetCubit(accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => SoldAssetCubit(repository:accountingInjection()),
+        ),
+        BlocProvider(
+          create: (context) => AssetDepreciationCubit(repository:accountingInjection()),
+        ),
+
+        BlocProvider(
+          create: (context) => DateRangeFinancialBalanceCubit(),
+        ),
+         BlocProvider(
+          create: (context) => FinancialBalanceCubit(repository: accountingInjection()),
+        ),
+         BlocProvider(
+          create: (context) => ServiceChargeCubit(repository: accountingInjection()),
+        ),
+         BlocProvider(
+          create: (context) => ServiceChargeSettingCubit(repository: accountingInjection()),
+        ),
+         BlocProvider(
+          create: (context) => TaxManagementCubit(repository: accountingInjection()),
+        ),
+         BlocProvider(
+          create: (context) => TaxManagementSettingCubit(repository: accountingInjection()),
+        ),
       ],
       child: MyApp(),
     ),

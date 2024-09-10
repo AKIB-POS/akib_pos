@@ -23,8 +23,6 @@ class PostCloseCashierCubit extends Cubit<PostCloseCashierState> {
         resetState(); // Reset state setelah error
       },
       (response) async {
-        // Set shared preference bahwa kasir sudah ditutup
-    
         
         emit(PostCloseCashierSuccess(response.message));
         
