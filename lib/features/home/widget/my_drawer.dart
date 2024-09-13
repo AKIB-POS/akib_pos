@@ -19,6 +19,7 @@ class MyDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     String cafeInitials = getInitials(_authSharedPref.getCompanyName() ?? "");
     return Drawer(
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topRight: Radius.circular(0),
