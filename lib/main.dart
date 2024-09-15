@@ -58,6 +58,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 import 'package:akib_pos/di/injection_container.dart' as di;
 import 'package:akib_pos/di/accounting_injection.dart' as accounting;
+import 'package:akib_pos/di/hrd_injection.dart' as hrd;
 import 'firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';  // <-- This line imports the initializeDateFormatting function
 
@@ -75,6 +76,7 @@ void main() async {
   await di.init();
   //for accounting injection initialization
   await accounting.initAccountingModule();
+  await hrd.initHRDModule();
 
   runApp(
     MultiBlocProvider(

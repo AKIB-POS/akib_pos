@@ -2,9 +2,11 @@ import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/home/widget/my_drawer.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/appbar_hrd_page.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/summary_attendance.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:sizer/sizer.dart';
@@ -20,6 +22,21 @@ class HrdPage extends StatefulWidget {
 class _HrdPage extends State<HrdPage> {
   final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
 
+  @override
+  void initState() {
+    super.initState();
+    _fetchAttendanceSummary();
+  }
+
+  void _fetchAttendanceSummary() {
+    final branchId = _authSharedPref.getBranchId() ?? 0;
+    final companyId = _authSharedPref.getCompanyId() ?? 0;
+
+    context.read<AttendanceSummaryCubit>().fetchAttendanceSummary(
+          branchId: branchId,
+          companyId: companyId,
+        );
+  }
   @override
   Widget build(BuildContext context) {
     // Fetch role from AuthSharedPref
@@ -41,34 +58,40 @@ class _HrdPage extends State<HrdPage> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              color: AppColors.backgroundGrey,
-              child: Column(
-                children: [
-                  SummaryAttendance(role: role),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    width: double.infinity,
-                    height: 20,
-                    decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(30),
-                            topRight: Radius.circular(30))),
-                  ),
-                ],
+      body: RefreshIndicator(
+        color: AppColors.primaryMain,
+        onRefresh: () async {
+          _fetchAttendanceSummary();
+        },
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                color: AppColors.backgroundGrey,
+                child: Column(
+                  children: [
+                    SummaryAttendance(role: role),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      width: double.infinity,
+                      height: 20,
+                      decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(30),
+                              topRight: Radius.circular(30))),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            // Conditionally render _attendanceRecap()
-            if (role != "employee") _attendanceRecap(),
-            _attendanceService(),
-            _employeeService(),
-          ],
+              // Conditionally render _attendanceRecap()
+              if (role != "employee") _attendanceRecap(),
+              _attendanceService(),
+              _employeeService(),
+            ],
+          ),
         ),
       ),
     );

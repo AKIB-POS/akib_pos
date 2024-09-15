@@ -20,7 +20,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<AttendanceSummaryResponse> getAttendanceSummary(int branchId, int companyId) async {
-    const url = '${URLs.baseUrlMock}/api/attendance-summary';
+    const url = '${URLs.baseUrlMock}/attendance-summary';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),
