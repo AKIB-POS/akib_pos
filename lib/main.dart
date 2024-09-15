@@ -1,5 +1,6 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/di/accounting_injection.dart';
+import 'package:akib_pos/di/hrd_injection.dart';
 import 'package:akib_pos/di/injection_container.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/active_asset_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/asset_depreciation_cubit.dart';
@@ -45,7 +46,9 @@ import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transact
 import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/checkout/checkout_cubit.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_summary_cubit.dart';
 import 'package:akib_pos/splash_screen.dart';
+import 'package:akib_pos/util/bloc_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -75,7 +78,10 @@ void main() async {
 
   runApp(
     MultiBlocProvider(
-      providers: [
+      providers: 
+      [
+
+        
         BlocProvider(
           create: (context) => NavigationCubit(),
         ),
@@ -222,6 +228,14 @@ void main() async {
         ),
          BlocProvider(
           create: (context) => TaxManagementSettingCubit(repository: accountingInjection()),
+        ),
+
+
+
+
+        //HRD
+        BlocProvider(
+          create: (context) => AttendanceSummaryCubit(hrdInjection()),
         ),
       ],
       child: MyApp(),

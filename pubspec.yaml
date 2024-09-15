@@ -109,7 +109,9 @@ flutter:
     - assets/images/
     - assets/identity/
     - assets/icons/accounting/
+    - assets/icons/hrd/
     - assets/images/accounting/
+    - assets/images/hrd/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

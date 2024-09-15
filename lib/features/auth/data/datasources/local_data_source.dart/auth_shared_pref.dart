@@ -14,6 +14,7 @@ class AuthSharedPref {
   static const String emailKey = 'email';
   static const String roleKey = 'role';
   static const String employeeNameKey = 'employeeName';
+  static const String employeeRoleKey = 'employeeRole'; // New key for employeeRole
   static const String permissionsKey = 'permissions';
   static const String cashRegisterIdKey = 'cashRegisterId';
   static const String isLoggedInKey = 'isLoggedIn';
@@ -28,6 +29,7 @@ class AuthSharedPref {
     await _prefs.setString(emailKey, response.email ?? '');
     await _prefs.setString(roleKey, response.role ?? '');
     await _prefs.setString(employeeNameKey, response.employeeName);
+    await _prefs.setString(employeeRoleKey, response.employeeRole); // Save employeeRole
     await _prefs.setStringList(permissionsKey, response.permissions);
   }
 
@@ -41,6 +43,7 @@ class AuthSharedPref {
     await _prefs.remove(emailKey);
     await _prefs.remove(roleKey);
     await _prefs.remove(employeeNameKey);
+    await _prefs.remove(employeeRoleKey); // Clear employeeRole
     await _prefs.remove(permissionsKey);
     await _prefs.remove(cashRegisterIdKey); // Clear cash register ID
   }
@@ -79,6 +82,11 @@ class AuthSharedPref {
 
   String? getEmployeeName() {
     return _prefs.getString(employeeNameKey);
+  }
+
+  // Method to get employeeRole
+  String? getEmployeeRole() {
+    return _prefs.getString(employeeRoleKey);
   }
 
   List<String>? getPermissions() {

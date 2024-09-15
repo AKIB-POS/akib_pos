@@ -245,7 +245,7 @@ class _AuthPage extends State<AuthPage> {
             ),
           ],
         ),
-        padding: EdgeInsets.all(60),
+        padding: isTabletDevice(context)  ? EdgeInsets.all(60) :EdgeInsets.symmetric(vertical: 20,horizontal: 12)  ,
         child: SingleChildScrollView(
           child: FormBuilder(
             key: _formKey,
@@ -254,7 +254,7 @@ class _AuthPage extends State<AuthPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("Login untuk memulai", style: AppTextStyle.headline4),
+                Text("Login untuk memulai", style: isTabletDevice(context) ? AppTextStyle.headline4 : AppTextStyle.headline5) ,
                 const SizedBox(height: 12),
                 const Text("*Email atau Username", style: AppTextStyle.body2),
                 const SizedBox(height: 8),
