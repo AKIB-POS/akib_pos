@@ -30,7 +30,7 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
   @override
   Future<LoginResponse> login({required String email, required String password}) async {
     final response = await http.post(
-      Uri.parse('${URLs.baseUrlProd}/login'),
+      Uri.parse('${URLs.baseUrlMock}/login'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'email': email,
@@ -38,7 +38,7 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
       }),
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       return LoginResponse.fromJson(jsonDecode(response.body));
     } else {
       final errorResponse = jsonDecode(response.body);
