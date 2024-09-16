@@ -1,6 +1,6 @@
 // CheckOutCubit
 import 'package:akib_pos/core/error/failures.dart';
-import 'package:akib_pos/features/hrd/data/models/check_in_out_request.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/check_in_out_request.dart';
 import 'package:akib_pos/features/hrd/data/repositories/hrd_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

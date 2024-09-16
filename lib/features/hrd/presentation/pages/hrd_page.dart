@@ -4,8 +4,10 @@ import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/a
 import 'package:akib_pos/features/home/widget/my_drawer.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/attendance_page.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/leave_page.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/appbar_hrd_page.dart';
-import 'package:akib_pos/features/hrd/presentation/widgets/summary_attendance.dart';
+import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/summary_attendance.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -211,26 +213,34 @@ class _HrdPage extends State<HrdPage> {
   }
 
   Widget _buildServiceItem(String label, String assetPath) {
-    return GestureDetector(
-      onTap: () {
-        if (label == 'Absensi') {
+  return GestureDetector(
+    onTap: () {
+      switch (label) {
+        case 'Absensi':
           _navigateToAttendancePage(context);
-        }
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SvgPicture.asset(
-            assetPath,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: AppTextStyle.caption,
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
+          break;
+        case 'Cuti':
+          Utils.navigateToPage(context, LeavePage());
+          break;
+        // Add more cases here if needed
+        default:
+          break;
+      }
+    },
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SvgPicture.asset(
+          assetPath,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: AppTextStyle.caption,
+          textAlign: TextAlign.center,
+        ),
+      ],
+    ),
+  );
+}
 }
