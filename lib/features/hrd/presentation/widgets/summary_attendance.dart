@@ -167,7 +167,7 @@ class SummaryAttendance extends StatelessWidget {
     );
   }
 
-  Widget _buildAttendanceContent(AttendanceSummary data) {
+  Widget _buildAttendanceContent(AttendanceSummaryData data) {
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -236,7 +236,7 @@ class SummaryAttendance extends StatelessWidget {
     );
   }
 
-  Widget _buildMiddleSection(AttendanceSummary data) {
+  Widget _buildMiddleSection(AttendanceSummaryData data) {
     return ClipRRect(
       borderRadius: const BorderRadius.only(
         bottomLeft: Radius.circular(12),

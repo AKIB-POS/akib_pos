@@ -3,6 +3,7 @@ import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/home/widget/my_drawer.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_summary_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/attendance_page.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/appbar_hrd_page.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/summary_attendance.dart';
 import 'package:flutter/material.dart';
@@ -37,11 +38,12 @@ class _HrdPage extends State<HrdPage> {
           companyId: companyId,
         );
   }
+
   @override
   Widget build(BuildContext context) {
     // Fetch role from AuthSharedPref
     String? role = _authSharedPref.getEmployeeRole();
-    
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.backgroundWhite,
@@ -63,35 +65,38 @@ class _HrdPage extends State<HrdPage> {
         onRefresh: () async {
           _fetchAttendanceSummary();
         },
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                color: AppColors.backgroundGrey,
-                child: Column(
-                  children: [
-                    SummaryAttendance(role: role),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      width: double.infinity,
-                      height: 20,
-                      decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(30),
-                              topRight: Radius.circular(30))),
-                    ),
-                  ],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                Container(
+                  color: AppColors.backgroundGrey,
+                  child: Column(
+                    children: [
+                      SummaryAttendance(role: role),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        width: double.infinity,
+                        height: 20,
+                        decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(30),
+                                topRight: Radius.circular(30))),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              // Conditionally render _attendanceRecap()
-              if (role != "employee") _attendanceRecap(),
-              _attendanceService(),
-              _employeeService(),
-            ],
-          ),
+                // Conditionally render _attendanceRecap()
+                if (role != "employee") _attendanceRecap(),
+                _attendanceService(),
+                _employeeService(),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -176,12 +181,15 @@ class _HrdPage extends State<HrdPage> {
             mainAxisSpacing: 20,
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              _buildServiceItem('Calon Pegawai', 'assets/icons/hrd/ic_employee_candidate.svg'),
+              _buildServiceItem('Calon Pegawai',
+                  'assets/icons/hrd/ic_employee_candidate.svg'),
               _buildServiceItem('Pegawai', 'assets/icons/hrd/ic_employee.svg'),
-              _buildServiceItem('Administrasi', 'assets/icons/hrd/ic_administration.svg'),
+              _buildServiceItem(
+                  'Administrasi', 'assets/icons/hrd/ic_administration.svg'),
               _buildServiceItem('Slip Gaji', 'assets/icons/hrd/ic_salary.svg'),
               _buildServiceItem('Tasking', 'assets/icons/hrd/ic_tasking.svg'),
-              _buildServiceItem('Pelatihan', 'assets/icons/hrd/ic_training.svg'),
+              _buildServiceItem(
+                  'Pelatihan', 'assets/icons/hrd/ic_training.svg'),
             ],
           ),
         ],
@@ -189,20 +197,40 @@ class _HrdPage extends State<HrdPage> {
     );
   }
 
+  void _navigateToAttendancePage(BuildContext context) {
+    final attendanceData = context.read<AttendanceSummaryCubit>().state;
+    if (attendanceData is AttendanceSummaryLoaded) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              AttendancePage(data: attendanceData.attendanceSummary.data),
+        ),
+      );
+    }
+  }
+
   Widget _buildServiceItem(String label, String assetPath) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SvgPicture.asset(
-          assetPath,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: AppTextStyle.caption,
-          textAlign: TextAlign.center,
-        ),
-      ],
+    return GestureDetector(
+      onTap: () {
+        if (label == 'Absensi') {
+          _navigateToAttendancePage(context);
+        }
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SvgPicture.asset(
+            assetPath,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: AppTextStyle.caption,
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }
