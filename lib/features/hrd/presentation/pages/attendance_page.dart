@@ -3,9 +3,11 @@ import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_summary.dart';
 import 'package:akib_pos/features/hrd/data/models/check_in_out_request.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_history_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/check_in_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/check_out_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/widgets/attendance_history_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -13,11 +15,27 @@ import 'package:intl/intl.dart';
 
 import 'package:intl/intl.dart';
 
-class AttendancePage extends StatelessWidget {
+class AttendancePage extends StatefulWidget {
   final AttendanceSummaryData data;
-  final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
 
   AttendancePage({required this.data});
+
+  @override
+  _AttendancePageState createState() => _AttendancePageState();
+}
+
+class _AttendancePageState extends State<AttendancePage> {
+  final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAttendanceHistory();
+  }
+
+  void _fetchAttendanceHistory() {
+    context.read<AttendanceHistoryCubit>().fetchAttendanceHistory(); // No parameters needed
+  }
 
   void _performCheckIn(BuildContext context) {
     final branchId = _authSharedPref.getBranchId() ?? 0;
@@ -82,12 +100,8 @@ class AttendancePage extends StatelessWidget {
               ),
             );
 
-            // Go back to HRD page and refresh data
-            Navigator.of(context).pop();
-            context.read<AttendanceSummaryCubit>().fetchAttendanceSummary(
-              branchId: _authSharedPref.getBranchId() ?? 0,
-              companyId: _authSharedPref.getCompanyId() ?? 0,
-            );
+            // Refresh attendance history data
+            _fetchAttendanceHistory();
           } else if (state is CheckInError) {
             // Close loading dialog
             Navigator.of(context).pop();
@@ -122,12 +136,8 @@ class AttendancePage extends StatelessWidget {
                 ),
               );
 
-              // Go back to HRD page and refresh data
-              Navigator.of(context).pop();
-              context.read<AttendanceSummaryCubit>().fetchAttendanceSummary(
-                branchId: _authSharedPref.getBranchId() ?? 0,
-                companyId: _authSharedPref.getCompanyId() ?? 0,
-              );
+              // Refresh attendance history data
+              _fetchAttendanceHistory();
             } else if (state is CheckOutError) {
               // Close loading dialog
               Navigator.of(context).pop();
@@ -141,12 +151,35 @@ class AttendancePage extends StatelessWidget {
               );
             }
           },
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                _buildAttendanceBody(context),
-              ],
+          child: RefreshIndicator(
+            onRefresh: () async {
+              _fetchAttendanceHistory(); // Refresh the attendance history
+            },
+            color: AppColors.primaryMain,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                children: [
+                  Container(
+                    color: AppColors.backgroundGrey,
+                    child: Column(
+                      children: [
+                        _buildAttendanceBody(context),
+                        Container(
+                        width: double.infinity,
+                        height: 20,
+                        decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(30),
+                                topRight: Radius.circular(30))),
+                      ),
+                      ],
+                    )),
+                  AttendanceHistoryWidget(), 
+                  
+                ],
+              ),
             ),
           ),
         ),
@@ -160,16 +193,17 @@ class AttendancePage extends StatelessWidget {
 
     // Parse expectedClockInTime to a DateTime object
     DateTime? expectedClockInDateTime;
-    if (data.expectedClockInTime != null) {
-      expectedClockInDateTime = DateFormat('HH:mm').parse(data.expectedClockInTime!);
+    if (widget.data.expectedClockInTime != null) {
+      expectedClockInDateTime = DateFormat('HH:mm').parse(widget.data.expectedClockInTime!);
     }
 
     // Determine button colors
-    bool isClockInEnabled = data.clockInTime == null &&
+    bool isClockInEnabled = widget.data.clockInTime == null &&
                             (expectedClockInDateTime != null && now.isAfter(expectedClockInDateTime));
-    bool isClockOutEnabled = data.clockInTime != null && data.clockOutTime == null;
+    bool isClockOutEnabled = widget.data.clockInTime != null && widget.data.clockOutTime == null;
 
     return Container(
+      margin: EdgeInsets.all(21),
       padding: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -200,7 +234,7 @@ class AttendancePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "${data.expectedClockInTime} - ${data.expectedClockOutTime}",
+                  "${widget.data.expectedClockInTime} - ${widget.data.expectedClockOutTime}",
                   style: AppTextStyle.headline5.copyWith(fontWeight: FontWeight.bold),
                 ),
               ],
@@ -217,15 +251,15 @@ class AttendancePage extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: data.clockInTime != null
+                      color: widget.data.clockInTime != null
                           ? AppColors.successMain.withOpacity(0.1)
                           : Colors.grey.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      data.clockInTime ?? '-- : --',
+                      widget.data.clockInTime ?? '-- : --',
                       style: AppTextStyle.bigCaptionBold.copyWith(
-                        color: data.clockInTime != null
+                        color: widget.data.clockInTime != null
                             ? AppColors.successMain
                             : Colors.grey,
                       ),
@@ -245,15 +279,15 @@ class AttendancePage extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: data.clockOutTime != null
+                      color: widget.data.clockOutTime != null
                           ? AppColors.errorMain.withOpacity(0.1)
                           : Colors.grey.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      data.clockOutTime ?? '-- : --',
+                      widget.data.clockOutTime ?? '-- : --',
                       style: AppTextStyle.bigCaptionBold.copyWith(
-                        color: data.clockOutTime != null
+                        color: widget.data.clockOutTime != null
                             ? AppColors.errorMain
                             : Colors.grey,
                       ),

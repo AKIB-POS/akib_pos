@@ -13,9 +13,9 @@ class CheckInOutRequest {
 
   Map<String, dynamic> toJson() {
     return {
-      'branch_id': branchId,
-      'company_id': companyId,
-      'employee_id': employeeId,
+      // 'branch_id': branchId,
+      // 'company_id': companyId,
+      // 'employee_id': employeeId,
       'time': time,
     };
   }
