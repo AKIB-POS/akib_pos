@@ -1,6 +1,6 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
-import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave_quota_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_quota_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
@@ -83,7 +83,7 @@ class LeaveQuotaWidget extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Saldo Cuti', style: AppTextStyle.bigCaptionBold),
+        const Text('Saldo Cuti', style: AppTextStyle.bigCaptionBold),
         const SizedBox(height: 16),
         Container(
           decoration: BoxDecoration(

@@ -54,8 +54,8 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Container(
         width: double.infinity,
         child: Image.asset(
-          'assets/identity/splash_screen.png',
-          fit: isPortrait ? BoxFit.cover : BoxFit.fitWidth,
+          !isPortrait ? 'assets/identity/splash_screen.png'  :'assets/identity/splash_screen_portrait.png',
+          fit: isPortrait ? BoxFit.cover : BoxFit.cover,
         ),
       ),
     );

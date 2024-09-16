@@ -47,7 +47,8 @@ import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubi
 import 'package:akib_pos/features/cashier/presentation/checkout/checkout_cubit.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/attendance_history_cubit.dart';
-import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave_quota_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_quota_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_request_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_in_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_out_cubit.dart';
@@ -73,7 +74,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-    await initializeDateFormatting('id', null);
+  await initializeDateFormatting('id', null);
   
   await _requestPermissions(); 
   //for auth and cashier injection initialization
@@ -85,9 +86,7 @@ void main() async {
   runApp(
     MultiBlocProvider(
       providers: 
-      [
-
-        
+      [ 
         BlocProvider(
           create: (context) => NavigationCubit(),
         ),
@@ -255,14 +254,17 @@ void main() async {
         BlocProvider(
           create: (context) => LeaveQuotaCubit(hrdInjection()),
         ),
+        BlocProvider(
+          create: (context) => LeaveRequestCubit(hrdInjection()),
+        ),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
 Future<void> _requestPermissions() async {
-  // Request Bluetooth and Location Permissions
+  
   PermissionStatus bluetoothStatus = await Permission.bluetooth.status;
   PermissionStatus locationStatus = await Permission.location.status;
 
@@ -273,9 +275,12 @@ Future<void> _requestPermissions() async {
   if (!locationStatus.isGranted) {
     await Permission.location.request();
   }
+
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Sizer(
