@@ -47,6 +47,8 @@ import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubi
 import 'package:akib_pos/features/cashier/presentation/checkout/checkout_cubit.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_summary_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/check_in_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/check_out_cubit.dart';
 import 'package:akib_pos/splash_screen.dart';
 import 'package:akib_pos/util/bloc_providers.dart';
 import 'package:flutter/material.dart';
@@ -238,6 +240,12 @@ void main() async {
         //HRD
         BlocProvider(
           create: (context) => AttendanceSummaryCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => CheckInCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => CheckOutCubit(hrdInjection()),
         ),
       ],
       child: MyApp(),

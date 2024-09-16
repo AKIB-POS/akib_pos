@@ -1,17 +1,55 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_summary.dart';
+import 'package:akib_pos/features/hrd/data/models/check_in_out_request.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_summary_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/check_in_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/check_out_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 
 import 'package:intl/intl.dart';
 
 class AttendancePage extends StatelessWidget {
   final AttendanceSummaryData data;
+  final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
 
   AttendancePage({required this.data});
+
+  void _performCheckIn(BuildContext context) {
+    final branchId = _authSharedPref.getBranchId() ?? 0;
+    final companyId = _authSharedPref.getCompanyId() ?? 0;
+    final employeeId = _authSharedPref.getUserId() ?? 0;
+    final time = DateFormat('HH:mm').format(DateTime.now());
+
+    final request = CheckInOutRequest(
+      branchId: branchId,
+      companyId: companyId,
+      employeeId: employeeId,
+      time: time,
+    );
+
+    context.read<CheckInCubit>().checkIn(request);
+  }
+
+  void _performCheckOut(BuildContext context) {
+    final branchId = _authSharedPref.getBranchId() ?? 0;
+    final companyId = _authSharedPref.getCompanyId() ?? 0;
+    final employeeId = _authSharedPref.getUserId() ?? 0;
+    final time = DateFormat('HH:mm').format(DateTime.now());
+
+    final request = CheckInOutRequest(
+      branchId: branchId,
+      companyId: companyId,
+      employeeId: employeeId,
+      time: time,
+    );
+
+    context.read<CheckOutCubit>().checkOut(request);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,18 +61,100 @@ class AttendancePage extends StatelessWidget {
         elevation: 0,
         titleSpacing: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _buildAttendanceBody(),
-          ],
+      body: BlocListener<CheckInCubit, CheckInState>(
+        listener: (context, state) {
+          if (state is CheckInLoading) {
+            // Show loading dialog
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (_) => const Center(child: CircularProgressIndicator()),
+            );
+          } else if (state is CheckInSuccess) {
+            // Close loading dialog
+            Navigator.of(context).pop();
+
+            // Show success snackbar
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.green,
+              ),
+            );
+
+            // Go back to HRD page and refresh data
+            Navigator.of(context).pop();
+            context.read<AttendanceSummaryCubit>().fetchAttendanceSummary(
+              branchId: _authSharedPref.getBranchId() ?? 0,
+              companyId: _authSharedPref.getCompanyId() ?? 0,
+            );
+          } else if (state is CheckInError) {
+            // Close loading dialog
+            Navigator.of(context).pop();
+
+            // Show error snackbar
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+        child: BlocListener<CheckOutCubit, CheckOutState>(
+          listener: (context, state) {
+            if (state is CheckOutLoading) {
+              // Show loading dialog
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (_) => const Center(child: CircularProgressIndicator()),
+              );
+            } else if (state is CheckOutSuccess) {
+              // Close loading dialog
+              Navigator.of(context).pop();
+
+              // Show success snackbar
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.green,
+                ),
+              );
+
+              // Go back to HRD page and refresh data
+              Navigator.of(context).pop();
+              context.read<AttendanceSummaryCubit>().fetchAttendanceSummary(
+                branchId: _authSharedPref.getBranchId() ?? 0,
+                companyId: _authSharedPref.getCompanyId() ?? 0,
+              );
+            } else if (state is CheckOutError) {
+              // Close loading dialog
+              Navigator.of(context).pop();
+
+              // Show error snackbar
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                _buildAttendanceBody(context),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildAttendanceBody() {
+  Widget _buildAttendanceBody(BuildContext context) {
     DateTime now = DateTime.now();
     String formattedDate = DateFormat('EEEE, dd MMMM yyyy', 'ID').format(now);
 
@@ -45,7 +165,7 @@ class AttendancePage extends StatelessWidget {
     }
 
     // Determine button colors
-    bool isClockInEnabled = data.clockInTime == null && 
+    bool isClockInEnabled = data.clockInTime == null &&
                             (expectedClockInDateTime != null && now.isAfter(expectedClockInDateTime));
     bool isClockOutEnabled = data.clockInTime != null && data.clockOutTime == null;
 
@@ -149,13 +269,17 @@ class AttendancePage extends StatelessWidget {
             children: [
               const SizedBox(width: 10),
               _buildActionButton(
+                context,
                 'Masuk',
                 isClockInEnabled ? AppColors.successMain : Colors.grey,
+                isClockInEnabled ? () => _performCheckIn(context) : null,
               ),
               const SizedBox(width: 10),
               _buildActionButton(
+                context,
                 'Keluar',
                 isClockOutEnabled ? AppColors.errorMain : Colors.grey,
+                isClockOutEnabled ? () => _performCheckOut(context) : null,
               ),
               const SizedBox(width: 10),
             ],
@@ -165,16 +289,12 @@ class AttendancePage extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(String text, Color color) {
+  Widget _buildActionButton(BuildContext context, String text, Color color, VoidCallback? onPressed) {
     return Expanded(
       child: SizedBox(
         width: double.maxFinite,
         child: ElevatedButton(
-          onPressed: color == Colors.grey
-              ? null // Disable the button if color is grey
-              : () {
-                  // Handle button press
-                },
+          onPressed: onPressed,
           style: ElevatedButton.styleFrom(
             backgroundColor: color,
             shape: RoundedRectangleBorder(

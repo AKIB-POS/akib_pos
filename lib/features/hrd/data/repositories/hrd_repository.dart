@@ -2,11 +2,15 @@ import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/core/error/failures.dart';
 import 'package:akib_pos/features/hrd/data/datasources/remote/hrd_remote_data_source.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_summary.dart';
+import 'package:akib_pos/features/hrd/data/models/check_in_out_request.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class HRDRepository {
   Future<Either<Failure, AttendanceSummaryResponse>> getAttendanceSummary(int branchId, int companyId);
+  Future<Either<Failure, CheckInOutResponse>> checkIn(CheckInOutRequest request);
+  Future<Either<Failure, CheckInOutResponse>> checkOut(CheckInOutRequest request);
 }
+
 class HRDRepositoryImpl implements HRDRepository {
   final HRDRemoteDataSource remoteDataSource;
 
@@ -23,5 +27,28 @@ class HRDRepositoryImpl implements HRDRepository {
       return Left(GeneralFailure(e.toString()));
     }
   }
-}
 
+  @override
+  Future<Either<Failure, CheckInOutResponse>> checkIn(CheckInOutRequest request) async {
+    try {
+      final checkInResponse = await remoteDataSource.checkIn(request);
+      return Right(checkInResponse);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, CheckInOutResponse>> checkOut(CheckInOutRequest request) async {
+    try {
+      final checkOutResponse = await remoteDataSource.checkOut(request);
+      return Right(checkOutResponse);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+}
