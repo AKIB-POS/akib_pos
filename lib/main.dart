@@ -46,7 +46,12 @@ import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transact
 import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/checkout/checkout_cubit.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/attendance_history_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_quota_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_request_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_summary_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_in_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_out_cubit.dart';
 import 'package:akib_pos/splash_screen.dart';
 import 'package:akib_pos/util/bloc_providers.dart';
 import 'package:flutter/material.dart';
@@ -58,6 +63,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 import 'package:akib_pos/di/injection_container.dart' as di;
 import 'package:akib_pos/di/accounting_injection.dart' as accounting;
+import 'package:akib_pos/di/hrd_injection.dart' as hrd;
 import 'firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';  // <-- This line imports the initializeDateFormatting function
 
@@ -68,20 +74,19 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-    await initializeDateFormatting('id', null);
+  await initializeDateFormatting('id', null);
   
   await _requestPermissions(); 
   //for auth and cashier injection initialization
   await di.init();
   //for accounting injection initialization
   await accounting.initAccountingModule();
+  await hrd.initHRDModule();
 
   runApp(
     MultiBlocProvider(
       providers: 
-      [
-
-        
+      [ 
         BlocProvider(
           create: (context) => NavigationCubit(),
         ),
@@ -237,14 +242,29 @@ void main() async {
         BlocProvider(
           create: (context) => AttendanceSummaryCubit(hrdInjection()),
         ),
+        BlocProvider(
+          create: (context) => CheckInCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => CheckOutCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => AttendanceHistoryCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => LeaveQuotaCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => LeaveRequestCubit(hrdInjection()),
+        ),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
 Future<void> _requestPermissions() async {
-  // Request Bluetooth and Location Permissions
+  
   PermissionStatus bluetoothStatus = await Permission.bluetooth.status;
   PermissionStatus locationStatus = await Permission.location.status;
 
@@ -255,9 +275,12 @@ Future<void> _requestPermissions() async {
   if (!locationStatus.isGranted) {
     await Permission.location.request();
   }
+
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Sizer(
