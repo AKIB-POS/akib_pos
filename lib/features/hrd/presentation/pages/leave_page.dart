@@ -76,9 +76,9 @@ class _LeavePageState extends State<LeavePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 16, left: 16),
-                          child: const Text('Saldo Cuti',
+                        const Padding(
+                          padding: EdgeInsets.only(top: 16, left: 16),
+                          child: Text('Saldo Cuti',
                               style: AppTextStyle.bigCaptionBold),
                         ),
                         LeaveQuotaWidget(),
@@ -95,7 +95,7 @@ class _LeavePageState extends State<LeavePage> {
                           child: Text('Pengajuan Cuti',
                               style: AppTextStyle.bigCaptionBold),
                         ),
-                        LeaveRequestWidget(),
+                        const LeaveRequestWidget(),
                         Container(
                           width: double.infinity,
                           height: 20,
@@ -115,8 +115,8 @@ class _LeavePageState extends State<LeavePage> {
                     child: Text('Riwayat Cuti',
                         style: AppTextStyle.bigCaptionBold),
                   ),
-                  SizedBox(height: 8,),
-                  LeaveHistoryWidget(), // Display leave history
+                  const SizedBox(height: 8,),
+                  const LeaveHistoryWidget(), // Display leave history
                 ],
               ),
             ),

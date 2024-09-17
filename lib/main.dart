@@ -50,6 +50,7 @@ import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/atten
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_quota_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_request_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave_history_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_quota_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_in_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_out_cubit.dart';
@@ -252,6 +253,8 @@ void main() async {
         BlocProvider(
           create: (context) => AttendanceHistoryCubit(hrdInjection()),
         ),
+
+
         BlocProvider(
           create: (context) => LeaveQuotaCubit(hrdInjection()),
         ),
@@ -260,6 +263,11 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => LeaveHistoryCubit(hrdInjection()),
+        ),
+
+
+        BlocProvider(
+          create: (context) => PermissionQuotaCubit(hrdInjection()),
         ),
       ],
       child: const MyApp(),

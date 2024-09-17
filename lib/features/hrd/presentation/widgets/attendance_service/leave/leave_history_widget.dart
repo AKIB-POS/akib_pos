@@ -8,6 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class LeaveHistoryWidget extends StatelessWidget {
+  const LeaveHistoryWidget({super.key});
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<LeaveHistoryCubit, LeaveHistoryState>(

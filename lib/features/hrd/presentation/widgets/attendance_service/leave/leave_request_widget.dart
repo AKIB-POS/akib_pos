@@ -9,6 +9,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:shimmer/shimmer.dart';
 
 class LeaveRequestWidget extends StatelessWidget {
+  const LeaveRequestWidget({super.key});
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<LeaveRequestCubit, LeaveRequestState>(

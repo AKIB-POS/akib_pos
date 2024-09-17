@@ -4,12 +4,15 @@ import 'package:akib_pos/features/hrd/data/datasources/remote/hrd_remote_data_so
 import 'package:akib_pos/features/hrd/data/models/attendance_service/attendance_history_item.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_history.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_request_data.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_quota.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_summary.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/check_in_out_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_quota.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class HRDRepository {
+
+  //Attendance
   Future<Either<Failure, AttendanceSummaryResponse>> getAttendanceSummary(
       int branchId, int companyId);
   Future<Either<Failure, CheckInOutResponse>> checkIn(
@@ -17,15 +20,35 @@ abstract class HRDRepository {
   Future<Either<Failure, CheckInOutResponse>> checkOut(
       CheckInOutRequest request);
   Future<Either<Failure, AttendanceHistoryResponse>> getAttendanceHistory();
+
+  //Leave
   Future<Either<Failure, LeaveQuotaResponse>> getLeaveQuota();
   Future<Either<Failure, LeaveRequestResponse>> getLeaveRequests();
   Future<Either<Failure, LeaveHistoryResponse>> getLeaveHistory();
+
+  //Permission
+    Future<Either<Failure, PermissionQuotaResponse>> getPermissionQuota();
+
 }
 
 class HRDRepositoryImpl implements HRDRepository {
   final HRDRemoteDataSource remoteDataSource;
 
   HRDRepositoryImpl({required this.remoteDataSource});
+
+
+
+  @override
+  Future<Either<Failure, PermissionQuotaResponse>> getPermissionQuota() async {
+    try {
+      final permissionQuota = await remoteDataSource.getPermissionQuota();
+      return Right(permissionQuota);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
   @override
   Future<Either<Failure, LeaveHistoryResponse>> getLeaveHistory() async {

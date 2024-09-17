@@ -6,6 +6,7 @@ import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/a
 import 'package:akib_pos/features/hrd/data/models/attendance_service/attendance_history_item.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_history.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_request_data.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_quota.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_summary.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/check_in_out_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_quota.dart';
@@ -14,14 +15,21 @@ import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
 abstract class HRDRemoteDataSource {
+
+  //Attendance
   Future<AttendanceSummaryResponse> getAttendanceSummary(
       int branchId, int companyId);
   Future<CheckInOutResponse> checkIn(CheckInOutRequest request);
   Future<CheckInOutResponse> checkOut(CheckInOutRequest request);
   Future<AttendanceHistoryResponse> getAttendanceHistory();
+
+  //Leave
   Future<LeaveRequestResponse> getLeaveRequests();
   Future<LeaveQuotaResponse> getLeaveQuota();
   Future<LeaveHistoryResponse> getLeaveHistory();
+
+  //Permission
+   Future<PermissionQuotaResponse> getPermissionQuota();
 }
 
 class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
@@ -29,7 +37,23 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
   final AuthSharedPref sharedPrefsHelper = GetIt.instance<AuthSharedPref>();
 
   HRDRemoteDataSourceImpl({required this.client});
+@override
+  Future<PermissionQuotaResponse> getPermissionQuota() async {
+    const url = '${URLs.baseUrlMock}/permission-quota';
+    final response = await client.get(
+      Uri.parse(url),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
 
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return PermissionQuotaResponse.fromJson(jsonResponse);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
 
   @override
   Future<LeaveHistoryResponse> getLeaveHistory() async {
