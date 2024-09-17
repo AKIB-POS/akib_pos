@@ -46,6 +46,7 @@ class _PermissionPageState extends State<PermissionPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        forceMaterialTransparency: true,
         title: const Text('Izin', style: AppTextStyle.headline5),
         backgroundColor: Colors.white,
         titleSpacing: 0,
@@ -66,24 +67,51 @@ class _PermissionPageState extends State<PermissionPage> {
           children: [
             Container(
               padding: const EdgeInsets.only(bottom: 21),
-              color: AppColors.backgroundGrey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 16, left: 16),
-                    child: Text('Saldo Izin', style: AppTextStyle.bigCaptionBold),
+                  Container(
+                    color: AppColors.backgroundGrey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(top: 16, left: 16),
+                          child: Text('Saldo Izin', style: AppTextStyle.bigCaptionBold),
+                        ),
+                        PermissionQuotaWidget(), // Display permission quota
+                      ],
+                    ),
                   ),
-                  PermissionQuotaWidget(), // Display permission quota
-                  const Padding(
-                    padding: EdgeInsets.only(left: 16, top: 16),
-                    child: Text('Pengajuan Izin', style: AppTextStyle.bigCaptionBold),
+                  Container(
+                    color: AppColors.backgroundGrey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(left: 16),
+                          child: Text('Pengajuan Izin', style: AppTextStyle.bigCaptionBold),
+                        ),
+                        const PermissionRequestWidget(), // Display permission requests
+                        Container(
+                          width: double.infinity,
+                          height: 20,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(30),
+                              topRight: Radius.circular(30),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  const PermissionRequestWidget(), // Display permission requests
                   const Padding(
-                    padding: EdgeInsets.only(left: 16, top: 16),
+                    padding: EdgeInsets.only(left: 16,),
                     child: Text('Riwayat Izin', style: AppTextStyle.bigCaptionBold),
                   ),
+                  const SizedBox(height: 8),
                   const PermissionHistoryWidget(), // Display permission history
                 ],
               ),
