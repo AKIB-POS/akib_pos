@@ -4,7 +4,9 @@ import 'package:akib_pos/features/hrd/data/datasources/remote/hrd_remote_data_so
 import 'package:akib_pos/features/hrd/data/models/attendance_service/attendance_history_item.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_history.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_request_data.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_history.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_quota.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_summary.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/check_in_out_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_quota.dart';
@@ -27,7 +29,9 @@ abstract class HRDRepository {
   Future<Either<Failure, LeaveHistoryResponse>> getLeaveHistory();
 
   //Permission
-    Future<Either<Failure, PermissionQuotaResponse>> getPermissionQuota();
+  Future<Either<Failure, PermissionQuotaResponse>> getPermissionQuota();
+  Future<Either<Failure, PermissionRequestResponse>> getPermissionRequests();
+  Future<Either<Failure, PermissionHistoryResponse>> getPermissionHistory();
 
 }
 
@@ -35,6 +39,30 @@ class HRDRepositoryImpl implements HRDRepository {
   final HRDRemoteDataSource remoteDataSource;
 
   HRDRepositoryImpl({required this.remoteDataSource});
+
+@override
+  Future<Either<Failure, PermissionHistoryResponse>> getPermissionHistory() async {
+    try {
+      final permissionHistory = await remoteDataSource.fetchPermissionHistory();
+      return Right(permissionHistory);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, PermissionRequestResponse>> getPermissionRequests() async {
+    try {
+      final permissionRequests = await remoteDataSource.getPermissionRequests();
+      return Right(permissionRequests);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
 
 

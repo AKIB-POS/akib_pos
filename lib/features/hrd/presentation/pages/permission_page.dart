@@ -1,7 +1,11 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_history_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_quota_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_request_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/permission/permission_history_widget.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/permission/permission_quota_widget.dart';
+import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/permission/permission_request_widgte.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -15,14 +19,26 @@ class _PermissionPageState extends State<PermissionPage> {
   void initState() {
     super.initState();
     _fetchPermissionQuota();
+    _fetchPermissionRequests();
+    _fetchPermissionHistory();
   }
 
   void _fetchPermissionQuota() {
     context.read<PermissionQuotaCubit>().fetchPermissionQuota();
   }
 
+  void _fetchPermissionRequests() {
+    context.read<PermissionRequestCubit>().fetchPermissionRequests();
+  }
+
+  void _fetchPermissionHistory() {
+    context.read<PermissionHistoryCubit>().fetchPermissionHistory();
+  }
+
   Future<void> _refreshPermissionData() async {
-    _fetchPermissionQuota(); // Refresh permission quota
+    _fetchPermissionQuota(); 
+    _fetchPermissionRequests();
+    _fetchPermissionHistory(); // Refresh permission history
   }
 
   @override
@@ -55,11 +71,20 @@ class _PermissionPageState extends State<PermissionPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Padding(
-                          padding: EdgeInsets.only(top: 16, left: 16),
-                          child: Text('Saldo Izin',
-                              style: AppTextStyle.bigCaptionBold),
-                        ),
+                    padding: EdgeInsets.only(top: 16, left: 16),
+                    child: Text('Saldo Izin', style: AppTextStyle.bigCaptionBold),
+                  ),
                   PermissionQuotaWidget(), // Display permission quota
+                  const Padding(
+                    padding: EdgeInsets.only(left: 16, top: 16),
+                    child: Text('Pengajuan Izin', style: AppTextStyle.bigCaptionBold),
+                  ),
+                  const PermissionRequestWidget(), // Display permission requests
+                  const Padding(
+                    padding: EdgeInsets.only(left: 16, top: 16),
+                    child: Text('Riwayat Izin', style: AppTextStyle.bigCaptionBold),
+                  ),
+                  const PermissionHistoryWidget(), // Display permission history
                 ],
               ),
             ),

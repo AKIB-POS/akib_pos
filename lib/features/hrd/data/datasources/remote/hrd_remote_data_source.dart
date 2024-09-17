@@ -6,7 +6,9 @@ import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/a
 import 'package:akib_pos/features/hrd/data/models/attendance_service/attendance_history_item.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_history.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_request_data.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_history.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_quota.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_summary.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/check_in_out_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_quota.dart';
@@ -30,6 +32,8 @@ abstract class HRDRemoteDataSource {
 
   //Permission
    Future<PermissionQuotaResponse> getPermissionQuota();
+   Future<PermissionRequestResponse> getPermissionRequests();
+   Future<PermissionHistoryResponse> fetchPermissionHistory();
 }
 
 class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
@@ -37,6 +41,43 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
   final AuthSharedPref sharedPrefsHelper = GetIt.instance<AuthSharedPref>();
 
   HRDRemoteDataSourceImpl({required this.client});
+
+  @override
+  Future<PermissionHistoryResponse> fetchPermissionHistory() async {
+    const url = '${URLs.baseUrlMock}/permission-history';
+    final response = await client.get(
+      Uri.parse(url),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return PermissionHistoryResponse.fromJson(jsonResponse);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+  @override
+  Future<PermissionRequestResponse> getPermissionRequests() async {
+    const url = '${URLs.baseUrlMock}/permission-requests';
+    final response = await client.get(
+      Uri.parse(url),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return PermissionRequestResponse.fromJson(jsonResponse);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+  
 @override
   Future<PermissionQuotaResponse> getPermissionQuota() async {
     const url = '${URLs.baseUrlMock}/permission-quota';

@@ -2,8 +2,10 @@ import 'package:akib_pos/features/hrd/data/datasources/remote/hrd_remote_data_so
 import 'package:akib_pos/features/hrd/data/repositories/hrd_repository.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/attendance_history_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_request_cubit.dart';
-import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave_history_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_history_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_history_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_quota_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_request_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_in_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_out_cubit.dart';
@@ -55,5 +57,12 @@ Future<void> initHRDModule() async {
   hrdInjection.registerFactory(
     () => PermissionQuotaCubit(hrdInjection()),
   );
+  hrdInjection.registerFactory(
+    () => PermissionRequestCubit(hrdInjection()),
+  );
+  hrdInjection.registerFactory(
+    () => PermissionHistoryCubit(hrdInjection()),
+  );
+
 
 }

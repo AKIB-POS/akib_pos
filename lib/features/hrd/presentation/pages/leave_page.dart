@@ -2,7 +2,7 @@ import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_quota_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_request_cubit.dart';
-import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave_history_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_history_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/leave/leave_history_widget.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/leave/leave_quota_widget.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/leave/leave_request_widget.dart';
