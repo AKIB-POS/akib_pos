@@ -16,22 +16,16 @@ class LeaveRequestWidget extends StatelessWidget {
         if (state is LeaveRequestLoading) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Padding(
-              //   padding: const EdgeInsets.only(left: 16),
-              //   child: const Text('Pengajuan Cuti', style: AppTextStyle.bigCaptionBold),
-              // ),
-              Utils.buildLoadingCardShimmer()
-            ],
+            children: [Utils.buildLoadingCardShimmer()],
           );
         } else if (state is LeaveRequestLoaded) {
           if (state.leaveRequests.data.isEmpty) {
-            return _buildEmptyState();
+            return buildEmptyUI();
           } else {
             return _buildRequestList(state.leaveRequests.data);
           }
         } else if (state is LeaveRequestError) {
-          return _buildEmptyState(); // Using the empty state for errors as well
+          return buildEmptyUI();
         } else {
           return Container();
         }
@@ -39,34 +33,28 @@ class LeaveRequestWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SvgPicture.asset(
-            'assets/images/accounting/empty_report.svg',
-            height: 150,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Belum ada Pengajuan',
-            style: AppTextStyle.bigCaptionBold,
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Status Pengajuan akan tampil setelah anda\nmengisi form pengajuan cuti',
-            textAlign: TextAlign.center,
-            style: AppTextStyle.caption,
-          ),
-        ],
-      ),
-    );
+  Widget buildEmptyUI() {
+    return Container(
+        width: double.infinity,
+        margin: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Utils.buildEmptyState("Belum ada Pengajuan",
+            "Status Pengajuan akan tampil setelah anda\nmengisi form pengajuan cuti"));
   }
 
   Widget _buildRequestList(List<LeaveRequestData> requests) {
     return Padding(
-      padding: const EdgeInsets.only(right: 16, top: 16,left: 16),
+      padding: const EdgeInsets.only(right: 16, top: 16, left: 16),
       child: Column(
         children:
             requests.map((request) => _buildRequestItem(request)).toList(),

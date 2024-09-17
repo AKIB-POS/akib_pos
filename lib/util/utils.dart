@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 class Utils{
 
-static  buildLoadingCardShimmer() {
+static Widget buildLoadingCardShimmer() {
     return Container(
       padding: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -50,6 +50,37 @@ static  buildLoadingCardShimmer() {
       ),
     );
   }
+
+static Widget buildEmptyState(String title, String? message) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              'assets/images/accounting/empty_report.svg',
+              height: 80,
+            ),
+            const SizedBox(height: 12),
+            Text(
+             title,
+              style: AppTextStyle.bigCaptionBold,
+            ),
+            const SizedBox(height: 4),
+             Text(
+              message ?? "",
+              textAlign: TextAlign.center,
+              style: AppTextStyle.caption,
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+
   static void navigateToPage(BuildContext context, Widget page) {
   Navigator.push(
     context,

@@ -2,6 +2,7 @@ import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/core/error/failures.dart';
 import 'package:akib_pos/features/hrd/data/datasources/remote/hrd_remote_data_source.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/attendance_history_item.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_history.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_request_data.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_summary.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/check_in_out_request.dart';
@@ -9,19 +10,36 @@ import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave
 import 'package:dartz/dartz.dart';
 
 abstract class HRDRepository {
-  Future<Either<Failure, AttendanceSummaryResponse>> getAttendanceSummary(int branchId, int companyId);
-  Future<Either<Failure, CheckInOutResponse>> checkIn(CheckInOutRequest request);
-  Future<Either<Failure, CheckInOutResponse>> checkOut(CheckInOutRequest request);
+  Future<Either<Failure, AttendanceSummaryResponse>> getAttendanceSummary(
+      int branchId, int companyId);
+  Future<Either<Failure, CheckInOutResponse>> checkIn(
+      CheckInOutRequest request);
+  Future<Either<Failure, CheckInOutResponse>> checkOut(
+      CheckInOutRequest request);
   Future<Either<Failure, AttendanceHistoryResponse>> getAttendanceHistory();
   Future<Either<Failure, LeaveQuotaResponse>> getLeaveQuota();
-  Future<Either<Failure, LeaveRequestResponse>> getLeaveRequests(); 
+  Future<Either<Failure, LeaveRequestResponse>> getLeaveRequests();
+  Future<Either<Failure, LeaveHistoryResponse>> getLeaveHistory();
 }
 
 class HRDRepositoryImpl implements HRDRepository {
   final HRDRemoteDataSource remoteDataSource;
 
   HRDRepositoryImpl({required this.remoteDataSource});
-@override
+
+  @override
+  Future<Either<Failure, LeaveHistoryResponse>> getLeaveHistory() async {
+    try {
+      final leaveHistory = await remoteDataSource.getLeaveHistory();
+      return Right(leaveHistory);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, LeaveRequestResponse>> getLeaveRequests() async {
     try {
       final leaveRequests = await remoteDataSource.getLeaveRequests();
@@ -32,7 +50,8 @@ class HRDRepositoryImpl implements HRDRepository {
       return Left(GeneralFailure(e.toString()));
     }
   }
-@override
+
+  @override
   Future<Either<Failure, LeaveQuotaResponse>> getLeaveQuota() async {
     try {
       final leaveQuota = await remoteDataSource.getLeaveQuota();
@@ -43,8 +62,11 @@ class HRDRepositoryImpl implements HRDRepository {
       return Left(GeneralFailure(e.toString()));
     }
   }
-   @override
-  Future<Either<Failure, AttendanceHistoryResponse>> getAttendanceHistory() async { // No parameters required
+
+  @override
+  Future<Either<Failure, AttendanceHistoryResponse>>
+      getAttendanceHistory() async {
+    // No parameters required
     try {
       final attendanceHistory = await remoteDataSource.getAttendanceHistory();
       return Right(attendanceHistory);
@@ -56,9 +78,11 @@ class HRDRepositoryImpl implements HRDRepository {
   }
 
   @override
-  Future<Either<Failure, AttendanceSummaryResponse>> getAttendanceSummary(int branchId, int companyId) async {
+  Future<Either<Failure, AttendanceSummaryResponse>> getAttendanceSummary(
+      int branchId, int companyId) async {
     try {
-      final attendanceSummary = await remoteDataSource.getAttendanceSummary(branchId, companyId);
+      final attendanceSummary =
+          await remoteDataSource.getAttendanceSummary(branchId, companyId);
       return Right(attendanceSummary);
     } on ServerException {
       return Left(ServerFailure());
@@ -68,7 +92,8 @@ class HRDRepositoryImpl implements HRDRepository {
   }
 
   @override
-  Future<Either<Failure, CheckInOutResponse>> checkIn(CheckInOutRequest request) async {
+  Future<Either<Failure, CheckInOutResponse>> checkIn(
+      CheckInOutRequest request) async {
     try {
       final checkInResponse = await remoteDataSource.checkIn(request);
       return Right(checkInResponse);
@@ -80,7 +105,8 @@ class HRDRepositoryImpl implements HRDRepository {
   }
 
   @override
-  Future<Either<Failure, CheckInOutResponse>> checkOut(CheckInOutRequest request) async {
+  Future<Either<Failure, CheckInOutResponse>> checkOut(
+      CheckInOutRequest request) async {
     try {
       final checkOutResponse = await remoteDataSource.checkOut(request);
       return Right(checkOutResponse);
