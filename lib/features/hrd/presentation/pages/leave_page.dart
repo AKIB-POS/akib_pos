@@ -6,6 +6,7 @@ import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/leave/leave_history_widget.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/leave/leave_quota_widget.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/leave/leave_request_widget.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart'; // Ensure to add shimmer package in pubspec.yaml
@@ -123,6 +124,9 @@ class _LeavePageState extends State<LeavePage> {
           ],
         ),
       ),
+      floatingActionButton: Utils.buildFloatingActionButton(onPressed: () {
+        
+      },)
     );
   }
 }

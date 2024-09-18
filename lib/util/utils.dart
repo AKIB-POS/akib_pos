@@ -1,4 +1,5 @@
 
+import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,27 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 class Utils{
+
+  static FloatingActionButton buildFloatingActionButton({
+  required VoidCallback onPressed,
+}) {
+  return FloatingActionButton.extended(
+    onPressed: onPressed,
+    label: Text(
+      "Tambah",
+      style: AppTextStyle.body2.copyWith(color: Colors.white),
+    ),
+    icon: SvgPicture.asset(
+      'assets/icons/hrd/ic_add.svg',
+      width: 24,
+      height: 24,
+    ),
+    backgroundColor: AppColors.successMain,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(100), // Adjust the radius here
+    ),
+  );
+}
 
 static Widget buildLoadingCardShimmer() {
     return Container(

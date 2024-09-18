@@ -5,8 +5,10 @@ import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overt
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_request)cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/overtime/overtime_history.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/overtime/overtime_request_widget.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 class OvertimePage extends StatefulWidget {
   const OvertimePage({super.key});
@@ -100,6 +102,9 @@ class _OvertimePageState extends State<OvertimePage> {
           ],
         ),
       ),
+      floatingActionButton: Utils.buildFloatingActionButton(onPressed: () {
+        
+      },)
     );
   }
 }

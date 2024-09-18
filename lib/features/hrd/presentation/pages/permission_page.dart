@@ -6,8 +6,10 @@ import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permi
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/permission/permission_history_widget.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/permission/permission_quota_widget.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/permission/permission_request_widgte.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 class PermissionPage extends StatefulWidget {
   @override
@@ -119,6 +121,9 @@ class _PermissionPageState extends State<PermissionPage> {
           ],
         ),
       ),
+      floatingActionButton:  Utils.buildFloatingActionButton(onPressed: () {
+        
+      },)
     );
   }
 }
