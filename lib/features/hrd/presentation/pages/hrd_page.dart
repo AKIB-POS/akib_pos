@@ -5,6 +5,7 @@ import 'package:akib_pos/features/home/widget/my_drawer.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/attendance_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/leave_page.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/overtime_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/permission_page.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/appbar_hrd_page.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/summary_attendance.dart';
@@ -225,6 +226,9 @@ class _HrdPage extends State<HrdPage> {
           break;
         case 'Izin':
           Utils.navigateToPage(context, PermissionPage());
+          break;
+        case 'Lembur':
+          Utils.navigateToPage(context, const OvertimePage());
           break;
         // Add more cases here if needed
         default:

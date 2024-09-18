@@ -17,13 +17,13 @@ class PermissionHistoryResponse {
 class PermissionHistoryData {
   final String permissionType;
   final String startDate;
-  final String endDate;
+  final String time;
   final String status;
 
   PermissionHistoryData({
     required this.permissionType,
     required this.startDate,
-    required this.endDate,
+    required this.time,
     required this.status,
   });
 
@@ -31,7 +31,7 @@ class PermissionHistoryData {
     return PermissionHistoryData(
       permissionType: json['permission_type'],
       startDate: json['start_date'],
-      endDate: json['end_date'],
+      time: json['time'],
       status: json['status'],
     );
   }

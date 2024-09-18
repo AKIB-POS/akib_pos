@@ -1,30 +1,28 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
-import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_history.dart';
-import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_history_cubit.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/overtime_history.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_history_cubit.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class PermissionHistoryWidget extends StatelessWidget {
-  const PermissionHistoryWidget({super.key});
+class OvertimeHistoryWidget extends StatelessWidget {
+  const OvertimeHistoryWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PermissionHistoryCubit, PermissionHistoryState>(
+    return BlocBuilder<OvertimeHistoryCubit, OvertimeHistoryState>(
       builder: (context, state) {
-        if (state is PermissionHistoryLoading) {
+        if (state is OvertimeHistoryLoading) {
           return _buildLoadingShimmer(); // Display shimmer when loading
-        } else if (state is PermissionHistoryError) {
+        } else if (state is OvertimeHistoryError) {
           return Center(child: Text(state.message)); // Display error message
-        } else if (state is PermissionHistoryLoaded) {
-          if (state.permissionHistory.data.isEmpty) {
-            return Utils.buildEmptyState(
-              "Belum ada Riwayat",
-              "Riwayat akan tampil setelah\nizin anda telah selesai"
-            );
+        } else if (state is OvertimeHistoryLoaded) {
+          if (state.overtimeHistory.data.isEmpty) {
+            return Utils.buildEmptyState("Belum ada Riwayat",
+                "Riwayat akan tampil setelah\nlembur anda telah selesai");
           } else {
-            return _buildPermissionHistoryList(state.permissionHistory.data);
+            return _buildOvertimeHistoryList(state.overtimeHistory.data);
           }
         } else {
           return Container();
@@ -53,19 +51,19 @@ class PermissionHistoryWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildPermissionHistoryList(List<PermissionHistoryData> permissionHistory) {
+  Widget _buildOvertimeHistoryList(List<OvertimeHistoryData> overtimeHistory) {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: permissionHistory.length,
+      itemCount: overtimeHistory.length,
       itemBuilder: (context, index) {
-        final item = permissionHistory[index];
-        return _buildPermissionHistoryItem(item);
+        final item = overtimeHistory[index];
+        return _buildOvertimeHistoryItem(item);
       },
     );
   }
 
-  Widget _buildPermissionHistoryItem(PermissionHistoryData item) {
+  Widget _buildOvertimeHistoryItem(OvertimeHistoryData item) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Container(
@@ -76,28 +74,28 @@ class PermissionHistoryWidget extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center, // Aligns items at the top
           children: [
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(item.permissionType, style: AppTextStyle.bigCaptionBold),
+                  Text(item.overtimeDescription, style: AppTextStyle.bigCaptionBold),
                   const SizedBox(height: 4),
                   Text(
-                    '${item.startDate} - ${item.time}',
+                    '${item.startDatetime} - ${item.endDatetime}',
                     style: AppTextStyle.caption.copyWith(color: AppColors.textGrey500),
-                    maxLines: 2,
-                    overflow: TextOverflow.visible,
+                    maxLines: 2, // Allow text to wrap to the next line if needed
+                    overflow: TextOverflow.visible, // Make sure the text wraps to the next line
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 8), // Add spacing between text and status
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: item.status == "Disetujui"
+                color: item.status == "Selesai"
                     ? AppColors.successMain.withOpacity(0.1)
                     : AppColors.errorMain.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(4),
@@ -105,7 +103,7 @@ class PermissionHistoryWidget extends StatelessWidget {
               child: Text(
                 item.status,
                 style: TextStyle(
-                  color: item.status == "Disetujui" ? AppColors.successMain : AppColors.errorMain,
+                  color: item.status == "Selesai" ? AppColors.successMain : AppColors.errorMain,
                 ),
               ),
             ),

@@ -74,6 +74,7 @@ class _AttendancePageState extends State<AttendancePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        forceMaterialTransparency: true,
         title: const Text('Absensi', style: AppTextStyle.headline5),
         backgroundColor: Colors.white,
         elevation: 0,

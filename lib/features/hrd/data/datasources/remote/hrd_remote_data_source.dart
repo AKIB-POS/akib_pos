@@ -6,6 +6,8 @@ import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/a
 import 'package:akib_pos/features/hrd/data/models/attendance_service/attendance_history_item.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_history.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_request_data.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/overtime_history.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/overtime_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_history.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_quota.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_request.dart';
@@ -34,6 +36,13 @@ abstract class HRDRemoteDataSource {
    Future<PermissionQuotaResponse> getPermissionQuota();
    Future<PermissionRequestResponse> getPermissionRequests();
    Future<PermissionHistoryResponse> fetchPermissionHistory();
+
+   //Overtime
+   Future<OvertimeRequestResponse> getOvertimeRequests();
+   Future<OvertimeHistoryResponse> fetchOvertimeHistory();
+   
+
+
 }
 
 class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
@@ -41,6 +50,42 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
   final AuthSharedPref sharedPrefsHelper = GetIt.instance<AuthSharedPref>();
 
   HRDRemoteDataSourceImpl({required this.client});
+
+  @override
+  Future<OvertimeHistoryResponse> fetchOvertimeHistory() async {
+    const url = '${URLs.baseUrlMock}/overtime-history';
+    final response = await client.get(
+      Uri.parse(url),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return OvertimeHistoryResponse.fromJson(jsonResponse);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+  @override
+  Future<OvertimeRequestResponse> getOvertimeRequests() async {
+    const url = '${URLs.baseUrlMock}/overtime-requests';
+    final response = await client.get(
+      Uri.parse(url),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return OvertimeRequestResponse.fromJson(jsonResponse);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
 
   @override
   Future<PermissionHistoryResponse> fetchPermissionHistory() async {

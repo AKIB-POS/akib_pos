@@ -4,6 +4,8 @@ import 'package:akib_pos/features/hrd/data/datasources/remote/hrd_remote_data_so
 import 'package:akib_pos/features/hrd/data/models/attendance_service/attendance_history_item.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_history.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_request_data.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/overtime_history.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/overtime_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_history.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_quota.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_request.dart';
@@ -33,12 +35,40 @@ abstract class HRDRepository {
   Future<Either<Failure, PermissionRequestResponse>> getPermissionRequests();
   Future<Either<Failure, PermissionHistoryResponse>> getPermissionHistory();
 
+  //Overtime
+  Future<Either<Failure, OvertimeRequestResponse>> getOvertimeRequests();
+  Future<Either<Failure, OvertimeHistoryResponse>> fetchOvertimeHistory();
+  
+
 }
 
 class HRDRepositoryImpl implements HRDRepository {
   final HRDRemoteDataSource remoteDataSource;
 
   HRDRepositoryImpl({required this.remoteDataSource});
+ @override
+  Future<Either<Failure, OvertimeHistoryResponse>> fetchOvertimeHistory() async {
+    try {
+      final overtimeHistory = await remoteDataSource.fetchOvertimeHistory();
+      return Right(overtimeHistory);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+@override
+  Future<Either<Failure, OvertimeRequestResponse>> getOvertimeRequests() async {
+    try {
+      final overtimeRequests = await remoteDataSource.getOvertimeRequests();
+      return Right(overtimeRequests);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
 @override
   Future<Either<Failure, PermissionHistoryResponse>> getPermissionHistory() async {
@@ -51,6 +81,8 @@ class HRDRepositoryImpl implements HRDRepository {
       return Left(GeneralFailure(e.toString()));
     }
   }
+
+  
 
   @override
   Future<Either<Failure, PermissionRequestResponse>> getPermissionRequests() async {

@@ -2,14 +2,14 @@ class PermissionRequest {
   final String requestDate;
   final String permissionType;
   final String startDate;
-  final String endDate;
+  final String time;
   final String approverName;
 
   PermissionRequest({
     required this.requestDate,
     required this.permissionType,
     required this.startDate,
-    required this.endDate,
+    required this.time,
     required this.approverName,
   });
 
@@ -18,7 +18,7 @@ class PermissionRequest {
       requestDate: json['request_date'],
       permissionType: json['permission_type'],
       startDate: json['start_date'],
-      endDate: json['end_date'],
+      time: json['time'],
       approverName: json['approver_name'],
     );
   }

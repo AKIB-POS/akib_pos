@@ -1,31 +1,31 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
-import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_request.dart';
-import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_request_cubit.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/overtime_request.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_request)cubit.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
-class PermissionRequestWidget extends StatelessWidget {
-  const PermissionRequestWidget({Key? key}) : super(key: key);
+class OvertimeRequestWidget extends StatelessWidget {
+  const OvertimeRequestWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PermissionRequestCubit, PermissionRequestState>(
+    return BlocBuilder<OvertimeRequestCubit, OvertimeRequestState>(
       builder: (context, state) {
-        if (state is PermissionRequestLoading) {
+        if (state is OvertimeRequestLoading) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [Utils.buildLoadingCardShimmer()],
           );
-        } else if (state is PermissionRequestLoaded) {
-          if (state.permissionRequest.data.isEmpty) {
+        } else if (state is OvertimeRequestLoaded) {
+          if (state.overtimeRequests.data.isEmpty) {
             return buildEmptyUI();
           } else {
-            return _buildRequestList(state.permissionRequest.data);
+            return _buildRequestList(state.overtimeRequests.data);
           }
-        } else if (state is PermissionRequestError) {
+        } else if (state is OvertimeRequestError) {
           return buildEmptyUI();
         } else {
           return Container();
@@ -36,34 +36,34 @@ class PermissionRequestWidget extends StatelessWidget {
 
   Widget buildEmptyUI() {
     return Container(
-        width: double.infinity,
-        margin: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12.withOpacity(0.1),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Utils.buildEmptyState("Belum ada Pengajuan",
-            "Status Pengajuan akan tampil setelah anda\nmengisi form pengajuan izin"));
+      width: double.infinity,
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Utils.buildEmptyState("Belum ada Pengajuan",
+          "Status Pengajuan akan tampil setelah anda\nmengisi form pengajuan lembur"),
+    );
   }
 
-  Widget _buildRequestList(List<PermissionRequest> requests) {
+  Widget _buildRequestList(List<OvertimeRequest> requests) {
     return Padding(
       padding: const EdgeInsets.only(right: 16, top: 16, left: 16),
       child: Column(
-        children:
-            requests.map((request) => _buildRequestItem(request)).toList(),
+        children: requests.map((request) => _buildRequestItem(request)).toList(),
       ),
     );
   }
 
-  Widget _buildRequestItem(PermissionRequest request) {
+  Widget _buildRequestItem(OvertimeRequest request) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 16),
@@ -88,19 +88,40 @@ class PermissionRequestWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 8),
-                Text(
-                  request.permissionType,
-                  style: AppTextStyle.headline5,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        request.overtimeDescription,
+                        style: AppTextStyle.headline5,
+                      ),
+                    ),
+                    OutlinedButton(
+                      onPressed: () {
+                        // Handle detail button press
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.primaryMain),
+                        shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                      ),
+                      child: Text('Detail', style: TextStyle(color: AppColors.primaryMain)),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "${request.startDate} - ${request.time}",
-                  style: AppTextStyle.caption
-                      .copyWith(color: AppColors.textGrey800),
+                  'Mulai Lembur: ${request.startDatetime}',
+                  style: AppTextStyle.caption.copyWith(color: AppColors.textGrey800),
+                ),
+                Text(
+                  'Selesai Lembur: ${request.endDatetime}',
+                  style: AppTextStyle.caption.copyWith(color: AppColors.textGrey800),
                 ),
                 const SizedBox(height: 12),
-                _buildApprovalStatusRow(
-                    'Status Persetujuan', request.approverName),
+                _buildApprovalStatusRow('Status Persetujuan', request.approverName),
               ],
             ),
           ),
