@@ -11,7 +11,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:sizer/sizer.dart';
+
 class AccountingPage extends StatefulWidget {
+  const AccountingPage({super.key});
+
   @override
   _AccountingPageState createState() => _AccountingPageState();
 }

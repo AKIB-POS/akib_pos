@@ -85,7 +85,7 @@ class _TransactionReportState extends State<TransactionReport> {
       builder: (BuildContext context) {
         return Theme(
           data: ThemeData.light().copyWith(
-            colorScheme: ColorScheme.light(
+            colorScheme: const ColorScheme.light(
               primary: AppColors.primaryMain,
             ),
           ),
@@ -144,109 +144,118 @@ class _TransactionReportState extends State<TransactionReport> {
       },
     );
   }
+void showEmployeePicker(BuildContext context) async {
+  final cubit = context.read<TransactionReportInteractionCubit>();
+  final employees = cubit.getEmployeeList();
+  String? tempSelectedEmployee = cubit.state.employeeName;
 
-  void showEmployeePicker(BuildContext context) async {
-    final cubit = context.read<TransactionReportInteractionCubit>();
-    final employees = cubit.getEmployeeList();
-    String? tempSelectedEmployee = cubit.state.employeeName;
-
-    await showModalBottomSheet(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(12),
-        ),
+  await showModalBottomSheet(
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(12),
       ),
-      backgroundColor: Colors.white,
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    height: 8,
-                    width: 50,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: AppColors.textGrey300),
+    ),
+    backgroundColor: Colors.white,
+    context: context,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  height: 8,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: AppColors.textGrey300,
                   ),
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Pilih Karyawan',
-                          style: AppTextStyle.headline5,
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                      ],
-                    ),
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Pilih Karyawan',
+                        style: AppTextStyle.headline5,
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  for (var employee in employees)
-                    RadioListTile<String>(
-                      title: Text(employee.employeeName),
-                      value: employee.employeeName,
-                      groupValue: tempSelectedEmployee,
-                      dense: true,
-                      activeColor: AppColors.primaryMain,
-                      toggleable: true,
-                      contentPadding: const EdgeInsets.only(left: 0),
-                      visualDensity: VisualDensity.compact,
-                      onChanged: (String? value) {
-                        setState(() {
-                          tempSelectedEmployee = value ?? tempSelectedEmployee;
-                        });
-                      },
-                    ),
-                  const SizedBox(height: 16),
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor: const WidgetStatePropertyAll<Color>(
-                            AppColors.primaryMain),
-                        padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
-                          EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                ),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: employees.length,
+                    itemBuilder: (context, index) {
+                      final employee = employees[index];
+                      return RadioListTile<String>(
+                        title: Text(employee.employeeName),
+                        value: employee.employeeName,
+                        groupValue: tempSelectedEmployee,
+                        dense: true,
+                        activeColor: AppColors.primaryMain,
+                        toggleable: true,
+                        contentPadding: const EdgeInsets.only(left: 0),
+                        visualDensity: VisualDensity.compact,
+                        onChanged: (String? value) {
+                          setState(() {
+                            tempSelectedEmployee = value ?? tempSelectedEmployee;
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: const WidgetStatePropertyAll<Color>(
+                          AppColors.primaryMain),
+                      padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
+                        EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        if (tempSelectedEmployee != null) {
-                          cubit.selectEmployee(tempSelectedEmployee!);
-                          _fetchTodayTransactionReport(cubit.state);
-                          _fetchCustomerTransactions(cubit.state);
-                        }
-                      },
-                      child: const Text(
-                        'Terapkan',
-                        style: TextStyle(color: Colors.white),
-                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      if (tempSelectedEmployee != null) {
+                        cubit.selectEmployee(tempSelectedEmployee!);
+                        _fetchTodayTransactionReport(cubit.state);
+                        _fetchCustomerTransactions(cubit.state);
+                      }
+                    },
+                    child: const Text(
+                      'Terapkan',
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {

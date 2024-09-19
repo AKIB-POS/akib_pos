@@ -1,5 +1,8 @@
 import 'package:akib_pos/features/hrd/data/datasources/remote/hrd_remote_data_source.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip.dart';
 import 'package:akib_pos/features/hrd/data/repositories/hrd_repository.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_recap/attendance_recap_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_recap/attendance_recap_interaction_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/attendance_history_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_request_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_history_cubit.dart';
@@ -8,10 +11,12 @@ import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overt
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_history_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_quota_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_request_cubit.dart';
-import 'package:akib_pos/features/hrd/presentation/bloc/attendance_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_in_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_out_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_quota_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/detail_salary_slip_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/salary_slip_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 final hrdInjection = GetIt.instance;
@@ -29,9 +34,23 @@ Future<void> initHRDModule() async {
   );
 
   // Cubits
-  hrdInjection.registerFactory(
-    () => AttendanceSummaryCubit(hrdInjection()),
+
+
+    hrdInjection.registerFactory(
+    () => HRDSummaryCubit(hrdInjection()),
   );
+  //attendance
+ 
+
+  hrdInjection.registerFactory(
+    () => AttendanceRecapInteractionCubit(employeeSharedPref: hrdInjection()),
+  );
+   hrdInjection.registerFactory(
+    () => AttendanceRecapCubit(hrdInjection()),
+  );
+
+
+
   hrdInjection.registerFactory(
     () => CheckInCubit(hrdInjection()),
   );
@@ -72,6 +91,14 @@ Future<void> initHRDModule() async {
   );
   hrdInjection.registerFactory(
     () => OvertimeHistoryCubit(hrdInjection()),
+  );
+
+  hrdInjection.registerFactory(
+    () => SalarySlipCubit(hrdInjection()),
+  );
+
+  hrdInjection.registerFactory(
+    () => DetailSalarySlipCubit(hrdInjection()),
   );
 
 

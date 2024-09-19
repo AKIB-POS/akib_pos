@@ -1,12 +1,14 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/employee_cubit.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/home/widget/my_drawer.dart';
-import 'package:akib_pos/features/hrd/presentation/bloc/attendance_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/attendance_page.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/attendance_recap_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/leave_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/overtime_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/permission_page.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/salary_%20slip_page.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/appbar_hrd_page.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/summary_attendance.dart';
 import 'package:akib_pos/util/utils.dart';
@@ -20,6 +22,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class HrdPage extends StatefulWidget {
+  const HrdPage({super.key});
+
   @override
   createState() => _HrdPage();
 }
@@ -37,10 +41,20 @@ class _HrdPage extends State<HrdPage> {
     final branchId = _authSharedPref.getBranchId() ?? 0;
     final companyId = _authSharedPref.getCompanyId() ?? 0;
 
-    context.read<AttendanceSummaryCubit>().fetchAttendanceSummary(
-          branchId: branchId,
-          companyId: companyId,
-        );
+    // context.read<AttendanceSummaryCubit>().fetchAttendanceSummary(
+    //       branchId: branchId,
+    //       companyId: companyId,
+    //     );
+
+
+      // Check the role and fetch employees if not "employee"
+    if (_authSharedPref.getEmployeeRole() != "employee") {
+      context.read<EmployeeCubit>().fetchAllEmployees(
+        branchId,
+        companyId,
+      );
+    }
+    
   }
 
   @override
@@ -69,69 +83,107 @@ class _HrdPage extends State<HrdPage> {
         onRefresh: () async {
           _fetchAttendanceSummary();
         },
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                Container(
-                  color: AppColors.backgroundGrey,
-                  child: Column(
-                    children: [
-                      SummaryAttendance(role: role),
-                      const SizedBox(
-                        height: 10,
+        child: Stack(
+          children: [
+            // Main content
+            LayoutBuilder(
+              builder: (context, constraints) {
+                return ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    Container(
+                      color: AppColors.backgroundGrey,
+                      child: Column(
+                        children: [
+                          // SummaryAttendance(role: role),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Container(
+                            width: double.infinity,
+                            height: 20,
+                            decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(30),
+                                    topRight: Radius.circular(30))),
+                          ),
+                        ],
                       ),
-                      Container(
-                        width: double.infinity,
-                        height: 20,
-                        decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(30),
-                                topRight: Radius.circular(30))),
+                    ),
+                    // Conditionally render _attendanceRecap()
+                    if (role != "employee") _attendanceRecap(),
+                    _attendanceService(),
+                    _employeeService(),
+                  ],
+                );
+              },
+            ),
+            // Loading indicator
+            if (role != "employee")
+              BlocBuilder<EmployeeCubit, EmployeeState>(
+                builder: (context, state) {
+                  if (state is EmployeeLoading) {
+                    // Center the loading indicator
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (state is EmployeeError) {
+                    return const Positioned(
+                      bottom: 16,
+                      left: 16,
+                      right: 16,
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Text(
+                          'Gagal memuat data karyawan. Tarik Kebawah Refresh Data',
+                          style: TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                    ],
-                  ),
-                ),
-                // Conditionally render _attendanceRecap()
-                if (role != "employee") _attendanceRecap(),
-                _attendanceService(),
-                _employeeService(),
-              ],
-            );
-          },
+                    );
+                  } else {
+                    return const SizedBox.shrink();
+                  }
+                },
+              ),
+          ],
         ),
       ),
     );
   }
-
   Widget _attendanceRecap() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        border: Border.all(width: 2, color: AppColors.primary100),
-        color: AppColors.primaryBackgorund,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              SvgPicture.asset(
-                'assets/icons/hrd/ic_attendance_recap.svg',
-                fit: BoxFit.cover,
-              ),
-              const SizedBox(width: 8),
-              Text('Cek Pengajuan Karyawan',
-                  style: AppTextStyle.caption
-                      .copyWith(color: AppColors.primaryMain)),
-            ],
-          ),
-          const Icon(Icons.arrow_forward, color: AppColors.primaryMain),
-        ],
+    return GestureDetector(
+      onTap: () {
+        Utils.navigateToPage(context, AttendanceRecapPage());
+        
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          border: Border.all(width: 2, color: AppColors.primary100),
+          color: AppColors.primaryBackgorund,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                SvgPicture.asset(
+                  'assets/icons/hrd/ic_attendance_recap.svg',
+                  fit: BoxFit.cover,
+                ),
+                const SizedBox(width: 8),
+                Text('Rekap Kehadiran Karyawan',
+                    style: AppTextStyle.caption
+                        .copyWith(color: AppColors.primaryMain)),
+              ],
+            ),
+            const Icon(Icons.arrow_forward, color: AppColors.primaryMain),
+          ],
+        ),
       ),
     );
   }
@@ -185,15 +237,12 @@ class _HrdPage extends State<HrdPage> {
             mainAxisSpacing: 20,
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              _buildServiceItem('Calon Pegawai',
-                  'assets/icons/hrd/ic_employee_candidate.svg'),
+              _buildServiceItem('Calon Pegawai','assets/icons/hrd/ic_employee_candidate.svg'),
               _buildServiceItem('Pegawai', 'assets/icons/hrd/ic_employee.svg'),
-              _buildServiceItem(
-                  'Administrasi', 'assets/icons/hrd/ic_administration.svg'),
+              _buildServiceItem('Administrasi', 'assets/icons/hrd/ic_administration.svg'),
               _buildServiceItem('Slip Gaji', 'assets/icons/hrd/ic_salary.svg'),
               _buildServiceItem('Tasking', 'assets/icons/hrd/ic_tasking.svg'),
-              _buildServiceItem(
-                  'Pelatihan', 'assets/icons/hrd/ic_training.svg'),
+              _buildServiceItem('Pelatihan', 'assets/icons/hrd/ic_training.svg'),
             ],
           ),
         ],
@@ -201,34 +250,37 @@ class _HrdPage extends State<HrdPage> {
     );
   }
 
-  void _navigateToAttendancePage(BuildContext context) {
-    final attendanceData = context.read<AttendanceSummaryCubit>().state;
-    if (attendanceData is AttendanceSummaryLoaded) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              AttendancePage(data: attendanceData.attendanceSummary.data),
-        ),
-      );
-    }
-  }
+  // void _navigateToAttendancePage(BuildContext context) {
+  //   final attendanceData = context.read<AttendanceSummaryCubit>().state;
+  //   if (attendanceData is AttendanceSummaryLoaded) {
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(
+  //         builder: (context) =>
+  //             AttendancePage(data: attendanceData.attendanceSummary.data),
+  //       ),
+  //     );
+  //   }
+  // }
 
   Widget _buildServiceItem(String label, String assetPath) {
   return GestureDetector(
     onTap: () {
       switch (label) {
         case 'Absensi':
-          _navigateToAttendancePage(context);
+          // _navigateToAttendancePage(context);
           break;
         case 'Cuti':
-          Utils.navigateToPage(context, LeavePage());
+          Utils.navigateToPage(context, const LeavePage());
           break;
         case 'Izin':
           Utils.navigateToPage(context, PermissionPage());
           break;
         case 'Lembur':
           Utils.navigateToPage(context, const OvertimePage());
+          break;
+        case 'Slip Gaji':
+          Utils.navigateToPage(context, const SalarySlipPage());
           break;
         // Add more cases here if needed
         default:
