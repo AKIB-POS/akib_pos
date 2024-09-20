@@ -62,6 +62,7 @@ import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_out_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/detail_salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/salary_slip_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
 import 'package:akib_pos/splash_screen.dart';
 import 'package:akib_pos/util/bloc_providers.dart';
 import 'package:flutter/material.dart';
@@ -251,6 +252,10 @@ void main() async {
         ),
 
         //HRD
+
+        BlocProvider(
+          create: (context) => HRDSummaryCubit(hrdInjection()),
+        ),
     
         BlocProvider(
           create: (context) => CheckInCubit(hrdInjection()),
