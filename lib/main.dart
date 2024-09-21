@@ -60,9 +60,16 @@ import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permi
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_request_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_in_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_out_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_approved_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_pending_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_rejected_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/detail_salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/approved_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/pending_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/rejected_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/widgets/submission/pending_approval_tab.dart';
 import 'package:akib_pos/splash_screen.dart';
 import 'package:akib_pos/util/bloc_providers.dart';
 import 'package:flutter/material.dart';
@@ -142,7 +149,7 @@ void main() async {
             create: (context) =>
                 PrinterCubit(bluetooth: sl(), sharedPreferences: sl())),
 
-        //for accounting
+        //ACCOUNTING MODULE
         BlocProvider(
           create: (context) =>
               TransactionSummaryCubit(repository: accountingInjection()),
@@ -252,7 +259,6 @@ void main() async {
         ),
 
         //HRD
-
         BlocProvider(
           create: (context) => HRDSummaryCubit(hrdInjection()),
         ),
@@ -310,6 +316,29 @@ void main() async {
         BlocProvider(
           create: (context) => DetailSalarySlipCubit(hrdInjection()),
         ),
+
+        //Employee Submission
+        BlocProvider(
+          create: (context) => PendingSubmissionsCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => ApprovedSubmissionsCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => RejectedSubmissionsCubit(hrdInjection()),
+        ),
+
+        //Candidate Submission
+        BlocProvider(
+          create: (context) => CandidatePendingSubmissionsCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => CandidateApprovedSubmissionsCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => CandidateRejectedSubmissionsCubit(hrdInjection()),
+        ),
+
       ],
       child: const MyApp(),
     ),

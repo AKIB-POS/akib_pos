@@ -14,9 +14,15 @@ import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permi
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_in_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_out_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_quota_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_approved_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_pending_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_rejected_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/detail_salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/approved_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/pending_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/rejected_submission_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 final hrdInjection = GetIt.instance;
@@ -99,6 +105,29 @@ Future<void> initHRDModule() async {
 
   hrdInjection.registerFactory(
     () => DetailSalarySlipCubit(hrdInjection()),
+  );
+  
+  
+  hrdInjection.registerFactory(
+    () => PendingSubmissionsCubit(hrdInjection()),
+  );
+  hrdInjection.registerFactory(
+    () => ApprovedSubmissionsCubit(hrdInjection()),
+  );
+  hrdInjection.registerFactory(
+    () => RejectedSubmissionsCubit(hrdInjection()),
+  );
+
+  //candiate submission
+  // Cubits
+  hrdInjection.registerFactory(
+    () => CandidatePendingSubmissionsCubit(hrdInjection()),
+  );
+  hrdInjection.registerFactory(
+    () => CandidateApprovedSubmissionsCubit(hrdInjection()),
+  );
+  hrdInjection.registerFactory(
+    () => CandidateRejectedSubmissionsCubit(hrdInjection()),
   );
 
 

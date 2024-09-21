@@ -4,6 +4,8 @@ import 'package:akib_pos/features/accounting/presentation/pages/accounting_page.
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/hrd/data/models/hrd_summary.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/employee_submission_page.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -34,16 +36,29 @@ class SummaryAttendance extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(
                         left: 16, right: 16, bottom: 16, top: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                    
                       children: [
-                        Expanded(
-                          child: _buildCandidateVerificationCard(
-                              data.totalCandidateVerifications),
-                        ),
-                        Expanded(
-                          child: _buildSubmissionVerificationCard(
-                              data.totalSubmissionVerifications),
+                        const Text("Layanan Verifikasi",style: AppTextStyle.headline5,),
+                        const SizedBox(height: 16,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  Utils.navigateToPage(context, const EmployeeSubmissionPage());
+                                },
+                                child: _buildCandidateVerificationCard(
+                                    data.totalCandidateVerifications),
+                              ),
+                            ),
+                            Expanded(
+                              child: _buildSubmissionVerificationCard(
+                                  data.totalSubmissionVerifications),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -72,8 +87,8 @@ class SummaryAttendance extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Expanded(child: _buildShimmerVerificationCard()),
-                  Expanded(child: _buildShimmerVerificationCard()),
+                  Expanded(child: _buildShimmerVerificationCard("Calon\nPegawai")),
+                  Expanded(child: _buildShimmerVerificationCard("Pengajuan\nKaryawan")),
                 ],
               ),
             ),
@@ -163,8 +178,8 @@ class SummaryAttendance extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildShimmerInfoColumn(),
-                  _buildShimmerInfoColumn(),
+                  _buildShimmerInfoColumn("Saldo Cuti"),
+                  _buildShimmerInfoColumn("Alpa"),
                 ],
               ),
             ),
@@ -174,7 +189,7 @@ class SummaryAttendance extends StatelessWidget {
     );
   }
 
-  Widget _buildShimmerInfoColumn() {
+  Widget _buildShimmerInfoColumn(String label) {
     return Column(
       children: [
         Shimmer.fromColors(
@@ -190,12 +205,12 @@ class SummaryAttendance extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text('Label', style: const TextStyle(color: Colors.white)), // Static label
+         Text(label, style: TextStyle(color: Colors.white)), // Static label
       ],
     );
   }
 
-  Widget _buildShimmerVerificationCard() {
+  Widget _buildShimmerVerificationCard(String label) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -230,8 +245,8 @@ class SummaryAttendance extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text('Label', style: AppTextStyle.bigCaptionBold), // Static label
-              ],
+                 Text(label, style: AppTextStyle.bigCaptionBold), // Static label
+              ]
             ),
             SvgPicture.asset('assets/icons/hrd/ic_employee_candidate.svg',
                 height: 40, width: 40),
@@ -371,7 +386,7 @@ class SummaryAttendance extends StatelessWidget {
       padding: const EdgeInsets.only(left: 8),
       child: _buildVerificationCard(
         totalSubmissionVerifications ?? 0,
-        'Verifikasi\nPengajuan',
+        'Pengajuan\nKaryawan',
         'assets/icons/hrd/ic_application_verification.svg',
       ),
     );

@@ -147,7 +147,8 @@ class _HrdPage extends State<HrdPage> {
             mainAxisSpacing: 20,
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              _buildServiceItem('Pegawai', 'assets/icons/hrd/ic_employee.svg'),
+              if (_authSharedPref.getEmployeeRole() != "employee")
+                _buildServiceItem('Pegawai', 'assets/icons/hrd/ic_employee.svg'),
               _buildServiceItem('Administrasi', 'assets/icons/hrd/ic_administration.svg'),
               _buildServiceItem('Slip Gaji', 'assets/icons/hrd/ic_salary.svg'),
               _buildServiceItem('Tasking', 'assets/icons/hrd/ic_tasking.svg'),

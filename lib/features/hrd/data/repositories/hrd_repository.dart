@@ -12,9 +12,11 @@ import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/
 import 'package:akib_pos/features/hrd/data/models/attendance_service/check_in_out_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_quota.dart';
 import 'package:akib_pos/features/hrd/data/models/attenddance_recap.dart';
+import 'package:akib_pos/features/hrd/data/models/candidate_submission.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip_detail.dart';
 import 'package:akib_pos/features/hrd/data/models/hrd_summary.dart';
+import 'package:akib_pos/features/hrd/data/models/submission.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class HRDRepository {
@@ -47,6 +49,17 @@ abstract class HRDRepository {
   //Salary
   Future<Either<Failure, SalarySlipsResponse>> getSalarySlips(int year);
   Future<Either<Failure, SalarySlipDetail>> getSalarySlipDetail(int slipId);
+
+  //Submission
+  Future<Either<Failure, List<Submission>>> getPendingSubmissions(int branchId);
+  Future<Either<Failure, List<Submission>>> getApprovedSubmissions(int branchId);
+  Future<Either<Failure, List<Submission>>> getRejectedSubmissions(int branchId);
+
+
+  //CandidateSubmission
+  Future<Either<Failure, List<CandidateSubmission>>> getCandidateSubmissionsPending(int branchId);
+  Future<Either<Failure, List<CandidateSubmission>>> getCandidateSubmissionsApproved(int branchId);
+  Future<Either<Failure, List<CandidateSubmission>>> getCandidateSubmissionsRejected(int branchId);
   
 
 }
@@ -55,6 +68,81 @@ class HRDRepositoryImpl implements HRDRepository {
   final HRDRemoteDataSource remoteDataSource;
 
   HRDRepositoryImpl({required this.remoteDataSource});
+
+
+@override
+  Future<Either<Failure, List<CandidateSubmission>>> getCandidateSubmissionsPending(int branchId) async {
+    try {
+      final submissions = await remoteDataSource.getCandidateSubmissionsPending(branchId);
+      return Right(submissions);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<CandidateSubmission>>> getCandidateSubmissionsApproved(int branchId) async {
+    try {
+      final submissions = await remoteDataSource.getCandidateSubmissionsApproved(branchId);
+      return Right(submissions);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<CandidateSubmission>>> getCandidateSubmissionsRejected(int branchId) async {
+    try {
+      final submissions = await remoteDataSource.getCandidateSubmissionsRejected(branchId);
+      return Right(submissions);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+  
+
+
+  @override
+  Future<Either<Failure, List<Submission>>> getPendingSubmissions(int branchId) async {
+    try {
+      final submissions = await remoteDataSource.getPendingSubmissions(branchId);
+      return Right(submissions);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Submission>>> getApprovedSubmissions(int branchId) async {
+    try {
+      final submissions = await remoteDataSource.getApprovedSubmissions(branchId);
+      return Right(submissions);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Submission>>> getRejectedSubmissions(int branchId) async {
+    try {
+      final submissions = await remoteDataSource.getRejectedSubmissions(branchId);
+      return Right(submissions);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
 
   @override
