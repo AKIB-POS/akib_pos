@@ -4,6 +4,7 @@ import 'package:akib_pos/features/accounting/presentation/bloc/transaction_repor
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/home/widget/my_drawer.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/administration_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/attendance_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/attendance_recap_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/leave_page.dart';
@@ -11,7 +12,7 @@ import 'package:akib_pos/features/hrd/presentation/pages/overtime_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/permission_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/salary_%20slip_page.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/appbar_hrd_page.dart';
-import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/summary_attendance.dart';
+import 'package:akib_pos/features/hrd/presentation/widgets/summary_hrd.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -74,7 +75,7 @@ class _HrdPage extends State<HrdPage> {
               color: AppColors.backgroundGrey,
               child: Column(
                 children: [
-                  SummaryAttendance(),
+                  SummaryHRD(),
                   const SizedBox(height: 10),
                   Container(
                     width: double.infinity,
@@ -178,6 +179,9 @@ class _HrdPage extends State<HrdPage> {
             break;
           case 'Slip Gaji':
             Utils.navigateToPage(context, const SalarySlipPage());
+            break;
+          case 'Administrasi':
+            Utils.navigateToPage(context, const AdministrationPage());
             break;
           default:
             break;

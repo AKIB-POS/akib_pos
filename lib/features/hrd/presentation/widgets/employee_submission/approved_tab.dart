@@ -1,6 +1,6 @@
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/approved_submission_cubit.dart';
-import 'package:akib_pos/features/hrd/presentation/widgets/submission/submission_list_content.dart';
+import 'package:akib_pos/features/hrd/presentation/widgets/employee_submission/employee_submission_list_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -36,7 +36,7 @@ class ApprovedTab extends StatelessWidget {
                 itemCount: state.approvedSubmissions.length,
                 itemBuilder: (context, index) {
                   final submission = state.approvedSubmissions[index];
-                  return SubmissionListContent(submission: submission);
+                  return EmployeeSubmissionListContent(submission: submission);
                 },
               ),
             );

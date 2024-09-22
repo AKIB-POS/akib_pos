@@ -35,7 +35,7 @@ class ApprovedSubmissionsInitial extends ApprovedSubmissionsState {}
 class ApprovedSubmissionsLoading extends ApprovedSubmissionsState {}
 
 class ApprovedSubmissionsLoaded extends ApprovedSubmissionsState {
-  final List<Submission> approvedSubmissions;
+  final List<EmployeeSubmission> approvedSubmissions;
 
   ApprovedSubmissionsLoaded(this.approvedSubmissions);
 }

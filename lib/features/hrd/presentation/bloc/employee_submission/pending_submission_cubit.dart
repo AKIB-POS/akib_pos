@@ -35,7 +35,7 @@ class PendingSubmissionsInitial extends PendingSubmissionsState {}
 class PendingSubmissionsLoading extends PendingSubmissionsState {}
 
 class PendingSubmissionsLoaded extends PendingSubmissionsState {
-  final List<Submission> submissions;
+  final List<EmployeeSubmission> submissions;
   PendingSubmissionsLoaded(this.submissions);
 }
 

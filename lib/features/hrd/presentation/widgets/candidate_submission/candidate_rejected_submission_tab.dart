@@ -1,21 +1,20 @@
-import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/rejected_submission_cubit.dart';
-import 'package:akib_pos/features/hrd/presentation/widgets/submission/submission_list_content.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_rejected_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/widgets/candidate_submission/candidate_submission_list_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 
-class RejectedTab extends StatelessWidget {
-  const RejectedTab({Key? key}) : super(key: key);
+class CandidateRejectedSubmissionTab extends StatelessWidget {
+  const CandidateRejectedSubmissionTab({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RejectedSubmissionsCubit, RejectedSubmissionsState>(
+    return BlocBuilder<CandidateRejectedSubmissionsCubit, CandidateRejectedSubmissionsState>(
       builder: (context, state) {
-        if (state is RejectedSubmissionsLoading) {
+        if (state is CandidateRejectedSubmissionsLoading) {
           return const Center(child: CircularProgressIndicator());
-        } else if (state is RejectedSubmissionsError) {
+        } else if (state is CandidateRejectedSubmissionsError) {
           return Center(child: Text('Error: ${state.message}'));
-        } else if (state is RejectedSubmissionsLoaded) {
+        } else if (state is CandidateRejectedSubmissionsLoaded) {
           if (state.rejectedSubmissions.isEmpty) {
             return const Center(child: Text('Tidak ada pengajuan yang ditolak'));
           } else {
@@ -26,7 +25,7 @@ class RejectedTab extends StatelessWidget {
                 itemCount: state.rejectedSubmissions.length,
                 itemBuilder: (context, index) {
                   final submission = state.rejectedSubmissions[index];
-                  return SubmissionListContent(submission: submission);
+                  return CandidateSubmissionListContent(submission: submission);
                 },
               ),
             );

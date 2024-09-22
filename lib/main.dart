@@ -69,7 +69,7 @@ import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/approved_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/pending_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/rejected_submission_cubit.dart';
-import 'package:akib_pos/features/hrd/presentation/widgets/submission/pending_approval_tab.dart';
+import 'package:akib_pos/features/hrd/presentation/widgets/employee_submission/pending_approval_tab.dart';
 import 'package:akib_pos/splash_screen.dart';
 import 'package:akib_pos/util/bloc_providers.dart';
 import 'package:flutter/material.dart';

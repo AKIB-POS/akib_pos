@@ -1,3 +1,4 @@
+import 'package:akib_pos/core/error/failures.dart';
 import 'package:akib_pos/features/hrd/data/models/candidate_submission.dart';
 import 'package:akib_pos/features/hrd/data/repositories/hrd_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,10 +15,14 @@ class CandidateRejectedSubmissionsCubit extends Cubit<CandidateRejectedSubmissio
 
     result.fold(
       (failure) {
-        emit(CandidateRejectedSubmissionsError(failure.toString()));
+        if (failure is GeneralFailure) {
+          emit(CandidateRejectedSubmissionsError(failure.message));
+        } else {
+          emit(CandidateRejectedSubmissionsError('Failed to fetch rejected submissions.'));
+        }
       },
-      (submissions) {
-        emit(CandidateRejectedSubmissionsLoaded(submissions));
+      (rejectedSubmissions) {
+        emit(CandidateRejectedSubmissionsLoaded(rejectedSubmissions));
       },
     );
   }

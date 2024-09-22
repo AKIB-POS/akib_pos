@@ -4,9 +4,9 @@ import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/a
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/approved_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/pending_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/rejected_submission_cubit.dart';
-import 'package:akib_pos/features/hrd/presentation/widgets/submission/approved_tab.dart';
-import 'package:akib_pos/features/hrd/presentation/widgets/submission/pending_approval_tab.dart';
-import 'package:akib_pos/features/hrd/presentation/widgets/submission/rejected_tab.dart';
+import 'package:akib_pos/features/hrd/presentation/widgets/employee_submission/approved_tab.dart';
+import 'package:akib_pos/features/hrd/presentation/widgets/employee_submission/pending_approval_tab.dart';
+import 'package:akib_pos/features/hrd/presentation/widgets/employee_submission/rejected_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -77,9 +77,9 @@ class _EmployeeSubmissionPageState extends State<EmployeeSubmissionPage>
             return null; // Tidak ada warna jika tidak ada aksi
           }),
           controller: _tabController,
-          labelColor: Colors.red,
+          labelColor: AppColors.primaryMain,
           unselectedLabelColor: Colors.grey,
-          indicatorColor: Colors.red,
+          indicatorColor: AppColors.primaryMain,
           labelStyle: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,

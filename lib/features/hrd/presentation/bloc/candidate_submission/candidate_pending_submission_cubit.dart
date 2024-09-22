@@ -1,3 +1,4 @@
+import 'package:akib_pos/core/error/failures.dart';
 import 'package:akib_pos/features/hrd/data/models/candidate_submission.dart';
 import 'package:akib_pos/features/hrd/data/repositories/hrd_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,10 +15,14 @@ class CandidatePendingSubmissionsCubit extends Cubit<CandidatePendingSubmissions
 
     result.fold(
       (failure) {
-        emit(CandidatePendingSubmissionsError(failure.toString()));
+        if (failure is GeneralFailure) {
+          emit(CandidatePendingSubmissionsError(failure.message));
+        } else {
+          emit(CandidatePendingSubmissionsError('Failed to fetch pending submissions.'));
+        }
       },
-      (submissions) {
-        emit(CandidatePendingSubmissionsLoaded(submissions));
+      (pendingSubmissions) {
+        emit(CandidatePendingSubmissionsLoaded(pendingSubmissions));
       },
     );
   }

@@ -1,17 +1,20 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/hrd/data/models/submission.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/employee_submission_detail.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class SubmissionListContent extends StatelessWidget {
-  final Submission submission;
+class EmployeeSubmissionListContent extends StatelessWidget {
+  final EmployeeSubmission submission;
 
-  const SubmissionListContent({Key? key, required this.submission}) : super(key: key);
+  const EmployeeSubmissionListContent({Key? key, required this.submission}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: EdgeInsets.only(bottom: 10),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -41,6 +44,7 @@ class SubmissionListContent extends StatelessWidget {
                    Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                      children: [
+                      const SizedBox(height: 8),
                        _buildType(submission.type),
                         const SizedBox(height: 4),
                         Text(submission.name, style: AppTextStyle.headline5),
@@ -51,20 +55,21 @@ class SubmissionListContent extends StatelessWidget {
                    ),
                    OutlinedButton(
                       onPressed: () {
-                        // Handle detail button press
+                        Utils.navigateToPage(context, EmployeeSubmissionDetailPage(submission: submission));
                       },
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: AppColors.primaryMain),
                         shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(4),
                               ),
+                              overlayColor: Colors.white
                       ),
-                      child: Text('Detail', style: TextStyle(color: AppColors.primaryMain)),
+                      child: const Text('Detail', style: TextStyle(color: AppColors.primaryMain)),
                     ),
                  ],
                ),
                 Container(
-                  padding: EdgeInsets.symmetric(vertical: 8,horizontal: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 8,horizontal: 12),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     color: AppColors.textGrey100
@@ -72,7 +77,7 @@ class SubmissionListContent extends StatelessWidget {
                   child: Column(
                     
                     children: [
-                  _buildSubmissionDetails(submission.details),
+                  _buildSubmissionDetails(submission.submissionDetails),
                   const SizedBox(height: 8),
                   _buildApprovalStatus(submission.approverName, submission.approvalStatus),
                     ],
@@ -114,11 +119,11 @@ class SubmissionListContent extends StatelessWidget {
  
 
     return Container(
-      padding:  EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
+      padding:  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: const BoxDecoration(
         // color: AppColors.primaryMain,
         color: AppColors.primaryMain,
-        borderRadius: const BorderRadius.only(
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(8),
           topRight: Radius.circular(8),
         ),
@@ -135,7 +140,7 @@ class SubmissionListContent extends StatelessWidget {
     );
   }
 
-  Widget _buildSubmissionDetails(List<Detail> details) {
+  Widget _buildSubmissionDetails(List<SubmissionInfo> details) {
     return Column(
       children: details
           .map((detail) => Padding(
@@ -167,7 +172,7 @@ class SubmissionListContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Status Persetujuan', style: AppTextStyle.caption.copyWith(color: AppColors.textGrey600)),
-        SizedBox(height: 4,),
+        const SizedBox(height: 4,),
         Row(
           children: [
             Text("${approverName} : "  , style: AppTextStyle.caption.copyWith(color: Colors.black)),

@@ -29,6 +29,40 @@ class Utils{
   );
 }
 
+  // Buat Menu List
+  static Widget buildMenuItem(BuildContext context,
+      {required String title, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: AppTextStyle.bigCaptionBold
+            ),
+            const Icon(Icons.arrow_forward_ios, size: 18),
+          ],
+        ),
+      ),
+    );
+  }
+
 static Widget buildLoadingCardShimmer() {
     return Container(
       padding: const EdgeInsets.only(bottom: 16),

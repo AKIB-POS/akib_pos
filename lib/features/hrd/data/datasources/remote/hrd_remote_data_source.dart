@@ -53,9 +53,9 @@ abstract class HRDRemoteDataSource {
   Future<SalarySlipDetail> getSalarySlipDetail(int slipId);
 
   //Submission
-  Future<List<Submission>> getPendingSubmissions(int branchId);
-  Future<List<Submission>> getApprovedSubmissions(int branchId);
-  Future<List<Submission>> getRejectedSubmissions(int branchId);
+  Future<List<EmployeeSubmission>> getPendingSubmissions(int branchId);
+  Future<List<EmployeeSubmission>> getApprovedSubmissions(int branchId);
+  Future<List<EmployeeSubmission>> getRejectedSubmissions(int branchId);
    
 
    //Candidate Submission
@@ -115,8 +115,8 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
   }
   
 @override
-  Future<List<Submission>> getPendingSubmissions(int branchId) async {
-    const url = '${URLs.baseUrlMock}/submissions/pending-approval';
+  Future<List<EmployeeSubmission>> getPendingSubmissions(int branchId) async {
+    const url = '${URLs.baseUrlMock}/employee-submissions/pending-approval';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {'branch_id': branchId.toString()}),
       headers: _buildHeaders(),
@@ -125,7 +125,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       List<dynamic> submissionsData = jsonResponse['data'];
-      return submissionsData.map((json) => Submission.fromJson(json)).toList();
+      return submissionsData.map((json) => EmployeeSubmission.fromJson(json)).toList();
     } else if (response.statusCode >= 400 && response.statusCode < 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
@@ -134,8 +134,8 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
   }
 
    @override
-  Future<List<Submission>> getApprovedSubmissions(int branchId) async {
-    const url = '${URLs.baseUrlMock}/submissions/approved';
+  Future<List<EmployeeSubmission>> getApprovedSubmissions(int branchId) async {
+    const url = '${URLs.baseUrlMock}/employee-submissions/approved';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {'branch_id': branchId.toString()}),
       headers: _buildHeaders(),
@@ -144,7 +144,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       List<dynamic> submissionsData = jsonResponse['data'];
-      return submissionsData.map((json) => Submission.fromJson(json)).toList();
+      return submissionsData.map((json) => EmployeeSubmission.fromJson(json)).toList();
     } else if (response.statusCode >= 400 && response.statusCode < 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
@@ -153,8 +153,8 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
   }
 
   @override
-  Future<List<Submission>> getRejectedSubmissions(int branchId) async {
-    const url = '${URLs.baseUrlMock}/submissions/rejected';
+  Future<List<EmployeeSubmission>> getRejectedSubmissions(int branchId) async {
+    const url = '${URLs.baseUrlMock}/employee-submissions/rejected';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {'branch_id': branchId.toString()}),
       headers: _buildHeaders(),
@@ -163,7 +163,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       List<dynamic> submissionsData = jsonResponse['data'];
-      return submissionsData.map((json) => Submission.fromJson(json)).toList();
+      return submissionsData.map((json) => EmployeeSubmission.fromJson(json)).toList();
     } else if (response.statusCode >= 400 && response.statusCode < 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {

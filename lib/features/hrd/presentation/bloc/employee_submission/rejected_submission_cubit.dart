@@ -36,7 +36,7 @@ class RejectedSubmissionsInitial extends RejectedSubmissionsState {}
 class RejectedSubmissionsLoading extends RejectedSubmissionsState {}
 
 class RejectedSubmissionsLoaded extends RejectedSubmissionsState {
-  final List<Submission> rejectedSubmissions;
+  final List<EmployeeSubmission> rejectedSubmissions;
 
   RejectedSubmissionsLoaded(this.rejectedSubmissions);
 }

@@ -4,6 +4,7 @@ import 'package:akib_pos/features/accounting/presentation/pages/accounting_page.
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/hrd/data/models/hrd_summary.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/candidate_submission_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/employee_submission_page.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shimmer/shimmer.dart';
 
-class SummaryAttendance extends StatelessWidget {
+class SummaryHRD extends StatelessWidget {
   final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
 
   @override
@@ -48,15 +49,20 @@ class SummaryAttendance extends StatelessWidget {
                             Expanded(
                               child: GestureDetector(
                                 onTap: () {
-                                  Utils.navigateToPage(context, const EmployeeSubmissionPage());
+                                  Utils.navigateToPage(context, const CandidateSubmissionPage());
                                 },
                                 child: _buildCandidateVerificationCard(
                                     data.totalCandidateVerifications),
                               ),
                             ),
                             Expanded(
-                              child: _buildSubmissionVerificationCard(
-                                  data.totalSubmissionVerifications),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Utils.navigateToPage(context, const EmployeeSubmissionPage());
+                                },
+                                child: _buildSubmissionVerificationCard(
+                                    data.totalSubmissionVerifications),
+                              ),
                             ),
                           ],
                         ),

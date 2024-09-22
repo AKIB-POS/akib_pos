@@ -51,9 +51,9 @@ abstract class HRDRepository {
   Future<Either<Failure, SalarySlipDetail>> getSalarySlipDetail(int slipId);
 
   //Submission
-  Future<Either<Failure, List<Submission>>> getPendingSubmissions(int branchId);
-  Future<Either<Failure, List<Submission>>> getApprovedSubmissions(int branchId);
-  Future<Either<Failure, List<Submission>>> getRejectedSubmissions(int branchId);
+  Future<Either<Failure, List<EmployeeSubmission>>> getPendingSubmissions(int branchId);
+  Future<Either<Failure, List<EmployeeSubmission>>> getApprovedSubmissions(int branchId);
+  Future<Either<Failure, List<EmployeeSubmission>>> getRejectedSubmissions(int branchId);
 
 
   //CandidateSubmission
@@ -109,7 +109,7 @@ class HRDRepositoryImpl implements HRDRepository {
 
 
   @override
-  Future<Either<Failure, List<Submission>>> getPendingSubmissions(int branchId) async {
+  Future<Either<Failure, List<EmployeeSubmission>>> getPendingSubmissions(int branchId) async {
     try {
       final submissions = await remoteDataSource.getPendingSubmissions(branchId);
       return Right(submissions);
@@ -121,7 +121,7 @@ class HRDRepositoryImpl implements HRDRepository {
   }
 
   @override
-  Future<Either<Failure, List<Submission>>> getApprovedSubmissions(int branchId) async {
+  Future<Either<Failure, List<EmployeeSubmission>>> getApprovedSubmissions(int branchId) async {
     try {
       final submissions = await remoteDataSource.getApprovedSubmissions(branchId);
       return Right(submissions);
@@ -133,7 +133,7 @@ class HRDRepositoryImpl implements HRDRepository {
   }
 
   @override
-  Future<Either<Failure, List<Submission>>> getRejectedSubmissions(int branchId) async {
+  Future<Either<Failure, List<EmployeeSubmission>>> getRejectedSubmissions(int branchId) async {
     try {
       final submissions = await remoteDataSource.getRejectedSubmissions(branchId);
       return Right(submissions);

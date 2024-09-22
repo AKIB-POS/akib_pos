@@ -1,5 +1,7 @@
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/pending_submission_cubit.dart';
-import 'package:akib_pos/features/hrd/presentation/widgets/submission/submission_list_content.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/employee_submission_detail.dart';
+import 'package:akib_pos/features/hrd/presentation/widgets/employee_submission/employee_submission_list_content.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -29,7 +31,8 @@ class PendingApprovalTab extends StatelessWidget {
                 itemCount: state.submissions.length,
                 itemBuilder: (context, index) {
                   final submission = state.submissions[index];
-                  return SubmissionListContent(submission: submission);
+                  return EmployeeSubmissionListContent(submission: submission
+                  );
                 },
               ),
             );
