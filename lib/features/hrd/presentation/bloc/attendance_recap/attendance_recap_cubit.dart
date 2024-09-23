@@ -31,7 +31,9 @@ class AttendanceRecapCubit extends Cubit<AttendanceRecapState> {
   }
 }
 
-abstract class AttendanceRecapState {}
+abstract class AttendanceRecapState {
+  get attendanceSummary => null;
+}
 
 class AttendanceRecapInitial extends AttendanceRecapState {}
 

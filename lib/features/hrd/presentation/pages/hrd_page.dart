@@ -161,12 +161,25 @@ class _HrdPage extends State<HrdPage> {
     );
   }
 
+  void _navigateToAttendancePage(BuildContext context) {
+    final attendanceData = context.read<HRDSummaryCubit>().state;
+    if (attendanceData is HRDSummaryLoaded) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              AttendancePage(data: attendanceData.hrdSummary),
+        ),
+      );
+    }
+  }
+
   Widget _buildServiceItem(String label, String assetPath) {
     return GestureDetector(
       onTap: () {
         switch (label) {
           case 'Absensi':
-            // Navigate to attendance page
+            _navigateToAttendancePage(context);
             break;
           case 'Cuti':
             Utils.navigateToPage(context, const LeavePage());

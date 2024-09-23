@@ -65,6 +65,7 @@ dependencies:
   permission_handler: ^11.3.1
   syncfusion_flutter_datepicker: ^26.2.12
   flutter_svg_provider: ^1.0.7
+  geolocator: ^13.0.1
 
 dev_dependencies:
   flutter_test:

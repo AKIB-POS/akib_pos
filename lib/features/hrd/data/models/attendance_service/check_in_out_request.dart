@@ -1,25 +1,23 @@
 class CheckInOutRequest {
-  final int branchId;
-  final int companyId;
-  final int employeeId;
   final String time;
+  final double lat;
+  final double long;
 
   CheckInOutRequest({
-    required this.branchId,
-    required this.companyId,
-    required this.employeeId,
     required this.time,
+    required this.lat,
+    required this.long,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      // 'branch_id': branchId,
-      // 'company_id': companyId,
-      // 'employee_id': employeeId,
       'time': time,
+      'lat': lat,
+      'long': long,
     };
   }
 }
+
 
 class CheckInOutResponse {
   final String message;

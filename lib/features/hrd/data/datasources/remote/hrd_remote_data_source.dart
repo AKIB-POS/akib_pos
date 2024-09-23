@@ -215,7 +215,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
    @override
   Future<SalarySlipDetail> getSalarySlipDetail(int slipId) async {
-    const url = '${URLs.baseUrlMock}/salary-slip-details';
+    final url = '${URLs.baseUrlMock}/salary-slip-details';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'slip_id': slipId.toString(),
