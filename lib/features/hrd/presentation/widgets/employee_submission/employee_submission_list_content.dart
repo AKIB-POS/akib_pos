@@ -1,7 +1,7 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
-import 'package:akib_pos/features/hrd/data/models/submission.dart';
-import 'package:akib_pos/features/hrd/presentation/pages/employee_submission_detail.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/employee/submission.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/submission/employee/employee_submission_detail.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';

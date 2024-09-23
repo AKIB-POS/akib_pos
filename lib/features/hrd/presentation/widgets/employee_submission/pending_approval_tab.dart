@@ -1,5 +1,5 @@
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/pending_submission_cubit.dart';
-import 'package:akib_pos/features/hrd/presentation/pages/employee_submission_detail.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/submission/employee/employee_submission_detail.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/employee_submission/employee_submission_list_content.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';

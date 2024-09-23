@@ -12,11 +12,13 @@ import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/
 import 'package:akib_pos/features/hrd/data/models/attendance_service/check_in_out_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_quota.dart';
 import 'package:akib_pos/features/hrd/data/models/attenddance_recap.dart';
-import 'package:akib_pos/features/hrd/data/models/candidate_submission.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/candidate/candidate_submission.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip_detail.dart';
 import 'package:akib_pos/features/hrd/data/models/hrd_summary.dart';
-import 'package:akib_pos/features/hrd/data/models/submission.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/candidate/permanent_submission_detail_model.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/employee/submission.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/candidate/contract_submission_detail_model.dart.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class HRDRepository {
@@ -60,6 +62,8 @@ abstract class HRDRepository {
   Future<Either<Failure, List<CandidateSubmission>>> getCandidateSubmissionsPending(int branchId);
   Future<Either<Failure, List<CandidateSubmission>>> getCandidateSubmissionsApproved(int branchId);
   Future<Either<Failure, List<CandidateSubmission>>> getCandidateSubmissionsRejected(int branchId);
+  Future<Either<Failure, ContractSubmissionDetail>> getContractSubmissionDetail(int candidateSubmissionId);
+  Future<Either<Failure, PermanentSubmissionDetail>> getPermanentSubmissionDetail(int candidateSubmissionId);
   
 
 }
@@ -69,6 +73,29 @@ class HRDRepositoryImpl implements HRDRepository {
 
   HRDRepositoryImpl({required this.remoteDataSource});
 
+@override
+  Future<Either<Failure, ContractSubmissionDetail>> getContractSubmissionDetail(int candidateSubmissionId) async {
+    try {
+      final contractSubmissionDetail = await remoteDataSource.getContractSubmissionDetail(candidateSubmissionId);
+      return Right(contractSubmissionDetail);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, PermanentSubmissionDetail>> getPermanentSubmissionDetail(int candidateSubmissionId) async {
+    try {
+      final permanentSubmissionDetail = await remoteDataSource.getPermanentSubmissionDetail(candidateSubmissionId);
+      return Right(permanentSubmissionDetail);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
 @override
   Future<Either<Failure, List<CandidateSubmission>>> getCandidateSubmissionsPending(int branchId) async {

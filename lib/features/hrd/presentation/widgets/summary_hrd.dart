@@ -4,8 +4,8 @@ import 'package:akib_pos/features/accounting/presentation/pages/accounting_page.
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/hrd/data/models/hrd_summary.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
-import 'package:akib_pos/features/hrd/presentation/pages/candidate_submission_page.dart';
-import 'package:akib_pos/features/hrd/presentation/pages/employee_submission_page.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/submission/candidate/candidate_submission_page.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/submission/employee/employee_submission_page.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

@@ -1,7 +1,7 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
-import 'package:akib_pos/features/hrd/data/models/submission.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/employee/submission.dart';
 import 'package:flutter/material.dart';
 
 class EmployeeSubmissionDetailPage extends StatelessWidget {

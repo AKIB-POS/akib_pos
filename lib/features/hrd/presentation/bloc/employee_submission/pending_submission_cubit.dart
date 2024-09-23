@@ -1,5 +1,5 @@
 import 'package:akib_pos/core/error/failures.dart';
-import 'package:akib_pos/features/hrd/data/models/submission.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/employee/submission.dart';
 import 'package:akib_pos/features/hrd/data/repositories/hrd_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 class PendingSubmissionsCubit extends Cubit<PendingSubmissionsState> {

@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:akib_pos/api/urls.dart';
 import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
@@ -14,25 +13,26 @@ import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/
 import 'package:akib_pos/features/hrd/data/models/attendance_service/check_in_out_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_quota.dart';
 import 'package:akib_pos/features/hrd/data/models/attenddance_recap.dart';
-import 'package:akib_pos/features/hrd/data/models/candidate_submission.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/candidate/candidate_submission.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip_detail.dart';
 import 'package:akib_pos/features/hrd/data/models/hrd_summary.dart';
-import 'package:akib_pos/features/hrd/data/models/submission.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/candidate/permanent_submission_detail_model.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/employee/submission.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/candidate/contract_submission_detail_model.dart.dart';
 import 'package:get_it/get_it.dart';
-
 import 'package:http/http.dart' as http;
+
 
 abstract class HRDRemoteDataSource {
   Future<HRDSummaryResponse> getHRDSummary(int branchId);
 
   //HRDPage
-
   //Attendance
   Future<CheckInOutResponse> checkIn(CheckInOutRequest request);
   Future<CheckInOutResponse> checkOut(CheckInOutRequest request);
   Future<AttendanceHistoryResponse> getAttendanceHistory();
-   Future<AttendanceRecap> getAttendanceRecap(int branchId, String date);
+  Future<AttendanceRecap> getAttendanceRecap(int branchId, String date);
 
   //Leave
   Future<LeaveRequestResponse> getLeaveRequests();
@@ -40,16 +40,16 @@ abstract class HRDRemoteDataSource {
   Future<LeaveHistoryResponse> getLeaveHistory();
 
   //Permission
-   Future<PermissionQuotaResponse> getPermissionQuota();
-   Future<PermissionRequestResponse> getPermissionRequests();
-   Future<PermissionHistoryResponse> fetchPermissionHistory();
+  Future<PermissionQuotaResponse> getPermissionQuota();
+  Future<PermissionRequestResponse> getPermissionRequests();
+  Future<PermissionHistoryResponse> fetchPermissionHistory();
 
    //Overtime
-   Future<OvertimeRequestResponse> getOvertimeRequests();
-   Future<OvertimeHistoryResponse> fetchOvertimeHistory();
+  Future<OvertimeRequestResponse> getOvertimeRequests();
+  Future<OvertimeHistoryResponse> fetchOvertimeHistory();
 
    //Salary
-   Future<SalarySlipsResponse> getSalarySlips(int year);
+  Future<SalarySlipsResponse> getSalarySlips(int year);
   Future<SalarySlipDetail> getSalarySlipDetail(int slipId);
 
   //Submission
@@ -62,6 +62,8 @@ abstract class HRDRemoteDataSource {
   Future<List<CandidateSubmission>> getCandidateSubmissionsPending(int branchId);
   Future<List<CandidateSubmission>> getCandidateSubmissionsApproved(int branchId);
   Future<List<CandidateSubmission>> getCandidateSubmissionsRejected(int branchId);
+  Future<ContractSubmissionDetail> getContractSubmissionDetail(int candidateSubmissionId);
+  Future<PermanentSubmissionDetail> getPermanentSubmissionDetail(int candidateSubmissionId);
 
 }
 
@@ -74,6 +76,46 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   HRDRemoteDataSourceImpl({required this.client});
 
+
+@override
+  Future<ContractSubmissionDetail> getContractSubmissionDetail(int candidateSubmissionId) async {
+    const url = '${URLs.baseUrlMock}/candidate-submission-detail/contract';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'candidate_submission_id': candidateSubmissionId.toString(),
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return ContractSubmissionDetail.fromJson(jsonResponse['data']);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+  @override
+  Future<PermanentSubmissionDetail> getPermanentSubmissionDetail(int candidateSubmissionId) async {
+    const url = '${URLs.baseUrlMock}/candidate-submission-detail/permanent';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'candidate_submission_id': candidateSubmissionId.toString(),
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return PermanentSubmissionDetail.fromJson(jsonResponse['data']);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
 
    @override
   Future<List<CandidateSubmission>> getCandidateSubmissionsPending(int branchId) async {
@@ -173,7 +215,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
    @override
   Future<SalarySlipDetail> getSalarySlipDetail(int slipId) async {
-    final url = '${URLs.baseUrlMock}/salary-slip-details';
+    const url = '${URLs.baseUrlMock}/salary-slip-details';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'slip_id': slipId.toString(),

@@ -1,6 +1,8 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
-import 'package:akib_pos/features/hrd/data/models/candidate_submission.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/candidate/candidate_submission.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/submission/candidate/candidate_submission_detail_page.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -12,7 +14,7 @@ class CandidateSubmissionListContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 8),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -46,19 +48,22 @@ class CandidateSubmissionListContent extends StatelessWidget {
                         _buildType(submission.submissionType),
                         const SizedBox(height: 6),
                         Text(submission.candidateName, style: AppTextStyle.headline5),
-                                const SizedBox(height: 8),
+                        const SizedBox(height: 8),
                       ],
                     ),
                     OutlinedButton(
                       onPressed: () {
                         // Handle detail button press
+                        Utils.navigateToPage(context, CandidateSubmissionDetailPage(candidateId: submission.candidateSubmissionId, submissionType: submission.submissionType,approvalStatus: submission.approvalStatus,));
                       },
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: AppColors.primaryMain),
                         shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              padding: EdgeInsets.symmetric(horizontal: 1,)
+                              padding: const EdgeInsets.symmetric(horizontal: 1,),
+
+                        overlayColor: Colors.white
                       ),
                       child: Text('Detail', style: AppTextStyle.caption.copyWith(color : AppColors.primaryMain)),
                     ),

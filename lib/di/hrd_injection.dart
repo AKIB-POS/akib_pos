@@ -17,6 +17,8 @@ import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_approved_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_pending_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_rejected_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/contract_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/permanent_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/detail_salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
@@ -41,21 +43,17 @@ Future<void> initHRDModule() async {
 
   // Cubits
 
-
-    hrdInjection.registerFactory(
+  hrdInjection.registerFactory(
     () => HRDSummaryCubit(hrdInjection()),
   );
   //attendance
- 
 
   hrdInjection.registerFactory(
     () => AttendanceRecapInteractionCubit(employeeSharedPref: hrdInjection()),
   );
-   hrdInjection.registerFactory(
+  hrdInjection.registerFactory(
     () => AttendanceRecapCubit(hrdInjection()),
   );
-
-
 
   hrdInjection.registerFactory(
     () => CheckInCubit(hrdInjection()),
@@ -64,7 +62,7 @@ Future<void> initHRDModule() async {
     () => CheckOutCubit(hrdInjection()),
   );
 
-    hrdInjection.registerFactory(
+  hrdInjection.registerFactory(
     () => AttendanceHistoryCubit(hrdInjection()),
   );
 
@@ -72,14 +70,13 @@ Future<void> initHRDModule() async {
     () => LeaveQuotaCubit(hrdInjection()), // Register the LeaveQuotaCubit
   );
 
-   hrdInjection.registerFactory(
+  hrdInjection.registerFactory(
     () => LeaveRequestCubit(hrdInjection()), // Register the LeaveRequestCubit
   );
 
   hrdInjection.registerFactory(
     () => LeaveHistoryCubit(hrdInjection()), // Register the LeaveHistoryCubit
   );
-
 
   hrdInjection.registerFactory(
     () => PermissionQuotaCubit(hrdInjection()),
@@ -90,7 +87,6 @@ Future<void> initHRDModule() async {
   hrdInjection.registerFactory(
     () => PermissionHistoryCubit(hrdInjection()),
   );
-
 
   hrdInjection.registerFactory(
     () => OvertimeRequestCubit(hrdInjection()),
@@ -106,8 +102,7 @@ Future<void> initHRDModule() async {
   hrdInjection.registerFactory(
     () => DetailSalarySlipCubit(hrdInjection()),
   );
-  
-  
+
   hrdInjection.registerFactory(
     () => PendingSubmissionsCubit(hrdInjection()),
   );
@@ -129,7 +124,6 @@ Future<void> initHRDModule() async {
   hrdInjection.registerFactory(
     () => CandidateRejectedSubmissionsCubit(hrdInjection()),
   );
-
-
-
+  hrdInjection.registerFactory(() => ContractSubmissionCubit(hrdInjection()));
+  hrdInjection.registerFactory(() => PermanentSubmissionCubit(hrdInjection()));
 }
