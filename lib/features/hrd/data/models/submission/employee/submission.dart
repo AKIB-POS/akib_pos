@@ -8,8 +8,9 @@ class EmployeeSubmission {
   final List<SubmissionInfo> submissionDetails;
   final String approverName;
   final String approvalStatus;
-  final String? description;  // Nullable karena bisa tidak ada keterangan
-  final String? attachment;   // Nullable karena bisa tidak ada lampiran
+  final String? description;  // Nullable because it may not always have a description
+  final String? attachment;   // Nullable because it may not always have an attachment
+  final String? reason;       // Nullable because pending submissions won't have a reason
 
   EmployeeSubmission({
     required this.employeeSubmissionId,
@@ -23,6 +24,7 @@ class EmployeeSubmission {
     required this.approvalStatus,
     this.description,
     this.attachment,
+    this.reason,
   });
 
   factory EmployeeSubmission.fromJson(Map<String, dynamic> json) {
@@ -41,6 +43,7 @@ class EmployeeSubmission {
       approvalStatus: json['approval_status'],
       description: json['description'],
       attachment: json['attachment'],
+      reason: json['reason'],
     );
   }
 
@@ -57,6 +60,7 @@ class EmployeeSubmission {
       'approval_status': approvalStatus,
       'description': description,
       'attachment': attachment,
+      'reason': reason,
     };
   }
 }

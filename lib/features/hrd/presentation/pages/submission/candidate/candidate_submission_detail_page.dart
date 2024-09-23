@@ -1,6 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
-
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
@@ -132,8 +132,7 @@ class _CandidateSubmissionDetailPageState
           ),
         ),
         // Action buttons yang tetap di bawah layar
-        if (widget.approvalStatus == "pending")
-          _buildActionButtons(),
+        if (widget.approvalStatus == "pending") _buildActionButtons(),
       ],
     );
   }
@@ -256,7 +255,8 @@ class _CandidateSubmissionDetailPageState
               Row(
                 children: [
                   Expanded(
-                      flex: 5, child: _buildColumn('Jenis Kelamin', info.gender)),
+                      flex: 5,
+                      child: _buildColumn('Jenis Kelamin', info.gender)),
                   Expanded(
                       flex: 5,
                       child: _buildColumn('Tanggal Lahir', info.dateOfBirth)),
@@ -266,8 +266,8 @@ class _CandidateSubmissionDetailPageState
               Row(
                 children: [
                   Expanded(
-                    flex: 5,
-                    child: _buildColumn('No. Telepon', info.phoneNumber)),
+                      flex: 5,
+                      child: _buildColumn('No. Telepon', info.phoneNumber)),
                   Expanded(flex: 5, child: _buildColumn('Email', info.email)),
                 ],
               ),
@@ -318,7 +318,22 @@ class _CandidateSubmissionDetailPageState
                 padding: const EdgeInsets.symmetric(vertical: 12),
               ),
               onPressed: () {
-                // Tambahkan logika untuk tolak
+                Utils.showConfirmationDialog(
+                  context,
+                  buttonText: 'Ya, Tolak', // Text for the confirm button
+                  message:
+                      'Apakah Anda Yakin\nTolak Verifikasi Pengajuan?', // Custom message
+                  onConfirm: () {
+                    // Logika ketika user mengkonfirmasi tindakan
+                    print('Pengajuan ditolak');
+                    Navigator.of(context)
+                        .pop(); // Tutup dialog setelah konfirmasi
+                  },
+                  onCancel: () {
+                    Navigator.of(context)
+                        .pop(); // Tutup dialog saat user membatalkan
+                  },
+                );
               },
               child: Text(
                 'Tolak',
@@ -331,7 +346,22 @@ class _CandidateSubmissionDetailPageState
           Expanded(
             child: ElevatedButton(
               onPressed: () {
-                // Tambahkan logika untuk verifikasi
+                Utils.showConfirmationDialog(
+                  context,
+                  buttonText: 'Ya, Verifikasi', // Text for the confirm button
+                  message:
+                      'Apakah Anda Yakin\nTerima Verifikasi Pengajuan?', // Custom message
+                  onConfirm: () {
+                    // Logika ketika user mengkonfirmasi tindakan
+                
+                    Navigator.of(context)
+                        .pop(); // Tutup dialog setelah konfirmasi
+                  },
+                  onCancel: () {
+                    Navigator.of(context)
+                        .pop(); // Tutup dialog saat user membatalkan
+                  },
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryMain,
