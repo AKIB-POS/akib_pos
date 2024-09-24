@@ -18,8 +18,10 @@ import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip_detail.dart';
 import 'package:akib_pos/features/hrd/data/models/hrd_summary.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/permanent_submission_detail_model.dart';
-import 'package:akib_pos/features/hrd/data/models/submission/employee/submission.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/employee/employee_submission.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/contract_submission_detail_model.dart.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/employee/verify_employee_submission_request.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/employee/verify_employee_submission_response.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
@@ -56,6 +58,7 @@ abstract class HRDRemoteDataSource {
   Future<List<EmployeeSubmission>> getPendingSubmissions(int branchId);
   Future<List<EmployeeSubmission>> getApprovedSubmissions(int branchId);
   Future<List<EmployeeSubmission>> getRejectedSubmissions(int branchId);
+  Future<VerifyEmployeeSubmissionResponse> verifyEmployeeSubmission(VerifyEmployeeSubmissionRequest request);
    
 
    //Candidate Submission
@@ -76,6 +79,25 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   HRDRemoteDataSourceImpl({required this.client});
 
+  Future<VerifyEmployeeSubmissionResponse> verifyEmployeeSubmission(VerifyEmployeeSubmissionRequest request) async {
+    const url = '${URLs.baseUrlMock}/employee-submissions/verify';
+    final response = await client
+        .post(
+          Uri.parse(url),
+          headers: _buildHeaders(),
+          body: json.encode(request.toJson()),
+        )
+        .timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final jsonResponse = json.decode(response.body);
+      return VerifyEmployeeSubmissionResponse.fromJson(jsonResponse);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
 
 @override
   Future<ContractSubmissionDetail> getContractSubmissionDetail(int candidateSubmissionId) async {

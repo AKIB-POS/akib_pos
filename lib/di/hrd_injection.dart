@@ -21,6 +21,7 @@ import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/con
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/permanent_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/detail_salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/salary_slip_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/verify_employee_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/approved_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/pending_submission_cubit.dart';
@@ -103,6 +104,7 @@ Future<void> initHRDModule() async {
     () => DetailSalarySlipCubit(hrdInjection()),
   );
 
+  //Employee Submission
   hrdInjection.registerFactory(
     () => PendingSubmissionsCubit(hrdInjection()),
   );
@@ -111,6 +113,10 @@ Future<void> initHRDModule() async {
   );
   hrdInjection.registerFactory(
     () => RejectedSubmissionsCubit(hrdInjection()),
+  );
+  // Register the cubit
+  hrdInjection.registerFactory(
+    () => VerifyEmployeeSubmissionCubit(hrdInjection()),
   );
 
   //candiate submission

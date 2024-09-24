@@ -1,10 +1,16 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
-import 'package:akib_pos/features/hrd/data/models/submission/employee/submission.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/employee/employee_submission.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/approved_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/pending_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/rejected_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/submission/employee/employee_submission_detail.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get_it/get_it.dart';
 
 class EmployeeSubmissionListContent extends StatelessWidget {
   final EmployeeSubmission submission;
@@ -54,8 +60,24 @@ class EmployeeSubmissionListContent extends StatelessWidget {
                      ],
                    ),
                    OutlinedButton(
-                      onPressed: () {
-                        Utils.navigateToPage(context, EmployeeSubmissionDetailPage(submission: submission));
+                      onPressed: ()async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EmployeeSubmissionDetailPage(
+                              submission: submission,
+                            ),
+                          ),
+                        );
+
+                        // Jika hasilnya true, berarti verifikasi berhasil
+                        if (result == true) {
+                          // Panggil metode untuk memuat ulang data di halaman sebelumnya
+                          final branchId = GetIt.instance<AuthSharedPref>().getBranchId() ?? 0;
+                          context.read<PendingSubmissionsCubit>().fetchPendingSubmissions(branchId: branchId);
+                          context.read<ApprovedSubmissionsCubit>().fetchApprovedSubmissions(branchId: branchId);
+                          context.read<RejectedSubmissionsCubit>().fetchRejectedSubmissions(branchId: branchId);
+                        }
                       },
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: AppColors.primaryMain),

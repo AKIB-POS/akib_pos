@@ -1,14 +1,27 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
-import 'package:akib_pos/features/hrd/data/models/submission/employee/submission.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/employee/employee_submission.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/employee/verify_employee_submission_request.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/verify_employee_submission_cubit.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class EmployeeSubmissionDetailPage extends StatelessWidget {
   final EmployeeSubmission submission;
 
   const EmployeeSubmissionDetailPage({super.key, required this.submission});
+
+  void _verifySubmission(BuildContext context, String status, String? reason) {
+    final request = VerifyEmployeeSubmissionRequest(
+        employeeSubmissionId: submission.employeeSubmissionId,
+        status: status,
+        reason: reason);
+    context
+        .read<VerifyEmployeeSubmissionCubit>()
+        .verifyEmployeeSubmission(request);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,42 +43,67 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
           style: AppTextStyle.headline5,
         ),
       ),
-      body: Column( // Menggunakan Column untuk layout utama
-        children: [
-          Expanded( // Gunakan Expanded untuk memastikan tombol tetap di bawah
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 80), // Tambahkan padding di bawah agar konten tidak tertutupi tombol
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (submission.reason != null) ...[
-                    const SizedBox(height: 16),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: _buildStatusInfo(),
+      body: BlocConsumer<VerifyEmployeeSubmissionCubit,
+          VerifyEmployeeSubmissionState>(
+        listener: (context, state) {
+          if (state is VerifyEmployeeSubmissionLoading) {
+            // Tampilkan loading dialog
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (_) => const Center(child: CircularProgressIndicator()),
+            );
+          } else if (state is VerifyEmployeeSubmissionSuccess) {
+            // Tutup loading dialog dan tampilkan pesan sukses
+            Navigator.of(context).pop(); // Tutup dialog
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content: Text(state.message), backgroundColor: Colors.green),
+            );
+            Navigator.of(context).pop();
+            Navigator.of(context).pop(true);
+          } else if (state is VerifyEmployeeSubmissionError) {
+            // Tutup loading dialog dan tampilkan pesan error
+            Navigator.of(context).pop(); // Tutup dialog
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content: Text(state.message), backgroundColor: Colors.red),
+            );
+          }
+        },
+        builder: (context, state) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.only(bottom: 80),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (submission.reason != null) ...[
+                          const SizedBox(height: 16),
+                          _buildStatusInfo(),
+                        ],
+                        const SizedBox(height: 16),
+                        _buildSubmissionInfo(),
+                        const SizedBox(height: 16),
+                        _buildEmployeeInfo(),
+                        const SizedBox(height: 16),
+                      ],
                     ),
-                  ],
-                  const SizedBox(height: 16),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _buildSubmissionInfo(),
                   ),
-                  const SizedBox(height: 16),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _buildEmployeeInfo(),
-                  ),
-                  const SizedBox(height: 16),
-                ],
+                ),
               ),
-            ),
-          ),
-          if (submission.approvalStatus == 'pending') 
-            _buildActionButtons(context),
-        ],
+              if (submission.approvalStatus == 'pending')
+                _buildActionButtons(context),
+            ],
+          );
+        },
       ),
     );
-
   }
 
   Widget _buildStatusInfo() {
@@ -144,10 +182,7 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Informasi Pegawai',
-          style: AppTextStyle.headline5,
-        ),
+        const Text('Informasi Pegawai', style: AppTextStyle.headline5),
         const SizedBox(height: 16),
         Container(
           width: double.infinity,
@@ -173,17 +208,10 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: AppTextStyle.caption,
-        ),
-        const SizedBox(
-          height: 4,
-        ),
-        Text(
-          value,
-          style: AppTextStyle.caption.copyWith(fontWeight: FontWeight.bold),
-        ),
+        Text(label, style: AppTextStyle.caption),
+        const SizedBox(height: 4),
+        Text(value,
+            style: AppTextStyle.caption.copyWith(fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -192,18 +220,19 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
     if (submission.attachment != null) {
       return ElevatedButton(
         onPressed: () {
+          // Tambahkan logika unduh lampiran
         },
         style: OutlinedButton.styleFrom(
           backgroundColor: Colors.white,
           foregroundColor: AppColors.primaryMain,
-          side: const BorderSide(color: AppColors.primaryMain,width: 1.2),
-          padding: EdgeInsets.symmetric(vertical: 10,horizontal: 12),
+          side: const BorderSide(color: AppColors.primaryMain, width: 1.2),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(6),
           ),
-
         ),
-        child: Text("Lihat Lampiran",style: AppTextStyle.caption.copyWith(fontWeight: FontWeight.bold),),
+        child: Text("Lihat Lampiran",
+            style: AppTextStyle.caption.copyWith(fontWeight: FontWeight.bold)),
       );
     }
     return const SizedBox();
@@ -218,62 +247,56 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
           Expanded(
             child: OutlinedButton(
               style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: Theme.of(context).primaryColor),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 12)),
+                side: BorderSide(color: Theme.of(context).primaryColor),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
               onPressed: () {
-                // Tambahkan aksi untuk tolak
                 Utils.showInputTextVerificationDialog(
                   context,
                   buttonText: 'Ya, Tolak',
                   onConfirm: (String reason) {
-                    // Gunakan nilai alasan  
-                    print('Alasan Tolak: $reason');
-                    // Tambahkan aksi untuk tolak berdasarkan alasan
+                    // Kirim status "rejected"
+                    _verifySubmission(context, 'REJECTED', reason);
                   },
                   onCancel: () {
-                    Navigator.of(context).pop(); // Untuk menutup dialog
+                    Navigator.of(context).pop();
                   },
                 );
               },
-              child: Text(
-                'Tolak',
-                style: AppTextStyle.headline5
-                    .copyWith(color: AppColors.primaryMain),
-              ),
+              child: Text('Tolak',
+                  style: AppTextStyle.headline5
+                      .copyWith(color: AppColors.primaryMain)),
             ),
           ),
           const SizedBox(width: 8),
           Expanded(
             child: ElevatedButton(
               onPressed: () {
-                // Tambahkan aksi untuk verifikasi
                 Utils.showInputTextVerificationDialog(
                   context,
                   buttonText: 'Ya, Terima',
                   onConfirm: (String reason) {
-                    // Gunakan nilai alasan  
-                    print('Alasan Tolak: $reason');
-                    // Tambahkan aksi untuk tolak berdasarkan alasan
+                    // Kirim status "verified"
+                    _verifySubmission(context, 'ACCEPTED', reason);
                   },
                   onCancel: () {
-                    Navigator.of(context).pop(); // Untuk menutup dialog
+                    Navigator.of(context).pop();
                   },
                 );
               },
               style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryMain,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4.0),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 12)),
-              child: Text(
-                'Verifikasi',
-                style: AppTextStyle.headline5.copyWith(color: Colors.white),
+                backgroundColor: AppColors.primaryMain,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4.0),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
               ),
+              child: Text('Verifikasi',
+                  style: AppTextStyle.headline5.copyWith(color: Colors.white)),
             ),
           ),
         ],

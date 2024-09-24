@@ -17,8 +17,10 @@ import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip_detail.dart';
 import 'package:akib_pos/features/hrd/data/models/hrd_summary.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/permanent_submission_detail_model.dart';
-import 'package:akib_pos/features/hrd/data/models/submission/employee/submission.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/employee/employee_submission.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/contract_submission_detail_model.dart.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/employee/verify_employee_submission_request.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/employee/verify_employee_submission_response.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class HRDRepository {
@@ -52,10 +54,11 @@ abstract class HRDRepository {
   Future<Either<Failure, SalarySlipsResponse>> getSalarySlips(int year);
   Future<Either<Failure, SalarySlipDetail>> getSalarySlipDetail(int slipId);
 
-  //Submission
+  //Employee Submission
   Future<Either<Failure, List<EmployeeSubmission>>> getPendingSubmissions(int branchId);
   Future<Either<Failure, List<EmployeeSubmission>>> getApprovedSubmissions(int branchId);
   Future<Either<Failure, List<EmployeeSubmission>>> getRejectedSubmissions(int branchId);
+  Future<Either<Failure, VerifyEmployeeSubmissionResponse>> verifyEmployeeSubmission(VerifyEmployeeSubmissionRequest request);
 
 
   //CandidateSubmission
@@ -72,6 +75,19 @@ class HRDRepositoryImpl implements HRDRepository {
   final HRDRemoteDataSource remoteDataSource;
 
   HRDRepositoryImpl({required this.remoteDataSource});
+
+
+  @override
+  Future<Either<Failure, VerifyEmployeeSubmissionResponse>> verifyEmployeeSubmission(VerifyEmployeeSubmissionRequest request) async {
+    try {
+      final response = await remoteDataSource.verifyEmployeeSubmission(request);
+      return Right(response);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
 @override
   Future<Either<Failure, ContractSubmissionDetail>> getContractSubmissionDetail(int candidateSubmissionId) async {
