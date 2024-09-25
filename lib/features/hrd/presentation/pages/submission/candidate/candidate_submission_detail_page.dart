@@ -1,5 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/verify_candidate_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/candidate/verify_candidate_submission_request.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
@@ -26,12 +28,10 @@ class CandidateSubmissionDetailPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _CandidateSubmissionDetailPageState createState() =>
-      _CandidateSubmissionDetailPageState();
+  _CandidateSubmissionDetailPageState createState() => _CandidateSubmissionDetailPageState();
 }
 
-class _CandidateSubmissionDetailPageState
-    extends State<CandidateSubmissionDetailPage> {
+class _CandidateSubmissionDetailPageState extends State<CandidateSubmissionDetailPage> {
   ContractSubmissionDetail? contractSubmission;
   PermanentSubmissionDetail? permanentSubmission;
   bool isLoading = true;
@@ -51,9 +51,7 @@ class _CandidateSubmissionDetailPageState
 
     try {
       if (widget.submissionType == 'Calon Pegawai Kontrak') {
-        await context
-            .read<ContractSubmissionCubit>()
-            .fetchContractSubmissionDetail(widget.candidateId);
+        await context.read<ContractSubmissionCubit>().fetchContractSubmissionDetail(widget.candidateId);
         final submission = context.read<ContractSubmissionCubit>().state;
         if (submission is ContractSubmissionLoaded) {
           setState(() {
@@ -61,9 +59,7 @@ class _CandidateSubmissionDetailPageState
           });
         }
       } else if (widget.submissionType == 'Calon Pegawai Tetap') {
-        await context
-            .read<PermanentSubmissionCubit>()
-            .fetchPermanentSubmissionDetail(widget.candidateId);
+        await context.read<PermanentSubmissionCubit>().fetchPermanentSubmissionDetail(widget.candidateId);
         final submission = context.read<PermanentSubmissionCubit>().state;
         if (submission is PermanentSubmissionLoaded) {
           setState(() {
@@ -96,23 +92,50 @@ class _CandidateSubmissionDetailPageState
           },
         ),
         titleSpacing: 0,
-        title: const Text(
-          'Detail Pengajuan Bawahan',
-          style: AppTextStyle.headline5,
-        ),
+        title: const Text('Detail Pengajuan Bawahan', style: AppTextStyle.headline5),
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : errorMessage != null
-              ? Center(child: Text('Error: $errorMessage'))
-              : _buildBodyContent(),
+      body: BlocListener<VerifyCandidateSubmissionCubit, VerifyCandidateSubmissionState>(
+        listener: (context, state) {
+          if (state is VerifyCandidateSubmissionLoading) {
+            // Show loading indicator
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (_) => const Center(child: CircularProgressIndicator()),
+            );
+          } else if (state is VerifyCandidateSubmissionSuccess) {
+            // Close loading indicator and show success snackbar
+            Navigator.of(context).pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.green,
+              ),
+            );
+            Navigator.of(context).pop(true); 
+          } else if (state is VerifyCandidateSubmissionError) {
+            // Close loading indicator and show error snackbar
+            Navigator.of(context).pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : errorMessage != null
+                ? Center(child: Text('Error: $errorMessage'))
+                : _buildBodyContent(),
+      ),
     );
   }
 
   Widget _buildBodyContent() {
     return Column(
       children: [
-        // Konten yang bisa di-scroll
         Expanded(
           child: RefreshIndicator(
             onRefresh: _fetchData,
@@ -131,13 +154,96 @@ class _CandidateSubmissionDetailPageState
             ),
           ),
         ),
-        // Action buttons yang tetap di bawah layar
         if (widget.approvalStatus == "pending") _buildActionButtons(),
       ],
     );
   }
 
-  // Widget untuk Contract Submission
+  Widget _buildActionButtons() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: AppColors.primaryMain),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              onPressed: () {
+                Utils.showConfirmationDialog(
+                  context,
+                  buttonText: 'Ya, Tolak',
+                  message: 'Apakah Anda Yakin\nTolak Verifikasi Pengajuan?',
+                  onConfirm: () {
+                    context.read<VerifyCandidateSubmissionCubit>().verifySubmission(
+                      VerifyCandidateSubmissionRequest(
+                        candidateSubmissionId: widget.candidateId,
+                        status: 'REJECTED',
+                      ),
+                    );
+                    Navigator.of(context).pop(); // Close dialog
+                  },
+                  onCancel: () {
+                    Navigator.of(context).pop(); // Close dialog
+                  },
+                );
+              },
+              child: Text(
+                'Tolak',
+                style: AppTextStyle.headline5.copyWith(color: AppColors.primaryMain),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {
+                Utils.showConfirmationDialog(
+                  context,
+                  buttonText: 'Ya, Verifikasi',
+                  message: 'Apakah Anda Yakin\nTerima Verifikasi Pengajuan?',
+                  onConfirm: () {
+                    context.read<VerifyCandidateSubmissionCubit>().verifySubmission(
+                      VerifyCandidateSubmissionRequest(
+                        candidateSubmissionId: widget.candidateId,
+                        status: 'ACCEPTED',
+                      ),
+                    );
+                    Navigator.of(context).pop(); // Close dialog
+                  },
+                  onCancel: () {
+                    Navigator.of(context).pop(); // Close dialog
+                  },
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryMain,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4.0),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              child: Text(
+                'Verifikasi',
+                style: AppTextStyle.headline5.copyWith(color: Colors.white),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Contract Submission details
   Widget _buildContractDetail(ContractSubmissionDetail submission) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -150,7 +256,7 @@ class _CandidateSubmissionDetailPageState
     );
   }
 
-  // Widget untuk Permanent Submission
+  // Permanent Submission details
   Widget _buildPermanentDetail(PermanentSubmissionDetail submission) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,90 +401,6 @@ class _CandidateSubmissionDetailPageState
           style: AppTextStyle.caption.copyWith(fontWeight: FontWeight.bold),
         ),
       ],
-    );
-  }
-
-  // Tombol aksi (Tolak dan Verifikasi)
-  Widget _buildActionButtons() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(color: AppColors.primaryMain),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-              onPressed: () {
-                Utils.showConfirmationDialog(
-                  context,
-                  buttonText: 'Ya, Tolak', // Text for the confirm button
-                  message:
-                      'Apakah Anda Yakin\nTolak Verifikasi Pengajuan?', // Custom message
-                  onConfirm: () {
-                    // Logika ketika user mengkonfirmasi tindakan
-                    print('Pengajuan ditolak');
-                    Navigator.of(context)
-                        .pop(); // Tutup dialog setelah konfirmasi
-                  },
-                  onCancel: () {
-                    Navigator.of(context)
-                        .pop(); // Tutup dialog saat user membatalkan
-                  },
-                );
-              },
-              child: Text(
-                'Tolak',
-                style: AppTextStyle.headline5
-                    .copyWith(color: AppColors.primaryMain),
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                Utils.showConfirmationDialog(
-                  context,
-                  buttonText: 'Ya, Verifikasi', // Text for the confirm button
-                  message:
-                      'Apakah Anda Yakin\nTerima Verifikasi Pengajuan?', // Custom message
-                  onConfirm: () {
-                    // Logika ketika user mengkonfirmasi tindakan
-                
-                    Navigator.of(context)
-                        .pop(); // Tutup dialog setelah konfirmasi
-                  },
-                  onCancel: () {
-                    Navigator.of(context)
-                        .pop(); // Tutup dialog saat user membatalkan
-                  },
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryMain,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4.0),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-              child: Text(
-                'Verifikasi',
-                style: AppTextStyle.headline5.copyWith(color: Colors.white),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

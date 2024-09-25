@@ -1,12 +1,14 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/employee/employee_submission.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/employee/verify_employee_submission_request.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/verify_employee_submission_cubit.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
 class EmployeeSubmissionDetailPage extends StatelessWidget {
   final EmployeeSubmission submission;
@@ -25,6 +27,7 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final role = GetIt.instance<AuthSharedPref>().getEmployeeRole();
     return Scaffold(
       backgroundColor: AppColors.backgroundGrey,
       resizeToAvoidBottomInset: true, // Hindari overflow saat keyboard muncul
@@ -97,7 +100,8 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
                   ),
                 ),
               ),
-              if (submission.approvalStatus == 'pending')
+              
+              if (submission.approvalStatus == 'pending' && role == "owner")
                 _buildActionButtons(context),
             ],
           );

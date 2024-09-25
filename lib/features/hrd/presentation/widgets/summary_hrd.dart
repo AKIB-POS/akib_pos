@@ -1,6 +1,5 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
-import 'package:akib_pos/features/accounting/presentation/pages/accounting_page.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/hrd/data/models/hrd_summary.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
@@ -31,7 +30,8 @@ class SummaryHRD extends StatelessWidget {
             width: double.infinity,
             child: Column(
               children: [
-                _buildSummaryContent(data),
+                if(_authSharedPref.getEmployeeRole() != "owner")
+                  _buildSummaryContent(data),
                 // Check if role is not "employee"
                 if (_authSharedPref.getEmployeeRole() != "employee")
                   Padding(
@@ -85,7 +85,8 @@ class SummaryHRD extends StatelessWidget {
       width: double.infinity,
       child: Column(
         children: [
-          _buildShimmerSummaryContent(),
+          if(_authSharedPref.getEmployeeRole() != "owner")
+            _buildShimmerSummaryContent(),
           if (_authSharedPref.getEmployeeRole() != "employee")
             Padding(
               padding: const EdgeInsets.only(

@@ -1,5 +1,6 @@
 import 'package:akib_pos/features/hrd/data/datasources/remote/hrd_remote_data_source.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/candidate/candidate_submission.dart';
 import 'package:akib_pos/features/hrd/data/repositories/hrd_repository.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_recap/attendance_recap_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_recap/attendance_recap_interaction_cubit.dart';
@@ -19,6 +20,7 @@ import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/can
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_rejected_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/contract_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/permanent_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/verify_candidate_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/detail_salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/verify_employee_submission_cubit.dart';
@@ -132,4 +134,5 @@ Future<void> initHRDModule() async {
   );
   hrdInjection.registerFactory(() => ContractSubmissionCubit(hrdInjection()));
   hrdInjection.registerFactory(() => PermanentSubmissionCubit(hrdInjection()));
+  hrdInjection.registerFactory(() => VerifyCandidateSubmissionCubit(hrdInjection()));
 }

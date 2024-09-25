@@ -65,6 +65,7 @@ import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/can
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_rejected_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/contract_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/permanent_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/verify_candidate_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/detail_salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/verify_employee_submission_cubit.dart';
@@ -349,6 +350,9 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => PermanentSubmissionCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => VerifyCandidateSubmissionCubit(hrdInjection()),
         ),
 
       ],

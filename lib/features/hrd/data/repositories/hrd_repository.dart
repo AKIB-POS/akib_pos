@@ -21,6 +21,7 @@ import 'package:akib_pos/features/hrd/data/models/submission/employee/employee_s
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/contract_submission_detail_model.dart.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/employee/verify_employee_submission_request.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/employee/verify_employee_submission_response.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/candidate/verify_candidate_submission_request.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class HRDRepository {
@@ -67,6 +68,7 @@ abstract class HRDRepository {
   Future<Either<Failure, List<CandidateSubmission>>> getCandidateSubmissionsRejected(int branchId);
   Future<Either<Failure, ContractSubmissionDetail>> getContractSubmissionDetail(int candidateSubmissionId);
   Future<Either<Failure, PermanentSubmissionDetail>> getPermanentSubmissionDetail(int candidateSubmissionId);
+  Future<Either<Failure, void>> verifyCandidateSubmission(VerifyCandidateSubmissionRequest request);
   
 
 }
@@ -75,6 +77,19 @@ class HRDRepositoryImpl implements HRDRepository {
   final HRDRemoteDataSource remoteDataSource;
 
   HRDRepositoryImpl({required this.remoteDataSource});
+
+
+   @override
+  Future<Either<Failure, void>> verifyCandidateSubmission(VerifyCandidateSubmissionRequest request) async {
+    try {
+      await remoteDataSource.verifyCandidateSubmission(request);
+      return Right(null);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
 
   @override

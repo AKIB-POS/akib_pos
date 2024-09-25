@@ -1,10 +1,16 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/candidate_submission.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_approved_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_pending_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_rejected_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/submission/candidate/candidate_submission_detail_page.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get_it/get_it.dart';
 
 class CandidateSubmissionListContent extends StatelessWidget {
   final CandidateSubmission submission;
@@ -52,9 +58,26 @@ class CandidateSubmissionListContent extends StatelessWidget {
                       ],
                     ),
                     OutlinedButton(
-                      onPressed: () {
+                      onPressed: () async{
                         // Handle detail button press
-                        Utils.navigateToPage(context, CandidateSubmissionDetailPage(candidateId: submission.candidateSubmissionId, submissionType: submission.submissionType,approvalStatus: submission.approvalStatus,));
+                       final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CandidateSubmissionDetailPage(
+                              candidateId: submission.candidateSubmissionId,
+                              submissionType: submission.submissionType,
+                              approvalStatus: submission.approvalStatus,
+                            ),
+                          ),
+                        );
+
+                        // Jika hasilnya true, berarti verifikasi berhasil dan kita perlu fetch ulang data
+                        if (result == true) {
+                          final branchId = GetIt.instance<AuthSharedPref>().getBranchId() ?? 0;
+                          context.read<CandidatePendingSubmissionsCubit>().fetchPendingSubmissions(branchId: branchId);
+                          context.read<CandidateApprovedSubmissionsCubit>().fetchApprovedSubmissions(branchId: branchId);
+                          context.read<CandidateRejectedSubmissionsCubit>().fetchRejectedSubmissions(branchId: branchId);
+                        }
                       },
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: AppColors.primaryMain),

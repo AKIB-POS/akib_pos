@@ -22,6 +22,7 @@ import 'package:akib_pos/features/hrd/data/models/submission/employee/employee_s
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/contract_submission_detail_model.dart.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/employee/verify_employee_submission_request.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/employee/verify_employee_submission_response.dart';
+import 'package:akib_pos/features/hrd/data/models/submission/candidate/verify_candidate_submission_request.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
@@ -67,6 +68,7 @@ abstract class HRDRemoteDataSource {
   Future<List<CandidateSubmission>> getCandidateSubmissionsRejected(int branchId);
   Future<ContractSubmissionDetail> getContractSubmissionDetail(int candidateSubmissionId);
   Future<PermanentSubmissionDetail> getPermanentSubmissionDetail(int candidateSubmissionId);
+  Future<void> verifyCandidateSubmission(VerifyCandidateSubmissionRequest request);
 
 }
 
@@ -78,6 +80,29 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
   final AuthSharedPref sharedPrefsHelper = GetIt.instance<AuthSharedPref>();
 
   HRDRemoteDataSourceImpl({required this.client});
+
+
+  @override
+  Future<void> verifyCandidateSubmission(VerifyCandidateSubmissionRequest request) async {
+    const url = '${URLs.baseUrlMock}/candidate-submissions/verify';
+    final response = await client
+        .post(
+          Uri.parse(url),
+          headers: _buildHeaders(),
+          body: json.encode(request.toJson()),
+        )
+        .timeout(const Duration(seconds: 30));
+
+    if (response.statusCode != 201) {
+      final errorResponse = json.decode(response.body);
+      if (response.statusCode >= 400 && response.statusCode < 500) {
+        throw GeneralException(errorResponse['message']);
+      } else {
+        throw ServerException();
+      }
+    }
+  }
+
 
   Future<VerifyEmployeeSubmissionResponse> verifyEmployeeSubmission(VerifyEmployeeSubmissionRequest request) async {
     const url = '${URLs.baseUrlMock}/employee-submissions/verify';
