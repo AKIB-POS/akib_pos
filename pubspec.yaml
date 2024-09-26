@@ -66,6 +66,7 @@ dependencies:
   syncfusion_flutter_datepicker: ^26.2.12
   flutter_svg_provider: ^1.0.7
   geolocator: ^13.0.1
+  month_year_picker: ^0.4.0+1
 
 dev_dependencies:
   flutter_test:

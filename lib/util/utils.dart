@@ -9,6 +9,28 @@ import 'package:shimmer/shimmer.dart';
 
 class Utils {
 
+  static const List<String> months = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+  ];
+
+  // Fungsi untuk mendapatkan nama bulan dari nomor bulan
+  static String getMonthString(int month) {
+    if (month < 1 || month > 12) {
+      throw Exception('Bulan harus di antara 1 hingga 12.');
+    }
+    return months[month - 1]; // Karena index dalam array mulai dari 0
+  }
+
+  // Fungsi untuk mendapatkan nomor bulan dari nama bulan
+  static int getMonthNumber(String month) {
+    final index = months.indexOf(month);
+    if (index == -1) {
+      throw Exception('Bulan tidak ditemukan.');
+    }
+    return index + 1;
+  }
+
 static Widget buildLoadingCardShimmer() {
     return Container(
       padding: const EdgeInsets.only(bottom: 16),

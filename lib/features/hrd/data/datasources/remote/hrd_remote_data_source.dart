@@ -14,6 +14,8 @@ import 'package:akib_pos/features/hrd/data/models/attendance_service/check_in_ou
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_quota.dart';
 import 'package:akib_pos/features/hrd/data/models/attenddance_recap.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_all_employee.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/employee_performance.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/submit_employee_request.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/candidate_submission.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip_detail.dart';
@@ -59,10 +61,12 @@ abstract class HRDRemoteDataSource {
   Future<SalarySlipDetail> getSalarySlipDetail(int slipId);
 
 
-  //Employee
+  //Employee Service
   Future<List<HRDAllEmployee>> getAllEmployees(int branchId);
   Future<ContractEmployeeDetail> getContractEmployeeDetail(int employeeId);
   Future<PermanentEmployeeDetail> getPermanentEmployeeDetail(int employeeId);
+  Future<List<EmployeePerformance>> getEmployeePerformance(int branchId, String month, String year);
+  Future<void> submitEmployeePerformance(SubmitEmployeePerformanceRequest request);
 
   //Submission
   Future<List<EmployeeSubmission>> getPendingSubmissions(int branchId);
@@ -89,6 +93,55 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
   final AuthSharedPref sharedPrefsHelper = GetIt.instance<AuthSharedPref>();
 
   HRDRemoteDataSourceImpl({required this.client});
+
+
+  @override
+  Future<void> submitEmployeePerformance(SubmitEmployeePerformanceRequest request) async {
+    const url = '${URLs.baseUrlMock}/submit-employee-performance';
+
+    final response = await client.post(
+      Uri.parse(url),
+      headers: _buildHeaders(),
+      body: json.encode(request.toJson()),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 201) {
+      final jsonResponse = json.decode(response.body);
+      if (jsonResponse['status'] != 'success') {
+        throw GeneralException(jsonResponse['message']);
+      }
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+
+   @override
+  Future<List<EmployeePerformance>> getEmployeePerformance(int branchId, String month, String year) async {
+    const url = '${URLs.baseUrlMock}/employee-performance';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branch_id': branchId.toString(),
+        'month': month,
+        'year': year,
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      List<EmployeePerformance> employeePerformances = (jsonResponse['data'] as List)
+          .map((employee) => EmployeePerformance.fromJson(employee))
+          .toList();
+      return employeePerformances;
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
 
 
 

@@ -13,6 +13,8 @@ import 'package:akib_pos/features/hrd/data/models/attendance_service/check_in_ou
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_quota.dart';
 import 'package:akib_pos/features/hrd/data/models/attenddance_recap.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_all_employee.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/employee_performance.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/submit_employee_request.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/candidate_submission.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip_detail.dart';
@@ -64,6 +66,8 @@ abstract class HRDRepository {
       int employeeId);
   Future<Either<Failure, PermanentEmployeeDetail>> getPermanentEmployeeDetail(
       int employeeId);
+  Future<Either<Failure, List<EmployeePerformance>>> getEmployeePerformance(int branchId, String month, String year);
+  Future<Either<Failure, void>> submitEmployeePerformance(SubmitEmployeePerformanceRequest request);
 
   //Employee Submission
   Future<Either<Failure, List<EmployeeSubmission>>> getPendingSubmissions(
@@ -94,6 +98,33 @@ class HRDRepositoryImpl implements HRDRepository {
   final HRDRemoteDataSource remoteDataSource;
 
   HRDRepositoryImpl({required this.remoteDataSource});
+
+
+  @override
+  Future<Either<Failure, void>> submitEmployeePerformance(SubmitEmployeePerformanceRequest request) async {
+    try {
+      await remoteDataSource.submitEmployeePerformance(request);
+      return const Right(null); // Jika sukses, return `Right(null)`
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+
+
+  @override
+  Future<Either<Failure, List<EmployeePerformance>>> getEmployeePerformance(int branchId, String month, String year) async {
+    try {
+      final employeePerformances = await remoteDataSource.getEmployeePerformance(branchId, month, year);
+      return Right(employeePerformances);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
   @override
   Future<Either<Failure, ContractEmployeeDetail>> getContractEmployeeDetail(
