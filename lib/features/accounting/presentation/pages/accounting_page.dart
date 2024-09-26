@@ -68,9 +68,9 @@ class _AccountingPageState extends State<AccountingPage> {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(8.h),
         child: AppBar(
-          forceMaterialTransparency: true,
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.white,
           automaticallyImplyLeading: false,
-          backgroundColor: const Color.fromRGBO(248, 248, 248, 1),
           elevation: 0,
           flexibleSpace: SafeArea(
             child: AppBarAccountingContent(),

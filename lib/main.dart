@@ -46,6 +46,7 @@ import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transact
 import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/checkout/checkout_cubit.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_all_employee.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_recap/attendance_recap_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_recap/attendance_recap_interaction_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_recap/date_range_attendance_cubit.dart';
@@ -66,6 +67,9 @@ import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/can
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/contract_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/permanent_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/verify_candidate_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/contract_employee_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/hrd_employee_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/permanent_employee_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/detail_salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/verify_employee_submission_cubit.dart';
@@ -319,6 +323,17 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => DetailSalarySlipCubit(hrdInjection()),
+        ),
+
+        //Employee
+        BlocProvider(
+          create: (context) => HRDAllEmployeesCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => ContractEmployeeCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => PermanentEmployeeCubit(hrdInjection()),
         ),
 
         //Employee Submission

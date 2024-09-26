@@ -9,6 +9,49 @@ import 'package:shimmer/shimmer.dart';
 
 class Utils {
 
+static Widget buildLoadingCardShimmer() {
+    return Container(
+      padding: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
+      ),
+      margin: const EdgeInsets.all(16),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              width: double.infinity,
+              height: 40,
+              color: Colors.grey[300],
+              margin: const EdgeInsets.all(16),
+            ),
+            Container(
+              width: double.infinity,
+              height: 16,
+              color: Colors.grey[300],
+              margin: const EdgeInsets.only(left: 16, right: 16, top: 8),
+            ),
+            Container(
+              width: double.infinity,
+              height: 16,
+              color: Colors.grey[300],
+              margin: const EdgeInsets.only(left: 16, right: 16, top: 8),
+            ),
+            Container(
+              width: double.infinity,
+              height: 16,
+              color: Colors.grey[300],
+              margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 static Future<void> showConfirmationDialog(
     BuildContext context, {
     required String buttonText, // Text for the action button
@@ -27,7 +70,7 @@ static Future<void> showConfirmationDialog(
             borderRadius: BorderRadius.circular(8),
           ),
           contentPadding: EdgeInsets.zero, // Remove default padding around content
-          insetPadding: EdgeInsets.symmetric(horizontal: 20), // Dialog margin
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20), // Dialog margin
           content: SingleChildScrollView(
             child: SizedBox(
               width: width, // Set dialog width
@@ -296,49 +339,7 @@ static Future<void> showConfirmationDialog(
     );
   }
 
-  static Widget buildLoadingCardShimmer() {
-    return Container(
-      padding: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-      ),
-      margin: const EdgeInsets.all(16),
-      child: Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              width: double.infinity,
-              height: 40,
-              color: Colors.grey[300],
-              margin: const EdgeInsets.all(16),
-            ),
-            Container(
-              width: double.infinity,
-              height: 16,
-              color: Colors.grey[300],
-              margin: const EdgeInsets.only(left: 16, right: 16, top: 8),
-            ),
-            Container(
-              width: double.infinity,
-              height: 16,
-              color: Colors.grey[300],
-              margin: const EdgeInsets.only(left: 16, right: 16, top: 8),
-            ),
-            Container(
-              width: double.infinity,
-              height: 16,
-              color: Colors.grey[300],
-              margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  
 
   static Widget buildEmptyState(String title, String? message) {
     return Padding(

@@ -1,7 +1,7 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/salary_slip_cubit.dart';
-import 'package:akib_pos/features/hrd/presentation/pages/salary_slips_details.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/employee_service/salary/salary_slips_details.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/employee_service/salary/salary_slip_top.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

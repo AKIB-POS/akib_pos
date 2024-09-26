@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
+import 'package:akib_pos/common/app_themes.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/verify_candidate_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/verify_candidate_submission_request.dart';
 import 'package:akib_pos/util/utils.dart';
@@ -170,13 +171,7 @@ class _CandidateSubmissionDetailPageState extends State<CandidateSubmissionDetai
         children: [
           Expanded(
             child: OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(color: AppColors.primaryMain),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
+              style: AppThemes.outlineButtonPrimaryStyle,
               onPressed: () {
                 Utils.showConfirmationDialog(
                   context,
@@ -224,14 +219,7 @@ class _CandidateSubmissionDetailPageState extends State<CandidateSubmissionDetai
                   },
                 );
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryMain,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4.0),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
+              style: AppThemes.elevatedBUttonPrimaryStyle,
               child: Text(
                 'Verifikasi',
                 style: AppTextStyle.headline5.copyWith(color: Colors.white),

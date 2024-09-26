@@ -13,6 +13,7 @@ import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/
 import 'package:akib_pos/features/hrd/data/models/attendance_service/check_in_out_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_quota.dart';
 import 'package:akib_pos/features/hrd/data/models/attenddance_recap.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_all_employee.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/candidate_submission.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip_detail.dart';
@@ -23,6 +24,8 @@ import 'package:akib_pos/features/hrd/data/models/submission/candidate/contract_
 import 'package:akib_pos/features/hrd/data/models/submission/employee/verify_employee_submission_request.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/employee/verify_employee_submission_response.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/verify_candidate_submission_request.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/employee/contract_employee_detail.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/employee/permanent_employee_detail.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
@@ -55,6 +58,12 @@ abstract class HRDRemoteDataSource {
   Future<SalarySlipsResponse> getSalarySlips(int year);
   Future<SalarySlipDetail> getSalarySlipDetail(int slipId);
 
+
+  //Employee
+  Future<List<HRDAllEmployee>> getAllEmployees(int branchId);
+  Future<ContractEmployeeDetail> getContractEmployeeDetail(int employeeId);
+  Future<PermanentEmployeeDetail> getPermanentEmployeeDetail(int employeeId);
+
   //Submission
   Future<List<EmployeeSubmission>> getPendingSubmissions(int branchId);
   Future<List<EmployeeSubmission>> getApprovedSubmissions(int branchId);
@@ -82,6 +91,67 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
   HRDRemoteDataSourceImpl({required this.client});
 
 
+
+  @override
+  Future<ContractEmployeeDetail> getContractEmployeeDetail(int employeeId) async {
+    final url = '${URLs.baseUrlMock}/employee/contract/details';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {'employee_id': employeeId.toString()}),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return ContractEmployeeDetail.fromJson(jsonResponse['data']);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+  @override
+  Future<PermanentEmployeeDetail> getPermanentEmployeeDetail(int employeeId) async {
+    final url = '${URLs.baseUrlMock}/employee/permanent/details';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {'employee_id': employeeId.toString()}),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return PermanentEmployeeDetail.fromJson(jsonResponse['data']);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+
+
+  @override
+  Future<List<HRDAllEmployee>> getAllEmployees(int branchId) async {
+    const url = '${URLs.baseUrlMock}/hrd-all-employee';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {'branch_id': branchId.toString()}),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      List<HRDAllEmployee> employeeList = (jsonResponse['data'] as List)
+          .map((employee) => HRDAllEmployee.fromJson(employee))
+          .toList();
+      return employeeList;
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+
   @override
   Future<void> verifyCandidateSubmission(VerifyCandidateSubmissionRequest request) async {
     const url = '${URLs.baseUrlMock}/candidate-submissions/verify';
@@ -104,6 +174,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
   }
 
 
+  @override
   Future<VerifyEmployeeSubmissionResponse> verifyEmployeeSubmission(VerifyEmployeeSubmissionRequest request) async {
     const url = '${URLs.baseUrlMock}/employee-submissions/verify';
     final response = await client

@@ -21,6 +21,9 @@ import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/can
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/contract_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/permanent_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/verify_candidate_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/contract_employee_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/hrd_employee_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/permanent_employee_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/detail_salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/verify_employee_submission_cubit.dart';
@@ -98,6 +101,7 @@ Future<void> initHRDModule() async {
     () => OvertimeHistoryCubit(hrdInjection()),
   );
 
+  //Salary
   hrdInjection.registerFactory(
     () => SalarySlipCubit(hrdInjection()),
   );
@@ -105,6 +109,20 @@ Future<void> initHRDModule() async {
   hrdInjection.registerFactory(
     () => DetailSalarySlipCubit(hrdInjection()),
   );
+
+  //Employee
+  hrdInjection.registerFactory(
+    () => HRDAllEmployeesCubit(hrdInjection()),
+  );
+   // Contract Employee Cubit
+  hrdInjection.registerFactory(
+    () => ContractEmployeeCubit(hrdInjection()),
+  );
+  // Permanent Employee Cubit
+  hrdInjection.registerFactory(
+    () => PermanentEmployeeCubit(hrdInjection()),
+  );
+  
 
   //Employee Submission
   hrdInjection.registerFactory(
@@ -116,6 +134,9 @@ Future<void> initHRDModule() async {
   hrdInjection.registerFactory(
     () => RejectedSubmissionsCubit(hrdInjection()),
   );
+
+ 
+
   // Register the cubit
   hrdInjection.registerFactory(
     () => VerifyEmployeeSubmissionCubit(hrdInjection()),
@@ -135,4 +156,5 @@ Future<void> initHRDModule() async {
   hrdInjection.registerFactory(() => ContractSubmissionCubit(hrdInjection()));
   hrdInjection.registerFactory(() => PermanentSubmissionCubit(hrdInjection()));
   hrdInjection.registerFactory(() => VerifyCandidateSubmissionCubit(hrdInjection()));
+  
 }

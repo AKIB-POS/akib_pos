@@ -66,8 +66,7 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
             Navigator.of(context).pop();
             Navigator.of(context).pop(true);
           } else if (state is VerifyEmployeeSubmissionError) {
-            // Tutup loading dialog dan tampilkan pesan error
-            Navigator.of(context).pop(); // Tutup dialog
+            Navigator.of(context).pop(); 
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                   content: Text(state.message), backgroundColor: Colors.red),
@@ -99,8 +98,7 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
-              
+              ),              
               if (submission.approvalStatus == 'pending' && role == "owner")
                 _buildActionButtons(context),
             ],
@@ -250,13 +248,7 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
         children: [
           Expanded(
             child: OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(color: Theme.of(context).primaryColor),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
+              style: AppThemes.outlineButtonPrimaryStyle,
               onPressed: () {
                 Utils.showInputTextVerificationDialog(
                   context,
@@ -283,7 +275,6 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
                   context,
                   buttonText: 'Ya, Terima',
                   onConfirm: (String reason) {
-                    // Kirim status "verified"
                     _verifySubmission(context, 'ACCEPTED', reason);
                   },
                   onCancel: () {
@@ -291,14 +282,7 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
                   },
                 );
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryMain,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4.0),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
+              style: AppThemes.elevatedBUttonPrimaryStyle,
               child: Text('Verifikasi',
                   style: AppTextStyle.headline5.copyWith(color: Colors.white)),
             ),

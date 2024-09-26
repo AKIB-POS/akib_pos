@@ -13,8 +13,9 @@ class AppbarHrdPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.backgroundGrey,
-      padding: const EdgeInsets.only(top:8),
+  
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,

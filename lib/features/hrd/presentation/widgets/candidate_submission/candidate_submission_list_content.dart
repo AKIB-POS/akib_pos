@@ -1,5 +1,6 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/common/app_themes.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/candidate_submission.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_approved_submission_cubit.dart';
@@ -79,15 +80,7 @@ class CandidateSubmissionListContent extends StatelessWidget {
                           context.read<CandidateRejectedSubmissionsCubit>().fetchRejectedSubmissions(branchId: branchId);
                         }
                       },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.primaryMain),
-                        shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              padding: const EdgeInsets.symmetric(horizontal: 1,),
-
-                        overlayColor: Colors.white
-                      ),
+                      style: AppThemes.outlineButtonPrimaryStyle,
                       child: Text('Detail', style: AppTextStyle.caption.copyWith(color : AppColors.primaryMain)),
                     ),
                   ],
