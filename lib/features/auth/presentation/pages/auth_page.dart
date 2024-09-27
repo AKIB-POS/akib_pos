@@ -103,7 +103,6 @@ class _AuthPage extends State<AuthPage> {
                   setState(() {
                     _isLoading = false;
                      currentPage = "Login";
-                     print("apakahhh $currentPage");
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("Registrasi berhasil, silakan login")),
@@ -245,7 +244,7 @@ class _AuthPage extends State<AuthPage> {
             ),
           ],
         ),
-        padding: EdgeInsets.all(60),
+        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
         child: SingleChildScrollView(
           child: FormBuilder(
             key: _formKey,
@@ -424,27 +423,25 @@ class _AuthPage extends State<AuthPage> {
                   )
                 ]
             ),
-            padding: EdgeInsets.all(60),
+            padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("Form Pendaftaran Akun", style: AppTextStyle.headline4,),
                 const SizedBox(height: 12,),
-                Expanded(
-                  child: FormBuilder(
-                    key: _registerFormKey,
-                    child: PageView(
-                      physics: NeverScrollableScrollPhysics(),
-                      controller: pageController,
-                      onPageChanged: (pageIndex){
-                        currentSteps = pageIndex;
-                        setState(() {});
-                      },
-                      children: [
-                        formUser(),
-                        formCompany(),
-                      ],
-                    ),
+                FormBuilder(
+                  key: _registerFormKey,
+                  child: PageView(
+                    physics: NeverScrollableScrollPhysics(),
+                    controller: pageController,
+                    onPageChanged: (pageIndex){
+                      currentSteps = pageIndex;
+                      setState(() {});
+                    },
+                    children: [
+                      formUser(),
+                      formCompany(),
+                    ],
                   ),
                 ),
                 TextButton(
@@ -507,277 +504,273 @@ class _AuthPage extends State<AuthPage> {
   }
 
   Widget formUser(){
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Halaman Pengguna", style: AppTextStyle.headline6,),
-          const SizedBox(height: 12,),
-          const Text("*Nama", style: AppTextStyle.body2,),
-          const SizedBox(height: 8,),
-          FormBuilderTextField(
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              name: 'name',
-              controller: _nameController,
-              validator: (value){
-                if (value == null || value.isEmpty) {
-                  return 'Harap isi nama anda';
-                }
-                return null;
-              },
-              keyboardType: TextInputType.text,
-              decoration: AppThemes.inputDecorationStyle.copyWith(
-                  hintText: "Nama"
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Halaman Pengguna", style: AppTextStyle.headline5,),
+        const SizedBox(height: 12,),
+        const Text("*Nama", style: AppTextStyle.body2,),
+        const SizedBox(height: 8,),
+        FormBuilderTextField(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            name: 'name',
+            controller: _nameController,
+            validator: (value){
+              if (value == null || value.isEmpty) {
+                return 'Harap isi nama anda';
+              }
+              return null;
+            },
+            keyboardType: TextInputType.text,
+            decoration: AppThemes.inputDecorationStyle.copyWith(
+                hintText: "Nama"
+            )
+        ),
+        const SizedBox(height: 12,),
+        Row(
+          children: [
+            Expanded(child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("*Email", style: AppTextStyle.body2,),
+                const SizedBox(height: 8,),
+                FormBuilderTextField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    name: 'email',
+                    controller: _emailController,
+                    validator: (value){
+                      if (value == null || value.isEmpty) {
+                        return 'Harap isi email anda';
+                      }
+
+                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                        return 'Harap masukkan email yang valid';
+                      }
+
+                      return null;
+                    },
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: AppThemes.inputDecorationStyle.copyWith(
+                        hintText: "Email"
+                    )
+                ),
+              ],
+            )),
+            SizedBox(width: 12,),
+            Expanded(child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("No Telepon", style: AppTextStyle.body2,),
+                const SizedBox(height: 8,),
+                FormBuilderTextField(
+                    name: 'phone',
+                    controller: _phoneController,
+                    keyboardType: TextInputType.phone,
+                    decoration: AppThemes.inputDecorationStyle.copyWith(
+                        hintText: "No Telepon"
+                    )
+                ),
+              ],
+            )),
+          ],
+        ),
+        const SizedBox(height: 12,),
+        const Text("*Password", style: AppTextStyle.body2,),
+        const SizedBox(height: 8,),
+        FormBuilderTextField(
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          name: 'password',
+          controller: _passwordController,
+          obscureText: !_passwordVisible,
+          validator: (value){
+            if (value == null || value.isEmpty) {
+              return 'Harap isi password anda';
+            }
+            return null;
+          },
+          keyboardType: TextInputType.visiblePassword,
+          decoration: AppThemes.inputDecorationStyle.copyWith(
+              hintText: "Password",
+              suffixIcon: IconButton(
+                  onPressed: (){
+                    _passwordVisible = !_passwordVisible;
+                    setState(() {
+
+                    });
+                  },
+                  icon: Icon(
+                    _passwordVisible ? Icons.visibility_off : Icons.visibility,
+                    color: AppColors.textGrey500,
+                  )
               )
           ),
-          const SizedBox(height: 12,),
-          Row(
-            children: [
-              Expanded(child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text("*Email", style: AppTextStyle.body2,),
-                  const SizedBox(height: 8,),
-                  FormBuilderTextField(
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      name: 'email',
-                      controller: _emailController,
-                      validator: (value){
-                        if (value == null || value.isEmpty) {
-                          return 'Harap isi email anda';
-                        }
+        ),
+        const SizedBox(height: 12,),
+        const Text("*Konfirmasi Password", style: AppTextStyle.body2,),
+        const SizedBox(height: 8,),
+        FormBuilderTextField(
+          name: 'repassword',
+          keyboardType: TextInputType.visiblePassword,
+          controller: _passwordConfirmationController,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          validator: (value){
+            if (value == null || value.isEmpty) {
+              return 'Harap melakukan pengisian ulang password anda';
+            }
+            else if(value.isNotEmpty && value.compareTo(_passwordController.text) != 0){
+              return 'Password tidak sama, ulangi password';
+            }
+            return null;
+          },
+          decoration: AppThemes.inputDecorationStyle.copyWith(
+              hintText: "Konfirmasi Password",
+              suffixIcon: IconButton(
+                  onPressed: (){
+                    _rePasswordVisible = !_rePasswordVisible;
+                    setState(() {
 
-                        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                          return 'Harap masukkan email yang valid';
-                        }
-
-                        return null;
-                      },
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: AppThemes.inputDecorationStyle.copyWith(
-                          hintText: "Email"
-                      )
-                  ),
-                ],
-              )),
-              SizedBox(width: 12,),
-              Expanded(child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text("No Telepon", style: AppTextStyle.body2,),
-                  const SizedBox(height: 8,),
-                  FormBuilderTextField(
-                      name: 'phone',
-                      controller: _phoneController,
-                      keyboardType: TextInputType.phone,
-                      decoration: AppThemes.inputDecorationStyle.copyWith(
-                          hintText: "No Telepon"
-                      )
-                  ),
-                ],
-              )),
-            ],
+                    });
+                  },
+                  icon: Icon(
+                    _rePasswordVisible ? Icons.visibility_off : Icons.visibility,
+                    color: AppColors.textGrey500,
+                  )
+              )
           ),
-          const SizedBox(height: 12,),
-          const Text("*Password", style: AppTextStyle.body2,),
-          const SizedBox(height: 8,),
-          FormBuilderTextField(
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            name: 'password',
-            controller: _passwordController,
-            obscureText: !_passwordVisible,
-            validator: (value){
-              if (value == null || value.isEmpty) {
-                return 'Harap isi password anda';
-              }
-              return null;
-            },
-            keyboardType: TextInputType.visiblePassword,
-            decoration: AppThemes.inputDecorationStyle.copyWith(
-                hintText: "Password",
-                suffixIcon: IconButton(
-                    onPressed: (){
-                      _passwordVisible = !_passwordVisible;
-                      setState(() {
-
-                      });
-                    },
-                    icon: Icon(
-                      _passwordVisible ? Icons.visibility_off : Icons.visibility,
-                      color: AppColors.textGrey500,
-                    )
-                )
-            ),
-          ),
-          const SizedBox(height: 12,),
-          const Text("*Konfirmasi Password", style: AppTextStyle.body2,),
-          const SizedBox(height: 8,),
-          FormBuilderTextField(
-            name: 'repassword',
-            keyboardType: TextInputType.visiblePassword,
-            controller: _passwordConfirmationController,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (value){
-              if (value == null || value.isEmpty) {
-                return 'Harap melakukan pengisian ulang password anda';
-              }
-              else if(value.isNotEmpty && value.compareTo(_passwordController.text) != 0){
-                return 'Password tidak sama, ulangi password';
-              }
-              return null;
-            },
-            decoration: AppThemes.inputDecorationStyle.copyWith(
-                hintText: "Konfirmasi Password",
-                suffixIcon: IconButton(
-                    onPressed: (){
-                      _rePasswordVisible = !_rePasswordVisible;
-                      setState(() {
-
-                      });
-                    },
-                    icon: Icon(
-                      _rePasswordVisible ? Icons.visibility_off : Icons.visibility,
-                      color: AppColors.textGrey500,
-                    )
-                )
-            ),
-            obscureText: !_rePasswordVisible,
-          )
-        ],
-      )
+          obscureText: !_rePasswordVisible,
+        )
+      ],
     );
 
 
   }
 
   Widget formCompany(){
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Halaman Perusahaan", style: AppTextStyle.headline6,),
-          const SizedBox(height: 12,),
-          const Text("Nama Perusahaan ", style: AppTextStyle.body2,),
-          const SizedBox(height: 8,),
-          FormBuilderTextField(
-              name: 'companyName',
-              controller: _companyNameController,
-              keyboardType: TextInputType.text,
-              decoration: AppThemes.inputDecorationStyle.copyWith(
-                  hintText: "Nama Perusahaan "
-              )
-          ),
-          const SizedBox(height: 12,),
-          Row(
-            children: [
-              Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text("*Email Perusahaan ", style: AppTextStyle.body2,),
-                      const SizedBox(height: 8,),
-                      FormBuilderTextField(
-                          name: 'companyEmail',
-                          controller: _companyEmailController,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          validator: (value){
-                            if(value == null || value.isEmpty){
-                              return "Harap isi email perusahaan";
-                            }
-                            return null;
-                          },
-                          keyboardType: TextInputType.emailAddress,
-                          decoration: AppThemes.inputDecorationStyle.copyWith(
-                              hintText: "Email Perusahaan "
-                          )
-                      ),
-                    ],
-                  )
-              ),
-              SizedBox(width: 12,),
-              Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text("Nomor Perusahaan ", style: AppTextStyle.body2,),
-                      const SizedBox(height: 8,),
-                      FormBuilderTextField(
-                          name: 'companyPhone',
-                          controller: _companyPhoneController,
-                          keyboardType: TextInputType.phone,
-                          decoration: AppThemes.inputDecorationStyle.copyWith(
-                              hintText: "Nomor Telepon Perusahaan "
-                          )
-                      ),
-                    ],
-                  )
-              )
-            ],
-          ),
-          const SizedBox(height: 12,),
-          const Text("Alamat Perusahaan", style: AppTextStyle.body2,),
-          const SizedBox(height: 8,),
-          FormBuilderTextField(
-              name: 'companyAddress',
-              controller: _companyAddressController,
-              keyboardType: TextInputType.text,
-              decoration: AppThemes.inputDecorationStyle.copyWith(
-                  hintText: "Alamat Perusahaan "
-              )
-          ),
-          const SizedBox(height: 12,),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SizedBox(
-                width: 24,
-                height: 24,
-                child: Checkbox(
-                    checkColor: AppColors.backgroundWhite,
-                    hoverColor: AppColors.primaryDark,
-                    fillColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
-                      if (states.contains(WidgetState.selected)) { // When the checkbox is checked
-                        return AppColors.primaryMain;
-                      }
-                      return AppColors.backgroundWhite; // Default color when unchecked
-                    }),
-                    side: const BorderSide(
-                        color: AppColors.primaryMain
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Halaman Perusahaan", style: AppTextStyle.headline6,),
+        const SizedBox(height: 12,),
+        const Text("Nama Perusahaan ", style: AppTextStyle.body2,),
+        const SizedBox(height: 8,),
+        FormBuilderTextField(
+            name: 'companyName',
+            controller: _companyNameController,
+            keyboardType: TextInputType.text,
+            decoration: AppThemes.inputDecorationStyle.copyWith(
+                hintText: "Nama Perusahaan "
+            )
+        ),
+        const SizedBox(height: 12,),
+        Row(
+          children: [
+            Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("*Email Perusahaan ", style: AppTextStyle.body2,),
+                    const SizedBox(height: 8,),
+                    FormBuilderTextField(
+                        name: 'companyEmail',
+                        controller: _companyEmailController,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (value){
+                          if(value == null || value.isEmpty){
+                            return "Harap isi email perusahaan";
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: AppThemes.inputDecorationStyle.copyWith(
+                            hintText: "Email Perusahaan "
+                        )
                     ),
-                    value: _isAcceptedTermsAndCondition, onChanged: (val){
-                  _isAcceptedTermsAndCondition = val ?? false;
-                  setState(() {
+                  ],
+                )
+            ),
+            SizedBox(width: 12,),
+            Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Nomor Perusahaan ", style: AppTextStyle.body2,),
+                    const SizedBox(height: 8,),
+                    FormBuilderTextField(
+                        name: 'companyPhone',
+                        controller: _companyPhoneController,
+                        keyboardType: TextInputType.phone,
+                        decoration: AppThemes.inputDecorationStyle.copyWith(
+                            hintText: "Nomor Telepon Perusahaan "
+                        )
+                    ),
+                  ],
+                )
+            )
+          ],
+        ),
+        const SizedBox(height: 12,),
+        const Text("Alamat Perusahaan", style: AppTextStyle.body2,),
+        const SizedBox(height: 8,),
+        FormBuilderTextField(
+            name: 'companyAddress',
+            controller: _companyAddressController,
+            keyboardType: TextInputType.text,
+            decoration: AppThemes.inputDecorationStyle.copyWith(
+                hintText: "Alamat Perusahaan "
+            )
+        ),
+        const SizedBox(height: 12,),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: Checkbox(
+                  checkColor: AppColors.backgroundWhite,
+                  hoverColor: AppColors.primaryDark,
+                  fillColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+                    if (states.contains(WidgetState.selected)) { // When the checkbox is checked
+                      return AppColors.primaryMain;
+                    }
+                    return AppColors.backgroundWhite; // Default color when unchecked
+                  }),
+                  side: const BorderSide(
+                      color: AppColors.primaryMain
+                  ),
+                  value: _isAcceptedTermsAndCondition, onChanged: (val){
+                _isAcceptedTermsAndCondition = val ?? false;
+                setState(() {
 
-                  });
-                }),
+                });
+              }),
+            ),
+            TextButton(
+              onPressed: (){
+                //TODO: go to terms and condition page
+              },
+              child: RichText(
+                  text: TextSpan(
+                      style: AppTextStyle.body4.copyWith(
+                          color: AppColors.black
+                      ),
+                      children: [
+                        TextSpan(text: "Saya telah menyetujui ",),
+                        TextSpan(text: "syarat dan ketentuan", style: AppTextStyle.body4.copyWith(
+                            color: AppColors.primaryMain
+                        ))
+                      ]
+                  )
               ),
-              TextButton(
-                onPressed: (){
-                  //TODO: go to terms and condition page
-                },
-                child: RichText(
-                    text: TextSpan(
-                        style: AppTextStyle.body4.copyWith(
-                            color: AppColors.black
-                        ),
-                        children: [
-                          TextSpan(text: "Saya telah menyetujui ",),
-                          TextSpan(text: "syarat dan ketentuan", style: AppTextStyle.body4.copyWith(
-                              color: AppColors.primaryMain
-                          ))
-                        ]
-                    )
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

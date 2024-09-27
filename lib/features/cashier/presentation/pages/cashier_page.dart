@@ -14,8 +14,18 @@ import 'package:get_it/get_it.dart';
 class CashierPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-   
+
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+
+    bool isLandscape = width > height;
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+          onPressed: (){
+
+          },
+          label: Icon(Icons.shopping_cart)
+      ),
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.backgroundGrey,
       drawer: MyDrawer(),
@@ -25,7 +35,7 @@ class CashierPage extends StatelessWidget {
         elevation: 0,
         flexibleSpace: AppBarContent(),
       ),
-      body: Row(
+      body: isLandscape ? Row(
         children: [
           Expanded(
             flex: 5,
@@ -36,7 +46,7 @@ class CashierPage extends StatelessWidget {
             child: RightBody(),
           ),
         ],
-      ),
+      ) : LeftBody(),
     );
   }
 
