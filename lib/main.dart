@@ -419,6 +419,7 @@ class MyApp extends StatelessWidget {
       builder: (context, orientation, deviceType) {
         return MaterialApp(
           title: 'AK Solutions',
+          debugShowCheckedModeBanner: false,
           theme: ThemeData(
             textSelectionTheme: TextSelectionThemeData(
               cursorColor:
