@@ -5,7 +5,7 @@ import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/a
 import 'package:akib_pos/features/home/widget/my_drawer.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/employee_performance.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
-import 'package:akib_pos/features/hrd/presentation/pages/administration_page.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/employee_service/administration_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/attendance_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/attendance_recap_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/employee_service/employee/hrd_employee_page.dart';
@@ -154,8 +154,7 @@ class _HrdPage extends State<HrdPage> {
               if (_authSharedPref.getEmployeeRole() != "employee")
                 _buildServiceItem('Pegawai', 'assets/icons/hrd/ic_employee.svg'),
               _buildServiceItem('Administrasi', 'assets/icons/hrd/ic_administration.svg'),
-              if (_authSharedPref.getEmployeeRole() != "employee")
-                _buildServiceItem('Kinerja Pegawai', 'assets/icons/hrd/ic_employee_performance.svg'),
+              _buildServiceItem('Kinerja Pegawai', 'assets/icons/hrd/ic_employee_performance.svg'),
               _buildServiceItem('Slip Gaji', 'assets/icons/hrd/ic_salary.svg'),
               _buildServiceItem('Tasking', 'assets/icons/hrd/ic_tasking.svg'),
               _buildServiceItem('Pelatihan', 'assets/icons/hrd/ic_training.svg'),
@@ -199,7 +198,7 @@ class _HrdPage extends State<HrdPage> {
             Utils.navigateToPage(context, const SalarySlipPage());
             break;
           case 'Pegawai':
-            Utils.navigateToPage(context,  HRDEmployeePage());
+            Utils.navigateToPage(context,  const HRDEmployeePage());
             break;
           case 'Administrasi':
             Utils.navigateToPage(context, const AdministrationPage());

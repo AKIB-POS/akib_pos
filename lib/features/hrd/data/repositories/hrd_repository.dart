@@ -12,6 +12,8 @@ import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/
 import 'package:akib_pos/features/hrd/data/models/attendance_service/check_in_out_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_quota.dart';
 import 'package:akib_pos/features/hrd/data/models/attenddance_recap.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/administration/company_rules.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/administration/employee_warning.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_all_employee.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/employee_performance.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/submit_employee_request.dart';
@@ -27,6 +29,7 @@ import 'package:akib_pos/features/hrd/data/models/submission/employee/verify_emp
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/verify_candidate_submission_request.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/contract_employee_detail.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/permanent_employee_detail.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/administration/employee_sop.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class HRDRepository {
@@ -68,6 +71,10 @@ abstract class HRDRepository {
       int employeeId);
   Future<Either<Failure, List<EmployeePerformance>>> getEmployeePerformance(int branchId, String month, String year);
   Future<Either<Failure, void>> submitEmployeePerformance(SubmitEmployeePerformanceRequest request);
+  //administration
+  Future<Either<Failure, List<EmployeeWarning>>> getEmployeeWarnings();
+  Future<Either<Failure, EmployeeSOPResponse>> getEmployeeSOP();
+  Future<Either<Failure, CompanyRulesResponse>> getCompanyRules();
 
   //Employee Submission
   Future<Either<Failure, List<EmployeeSubmission>>> getPendingSubmissions(
@@ -78,6 +85,7 @@ abstract class HRDRepository {
       int branchId);
   Future<Either<Failure, VerifyEmployeeSubmissionResponse>>
       verifyEmployeeSubmission(VerifyEmployeeSubmissionRequest request);
+    
 
   //CandidateSubmission
   Future<Either<Failure, List<CandidateSubmission>>>
@@ -98,6 +106,44 @@ class HRDRepositoryImpl implements HRDRepository {
   final HRDRemoteDataSource remoteDataSource;
 
   HRDRepositoryImpl({required this.remoteDataSource});
+
+@override
+  Future<Either<Failure, CompanyRulesResponse>> getCompanyRules() async {
+    try {
+      final companyRules = await remoteDataSource.getCompanyRules();
+      return Right(companyRules);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, EmployeeSOPResponse>> getEmployeeSOP() async {
+    try {
+      final employeeSOP = await remoteDataSource.getEmployeeSOP();
+      return Right(employeeSOP);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+
+  @override
+  Future<Either<Failure, List<EmployeeWarning>>> getEmployeeWarnings() async {
+    try {
+      final warnings = await remoteDataSource.getEmployeeWarnings();
+      return Right(warnings);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
 
 
   @override

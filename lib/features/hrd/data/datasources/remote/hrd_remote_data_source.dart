@@ -13,6 +13,8 @@ import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/
 import 'package:akib_pos/features/hrd/data/models/attendance_service/check_in_out_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_quota.dart';
 import 'package:akib_pos/features/hrd/data/models/attenddance_recap.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/administration/company_rules.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/administration/employee_warning.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_all_employee.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/employee_performance.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/submit_employee_request.dart';
@@ -28,6 +30,7 @@ import 'package:akib_pos/features/hrd/data/models/submission/employee/verify_emp
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/verify_candidate_submission_request.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/contract_employee_detail.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/permanent_employee_detail.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/administration/employee_sop.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
@@ -67,6 +70,11 @@ abstract class HRDRemoteDataSource {
   Future<PermanentEmployeeDetail> getPermanentEmployeeDetail(int employeeId);
   Future<List<EmployeePerformance>> getEmployeePerformance(int branchId, String month, String year);
   Future<void> submitEmployeePerformance(SubmitEmployeePerformanceRequest request);
+  //administration
+  Future<List<EmployeeWarning>> getEmployeeWarnings();
+  Future<EmployeeSOPResponse> getEmployeeSOP();
+  Future<CompanyRulesResponse> getCompanyRules();
+
 
   //Submission
   Future<List<EmployeeSubmission>> getPendingSubmissions(int branchId);
@@ -93,6 +101,62 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
   final AuthSharedPref sharedPrefsHelper = GetIt.instance<AuthSharedPref>();
 
   HRDRemoteDataSourceImpl({required this.client});
+
+
+  @override
+  Future<CompanyRulesResponse> getCompanyRules() async {
+    const url = '${URLs.baseUrlMock}/company-rules';
+    final response = await client.get(Uri.parse(url), headers: _buildHeaders());
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return CompanyRulesResponse.fromJson(jsonResponse['data']);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+
+  @override
+  Future<EmployeeSOPResponse> getEmployeeSOP() async {
+    const url = '${URLs.baseUrlMock}/employee-sop'; // URL endpoint yang sesuai
+    final response = await client.get(
+      Uri.parse(url),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return EmployeeSOPResponse.fromJson(jsonResponse['data']);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+
+  @override
+  Future<List<EmployeeWarning>> getEmployeeWarnings() async {
+    const url = '${URLs.baseUrlMock}/employee-warnings';
+
+    final response = await client.get(
+      Uri.parse(url),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      final List<dynamic> warnings = jsonResponse['data'];
+      return warnings.map((json) => EmployeeWarning.fromJson(json)).toList();
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
 
 
   @override

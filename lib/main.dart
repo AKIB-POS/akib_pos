@@ -67,6 +67,9 @@ import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/can
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/contract_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/permanent_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/verify_candidate_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/administration/company_rules_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/administration/employee_sop_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/administration/employee_warning_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/contract_employee_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/hrd_employee_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/permanent_employee_cubit.dart';
@@ -327,7 +330,7 @@ void main() async {
           create: (context) => DetailSalarySlipCubit(hrdInjection()),
         ),
 
-        //Employee
+        //Employee Service
         BlocProvider(
           create: (context) => HRDAllEmployeesCubit(hrdInjection()),
         ),
@@ -339,6 +342,16 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => SubmitEmployeePerformanceCubit(hrdInjection()),
+        ),
+        //Administration
+        BlocProvider(
+          create: (context) => EmployeeWarningCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => EmployeeSOPCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => CompanyRulesCubit(hrdInjection()),
         ),
 
         //Employee Submission

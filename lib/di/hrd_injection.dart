@@ -21,6 +21,8 @@ import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/can
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/contract_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/permanent_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/verify_candidate_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/administration/employee_sop_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/administration/employee_warning_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/contract_employee_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/hrd_employee_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/permanent_employee_cubit.dart';
@@ -128,6 +130,13 @@ Future<void> initHRDModule() async {
   );
   hrdInjection.registerFactory(
     () => SubmitEmployeePerformanceCubit(hrdInjection()),
+  );
+  //administration
+   hrdInjection.registerFactory(
+    () => EmployeeWarningCubit(hrdInjection()),
+  );
+  hrdInjection.registerFactory(
+    () => EmployeeSOPCubit(hrdInjection()),
   );
 
   

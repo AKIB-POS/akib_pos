@@ -67,6 +67,7 @@ dependencies:
   flutter_svg_provider: ^1.0.7
   geolocator: ^13.0.1
   month_year_picker: ^0.4.0+1
+  flutter_widget_from_html: ^0.15.2
 
 dev_dependencies:
   flutter_test:
