@@ -1,22 +1,23 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
-import 'package:akib_pos/features/hrd/data/models/attendance_summary.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/check_in_out_request.dart';
+import 'package:akib_pos/features/hrd/data/models/attenddance_recap.dart';
+import 'package:akib_pos/features/hrd/data/models/hrd_summary.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/attendance_history_cubit.dart';
-import 'package:akib_pos/features/hrd/presentation/bloc/attendance_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_in_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_out_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/attendance_history_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 
 import 'package:intl/intl.dart';
 
 class AttendancePage extends StatefulWidget {
-  final AttendanceSummaryData data;
+  final HRDSummaryResponse data;
 
   AttendancePage({required this.data});
 
@@ -37,33 +38,57 @@ class _AttendancePageState extends State<AttendancePage> {
     context.read<AttendanceHistoryCubit>().fetchAttendanceHistory(); // No parameters needed
   }
 
-  void _performCheckIn(BuildContext context) {
-    final branchId = _authSharedPref.getBranchId() ?? 0;
-    final companyId = _authSharedPref.getCompanyId() ?? 0;
-    final employeeId = _authSharedPref.getUserId() ?? 0;
+  Future<Position> _getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    return await Geolocator.getCurrentPosition();
+  }
+
+  void _performCheckIn(BuildContext context) async {
     final time = DateFormat('HH:mm').format(DateTime.now());
+    final position = await _getCurrentLocation(); // Get the user's location
+    final lat = position.latitude;
+    final long = position.longitude;
 
     final request = CheckInOutRequest(
-      branchId: branchId,
-      companyId: companyId,
-      employeeId: employeeId,
       time: time,
+      lat: lat,
+      long: long,
     );
 
     context.read<CheckInCubit>().checkIn(request);
   }
 
-  void _performCheckOut(BuildContext context) {
-    final branchId = _authSharedPref.getBranchId() ?? 0;
-    final companyId = _authSharedPref.getCompanyId() ?? 0;
-    final employeeId = _authSharedPref.getUserId() ?? 0;
+  void _performCheckOut(BuildContext context) async {
     final time = DateFormat('HH:mm').format(DateTime.now());
 
+    final position = await _getCurrentLocation(); // Get the user's location
+    final lat = position.latitude;
+    final long = position.longitude;
+
     final request = CheckInOutRequest(
-      branchId: branchId,
-      companyId: companyId,
-      employeeId: employeeId,
       time: time,
+      lat: lat,
+      long: long,
     );
 
     context.read<CheckOutCubit>().checkOut(request);
@@ -74,6 +99,7 @@ class _AttendancePageState extends State<AttendancePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        forceMaterialTransparency: true,
         title: const Text('Absensi', style: AppTextStyle.headline5),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -320,6 +346,7 @@ class _AttendancePageState extends State<AttendancePage> {
           ),
         ],
       ),
+      
     );
   }
 

@@ -70,7 +70,7 @@ class AttendanceHistoryWidget extends StatelessWidget {
   Widget _buildHistoryCard(AttendanceHistoryItem history) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.only(right: 16,bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
@@ -100,68 +100,71 @@ class AttendanceHistoryWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Absen Masuk', style: AppTextStyle.caption),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
+          Padding(
+            padding: const EdgeInsets.only(left: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Absen Masuk', style: AppTextStyle.caption),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: AppColors.successMain.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                      child: Row(
+                        children: [
+                          Text(
+                            history.clockInTime,
+                            style: AppTextStyle.bigCaptionBold
+                                .copyWith(color: AppColors.successMain),
+                          ),
+                          Text(
+                            " - ${history.clockInStatus}",
+                            style: AppTextStyle.bigCaptionBold
+                                .copyWith(color: AppColors.successMain),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Absen Pulang', style: AppTextStyle.caption),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: AppColors.successMain.withOpacity(0.1),
+                            color: AppColors.errorMain.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                    child: Row(
-                      children: [
-                        Text(
-                          history.clockInTime,
-                          style: AppTextStyle.bigCaptionBold
-                              .copyWith(color: AppColors.successMain),
-                        ),
-                        Text(
-                          " - ${history.clockInStatus}",
-                          style: AppTextStyle.bigCaptionBold
-                              .copyWith(color: AppColors.successMain),
-                        ),
-                      ],
+                      child: Row(
+                        children: [
+                          Text(
+                            history.clockOutTime,
+                            style: AppTextStyle.bigCaptionBold
+                                .copyWith(color: AppColors.errorMain),
+                          ),
+                          Text(
+                            " - ${history.clockOutStatus}",
+                            style: AppTextStyle.bigCaptionBold
+                                .copyWith(color: AppColors.errorMain),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Absen Pulang', style: AppTextStyle.caption),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: AppColors.errorMain.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                    child: Row(
-                      children: [
-                        Text(
-                          history.clockOutTime,
-                          style: AppTextStyle.bigCaptionBold
-                              .copyWith(color: AppColors.errorMain),
-                        ),
-                        Text(
-                          " - ${history.clockOutStatus}",
-                          style: AppTextStyle.bigCaptionBold
-                              .copyWith(color: AppColors.errorMain),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),

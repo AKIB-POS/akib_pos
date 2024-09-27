@@ -1,12 +1,21 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/transaction_report/employee_cubit.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/home/widget/my_drawer.dart';
-import 'package:akib_pos/features/hrd/presentation/bloc/attendance_summary_cubit.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/employee_performance.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/employee_service/administration_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/attendance_page.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/attendance_recap_page.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/employee_service/employee/hrd_employee_page.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/employee_service/employee_performance/employee_performance_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/leave_page.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/overtime_page.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/permission_page.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/employee_service/salary/salary_%20slip_page.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/appbar_hrd_page.dart';
-import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/summary_attendance.dart';
+import 'package:akib_pos/features/hrd/presentation/widgets/summary_hrd.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,8 +25,9 @@ import 'package:sizer/sizer.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 class HrdPage extends StatefulWidget {
+  const HrdPage({super.key});
+
   @override
   createState() => _HrdPage();
 }
@@ -28,24 +38,18 @@ class _HrdPage extends State<HrdPage> {
   @override
   void initState() {
     super.initState();
-    _fetchAttendanceSummary();
+    _fetchHRDSummary();
   }
 
-  void _fetchAttendanceSummary() {
+  void _fetchHRDSummary() {
     final branchId = _authSharedPref.getBranchId() ?? 0;
-    final companyId = _authSharedPref.getCompanyId() ?? 0;
 
-    context.read<AttendanceSummaryCubit>().fetchAttendanceSummary(
-          branchId: branchId,
-          companyId: companyId,
-        );
+    // Fetch HRD summary
+    context.read<HRDSummaryCubit>().fetchHRDSummary(branchId);
   }
 
   @override
   Widget build(BuildContext context) {
-    // Fetch role from AuthSharedPref
-    String? role = _authSharedPref.getEmployeeRole();
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.backgroundWhite,
@@ -53,9 +57,9 @@ class _HrdPage extends State<HrdPage> {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(8.h),
         child: AppBar(
-          forceMaterialTransparency: true,
+          surfaceTintColor: Colors.white,
           automaticallyImplyLeading: false,
-          backgroundColor: const Color.fromRGBO(248, 248, 248, 1),
+          backgroundColor: Colors.white,
           elevation: 0,
           flexibleSpace: SafeArea(
             child: AppbarHrdPage(),
@@ -65,71 +69,35 @@ class _HrdPage extends State<HrdPage> {
       body: RefreshIndicator(
         color: AppColors.primaryMain,
         onRefresh: () async {
-          _fetchAttendanceSummary();
+          _fetchHRDSummary();
         },
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                Container(
-                  color: AppColors.backgroundGrey,
-                  child: Column(
-                    children: [
-                      SummaryAttendance(role: role),
-                      const SizedBox(
-                        height: 10,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            Container(
+              color: AppColors.backgroundGrey,
+              child: Column(
+                children: [
+                  SummaryHRD(),
+                  const SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    height: 20,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
                       ),
-                      Container(
-                        width: double.infinity,
-                        height: 20,
-                        decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(30),
-                                topRight: Radius.circular(30))),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-                // Conditionally render _attendanceRecap()
-                if (role != "employee") _attendanceRecap(),
-                _attendanceService(),
-                _employeeService(),
-              ],
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _attendanceRecap() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        border: Border.all(width: 2, color: AppColors.primary100),
-        color: AppColors.primaryBackgorund,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              SvgPicture.asset(
-                'assets/icons/hrd/ic_attendance_recap.svg',
-                fit: BoxFit.cover,
+                ],
               ),
-              const SizedBox(width: 8),
-              Text('Cek Pengajuan Karyawan',
-                  style: AppTextStyle.caption
-                      .copyWith(color: AppColors.primaryMain)),
-            ],
-          ),
-          const Icon(Icons.arrow_forward, color: AppColors.primaryMain),
-        ],
+            ),
+            _attendanceService(),
+            _employeeService(),
+          ],
+        ),
       ),
     );
   }
@@ -183,15 +151,13 @@ class _HrdPage extends State<HrdPage> {
             mainAxisSpacing: 20,
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              _buildServiceItem('Calon Pegawai',
-                  'assets/icons/hrd/ic_employee_candidate.svg'),
-              _buildServiceItem('Pegawai', 'assets/icons/hrd/ic_employee.svg'),
-              _buildServiceItem(
-                  'Administrasi', 'assets/icons/hrd/ic_administration.svg'),
+              if (_authSharedPref.getEmployeeRole() != "employee")
+                _buildServiceItem('Pegawai', 'assets/icons/hrd/ic_employee.svg'),
+              _buildServiceItem('Administrasi', 'assets/icons/hrd/ic_administration.svg'),
+              _buildServiceItem('Kinerja Pegawai', 'assets/icons/hrd/ic_employee_performance.svg'),
               _buildServiceItem('Slip Gaji', 'assets/icons/hrd/ic_salary.svg'),
               _buildServiceItem('Tasking', 'assets/icons/hrd/ic_tasking.svg'),
-              _buildServiceItem(
-                  'Pelatihan', 'assets/icons/hrd/ic_training.svg'),
+              _buildServiceItem('Pelatihan', 'assets/icons/hrd/ic_training.svg'),
             ],
           ),
         ],
@@ -200,47 +166,58 @@ class _HrdPage extends State<HrdPage> {
   }
 
   void _navigateToAttendancePage(BuildContext context) {
-    final attendanceData = context.read<AttendanceSummaryCubit>().state;
-    if (attendanceData is AttendanceSummaryLoaded) {
+    final attendanceData = context.read<HRDSummaryCubit>().state;
+    if (attendanceData is HRDSummaryLoaded) {
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) =>
-              AttendancePage(data: attendanceData.attendanceSummary.data),
+              AttendancePage(data: attendanceData.hrdSummary),
         ),
       );
     }
   }
 
   Widget _buildServiceItem(String label, String assetPath) {
-  return GestureDetector(
-    onTap: () {
-      switch (label) {
-        case 'Absensi':
-          _navigateToAttendancePage(context);
-          break;
-        case 'Cuti':
-          Utils.navigateToPage(context, LeavePage());
-          break;
-        // Add more cases here if needed
-        default:
-          break;
-      }
-    },
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SvgPicture.asset(
-          assetPath,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: AppTextStyle.caption,
-          textAlign: TextAlign.center,
-        ),
-      ],
-    ),
-  );
-}
+    return GestureDetector(
+      onTap: () {
+        switch (label) {
+          case 'Absensi':
+            _navigateToAttendancePage(context);
+            break;
+          case 'Cuti':
+            Utils.navigateToPage(context, const LeavePage());
+            break;
+          case 'Izin':
+            Utils.navigateToPage(context,  PermissionPage());
+            break;
+          case 'Lembur':
+            Utils.navigateToPage(context, const OvertimePage());
+            break;
+          case 'Slip Gaji':
+            Utils.navigateToPage(context, const SalarySlipPage());
+            break;
+          case 'Pegawai':
+            Utils.navigateToPage(context,  const HRDEmployeePage());
+            break;
+          case 'Administrasi':
+            Utils.navigateToPage(context, const AdministrationPage());
+            break;
+          case 'Kinerja Pegawai':
+            Utils.navigateToPage(context, const EmployeePerformancePage());
+            break;
+          default:
+            break;
+        }
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SvgPicture.asset(assetPath),
+          const SizedBox(height: 8),
+          Text(label, style: AppTextStyle.caption, textAlign: TextAlign.center),
+        ],
+      ),
+    );
+  }
 }
