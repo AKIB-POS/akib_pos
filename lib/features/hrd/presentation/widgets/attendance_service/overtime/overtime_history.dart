@@ -16,7 +16,12 @@ class OvertimeHistoryWidget extends StatelessWidget {
         if (state is OvertimeHistoryLoading) {
           return _buildLoadingShimmer(); // Display shimmer when loading
         } else if (state is OvertimeHistoryError) {
-          return Center(child: Text(state.message)); // Display error message
+          return Utils.buildErrorState(
+          title: 'Gagal Memuat Data',
+          message: state.message,
+          onRetry: () {
+            context.read<OvertimeHistoryCubit>().fetchOvertimeHistory();
+          },);// Display error message
         } else if (state is OvertimeHistoryLoaded) {
           if (state.overtimeHistory.data.isEmpty) {
             return Utils.buildEmptyState("Belum ada Riwayat",

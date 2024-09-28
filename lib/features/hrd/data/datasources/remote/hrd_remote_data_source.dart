@@ -231,7 +231,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<ContractEmployeeDetail> getContractEmployeeDetail(int employeeId) async {
-    final url = '${URLs.baseUrlMock}/employee/contract/details';
+    const url = '${URLs.baseUrlMock}/employee/contract/details';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {'employee_id': employeeId.toString()}),
       headers: _buildHeaders(),
@@ -249,7 +249,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<PermanentEmployeeDetail> getPermanentEmployeeDetail(int employeeId) async {
-    final url = '${URLs.baseUrlMock}/employee/permanent/details';
+    const url = '${URLs.baseUrlMock}/employee/permanent/details';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {'employee_id': employeeId.toString()}),
       headers: _buildHeaders(),

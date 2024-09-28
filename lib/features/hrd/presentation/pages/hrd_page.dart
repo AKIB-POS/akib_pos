@@ -51,7 +51,9 @@ class _HrdPage extends State<HrdPage> {
 
   void _fetchEmployeeTrainings() {
     final branchId = _authSharedPref.getBranchId() ?? 0;
-    context.read<EmployeeTrainingCubit>().fetchEmployeeTrainings(branchId: branchId);
+    context
+        .read<EmployeeTrainingCubit>()
+        .fetchEmployeeTrainings(branchId: branchId);
   }
 
   void _fetchHRDSummary() {
@@ -110,7 +112,8 @@ class _HrdPage extends State<HrdPage> {
                 ],
               ),
             ),
-            if (_authSharedPref.getEmployeeRole() != "employee") _attendanceRecap(),
+            if (_authSharedPref.getEmployeeRole() != "employee")
+              _attendanceRecap(),
             if (!isOwner) _attendanceService(),
             if (!isOwner) _employeeService(),
             if (isOwner) _ownerMenuBar(),
@@ -127,12 +130,10 @@ class _HrdPage extends State<HrdPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-Padding(
-  padding: const EdgeInsets.only(bottom: 21,left: 16,top: 8),
-  child: Text('Layanan Kepegawaian',
-                      style: AppTextStyle.headline5),
-),
-              
+          Padding(
+            padding: const EdgeInsets.only(bottom: 21, left: 16, top: 8),
+            child: Text('Layanan Kepegawaian', style: AppTextStyle.headline5),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -167,7 +168,7 @@ Padding(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Padding(
-                padding: EdgeInsets.only(left: 16,top: 8),
+                padding: EdgeInsets.only(left: 16, top: 8),
                 child: Text('Pelatihan Akan Berjalan',
                     style: AppTextStyle.headline5),
               ),
@@ -175,6 +176,13 @@ Padding(
                   trainings: state.trainingData.trainings),
             ],
           );
+        }else if (state is EmployeeTrainingError){
+          return Utils.buildErrorState(
+          title: 'Gagal Memuat Data',
+          message: state.message,
+          onRetry: () {
+            _fetchEmployeeTrainings();
+          },);
         }
         return const SizedBox.shrink();
       },
@@ -184,8 +192,8 @@ Padding(
   Widget _buildMenuItem(String label, String assetPath, Widget? page) {
     return GestureDetector(
       onTap: () {
-        switch(label){
-           case 'Pegawai':
+        switch (label) {
+          case 'Pegawai':
             Utils.navigateToPage(context, const HRDEmployeePage());
             break;
           case 'Kinerja Pegawai':
@@ -342,7 +350,6 @@ Padding(
           case 'Kinerja Pegawai':
             Utils.navigateToPage(context, const EmployeePerformancePage());
             break;
-
           case 'Administrasi':
             Utils.navigateToPage(context, const AdministrationPage());
             break;

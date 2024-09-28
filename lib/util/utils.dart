@@ -8,10 +8,19 @@ import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 
 class Utils {
-
   static const List<String> months = [
-    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    'Januari',
+    'Februari',
+    'Maret',
+    'April',
+    'Mei',
+    'Juni',
+    'Juli',
+    'Agustus',
+    'September',
+    'Oktober',
+    'November',
+    'Desember'
   ];
 
   // Fungsi untuk mendapatkan nama bulan dari nomor bulan
@@ -31,7 +40,7 @@ class Utils {
     return index + 1;
   }
 
-static Widget buildLoadingCardShimmer() {
+  static Widget buildLoadingCardShimmer() {
     return Container(
       padding: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -74,14 +83,16 @@ static Widget buildLoadingCardShimmer() {
       ),
     );
   }
-static Future<void> showConfirmationDialog(
+
+  static Future<void> showConfirmationDialog(
     BuildContext context, {
     required String buttonText, // Text for the action button
     required String message, // Custom message to be displayed
     required VoidCallback onConfirm, // Action for confirm button
     required VoidCallback onCancel, // Action for cancel button
   }) async {
-    final width = MediaQuery.of(context).size.width * 0.95; // 95% of screen width
+    final width =
+        MediaQuery.of(context).size.width * 0.95; // 95% of screen width
 
     return showDialog(
       context: context,
@@ -91,8 +102,10 @@ static Future<void> showConfirmationDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
-          contentPadding: EdgeInsets.zero, // Remove default padding around content
-          insetPadding: const EdgeInsets.symmetric(horizontal: 20), // Dialog margin
+          contentPadding:
+              EdgeInsets.zero, // Remove default padding around content
+          insetPadding:
+              const EdgeInsets.symmetric(horizontal: 20), // Dialog margin
           content: SingleChildScrollView(
             child: SizedBox(
               width: width, // Set dialog width
@@ -159,7 +172,8 @@ static Future<void> showConfirmationDialog(
             onPressed: onCancel,
             child: Text(
               'Batal',
-              style: AppTextStyle.headline5.copyWith(color: AppColors.primaryMain),
+              style:
+                  AppTextStyle.headline5.copyWith(color: AppColors.primaryMain),
             ),
           ),
         ),
@@ -243,8 +257,8 @@ static Future<void> showConfirmationDialog(
                   const SizedBox(height: 24),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _buildActionButtonsInput(context, buttonText, onConfirm,
-                        onCancel, _reasonController),
+                    child: _buildActionButtonsInput(context, buttonText,
+                        onConfirm, onCancel, _reasonController),
                   ),
                   const SizedBox(height: 16),
                 ],
@@ -361,10 +375,63 @@ static Future<void> showConfirmationDialog(
     );
   }
 
-  
+  static Widget buildErrorState({
+    required String title,
+    required String message,
+    required VoidCallback onRetry, // Parameter untuk menangani tombol retry
+  }) {
+    return Container(
+      width: double.maxFinite,
+      height: double.maxFinite,
+      color: Colors.white,
+      padding: const EdgeInsets.all(16),
+      child: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              'assets/images/accounting/empty_report.svg', // Ganti dengan path icon error yang sesuai
+              height: 80,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: AppTextStyle.bigCaptionBold,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: AppTextStyle.caption,
+            ),
+            const SizedBox(height: 4),
+            ElevatedButton(
+              onPressed: onRetry, // Callback saat tombol ditekan
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 24, vertical: 12), // Atur padding di sini
+                backgroundColor:
+                    AppColors.primaryMain, // Atur warna latar belakang
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8), // Atur radius sudut
+                ),
+              ),
+              child: const Text(
+                'Coba Lagi',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   static Widget buildEmptyState(String title, String? message) {
-    return Padding(
+    return Container(
+      width: double.maxFinite,
+      height: double.maxFinite,
+      color: Colors.white,
       padding: const EdgeInsets.all(16),
       child: Center(
         child: Column(

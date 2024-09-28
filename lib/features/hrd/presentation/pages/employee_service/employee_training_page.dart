@@ -49,7 +49,12 @@ class _EmployeeTrainingPageState extends State<EmployeeTrainingPage> {
               itemBuilder: (context, index) => Utils.buildLoadingCardShimmer(),
             );
           } else if (state is EmployeeTrainingError) {
-            return _buildErrorState(state.message);
+            return Utils.buildErrorState(
+          title: 'Gagal Memuat Data',
+          message: state.message,
+          onRetry: () {
+            _fetchEmployeeTrainings();
+          },);
           } else if (state is EmployeeTrainingLoaded && state.trainingData.trainings.isNotEmpty) {
             return EmployeeTrainingCardWidget(trainings: state.trainingData.trainings);
           } else {
@@ -60,34 +65,5 @@ class _EmployeeTrainingPageState extends State<EmployeeTrainingPage> {
     );
   }
 
-  // Method untuk menampilkan error state dengan tombol refresh
-  Widget _buildErrorState(String errorMessage) {
-    return RefreshIndicator(
-      onRefresh: () async {
-        _fetchEmployeeTrainings();
-      },
-      child: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error, color: Colors.red, size: 48),
-              const SizedBox(height: 16),
-              Text(
-                errorMessage,
-                style: const TextStyle(fontSize: 18, color: Colors.red),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _fetchEmployeeTrainings,
-                child: const Text('Coba Lagi'),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+ 
 }
