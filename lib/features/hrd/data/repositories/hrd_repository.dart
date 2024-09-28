@@ -17,6 +17,7 @@ import 'package:akib_pos/features/hrd/data/models/employee_service/administratio
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_all_employee.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/employee_performance.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/submit_employee_request.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/employee_training.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/candidate_submission.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip_detail.dart';
@@ -75,6 +76,8 @@ abstract class HRDRepository {
   Future<Either<Failure, List<EmployeeWarning>>> getEmployeeWarnings();
   Future<Either<Failure, EmployeeSOPResponse>> getEmployeeSOP();
   Future<Either<Failure, CompanyRulesResponse>> getCompanyRules();
+  //training
+  Future<Either<Failure, EmployeeTrainingResponse>> getEmployeeTrainings(int branchId);
 
   //Employee Submission
   Future<Either<Failure, List<EmployeeSubmission>>> getPendingSubmissions(
@@ -106,6 +109,19 @@ class HRDRepositoryImpl implements HRDRepository {
   final HRDRemoteDataSource remoteDataSource;
 
   HRDRepositoryImpl({required this.remoteDataSource});
+
+
+@override
+  Future<Either<Failure, EmployeeTrainingResponse>> getEmployeeTrainings(int branchId) async {
+    try {
+      final trainingData = await remoteDataSource.getEmployeeTrainings(branchId);
+      return Right(trainingData);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
 @override
   Future<Either<Failure, CompanyRulesResponse>> getCompanyRules() async {

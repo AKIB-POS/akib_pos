@@ -28,6 +28,7 @@ import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employe
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/permanent_employee_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee_performance/employee_performance_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee_performance/submit_employee_performance_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee_training_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/detail_salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/verify_employee_submission_cubit.dart';
@@ -137,6 +138,10 @@ Future<void> initHRDModule() async {
   );
   hrdInjection.registerFactory(
     () => EmployeeSOPCubit(hrdInjection()),
+  );
+  //training
+  hrdInjection.registerFactory(
+    () => EmployeeTrainingCubit(hrdInjection()),
   );
 
   

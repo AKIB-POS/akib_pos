@@ -4,12 +4,14 @@ import 'package:akib_pos/features/accounting/presentation/bloc/transaction_repor
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/home/widget/my_drawer.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/employee_performance.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/employee_training.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/employee_service/administration_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/attendance_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/attendance_recap_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/employee_service/employee/hrd_employee_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/employee_service/employee_performance/employee_performance_page.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/employee_service/employee_training_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/leave_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/overtime_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/permission_page.dart';
@@ -94,6 +96,7 @@ class _HrdPage extends State<HrdPage> {
                 ],
               ),
             ),
+            if (_authSharedPref.getEmployeeRole() != "employee") _attendanceRecap(),
             _attendanceService(),
             _employeeService(),
           ],
@@ -132,6 +135,42 @@ class _HrdPage extends State<HrdPage> {
     );
   }
 
+  Widget _attendanceRecap() {
+    return GestureDetector(
+      onTap: () {
+        Utils.navigateToPage(context, const AttendanceRecapPage());
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          border: Border.all(width: 2, color: AppColors.primary100),
+          color: AppColors.primaryBackgorund,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                SvgPicture.asset(
+                  'assets/icons/hrd/ic_attendance_recap.svg',
+                  fit: BoxFit.cover,
+                ),
+                const SizedBox(width: 8),
+                Text('Rekap Kehadiran Karyawan',
+                    style: AppTextStyle.caption
+                        .copyWith(color: AppColors.primaryMain)),
+              ],
+            ),
+            const Icon(Icons.arrow_forward, color: AppColors.primaryMain),
+          ],
+        ),
+      ),
+    );
+  }
+  
+
   Widget _employeeService() {
     return Container(
       margin: const EdgeInsets.only(left: 16, right: 16, bottom: 25),
@@ -164,6 +203,8 @@ class _HrdPage extends State<HrdPage> {
       ),
     );
   }
+
+  
 
   void _navigateToAttendancePage(BuildContext context) {
     final attendanceData = context.read<HRDSummaryCubit>().state;
@@ -205,6 +246,9 @@ class _HrdPage extends State<HrdPage> {
             break;
           case 'Kinerja Pegawai':
             Utils.navigateToPage(context, const EmployeePerformancePage());
+            break;
+          case 'Pelatihan':
+            Utils.navigateToPage(context, const EmployeeTrainingPage());
             break;
           default:
             break;

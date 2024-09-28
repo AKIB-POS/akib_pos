@@ -8,7 +8,9 @@ import 'package:akib_pos/features/hrd/presentation/pages/submission/employee/emp
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svgProvider;
+
 import 'package:get_it/get_it.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -30,6 +32,8 @@ class SummaryHRD extends StatelessWidget {
             width: double.infinity,
             child: Column(
               children: [
+                if(_authSharedPref.getEmployeeRole() == "owner")
+                  _buildUiTotalEmployee(data.totalEmployee),
                 if(_authSharedPref.getEmployeeRole() != "owner")
                   _buildSummaryContent(data),
                 // Check if role is not "employee"
@@ -212,7 +216,7 @@ class SummaryHRD extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-         Text(label, style: TextStyle(color: Colors.white)), // Static label
+         Text(label, style: const TextStyle(color: Colors.white)), // Static label
       ],
     );
   }
@@ -436,6 +440,29 @@ class SummaryHRD extends StatelessWidget {
             ],
           ),
           SvgPicture.asset(assetPath, height: 40, width: 40),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildUiTotalEmployee(int? totalEmployee) {
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.only(right: 16,left: 16,top: 21,bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 21),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        image:  const DecorationImage(
+          image: svgProvider.Svg('assets/images/hrd/bg_total_employee.svg'),
+          fit: BoxFit.cover
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Total Pegawai",style: AppTextStyle.caption.copyWith(color: Colors.white),),
+          SizedBox(height: 10,),
+          Text("$totalEmployee Orang",style: AppTextStyle.bigCaptionBold.copyWith(color: Colors.white),)
         ],
       ),
     );

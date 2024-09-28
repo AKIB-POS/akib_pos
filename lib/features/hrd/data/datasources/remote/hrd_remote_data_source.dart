@@ -18,6 +18,7 @@ import 'package:akib_pos/features/hrd/data/models/employee_service/administratio
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_all_employee.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/employee_performance.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/submit_employee_request.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/employee_training.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/candidate_submission.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip_detail.dart';
@@ -74,6 +75,9 @@ abstract class HRDRemoteDataSource {
   Future<List<EmployeeWarning>> getEmployeeWarnings();
   Future<EmployeeSOPResponse> getEmployeeSOP();
   Future<CompanyRulesResponse> getCompanyRules();
+  //training
+  Future<EmployeeTrainingResponse> getEmployeeTrainings(int branchId);
+
 
 
   //Submission
@@ -101,6 +105,22 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
   final AuthSharedPref sharedPrefsHelper = GetIt.instance<AuthSharedPref>();
 
   HRDRemoteDataSourceImpl({required this.client});
+
+
+   @override
+  Future<EmployeeTrainingResponse> getEmployeeTrainings(int branchId) async {
+    final url = '${URLs.baseUrlMock}/employee-training?branch_id=$branchId';
+    final response = await client.get(Uri.parse(url), headers: _buildHeaders());
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return EmployeeTrainingResponse.fromJson(jsonResponse);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
 
 
   @override
