@@ -5,6 +5,7 @@ import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/a
 import 'package:akib_pos/features/home/widget/my_drawer.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/employee_performance.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_training.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee_training_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/employee_service/administration_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/attendance_page.dart';
@@ -17,6 +18,7 @@ import 'package:akib_pos/features/hrd/presentation/pages/overtime_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/permission_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/employee_service/salary/salary_%20slip_page.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/appbar_hrd_page.dart';
+import 'package:akib_pos/features/hrd/presentation/widgets/employee_service/employee_training_card_widget.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/summary_hrd.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +29,7 @@ import 'package:sizer/sizer.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
 class HrdPage extends StatefulWidget {
   const HrdPage({super.key});
 
@@ -41,6 +44,14 @@ class _HrdPage extends State<HrdPage> {
   void initState() {
     super.initState();
     _fetchHRDSummary();
+    if (_authSharedPref.getEmployeeRole() == "owner") {
+      _fetchEmployeeTrainings();
+    }
+  }
+
+  void _fetchEmployeeTrainings() {
+    final branchId = _authSharedPref.getBranchId() ?? 0;
+    context.read<EmployeeTrainingCubit>().fetchEmployeeTrainings(branchId: branchId);
   }
 
   void _fetchHRDSummary() {
@@ -52,6 +63,8 @@ class _HrdPage extends State<HrdPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isOwner = _authSharedPref.getEmployeeRole() == "owner";
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.backgroundWhite,
@@ -72,6 +85,7 @@ class _HrdPage extends State<HrdPage> {
         color: AppColors.primaryMain,
         onRefresh: () async {
           _fetchHRDSummary();
+          if (isOwner) _fetchEmployeeTrainings();
         },
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -97,10 +111,94 @@ class _HrdPage extends State<HrdPage> {
               ),
             ),
             if (_authSharedPref.getEmployeeRole() != "employee") _attendanceRecap(),
-            _attendanceService(),
-            _employeeService(),
+            if (!isOwner) _attendanceService(),
+            if (!isOwner) _employeeService(),
+            if (isOwner) _ownerMenuBar(),
+            if (isOwner) _trainingSection(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _ownerMenuBar() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+Padding(
+  padding: const EdgeInsets.only(bottom: 21,left: 16,top: 8),
+  child: Text('Layanan Kepegawaian',
+                      style: AppTextStyle.headline5),
+),
+              
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildMenuItem('Pegawai', 'assets/icons/hrd/ic_employee.svg',
+                  const HRDEmployeePage()),
+              _buildMenuItem(
+                  'Kinerja',
+                  'assets/icons/hrd/ic_employee_performance.svg',
+                  const EmployeePerformancePage()),
+              _buildMenuItem('Tasking', 'assets/icons/hrd/ic_tasking.svg',
+                  null), // Replace with the correct page
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _trainingSection() {
+    return BlocBuilder<EmployeeTrainingCubit, EmployeeTrainingState>(
+      builder: (context, state) {
+        if (state is EmployeeTrainingLoading) {
+          return ListView.builder(
+            itemCount: 2, // Number of shimmer loading cards
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) => Utils.buildLoadingCardShimmer(),
+          );
+        } else if (state is EmployeeTrainingLoaded &&
+            state.trainingData.trainings.isNotEmpty) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(left: 16,top: 8),
+                child: Text('Pelatihan Akan Berjalan',
+                    style: AppTextStyle.headline5),
+              ),
+              EmployeeTrainingCardWidget(
+                  trainings: state.trainingData.trainings),
+            ],
+          );
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  Widget _buildMenuItem(String label, String assetPath, Widget? page) {
+    return GestureDetector(
+      onTap: () {
+        switch(label){
+           case 'Pegawai':
+            Utils.navigateToPage(context, const HRDEmployeePage());
+            break;
+          case 'Kinerja Pegawai':
+            Utils.navigateToPage(context, const EmployeePerformancePage());
+            break;
+        }
+      },
+      child: Column(
+        children: [
+          SvgPicture.asset(assetPath),
+          const SizedBox(height: 8),
+          Text(label, style: AppTextStyle.caption),
+        ],
       ),
     );
   }
@@ -169,7 +267,6 @@ class _HrdPage extends State<HrdPage> {
       ),
     );
   }
-  
 
   Widget _employeeService() {
     return Container(
@@ -191,12 +288,16 @@ class _HrdPage extends State<HrdPage> {
             physics: const NeverScrollableScrollPhysics(),
             children: [
               if (_authSharedPref.getEmployeeRole() != "employee")
-                _buildServiceItem('Pegawai', 'assets/icons/hrd/ic_employee.svg'),
-              _buildServiceItem('Administrasi', 'assets/icons/hrd/ic_administration.svg'),
-              _buildServiceItem('Kinerja Pegawai', 'assets/icons/hrd/ic_employee_performance.svg'),
+                _buildServiceItem(
+                    'Pegawai', 'assets/icons/hrd/ic_employee.svg'),
+              _buildServiceItem(
+                  'Administrasi', 'assets/icons/hrd/ic_administration.svg'),
+              _buildServiceItem('Kinerja Pegawai',
+                  'assets/icons/hrd/ic_employee_performance.svg'),
               _buildServiceItem('Slip Gaji', 'assets/icons/hrd/ic_salary.svg'),
               _buildServiceItem('Tasking', 'assets/icons/hrd/ic_tasking.svg'),
-              _buildServiceItem('Pelatihan', 'assets/icons/hrd/ic_training.svg'),
+              _buildServiceItem(
+                  'Pelatihan', 'assets/icons/hrd/ic_training.svg'),
             ],
           ),
         ],
@@ -204,16 +305,13 @@ class _HrdPage extends State<HrdPage> {
     );
   }
 
-  
-
   void _navigateToAttendancePage(BuildContext context) {
     final attendanceData = context.read<HRDSummaryCubit>().state;
     if (attendanceData is HRDSummaryLoaded) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              AttendancePage(data: attendanceData.hrdSummary),
+          builder: (context) => AttendancePage(data: attendanceData.hrdSummary),
         ),
       );
     }
@@ -230,7 +328,7 @@ class _HrdPage extends State<HrdPage> {
             Utils.navigateToPage(context, const LeavePage());
             break;
           case 'Izin':
-            Utils.navigateToPage(context,  PermissionPage());
+            Utils.navigateToPage(context, PermissionPage());
             break;
           case 'Lembur':
             Utils.navigateToPage(context, const OvertimePage());
@@ -239,13 +337,14 @@ class _HrdPage extends State<HrdPage> {
             Utils.navigateToPage(context, const SalarySlipPage());
             break;
           case 'Pegawai':
-            Utils.navigateToPage(context,  const HRDEmployeePage());
-            break;
-          case 'Administrasi':
-            Utils.navigateToPage(context, const AdministrationPage());
+            Utils.navigateToPage(context, const HRDEmployeePage());
             break;
           case 'Kinerja Pegawai':
             Utils.navigateToPage(context, const EmployeePerformancePage());
+            break;
+
+          case 'Administrasi':
+            Utils.navigateToPage(context, const AdministrationPage());
             break;
           case 'Pelatihan':
             Utils.navigateToPage(context, const EmployeeTrainingPage());

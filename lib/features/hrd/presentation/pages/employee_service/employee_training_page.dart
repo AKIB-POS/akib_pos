@@ -3,6 +3,8 @@ import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_training.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee_training_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/widgets/employee_service/employee_training_card_widget.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -41,64 +43,19 @@ class _EmployeeTrainingPageState extends State<EmployeeTrainingPage> {
       body: BlocBuilder<EmployeeTrainingCubit, EmployeeTrainingState>(
         builder: (context, state) {
           if (state is EmployeeTrainingLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: 3, // Number of shimmer loading cards
+              itemBuilder: (context, index) => Utils.buildLoadingCardShimmer(),
+            );
           } else if (state is EmployeeTrainingError) {
             return _buildErrorState(state.message);
-          } else if (state is EmployeeTrainingLoaded) {
-            return state.trainingData.trainings.isEmpty
-                ? const Center(child: Text('Tidak ada data pelatihan.'))
-                : _buildTrainingList(state.trainingData.trainings);
+          } else if (state is EmployeeTrainingLoaded && state.trainingData.trainings.isNotEmpty) {
+            return EmployeeTrainingCardWidget(trainings: state.trainingData.trainings);
+          } else {
+            return const Center(child: Text('Tidak ada data pelatihan.'));
           }
-          return const Center(child: Text('Tidak ada data.'));
         },
-      ),
-    );
-  }
-
-  Widget _buildTrainingList(List<EmployeeTraining> trainings) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: trainings.length,
-      itemBuilder: (context, index) {
-        final training = trainings[index];
-        return _buildTrainingCard(training);
-      },
-    );
-  }
-
-  Widget _buildTrainingCard(EmployeeTraining training) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            training.trainingTitle,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            training.trainingDescription,
-            style: const TextStyle(fontSize: 14, color: Colors.grey),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            training.trainingDateTime,
-            style: const TextStyle(fontSize: 14, color: Colors.black87),
-          ),
-        ],
       ),
     );
   }
