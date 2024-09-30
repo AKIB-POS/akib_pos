@@ -38,12 +38,6 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
     } on PlatformException {
          throw GeneralException('Gagal Mendapatkan Device Id');
     }
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // try {
-    //   deviceId = await PlatformDeviceId.getDeviceId;
-    // } on PlatformException {
-    //   deviceId = 'Failed to get deviceId.';
-    // }
     final response = await http.post(
       Uri.parse('${URLs.baseUrlProd}/login'),
       headers: {'Content-Type': 'application/json'},

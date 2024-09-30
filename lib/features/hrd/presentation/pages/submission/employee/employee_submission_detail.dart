@@ -15,11 +15,13 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
 
   const EmployeeSubmissionDetailPage({super.key, required this.submission});
 
-  void _verifySubmission(BuildContext context, String status, String? reason) {
+  void _verifySubmission(BuildContext context, String status, String? reason,String submissionType) {
     final request = VerifyEmployeeSubmissionRequest(
         employeeSubmissionId: submission.employeeSubmissionId,
         status: status,
-        reason: reason);
+        reason: reason,
+        submissionType: submissionType
+        );
     context
         .read<VerifyEmployeeSubmissionCubit>()
         .verifyEmployeeSubmission(request);
@@ -155,7 +157,7 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildColumn('Waktu Pengajuan', submission.submissionDate),
+              _buildColumn('Waktu Pengajuan', submission.submissionDate ?? ""),
               const SizedBox(height: 12),
               _buildColumn(' Cuti', submission.submissionType),
               const SizedBox(height: 12),
@@ -241,54 +243,75 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 18),
-      decoration: AppThemes.bottomBoxDecorationDialog,
-      child: Row(
-        children: [
-          Expanded(
-            child: OutlinedButton(
-              style: AppThemes.outlineButtonPrimaryStyle,
-              onPressed: () {
-                Utils.showInputTextVerificationDialog(
-                  context,
-                  buttonText: 'Ya, Tolak',
-                  onConfirm: (String reason) {
-                    // Kirim status "rejected"
-                    _verifySubmission(context, 'REJECTED', reason);
-                  },
-                  onCancel: () {
-                    Navigator.of(context).pop();
-                  },
-                );
-              },
-              child: Text('Tolak',
-                  style: AppTextStyle.headline5
-                      .copyWith(color: AppColors.primaryMain)),
-            ),
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 18),
+    decoration: AppThemes.bottomBoxDecorationDialog,
+    child: Row(
+      children: [
+        Expanded(
+          child: OutlinedButton(
+            style: AppThemes.outlineButtonPrimaryStyle,
+            onPressed: () {
+              Utils.showInputTextVerificationDialog(
+                context,
+                buttonText: 'Ya, Tolak',
+                onConfirm: (String reason) {
+                  // Kondisi submissionType sesuai submission.type
+                  final submissionType = _mapSubmissionType(submission.type);
+                  // Kirim status "rejected"
+                  _verifySubmission(context, 'REJECTED', reason, submissionType);
+                },
+                onCancel: () {
+                  Navigator.of(context).pop();
+                },
+              );
+            },
+            child: Text('Tolak',
+                style: AppTextStyle.headline5
+                    .copyWith(color: AppColors.primaryMain)),
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                Utils.showInputTextVerificationDialog(
-                  context,
-                  buttonText: 'Ya, Terima',
-                  onConfirm: (String reason) {
-                    _verifySubmission(context, 'ACCEPTED', reason);
-                  },
-                  onCancel: () {
-                    Navigator.of(context).pop();
-                  },
-                );
-              },
-              style: AppThemes.elevatedBUttonPrimaryStyle,
-              child: Text('Verifikasi',
-                  style: AppTextStyle.headline5.copyWith(color: Colors.white)),
-            ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () {
+              Utils.showInputTextVerificationDialog(
+                context,
+                buttonText: 'Ya, Terima',
+                onConfirm: (String reason) {
+                  // Kondisi submissionType sesuai submission.type
+                  final submissionType = _mapSubmissionType(submission.type);
+                  _verifySubmission(context, 'APPROVED', reason, submissionType);
+                },
+                onCancel: () {
+                  Navigator.of(context).pop();
+                },
+              );
+            },
+            style: AppThemes.elevatedBUttonPrimaryStyle,
+            child: Text('Verifikasi',
+                style: AppTextStyle.headline5.copyWith(color: Colors.white)),
           ),
-        ],
-      ),
-    );
+        ),
+      ],
+    ),
+  );
+}
+
+// Fungsi untuk mapping submission.type ke submissionType yang sesuai
+String _mapSubmissionType(String submissionType) {
+  switch (submissionType) {
+    case 'cuti':
+      return 'LEAVE';
+    case 'izin':
+      return 'PERMISSION';
+    case 'lembur':
+      return 'OVERTIME';
+    default:
+      return 'UNKNOWN'; // Handle default case jika type tidak dikenal
   }
+}
+
+
+
 }

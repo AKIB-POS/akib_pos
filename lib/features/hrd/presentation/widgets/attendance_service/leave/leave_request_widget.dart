@@ -22,12 +22,14 @@ class LeaveRequestWidget extends StatelessWidget {
           );
         } else if (state is LeaveRequestLoaded) {
           if (state.leaveRequests.data.isEmpty) {
-            return buildEmptyUI();
+            return Utils.buildEmptyStatePlain("Belum ada Pengajuan",
+            "Status Pengajuan akan tampil setelah anda\nmengisi form pengajuan cuti");
           } else {
             return _buildRequestList(state.leaveRequests.data);
           }
         } else if (state is LeaveRequestError) {
-          return buildEmptyUI();
+          return Utils.buildEmptyStatePlain("Ada Kesalahan",
+            state.message);
         } else {
           return Container();
         }
@@ -35,24 +37,6 @@ class LeaveRequestWidget extends StatelessWidget {
     );
   }
 
-  Widget buildEmptyUI() {
-    return Container(
-        width: double.infinity,
-        margin: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12.withOpacity(0.1),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Utils.buildEmptyState("Belum ada Pengajuan",
-            "Status Pengajuan akan tampil setelah anda\nmengisi form pengajuan cuti"));
-  }
 
   Widget _buildRequestList(List<LeaveRequestData> requests) {
     return Padding(
@@ -101,7 +85,7 @@ class LeaveRequestWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 _buildApprovalStatusRow(
-                    'Status Persetujuan', request.approverName),
+                    'Status Persetujuan', request.approverName ?? ""),
               ],
             ),
           ),

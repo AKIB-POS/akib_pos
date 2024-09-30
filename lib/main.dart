@@ -54,6 +54,8 @@ import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/atten
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_quota_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_request_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_history_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_type_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/submit_leave_request_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_history_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_request)cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_history_cubit.dart';
@@ -304,6 +306,12 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => LeaveHistoryCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => SubmitLeaveRequestCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => LeaveTypeCubit(hrdInjection()),
         ),
 
         BlocProvider(

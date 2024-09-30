@@ -4,7 +4,9 @@ import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/attendance_history_item.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_history.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_request_data.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_type.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/overtime_history.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/overtime_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_history.dart';
@@ -50,6 +52,8 @@ abstract class HRDRemoteDataSource {
   Future<LeaveRequestResponse> getLeaveRequests();
   Future<LeaveQuotaResponse> getLeaveQuota();
   Future<LeaveHistoryResponse> getLeaveHistory();
+  Future<void> submitLeaveRequest(LeaveRequest leaveRequest);
+  Future<List<LeaveType>> getLeaveTypes();
 
   //Permission
   Future<PermissionQuotaResponse> getPermissionQuota();
@@ -105,6 +109,36 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
   final AuthSharedPref sharedPrefsHelper = GetIt.instance<AuthSharedPref>();
 
   HRDRemoteDataSourceImpl({required this.client});
+
+
+   @override
+  Future<void> submitLeaveRequest(LeaveRequest leaveRequest) async {
+    const url = '${URLs.baseUrlProd}/leave-request';
+
+    var request = http.MultipartRequest('POST', Uri.parse(url));
+    request.headers.addAll(_buildHeaders());
+
+    // Add form-data fields
+    request.fields.addAll(leaveRequest.toFormData());
+
+    // Add file if exists
+    if (leaveRequest.attachmentPath != null) {
+      var file = await http.MultipartFile.fromPath('attachment', leaveRequest.attachmentPath!);
+      request.files.add(file);
+    }
+
+    var response = await request.send().timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 201) {
+      // Success
+      return;
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      // Handle error
+      throw GeneralException('Failed to submit leave request');
+    } else {
+      throw ServerException();
+    }
+  }
 
 
    @override
@@ -313,7 +347,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<VerifyEmployeeSubmissionResponse> verifyEmployeeSubmission(VerifyEmployeeSubmissionRequest request) async {
-    const url = '${URLs.baseUrlMock}/employee-submissions/verify';
+    const url = '${URLs.baseUrlProd}/employee-submissions/verify';
     final response = await client
         .post(
           Uri.parse(url),
@@ -413,7 +447,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
   
 @override
   Future<List<EmployeeSubmission>> getPendingSubmissions(int branchId) async {
-    const url = '${URLs.baseUrlMock}/employee-submissions/pending-approval';
+    const url = '${URLs.baseUrlProd}/employee-submissions/pending-approval';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {'branch_id': branchId.toString()}),
       headers: _buildHeaders(),
@@ -432,7 +466,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
    @override
   Future<List<EmployeeSubmission>> getApprovedSubmissions(int branchId) async {
-    const url = '${URLs.baseUrlMock}/employee-submissions/approved';
+    const url = '${URLs.baseUrlProd}/employee-submissions/approved';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {'branch_id': branchId.toString()}),
       headers: _buildHeaders(),
@@ -451,7 +485,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<List<EmployeeSubmission>> getRejectedSubmissions(int branchId) async {
-    const url = '${URLs.baseUrlMock}/employee-submissions/rejected';
+    const url = '${URLs.baseUrlProd}/employee-submissions/rejected';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {'branch_id': branchId.toString()}),
       headers: _buildHeaders(),
@@ -622,7 +656,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<LeaveHistoryResponse> getLeaveHistory() async {
-    const url = '${URLs.baseUrlMock}/leave-history';
+    const url = '${URLs.baseUrlProd}/leave-history';
     final response = await client.get(
       Uri.parse(url),
       headers: _buildHeaders(),
@@ -640,9 +674,10 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
 
 
+
   @override
   Future<LeaveRequestResponse> getLeaveRequests() async {
-    const url = '${URLs.baseUrlMock}/leave-requests';
+    const url = '${URLs.baseUrlProd}/leave-requests';
     final response = await client.get(
       Uri.parse(url),
       headers: _buildHeaders(),
@@ -660,7 +695,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<LeaveQuotaResponse> getLeaveQuota() async {
-    const url = '${URLs.baseUrlMock}/leave-quota';
+    const url = '${URLs.baseUrlProd}/leave-quota';
     final response = await client
         .get(
           Uri.parse(url),
@@ -677,6 +712,26 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
       throw ServerException();
     }
   }
+
+    @override
+  Future<List<LeaveType>> getLeaveTypes() async {
+    const url = '${URLs.baseUrlProd}/leave-type';
+    final response = await client.get(
+      Uri.parse(url),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      List<dynamic> leaveTypeList = jsonResponse['data'];
+      return leaveTypeList.map((json) => LeaveType.fromJson(json)).toList();
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
 
   @override
   Future<AttendanceHistoryResponse> getAttendanceHistory() async {
@@ -701,7 +756,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
     @override
   Future<HRDSummaryResponse> getHRDSummary(int branchId) async {
-    final url = '${URLs.baseUrlMock}/hrd-summary';
+    const url = '${URLs.baseUrlProd}/hrd-summary';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),

@@ -7,6 +7,8 @@ import 'package:akib_pos/features/hrd/presentation/bloc/attendance_recap/attenda
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/attendance_history_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_request_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_history_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_type_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/submit_leave_request_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_history_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_request)cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_history_cubit.dart';
@@ -86,6 +88,12 @@ Future<void> initHRDModule() async {
 
   hrdInjection.registerFactory(
     () => LeaveHistoryCubit(hrdInjection()), // Register the LeaveHistoryCubit
+  );
+  hrdInjection.registerFactory(
+    () => SubmitLeaveRequestCubit(hrdInjection()), // Register the LeaveHistoryCubit
+  );
+   hrdInjection.registerFactory(
+    () => LeaveTypeCubit(hrdInjection()),
   );
 
   hrdInjection.registerFactory(

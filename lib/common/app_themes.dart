@@ -38,6 +38,14 @@ class AppThemes {
     padding: const EdgeInsets.symmetric(vertical: 12),
     overlayColor: Colors.white
   );
+  static final outlineButtonPrimaryStylePadding = OutlinedButton.styleFrom(
+    side: BorderSide(color: AppColors.primaryMain),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(4),
+    ),
+    padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 12),
+    overlayColor: Colors.white
+  );
 
   static BoxDecoration bottomShadow = BoxDecoration(
     color: Colors.white,

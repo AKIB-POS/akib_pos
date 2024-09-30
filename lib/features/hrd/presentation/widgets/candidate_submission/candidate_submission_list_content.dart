@@ -16,7 +16,7 @@ import 'package:get_it/get_it.dart';
 class CandidateSubmissionListContent extends StatelessWidget {
   final CandidateSubmission submission;
 
-  const CandidateSubmissionListContent({Key? key, required this.submission}) : super(key: key);
+  const CandidateSubmissionListContent({super.key, required this.submission});
 
   @override
   Widget build(BuildContext context) {

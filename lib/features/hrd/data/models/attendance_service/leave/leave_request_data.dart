@@ -19,7 +19,7 @@ class LeaveRequestData {
   final String leaveType;
   final String startDate;
   final String endDate;
-  final String approverName;
+  final String? approverName;
 
   LeaveRequestData({
     required this.requestDate,

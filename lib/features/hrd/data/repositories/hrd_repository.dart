@@ -3,7 +3,9 @@ import 'package:akib_pos/core/error/failures.dart';
 import 'package:akib_pos/features/hrd/data/datasources/remote/hrd_remote_data_source.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/attendance_history_item.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_history.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_request_data.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_type.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/overtime_history.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/overtime_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_history.dart';
@@ -50,6 +52,8 @@ abstract class HRDRepository {
   Future<Either<Failure, LeaveQuotaResponse>> getLeaveQuota();
   Future<Either<Failure, LeaveRequestResponse>> getLeaveRequests();
   Future<Either<Failure, LeaveHistoryResponse>> getLeaveHistory();
+  Future<Either<Failure, void>> submitLeaveRequest(LeaveRequest leaveRequest);
+  Future<Either<Failure, List<LeaveType>>> getLeaveTypes();
 
   //Permission
   Future<Either<Failure, PermissionQuotaResponse>> getPermissionQuota();
@@ -109,6 +113,19 @@ class HRDRepositoryImpl implements HRDRepository {
   final HRDRemoteDataSource remoteDataSource;
 
   HRDRepositoryImpl({required this.remoteDataSource});
+
+
+  @override
+  Future<Either<Failure, void>> submitLeaveRequest(LeaveRequest leaveRequest) async {
+    try {
+      await remoteDataSource.submitLeaveRequest(leaveRequest);
+      return const Right(null);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
 
 @override
@@ -499,6 +516,18 @@ class HRDRepositoryImpl implements HRDRepository {
     try {
       final leaveQuota = await remoteDataSource.getLeaveQuota();
       return Right(leaveQuota);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<LeaveType>>> getLeaveTypes() async {
+    try {
+      final leaveTypes = await remoteDataSource.getLeaveTypes();
+      return Right(leaveTypes);
     } on ServerException {
       return Left(ServerFailure());
     } catch (e) {

@@ -169,6 +169,7 @@ class _ExpenditureDialogState extends State<ExpenditureDialog> {
                                 return "Jumlah tidak boleh kosong";
                               return null;
                             },
+                            
                           ),
                           const SizedBox(height: 12),
                           Text('Kategori', style: AppTextStyle.headline6),

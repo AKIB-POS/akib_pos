@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
@@ -357,8 +359,8 @@ class SummaryHRD extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildInfoColumn(data.leaveBalance.toString(), 'Saldo Cuti'),
-                  _buildInfoColumn(data.totalAbsences.toString(), 'Alpha'),
+                  _buildInfoColumn(data.leaveBalance ?? 0, 'Saldo Cuti'),
+                  _buildInfoColumn(data.totalAbsences ?? 0, 'Alpha'),
                 ],
               ),
             ),
@@ -368,11 +370,11 @@ class SummaryHRD extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoColumn(String value, String label) {
+  Widget _buildInfoColumn(int value, String label) {
     return Column(
       children: [
         Text(
-          value,
+          "$value",
           style: AppTextStyle.bigCaptionBold.copyWith(color: Colors.white),
         ),
         const SizedBox(height: 4),

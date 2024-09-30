@@ -13,9 +13,9 @@ import 'package:akib_pos/features/hrd/presentation/pages/attendance_recap_page.d
 import 'package:akib_pos/features/hrd/presentation/pages/employee_service/employee/hrd_employee_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/employee_service/employee_performance/employee_performance_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/employee_service/employee_training_page.dart';
-import 'package:akib_pos/features/hrd/presentation/pages/leave_page.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/attendance_service/leave/leave_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/overtime_page.dart';
-import 'package:akib_pos/features/hrd/presentation/pages/permission_page.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/attendance_service/permission/permission_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/employee_service/salary/salary_%20slip_page.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/appbar_hrd_page.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/employee_service/employee_training_card_widget.dart';
