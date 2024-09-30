@@ -1,5 +1,6 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/di/accounting_injection.dart';
+import 'package:akib_pos/di/hrd_injection.dart';
 import 'package:akib_pos/di/injection_container.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/active_asset_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/asset_depreciation_cubit.dart';
@@ -45,7 +46,45 @@ import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transact
 import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/checkout/checkout_cubit.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_all_employee.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_recap/attendance_recap_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_recap/attendance_recap_interaction_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_recap/date_range_attendance_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/attendance_history_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_quota_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_request_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_history_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_history_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_request)cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_history_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_quota_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_request_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_in_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_out_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_approved_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_pending_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_rejected_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/contract_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/permanent_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/verify_candidate_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/administration/company_rules_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/administration/employee_sop_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/administration/employee_warning_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/contract_employee_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/hrd_employee_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/permanent_employee_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee_performance/employee_performance_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee_performance/submit_employee_performance_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/detail_salary_slip_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/salary_slip_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/verify_employee_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/approved_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/pending_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/rejected_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/widgets/employee_submission/pending_approval_tab.dart';
 import 'package:akib_pos/splash_screen.dart';
+import 'package:akib_pos/util/bloc_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -55,9 +94,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 import 'package:akib_pos/di/injection_container.dart' as di;
 import 'package:akib_pos/di/accounting_injection.dart' as accounting;
+import 'package:akib_pos/di/hrd_injection.dart' as hrd;
 import 'firebase_options.dart';
-import 'package:intl/date_symbol_data_local.dart';  // <-- This line imports the initializeDateFormatting function
-
+import 'package:intl/date_symbol_data_local.dart'; // <-- This line imports the initializeDateFormatting function
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,13 +104,14 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-    await initializeDateFormatting('id', null);
-  
-  await _requestPermissions(); 
+  await initializeDateFormatting('id', null);
+
+  await _requestPermissions();
   //for auth and cashier injection initialization
   await di.init();
   //for accounting injection initialization
   await accounting.initAccountingModule();
+  await hrd.initHRDModule();
 
   runApp(
     MultiBlocProvider(
@@ -85,10 +125,10 @@ void main() async {
             localDataSource: sl(),
           )
             ..add(FetchCategoriesEvent())
-            ..add(FetchSubCategoriesEvent())
+            ..add(const FetchSubCategoriesEvent())
             ..add(FetchProductsEvent())
-            ..add(FetchAdditionsEvent())
-            ..add(FetchVariantsEvent()),
+            ..add(const FetchAdditionsEvent())
+            ..add(const FetchVariantsEvent()),
         ),
         BlocProvider(
           create: (context) => CashierCubit(
@@ -111,86 +151,86 @@ void main() async {
         BlocProvider(
             create: (context) =>
                 CheckoutCubit(sl())), // Ensure this is provided here
+        BlocProvider(create: (context) => MemberCubit(repository: sl())),
+        BlocProvider(create: (context) => CloseCashierCubit(repository: sl())),
+        BlocProvider(
+            create: (context) => PostCloseCashierCubit(repository: sl())),
+        BlocProvider(create: (context) => OpenCashierCubit(repository: sl())),
+        BlocProvider(create: (context) => ExpenditureCubit(repository: sl())),
+        BlocProvider(create: (context) => AuthCubit(sl())),
         BlocProvider(
             create: (context) =>
-                MemberCubit(repository: sl())),
-        BlocProvider(
-            create: (context) =>
-                CloseCashierCubit(repository: sl())),
-        BlocProvider(
-            create: (context) =>
-                PostCloseCashierCubit(repository: sl())),
-        BlocProvider(
-            create: (context) =>
-                OpenCashierCubit(repository: sl())),
-        BlocProvider(
-            create: (context) =>
-                ExpenditureCubit(repository: sl())),
-        BlocProvider(
-            create: (context) =>
-                AuthCubit(sl())),
-        BlocProvider(
-            create: (context) =>
-                PrinterCubit(bluetooth: sl(),sharedPreferences: sl())),
+                PrinterCubit(bluetooth: sl(), sharedPreferences: sl())),
 
-
-        //for accounting
+        //ACCOUNTING MODULE
         BlocProvider(
-          create: (context) => TransactionSummaryCubit(repository: accountingInjection()),
+          create: (context) =>
+              TransactionSummaryCubit(repository: accountingInjection()),
         ),
         BlocProvider(
           create: (context) => EmployeeCubit(repository: accountingInjection()),
         ),
         BlocProvider(
-          create: (context) => TransactionReportInteractionCubit(employeeSharedPref: accountingInjection()),
+          create: (context) => TransactionReportInteractionCubit(
+              employeeSharedPref: accountingInjection()),
         ),
         BlocProvider(
-          create: (context) => TransactionListCubit(repository: accountingInjection()),
+          create: (context) =>
+              TransactionListCubit(repository: accountingInjection()),
         ),
         BlocProvider(
-          create: (context) => TransactionReportCubit(repository: accountingInjection()),
+          create: (context) =>
+              TransactionReportCubit(repository: accountingInjection()),
         ),
         BlocProvider(
           create: (context) => DateRangeCubit(),
         ),
         BlocProvider(
-          create: (context) => SalesReportCubit(repository: accountingInjection()),
+          create: (context) =>
+              SalesReportCubit(repository: accountingInjection()),
         ),
         BlocProvider(
-          create: (context) => SalesProductReportCubit(repository: accountingInjection()),
+          create: (context) =>
+              SalesProductReportCubit(repository: accountingInjection()),
         ),
         BlocProvider(
           create: (context) => DateRangePurchaseCubit(),
         ),
         BlocProvider(
-          create: (context) => TotalPurchaseCubit(repository: accountingInjection()),
+          create: (context) =>
+              TotalPurchaseCubit(repository: accountingInjection()),
         ),
         BlocProvider(
-          create: (context) => PurchaseListCubit(repository: accountingInjection()),
+          create: (context) =>
+              PurchaseListCubit(repository: accountingInjection()),
         ),
         BlocProvider(
           create: (context) => DateRangeExpenditureCubit(),
         ),
         BlocProvider(
-          create: (context) => TotalExpenditureCubit(repository: accountingInjection()),
+          create: (context) =>
+              TotalExpenditureCubit(repository: accountingInjection()),
         ),
         BlocProvider(
           create: (context) => DateRangeProfitLossCubit(),
         ),
         BlocProvider(
-          create: (context) => ProfitLossCubit(repository: accountingInjection()),
+          create: (context) =>
+              ProfitLossCubit(repository: accountingInjection()),
         ),
         BlocProvider(
           create: (context) => ProfitLossDetailsCubit(),
         ),
         BlocProvider(
-          create: (context) => PurchasedProductCubit(repository: accountingInjection()),
+          create: (context) =>
+              PurchasedProductCubit(repository: accountingInjection()),
         ),
         BlocProvider(
           create: (context) => DateRangeCashFlowCubit(),
         ),
         BlocProvider(
-          create: (context) => CashFlowReportCubit(repository: accountingInjection()),
+          create: (context) =>
+              CashFlowReportCubit(repository: accountingInjection()),
         ),
         BlocProvider(
           create: (context) => PendingAssetCubit(accountingInjection()),
@@ -199,38 +239,165 @@ void main() async {
           create: (context) => ActiveAssetCubit(accountingInjection()),
         ),
         BlocProvider(
-          create: (context) => SoldAssetCubit(repository:accountingInjection()),
+          create: (context) =>
+              SoldAssetCubit(repository: accountingInjection()),
         ),
         BlocProvider(
-          create: (context) => AssetDepreciationCubit(repository:accountingInjection()),
+          create: (context) =>
+              AssetDepreciationCubit(repository: accountingInjection()),
         ),
 
         BlocProvider(
           create: (context) => DateRangeFinancialBalanceCubit(),
         ),
-         BlocProvider(
-          create: (context) => FinancialBalanceCubit(repository: accountingInjection()),
+        BlocProvider(
+          create: (context) =>
+              FinancialBalanceCubit(repository: accountingInjection()),
         ),
-         BlocProvider(
-          create: (context) => ServiceChargeCubit(repository: accountingInjection()),
+        BlocProvider(
+          create: (context) =>
+              ServiceChargeCubit(repository: accountingInjection()),
         ),
-         BlocProvider(
-          create: (context) => ServiceChargeSettingCubit(repository: accountingInjection()),
+        BlocProvider(
+          create: (context) =>
+              ServiceChargeSettingCubit(repository: accountingInjection()),
         ),
-         BlocProvider(
-          create: (context) => TaxManagementCubit(repository: accountingInjection()),
+        BlocProvider(
+          create: (context) =>
+              TaxManagementCubit(repository: accountingInjection()),
         ),
-         BlocProvider(
-          create: (context) => TaxManagementSettingCubit(repository: accountingInjection()),
+        BlocProvider(
+          create: (context) =>
+              TaxManagementSettingCubit(repository: accountingInjection()),
         ),
+
+        //HRD
+        BlocProvider(
+          create: (context) => HRDSummaryCubit(hrdInjection()),
+        ),
+    
+        BlocProvider(
+          create: (context) => CheckInCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => CheckOutCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => AttendanceHistoryCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => AttendanceRecapCubit(hrdInjection()),
+        ),
+
+        BlocProvider(
+          create: (context) => DateRangeAttendanceCubit(),
+        ),
+        BlocProvider(
+          create: (context) => AttendanceRecapInteractionCubit(employeeSharedPref: hrdInjection())),
+
+        BlocProvider(
+          create: (context) => LeaveQuotaCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => LeaveRequestCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => LeaveHistoryCubit(hrdInjection()),
+        ),
+
+        BlocProvider(
+          create: (context) => PermissionQuotaCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => PermissionRequestCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => PermissionHistoryCubit(hrdInjection()),
+        ),
+
+        BlocProvider(
+          create: (context) => OvertimeRequestCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => OvertimeHistoryCubit(hrdInjection()),
+        ),
+
+
+        BlocProvider(
+          create: (context) => SalarySlipCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => DetailSalarySlipCubit(hrdInjection()),
+        ),
+
+        //Employee Service
+        BlocProvider(
+          create: (context) => HRDAllEmployeesCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => ContractEmployeeCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => PermanentEmployeeCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => SubmitEmployeePerformanceCubit(hrdInjection()),
+        ),
+        //Administration
+        BlocProvider(
+          create: (context) => EmployeeWarningCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => EmployeeSOPCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => CompanyRulesCubit(hrdInjection()),
+        ),
+
+        //Employee Submission
+        BlocProvider(
+          create: (context) => PendingSubmissionsCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => ApprovedSubmissionsCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => RejectedSubmissionsCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => VerifyEmployeeSubmissionCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => EmployeePerformanceCubit(hrdInjection()),
+        ),
+
+        //Candidate Submission
+        BlocProvider(
+          create: (context) => CandidatePendingSubmissionsCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => CandidateApprovedSubmissionsCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => CandidateRejectedSubmissionsCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => ContractSubmissionCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => PermanentSubmissionCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => VerifyCandidateSubmissionCubit(hrdInjection()),
+        ),
+
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
 Future<void> _requestPermissions() async {
-  // Request Bluetooth and Location Permissions
   PermissionStatus bluetoothStatus = await Permission.bluetooth.status;
   PermissionStatus locationStatus = await Permission.location.status;
 
@@ -244,12 +411,15 @@ Future<void> _requestPermissions() async {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Sizer(
       builder: (context, orientation, deviceType) {
         return MaterialApp(
           title: 'AK Solutions',
+          debugShowCheckedModeBanner: false,
           theme: ThemeData(
             textSelectionTheme: TextSelectionThemeData(
               cursorColor:
@@ -262,9 +432,9 @@ class MyApp extends StatelessWidget {
             textTheme: GoogleFonts.plusJakartaSansTextTheme(),
             primaryColor: AppColors.primaryMain,
             indicatorColor: AppColors.primaryMain,
-   progressIndicatorTheme: const ProgressIndicatorThemeData(
-          color: AppColors.primaryMain, // Warna progress indicator
-        ),
+            progressIndicatorTheme: const ProgressIndicatorThemeData(
+              color: AppColors.primaryMain, // Warna progress indicator
+            ),
           ),
           home: const SplashScreen(),
         );

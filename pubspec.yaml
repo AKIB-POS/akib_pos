@@ -64,6 +64,10 @@ dependencies:
   blue_thermal_printer: ^1.2.3
   permission_handler: ^11.3.1
   syncfusion_flutter_datepicker: ^26.2.12
+  flutter_svg_provider: ^1.0.7
+  geolocator: ^13.0.1
+  month_year_picker: ^0.4.0+1
+  flutter_widget_from_html: ^0.15.2
 
 dev_dependencies:
   flutter_test:
@@ -109,7 +113,9 @@ flutter:
     - assets/images/
     - assets/identity/
     - assets/icons/accounting/
+    - assets/icons/hrd/
     - assets/images/accounting/
+    - assets/images/hrd/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

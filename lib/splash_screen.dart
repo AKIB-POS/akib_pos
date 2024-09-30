@@ -29,6 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
     bool isLoggedIn = _authSharedPref.isLoggedIn();
 
     if (mounted) {
+      print("loginkahh${_authSharedPref.isLoggedIn()}");
       if (isLoggedIn) {
         Navigator.pushReplacement(
           context,
@@ -50,13 +51,11 @@ class _SplashScreenState extends State<SplashScreen> {
     bool isPortrait = height > width;
 
     return Scaffold(
-
       body: Container(
-        height: double.infinity,
         width: double.infinity,
         child: Image.asset(
-          isPortrait ?'assets/identity/splash_screen_portrait.png' : 'assets/identity/splash_screen.png',
-          fit: isPortrait ? BoxFit.cover : BoxFit.fitWidth,
+          !isPortrait ? 'assets/identity/splash_screen.png'  :'assets/identity/splash_screen_portrait.png',
+          fit: isPortrait ? BoxFit.cover : BoxFit.cover,
         ),
       ),
     );
