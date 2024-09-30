@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
-import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_request.dart';
-import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_request_cubit.dart';
-import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_type_cubit.dart';
-import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/submit_leave_request_cubit.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_request.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/submit_permission_request.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_type_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/submit_permission_request_cubit.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,19 +18,18 @@ import 'package:mobkit_dashed_border/mobkit_dashed_border.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shimmer/shimmer.dart';
 
-class SubmitLeaveRequestPage extends StatefulWidget {
-  const SubmitLeaveRequestPage({Key? key}) : super(key: key);
+class SubmitPermissionRequestPage extends StatefulWidget {
+  const SubmitPermissionRequestPage({Key? key}) : super(key: key);
 
   @override
-  _SubmitLeaveRequestPageState createState() => _SubmitLeaveRequestPageState();
+  _SubmitPermissionRequestPageState createState() => _SubmitPermissionRequestPageState();
 }
 
-class _SubmitLeaveRequestPageState extends State<SubmitLeaveRequestPage> {
+class _SubmitPermissionRequestPageState extends State<SubmitPermissionRequestPage> {
   final _formKey = GlobalKey<FormState>();
-  int? leaveType;
-  int? totalDays;
-  DateTime? startDate;
-  DateTime? endDate;
+  int? permissionTypeId;
+  DateTime? workDate;
+  TimeOfDay? timeIn;
   String? description;
   File? attachment;
   bool isLoading = false;
@@ -40,16 +39,16 @@ class _SubmitLeaveRequestPageState extends State<SubmitLeaveRequestPage> {
   @override
   void initState() {
     super.initState();
-    // Trigger cubit to fetch leave types
-    _fetchLeaveTypes();
+    // Trigger cubit to fetch permission types
+    _fetchPermissionTypes();
   }
-    // Function to fetch leave types
-  void _fetchLeaveTypes() {
-    context.read<LeaveTypeCubit>().fetchLeaveTypes();
-  }
- 
 
-  Future<void> _selectDate(BuildContext context, bool isStartDate) async {
+  // Function to fetch permission types
+  void _fetchPermissionTypes() {
+    context.read<PermissionTypeCubit>().fetchPermissionTypes();
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
     DateTime selectedDate = DateTime.now();
     await showDialog(
       context: context,
@@ -95,11 +94,7 @@ class _SubmitLeaveRequestPageState extends State<SubmitLeaveRequestPage> {
                 ),
                 onPressed: () {
                   setState(() {
-                    if (isStartDate) {
-                      startDate = selectedDate;
-                    } else {
-                      endDate = selectedDate;
-                    }
+                    workDate = selectedDate;
                   });
                   Navigator.of(context).pop();
                 },
@@ -112,83 +107,98 @@ class _SubmitLeaveRequestPageState extends State<SubmitLeaveRequestPage> {
     );
   }
 
-  Future<void> _pickImage(ImageSource source) async {
-  final status = await _handlePermission(source);
+  Future<void> _selectTime(BuildContext context) async {
+    TimeOfDay selectedTime = TimeOfDay.now();
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: selectedTime,
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(primary: AppColors.primaryMain),
+          ),
+          child: child!,
+        );
+      },
+    );
 
-  if (status.isGranted) {
-    // Jika izin diberikan, buka galeri atau kamera
-    final XFile? pickedFile = await _picker.pickImage(source: source);
-    if (pickedFile != null) {
-      File? compressedFile = await _compressImage(File(pickedFile.path));
+    if (picked != null && picked != selectedTime) {
       setState(() {
-        attachment = compressedFile;
+        timeIn = picked;
       });
     }
-  } else if (status.isDenied) {
-    // Tampilkan dialog meminta izin lagi
-    _showPermissionDialog(source);
-  } else if (status.isPermanentlyDenied) {
-    // Jika izin ditolak secara permanen, arahkan ke pengaturan
-    _showPermanentDeniedDialog();
   }
-}
 
-Future<PermissionStatus> _handlePermission(ImageSource source) async {
-  PermissionStatus status;
+  Future<void> _pickImage(ImageSource source) async {
+    final status = await _handlePermission(source);
 
-  if (source == ImageSource.camera) {
-    // Minta izin kamera
-    status = await Permission.camera.status;
-    if (status.isDenied || status.isPermanentlyDenied) {
-      status = await Permission.camera.request();
+    if (status.isGranted) {
+      final XFile? pickedFile = await _picker.pickImage(source: source);
+      if (pickedFile != null) {
+        File? compressedFile = await _compressImage(File(pickedFile.path));
+        setState(() {
+          attachment = compressedFile;
+        });
+      }
+    } else if (status.isDenied) {
+      _showPermissionDialog(source);
+    } else if (status.isPermanentlyDenied) {
+      _showPermanentDeniedDialog();
     }
-  } else {
-    // Minta izin galeri, gunakan Permission.storage untuk Android dan Permission.photos untuk iOS
-    if (Platform.isAndroid) {
-      status = await Permission.mediaLibrary.status;
-      if (!status.isGranted) {
-        status = await Permission.mediaLibrary.request();
+  }
+
+  Future<PermissionStatus> _handlePermission(ImageSource source) async {
+    PermissionStatus status;
+
+    if (source == ImageSource.camera) {
+      status = await Permission.camera.status;
+      if (status.isDenied || status.isPermanentlyDenied) {
+        status = await Permission.camera.request();
       }
     } else {
-      status = await Permission.photos.status;
-      if (!status.isGranted) {
-        status = await Permission.photos.request();
+      if (Platform.isAndroid) {
+        status = await Permission.mediaLibrary.status;
+        if (!status.isGranted) {
+          status = await Permission.mediaLibrary.request();
+        }
+      } else {
+        status = await Permission.photos.status;
+        if (!status.isGranted) {
+          status = await Permission.photos.request();
+        }
       }
     }
+
+    return status;
   }
 
-  return status;
-}
-
-void _showPermissionDialog(ImageSource source) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: const Text('Izin galeri/kamera diperlukan untuk memilih gambar.'),
-      action: SnackBarAction(
-        label: 'Retry',
-        onPressed: () {
-          _pickImage(source); // Minta ulang izin
-        },
+  void _showPermissionDialog(ImageSource source) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Izin galeri/kamera diperlukan untuk memilih gambar.'),
+        action: SnackBarAction(
+          label: 'Retry',
+          onPressed: () {
+            _pickImage(source);
+          },
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-void _showPermanentDeniedDialog() {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: const Text(
-          'Izin galeri/kamera ditolak secara permanen. Silakan aktifkan dari pengaturan.'),
-      action: SnackBarAction(
-        label: 'Settings',
-        onPressed: () {
-          openAppSettings(); // Buka pengaturan aplikasi
-        },
+  void _showPermanentDeniedDialog() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Izin galeri/kamera ditolak secara permanen. Silakan aktifkan dari pengaturan.'),
+        action: SnackBarAction(
+          label: 'Settings',
+          onPressed: () {
+            openAppSettings();
+          },
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Future<void> _showImageSourceActionSheet(BuildContext context) async {
     showModalBottomSheet(
@@ -256,7 +266,6 @@ void _showPermanentDeniedDialog() {
     final splitFilePath = filePath.substring(0, lastIndex);
     final outPath = "${splitFilePath}_compressed.jpg";
 
-    // Kompresi menggunakan FlutterImageCompress
     var result = await FlutterImageCompress.compressAndGetFile(
       file.absolute.path,
       outPath,
@@ -270,56 +279,66 @@ void _showPermanentDeniedDialog() {
   }
 
   bool _isFormValid() {
-    return leaveType != null &&
-        totalDays != null &&
-        startDate != null &&
-        endDate != null &&
+    return permissionTypeId != null &&
+        workDate != null &&
+        timeIn != null &&
         attachment != null;
   }
 
   void _submit() {
-    if (_formKey.currentState!.validate()) {
-      // Submit form logic here with LeaveRequestCubit
-      final DateFormat formatter = DateFormat('yyyy-MM-dd');
+  if (_formKey.currentState!.validate()) {
+    final DateFormat dateFormatter = DateFormat('yyyy-MM-dd');
+    final String formattedWorkDate = dateFormatter.format(workDate!);
 
-      final leaveRequest = LeaveRequest(
-        leaveType: leaveType!,
-        totalDays: totalDays!,
-        startDate: formatter.format(startDate!),
-        endDate: formatter.format(endDate!),
-        description: description ?? '',
-        attachmentPath: attachment?.path,
-      );
-      context.read<SubmitLeaveRequestCubit>().submitLeaveRequest(leaveRequest);
-    }
+    // Convert TimeOfDay to 24-hour format (HH:mm)
+    final String formattedTimeIn = timeIn != null
+        ? _formatTimeOfDay(timeIn!)
+        : ''; 
+
+    final permissionRequest = SubmitPermissionRequest(
+      permissionTypeId: permissionTypeId!,
+      workDate: formattedWorkDate,
+      timeIn: formattedTimeIn,
+      description: description ?? '',
+      attachmentPath: attachment?.path,
+    );
+    context.read<SubmitPermissionRequestCubit>().submitPermissionRequest(permissionRequest);
   }
+}
+
+String _formatTimeOfDay(TimeOfDay timeOfDay) {
+  final int hour = timeOfDay.hour;
+  final int minute = timeOfDay.minute;
+  return '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+}
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundGrey,
       appBar: AppBar(
-        title: const Text('Form Pengajuan Cuti', style: AppTextStyle.headline5),
+        title: const Text('Form Pengajuan Izin', style: AppTextStyle.headline5),
         backgroundColor: Colors.white,
         titleSpacing: 0,
         surfaceTintColor: Colors.white,
       ),
       body: RefreshIndicator(
         onRefresh: () async{
-          _fetchLeaveTypes();
+          _fetchPermissionTypes();
         },
         color: AppColors.primaryMain,
-        child: BlocListener<SubmitLeaveRequestCubit, SubmitLeaveRequestState>(
+        child: BlocListener<SubmitPermissionRequestCubit, SubmitPermissionRequestState>(
           listener: (context, state) {
-            if (state is SubmitLeaveRequestSuccess) {
+            if (state is SubmitPermissionRequestSuccess) {
               Navigator.of(context).pop(true);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Pengajuan cuti berhasil'),
+                  content: Text('Pengajuan izin berhasil'),
                   backgroundColor: AppColors.successMain,
                 ),
               );
-            } else if (state is SubmitLeaveRequestError) {
+            } else if (state is SubmitPermissionRequestError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Error: ${state.message}'),
@@ -330,7 +349,6 @@ void _showPermanentDeniedDialog() {
           },
           child: Column(
             children: [
-              // Expanded allows ListView to scroll within the available space
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -338,20 +356,17 @@ void _showPermanentDeniedDialog() {
                     key: _formKey,
                     child: ListView(
                       children: [
-                        const Text('Jenis Cuti',
-                            style: AppTextStyle.bigCaptionBold),
+                        const Text('Jenis Izin', style: AppTextStyle.bigCaptionBold),
                         const SizedBox(height: 8),
-                        // BlocBuilder to listen to the LeaveTypeCubit states
-                        BlocBuilder<LeaveTypeCubit, LeaveTypeState>(
+                        BlocBuilder<PermissionTypeCubit, PermissionTypeState>(
                           builder: (context, state) {
-                            if (state is LeaveTypeLoading) {
+                            if (state is PermissionTypeLoading) {
                               return Shimmer.fromColors(
                                 baseColor: Colors.grey[300]!,
                                 highlightColor: Colors.grey[100]!,
                                 child: DropdownButtonFormField2<int>(
                                   decoration: InputDecoration(
-                                    contentPadding:
-                                        const EdgeInsets.fromLTRB(8, 4, 0, 4),
+                                    contentPadding: const EdgeInsets.fromLTRB(8, 4, 0, 4),
                                     fillColor: Colors.white,
                                     filled: true,
                                     border: OutlineInputBorder(
@@ -359,11 +374,9 @@ void _showPermanentDeniedDialog() {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  items: null, // Tidak ada item saat loading
-                                  onChanged:
-                                      null, // Dropdown tidak ,bisa di klik saat loading
-                                  hint: const Text(
-                                      'Memuat...'), // Shimmer text untuk loading state
+                                  items: null,
+                                  onChanged: null,
+                                  hint: const Text('Memuat...'),
                                   buttonStyleData: const ButtonStyleData(
                                     padding: EdgeInsets.symmetric(horizontal: 8),
                                     height: 48,
@@ -385,26 +398,25 @@ void _showPermanentDeniedDialog() {
                                   ),
                                 ),
                               );
-                            } else if (state is LeaveTypeLoaded) {
+                            } else if (state is PermissionTypeLoaded) {
                               return DropdownButtonFormField2<int>(
-                                value: leaveType,
+                                value: permissionTypeId,
                                 decoration: AppThemes.inputDecorationStyle.copyWith(contentPadding: const EdgeInsets.symmetric(vertical: 0)),
                                 isExpanded: true,
-                                items: state.leaveTypes.map((leaveType) {
+                                items: state.permissionTypes.map((permissionType) {
                                   return DropdownMenuItem<int>(
-                                    value: leaveType.id,
-                                    child: Text(leaveType.name),
+                                    value: permissionType.id,
+                                    child: Text(permissionType.name),
                                   );
                                 }).toList(),
                                 onChanged: (value) {
                                   setState(() {
-                                    leaveType = value;
+                                    permissionTypeId = value;
                                   });
                                 },
-                                hint: const Text(
-                                    'Pilih Jenis Cuti'), // Text saat belum ada yang dipilih
+                                hint: const Text('Pilih Jenis Izin'),
                                 validator: (value) => value == null
-                                    ? 'Jenis cuti harus dipilih'
+                                    ? 'Jenis izin harus dipilih'
                                     : null,
                                 buttonStyleData: const ButtonStyleData(
                                   padding: EdgeInsets.symmetric(horizontal: 8),
@@ -426,7 +438,7 @@ void _showPermanentDeniedDialog() {
                                   maxHeight: 200,
                                 ),
                               );
-                            } else if (state is LeaveTypeError) {
+                            } else if (state is PermissionTypeError) {
                               return Column(
                                 children: [
                                   const Text(
@@ -435,32 +447,13 @@ void _showPermanentDeniedDialog() {
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.refresh),
-                                    onPressed: _fetchLeaveTypes, // Retry fetching
+                                    onPressed: _fetchPermissionTypes, // Retry fetching
                                   ),
                                 ],
                               );
                             } else {
                               return Container();
                             }
-                          },
-                        ),
-        
-                        const SizedBox(height: 16),
-                        const Text('Total Hari',
-                            style: AppTextStyle.bigCaptionBold),
-                        const SizedBox(height: 8),
-                        TextFormField(
-                          keyboardType: TextInputType.number,
-                          decoration: AppThemes.inputDecorationStyle
-                              .copyWith(hintText: 'Masukkan Total Hari'),
-                          validator: (value) {
-                            if (value?.isEmpty ?? true) {
-                              return "Total hari tidak boleh kosong";
-                            }
-                            return null;
-                          },
-                          onChanged: (value) {
-                            totalDays = int.tryParse(value);
                           },
                         ),
                         const SizedBox(height: 16),
@@ -470,26 +463,27 @@ void _showPermanentDeniedDialog() {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Tanggal Mulai',
-                                      style: AppTextStyle.bigCaptionBold),
+                                  const Text('Tanggal Kerja', style: AppTextStyle.bigCaptionBold),
                                   const SizedBox(height: 8),
                                   GestureDetector(
-                                    onTap: () => _selectDate(context, true),
+                                    onTap: () => _selectDate(context),
                                     child: AbsorbPointer(
                                       child: TextFormField(
-                                        decoration: AppThemes.inputDecorationStyle
-                                            .copyWith(
-                                          hintText: startDate != null
-                                              ? "${startDate!.day}/${startDate!.month}/${startDate!.year}"
+                                        decoration: AppThemes.inputDecorationStyle.copyWith(
+                                          hintText: workDate != null
+                                              ? "${workDate!.day}/${workDate!.month}/${workDate!.year}"
                                               : 'Pilih',
-                                          suffixIcon:Padding(
+                                          suffixIcon: Padding(
                                             padding: const EdgeInsets.all(12.0),
-                                            child: SvgPicture.asset("assets/icons/hrd/ic_calendar.svg",height: 2,width: 2,),
-                                          )
-                                          
+                                            child: SvgPicture.asset(
+                                              "assets/icons/hrd/ic_calendar.svg",
+                                              height: 2,
+                                              width: 2,
+                                            ),
+                                          ),
                                         ),
-                                        validator: (value) => startDate == null
-                                            ? 'Pilih Tanggal Mulai'
+                                        validator: (value) => workDate == null
+                                            ? 'Pilih Tanggal Kerja'
                                             : null,
                                       ),
                                     ),
@@ -502,25 +496,27 @@ void _showPermanentDeniedDialog() {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Tanggal Akhir',
-                                      style: AppTextStyle.bigCaptionBold),
+                                  const Text('Jam Masuk', style: AppTextStyle.bigCaptionBold),
                                   const SizedBox(height: 8),
                                   GestureDetector(
-                                    onTap: () => _selectDate(context, false),
+                                    onTap: () => _selectTime(context),
                                     child: AbsorbPointer(
                                       child: TextFormField(
-                                        decoration: AppThemes.inputDecorationStyle
-                                            .copyWith(
-                                          hintText: endDate != null
-                                              ? "${endDate!.day}/${endDate!.month}/${endDate!.year}"
+                                        decoration: AppThemes.inputDecorationStyle.copyWith(
+                                          hintText: timeIn != null
+                                              ? timeIn!.format(context)
                                               : 'Pilih',
-                                               suffixIcon:Padding(
+                                          suffixIcon: Padding(
                                             padding: const EdgeInsets.all(12.0),
-                                            child: SvgPicture.asset("assets/icons/hrd/ic_calendar.svg",height: 2,width: 2,),
-                                          )
+                                            child: SvgPicture.asset(
+                                              "assets/icons/hrd/ic_input_clock.svg",
+                                              height: 2,
+                                              width: 2,
+                                            ),
+                                          ),
                                         ),
-                                        validator: (value) => endDate == null
-                                            ? 'Pilih Tanggal Akhir'
+                                        validator: (value) => timeIn == null
+                                            ? 'Pilih Jam Masuk'
                                             : null,
                                       ),
                                     ),
@@ -531,27 +527,23 @@ void _showPermanentDeniedDialog() {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        const Text('Keterangan',
-                            style: AppTextStyle.bigCaptionBold),
+                        const Text('Keterangan', style: AppTextStyle.bigCaptionBold),
                         const SizedBox(height: 8),
                         TextFormField(
                           maxLines: 3,
-                          decoration: AppThemes.inputDecorationStyle
-                              .copyWith(hintText: 'Masukkan keterangan'),
+                          decoration: AppThemes.inputDecorationStyle.copyWith(hintText: 'Masukkan keterangan'),
                           onChanged: (value) {
                             description = value;
                           },
                         ),
                         const SizedBox(height: 16),
-        
                         Container(
                           height: 150,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             border: const DashedBorder.fromBorderSide(
                               dashLength: 11,
-                              side: BorderSide(
-                                  color: AppColors.textGrey600, width: 1),
+                              side: BorderSide(color: AppColors.textGrey600, width: 1),
                             ),
                           ),
                           child: attachment != null
@@ -560,8 +552,7 @@ void _showPermanentDeniedDialog() {
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Text('*Pilih satu file',
-                                          style: TextStyle(color: Colors.grey)),
+                                      Text('*Pilih satu file', style: TextStyle(color: Colors.grey)),
                                     ],
                                   ),
                                 ),
@@ -572,15 +563,13 @@ void _showPermanentDeniedDialog() {
                           child: OutlinedButton(
                             style: AppThemes.outlineButtonPrimaryStylePadding,
                             onPressed: () {
-                              _showImageSourceActionSheet(
-                                  context); // Menampilkan pilihan kamera atau galeri
+                              _showImageSourceActionSheet(context);
                             },
                             child: Text(
                               attachment == null
                                   ? 'Pilih Lampiran'
                                   : 'Upload Ulang',
-                              style: AppTextStyle.caption
-                                  .copyWith(color: AppColors.primaryMain),
+                              style: AppTextStyle.caption.copyWith(color: AppColors.primaryMain),
                             ),
                           ),
                         ),
@@ -592,36 +581,30 @@ void _showPermanentDeniedDialog() {
               Container(
                 decoration: AppThemes.bottomBoxDecorationDialog,
                 padding: const EdgeInsets.all(16.0),
-                child:
-                    BlocBuilder<SubmitLeaveRequestCubit, SubmitLeaveRequestState>(
+                child: BlocBuilder<SubmitPermissionRequestCubit, SubmitPermissionRequestState>(
                   builder: (context, state) {
                     return ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            _isFormValid() ? AppColors.primaryMain : Colors.grey,
+                        backgroundColor: _isFormValid() ? AppColors.primaryMain : Colors.grey,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        minimumSize:
-                            const Size.fromHeight(50), // Full-width button
+                        minimumSize: const Size.fromHeight(50),
                       ),
-                      onPressed:
-                          _isFormValid() && state is! SubmitLeaveRequestLoading
-                              ? _submit
-                              : null,
-                      child: state is SubmitLeaveRequestLoading
+                      onPressed: _isFormValid() && state is! SubmitPermissionRequestLoading
+                          ? _submit
+                          : null,
+                      child: state is SubmitPermissionRequestLoading
                           ? const SizedBox(
                               height: 24,
                               width: 24,
                               child: CircularProgressIndicator(
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                 strokeWidth: 2,
                               ),
                             )
-                          : const Text('Kirim',
-                              style: TextStyle(color: Colors.white)),
+                          : const Text('Kirim', style: TextStyle(color: Colors.white)),
                     );
                   },
                 ),

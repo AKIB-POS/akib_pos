@@ -3,6 +3,7 @@ import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_history_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_quota_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_request_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/attendance_service/permission/submit_permission_page.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/permission/permission_history_widget.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/permission/permission_quota_widget.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/permission/permission_request_widgte.dart';
@@ -114,15 +115,27 @@ class _PermissionPageState extends State<PermissionPage> {
                     child: Text('Riwayat Izin', style: AppTextStyle.bigCaptionBold),
                   ),
                   const SizedBox(height: 8),
-                  const PermissionHistoryWidget(), // Display permission history
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 60),
+                    child: PermissionHistoryWidget(),
+                  ), // Display permission history
                 ],
               ),
             ),
           ],
         ),
       ),
-      floatingActionButton:  Utils.buildFloatingActionButton(onPressed: () {
-        
+      floatingActionButton:  Utils.buildFloatingActionButton(onPressed: ()async {
+        final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const SubmitPermissionRequestPage(),
+      ),
+    );
+
+    // Jika result true, refresh data cuti
+    if (result == true) {
+      _refreshPermissionData();  // Panggil fungsi untuk refresh data
+    }
       },)
     );
   }

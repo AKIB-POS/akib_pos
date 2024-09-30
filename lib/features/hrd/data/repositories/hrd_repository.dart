@@ -13,6 +13,8 @@ import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/check_in_out_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_quota.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_type.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/submit_permission_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attenddance_recap.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/administration/company_rules.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/administration/employee_warning.dart';
@@ -59,6 +61,8 @@ abstract class HRDRepository {
   Future<Either<Failure, PermissionQuotaResponse>> getPermissionQuota();
   Future<Either<Failure, PermissionRequestResponse>> getPermissionRequests();
   Future<Either<Failure, PermissionHistoryResponse>> getPermissionHistory();
+  Future<void> submitPermissionRequest(SubmitPermissionRequest request);
+  Future<Either<Failure, List<PermissionType>>> fetchPermissionTypes();
 
   //Overtime
   Future<Either<Failure, OvertimeRequestResponse>> getOvertimeRequests();
@@ -446,6 +450,29 @@ class HRDRepositoryImpl implements HRDRepository {
       return Left(ServerFailure());
     } catch (e) {
       return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+
+@override
+  Future<Either<Failure, List<PermissionType>>> fetchPermissionTypes() async {
+    try {
+      final permissionTypes = await remoteDataSource.fetchPermissionTypes();
+      return Right(permissionTypes);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+  @override
+  Future<void> submitPermissionRequest(SubmitPermissionRequest request) async {
+    try {
+      await remoteDataSource.submitPermissionRequest(request);
+    } on ServerException {
+      throw ServerFailure();
+    } catch (e) {
+      throw GeneralFailure(e.toString());
     }
   }
 

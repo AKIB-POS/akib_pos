@@ -63,6 +63,8 @@ import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permi
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_request_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_in_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_out_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_type_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/submit_permission_request_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_approved_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_pending_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_rejected_submission_cubit.dart';
@@ -322,6 +324,12 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => PermissionHistoryCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => PermissionTypeCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => SubmitPermissionRequestCubit(hrdInjection()),
         ),
 
         BlocProvider(

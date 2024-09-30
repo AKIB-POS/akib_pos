@@ -14,6 +14,8 @@ import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/check_in_out_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_quota.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_type.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/submit_permission_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attenddance_recap.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/administration/company_rules.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/administration/employee_warning.dart';
@@ -59,6 +61,8 @@ abstract class HRDRemoteDataSource {
   Future<PermissionQuotaResponse> getPermissionQuota();
   Future<PermissionRequestResponse> getPermissionRequests();
   Future<PermissionHistoryResponse> fetchPermissionHistory();
+  Future<void> submitPermissionRequest(SubmitPermissionRequest request);
+  Future<List<PermissionType>> fetchPermissionTypes();
 
    //Overtime
   Future<OvertimeRequestResponse> getOvertimeRequests();
@@ -388,7 +392,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<PermanentSubmissionDetail> getPermanentSubmissionDetail(int candidateSubmissionId) async {
-    const url = '${URLs.baseUrlMock}/candidate-submission-detail/permanent';
+    const url = '${URLs.baseUrlProd}/candidate-submission-detail/permanent';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'candidate_submission_id': candidateSubmissionId.toString(),
@@ -408,7 +412,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
    @override
   Future<List<CandidateSubmission>> getCandidateSubmissionsPending(int branchId) async {
-    final url = '${URLs.baseUrlMock}/candidate-submissions/pending?branch_id=$branchId';
+    final url = '${URLs.baseUrlProd}/candidate-submissions/pending?branch_id=$branchId';
     final response = await client.get(Uri.parse(url), headers: _buildHeaders()).timeout(const Duration(seconds: 30));
 
     if (response.statusCode == 200) {
@@ -421,7 +425,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<List<CandidateSubmission>> getCandidateSubmissionsApproved(int branchId) async {
-    final url = '${URLs.baseUrlMock}/candidate-submissions/approved?branch_id=$branchId';
+    final url = '${URLs.baseUrlProd}/candidate-submissions/approved?branch_id=$branchId';
     final response = await client.get(Uri.parse(url), headers: _buildHeaders()).timeout(const Duration(seconds: 30));
 
     if (response.statusCode == 200) {
@@ -434,7 +438,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<List<CandidateSubmission>> getCandidateSubmissionsRejected(int branchId) async {
-    final url = '${URLs.baseUrlMock}/candidate-submissions/rejected?branch_id=$branchId';
+    final url = '${URLs.baseUrlProd}/candidate-submissions/rejected?branch_id=$branchId';
     final response = await client.get(Uri.parse(url), headers: _buildHeaders()).timeout(const Duration(seconds: 30));
 
     if (response.statusCode == 200) {
@@ -599,6 +603,50 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
       throw ServerException();
     }
   }
+
+   @override
+  Future<List<PermissionType>> fetchPermissionTypes() async {
+    const url = '${URLs.baseUrlProd}/permission-type';
+    
+    final response = await client.get(Uri.parse(url), headers: _buildHeaders());
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return (jsonResponse['data'] as List)
+          .map((permissionType) => PermissionType.fromJson(permissionType))
+          .toList();
+    } else {
+      throw ServerException();
+    }
+  }
+
+  @override
+  Future<void> submitPermissionRequest(SubmitPermissionRequest request) async {
+    const url = '${URLs.baseUrlProd}/permission-request';
+
+    var multipartRequest = http.MultipartRequest('POST', Uri.parse(url));
+    multipartRequest.headers.addAll(_buildHeaders());
+
+    // Tambahkan form-data fields
+    multipartRequest.fields.addAll(request.toFormData());
+
+    // Tambahkan file jika ada
+    if (request.attachmentPath != null) {
+      var file = await http.MultipartFile.fromPath('attachment', request.attachmentPath!);
+      multipartRequest.files.add(file);
+    }
+
+    var response = await multipartRequest.send().timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 201) {
+      return;
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException('Gagal mengirim permintaan izin');
+    } else {
+      throw ServerException();
+    }
+  }
+
 
   @override
   Future<PermissionHistoryResponse> fetchPermissionHistory() async {

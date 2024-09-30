@@ -85,7 +85,7 @@ class CandidateSubmissionListContent extends StatelessWidget {
                     ),
                   ],
                 ),
-                _buildApprovalStatus(submission.approverName, submission.approvalStatus),
+                _buildApprovalStatus(submission.approverName ?? "Belum Disetujui", submission.approvalStatus),
               ],
             ),
           ),
