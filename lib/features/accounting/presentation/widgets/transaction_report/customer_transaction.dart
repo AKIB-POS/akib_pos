@@ -116,8 +116,8 @@ class CustomerTransaction extends StatelessWidget {
                     ? state.transactions
                     : (state as DiscountTransactionsSuccess).transactions;
                 if (transactions.isEmpty) {
-                  return Utils.buildEmptyState("Belum ada Riwayat",
-                      "Riwayat akan tampil setelah\nizin anda telah selesai");
+                  return Utils.buildEmptyState("Belum ada Data",
+                      "");
                 } else {
                   return _buildTransactionList(transactions);
                 }

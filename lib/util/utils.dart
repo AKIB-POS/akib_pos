@@ -521,6 +521,7 @@ class Utils {
             Text(
               title ?? "Belum Ada Data",
               style: AppTextStyle.bigCaptionBold,
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 4),
             Text(

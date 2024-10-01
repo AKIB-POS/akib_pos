@@ -69,8 +69,13 @@ class _ActiveAssetPageState extends State<ActiveAssetPage> {
             if (state is ActiveAssetLoading) {
               return _buildLoadingShimmer();
             } else if (state is ActiveAssetError) {
-              return Center(child: Text(state.message));
+              return Utils.buildErrorStatePlain(title: "Gagal Mendapatkan data", message: state.message, onRetry: () {
+                _fetchActiveAssets();
+              },);
             } else if (state is ActiveAssetLoaded) {
+              if (state.activeAssets.isEmpty){
+                Utils.buildEmptyState("Belum Ada Aset", "");
+              }
               return _buildActiveAssetList(state.activeAssets);
             } else {
               return Container();

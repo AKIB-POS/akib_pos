@@ -20,7 +20,8 @@ class PurchasedProductCard extends StatelessWidget {
         if (state is PurchasedProductLoading) {
           return _buildLoadingShimmer();
         } else if (state is PurchasedProductError) {
-          return Center(child: Text(state.message));
+           return Utils.buildEmptyState(state.message,
+                      "Silahkan Swipe Kebawah\nUntuk Memuat Ulang");
         } else if (state is PurchasedProductSuccess) {
            if(state.products.isEmpty){
             return Utils.buildEmptyStatePlain("Belum ada Data",

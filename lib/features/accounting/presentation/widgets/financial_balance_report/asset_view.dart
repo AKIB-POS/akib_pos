@@ -20,7 +20,40 @@ class AssetsView extends StatelessWidget {
           final assets = state.financialBalance.assets;
           return _buildAssetsView(assets);
         } else if (state is FinancialBalanceError) {
-          return Center(child: Text("Error: ${state.message}"));
+          return Container(
+      padding: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
+      ),
+      margin: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.successMain.withOpacity(0.1),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+              ),
+            ),
+            child: Text(
+              "Aset",
+              style: AppTextStyle.bigCaptionBold
+                  .copyWith(color: AppColors.successMain),
+            ),
+
+          ),
+          Utils.buildEmptyStatePlain(state.message,
+                      "Silahkan Swipe Kebawah\nUntuk Memuat Ulang"),
+          
+        ],
+      ),
+    );
         }
         return const SizedBox.shrink();
       },

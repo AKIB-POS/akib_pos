@@ -42,7 +42,7 @@ class ProfitLossTopWidget extends StatelessWidget {
     );
   }
 
-   Widget nameDate(BuildContext context) {
+     Widget nameDate(BuildContext context) {
     return Container(
       decoration: AppThemes.bottomShadow,
       child: Padding(
@@ -69,15 +69,22 @@ class ProfitLossTopWidget extends StatelessWidget {
 
                           // Dapatkan tanggal hari ini
                           final today = DateTime.now();
-                          final formattedToday = DateTime(today.year, today.month, today.day);
-                          final formattedEndDate = DateTime(endDate.year, endDate.month, endDate.day);
+                          final formattedToday =
+                              DateTime(today.year, today.month, today.day);
+                          final formattedEndDate = DateTime(
+                              endDate.year, endDate.month, endDate.day);
 
                           // Hitung selisih hari antara startDate dan endDate
-                          final difference = formattedEndDate.difference(startDate).inDays + 1;
+                          final difference = formattedEndDate
+                                  .difference(startDate)
+                                  .inDays +
+                              1; // Adding 1 to count both startDate and endDate
 
                           // Periksa apakah rentang tanggal adalah 7 atau 30 hari terakhir
-                          final isLast7Days = difference == 8 && formattedEndDate.isAtSameMomentAs(formattedToday);
-                          final isLast30Days = difference == 31 && formattedEndDate.isAtSameMomentAs(formattedToday);
+                          final isLast7Days = difference == 8 &&
+                              formattedEndDate.isAtSameMomentAs(formattedToday);
+                          final isLast30Days = difference == 31 &&
+                              formattedEndDate.isAtSameMomentAs(formattedToday);
 
                           // Function to format date to 'd MMMM yyyy' (e.g., 8 Januari 2024)
                           String formatDate(DateTime date) {
@@ -91,10 +98,13 @@ class ProfitLossTopWidget extends StatelessWidget {
                           } else if (isLast30Days) {
                             displayedDate = "30 Hari Terakhir";
                           } else {
+                            // Format start and end dates if they are different
                             if (dates[0] == dates[1]) {
-                              displayedDate = formatDate(startDate); // Single date
+                              displayedDate =
+                                  formatDate(startDate); // Single date
                             } else {
-                              displayedDate = "${formatDate(startDate)} - ${formatDate(endDate)}"; // Custom range
+                              displayedDate =
+                                  "${formatDate(startDate)} - ${formatDate(endDate)}"; // Custom range
                             }
                           }
 
