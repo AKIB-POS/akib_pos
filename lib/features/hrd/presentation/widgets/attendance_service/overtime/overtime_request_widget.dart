@@ -21,12 +21,12 @@ class OvertimeRequestWidget extends StatelessWidget {
           );
         } else if (state is OvertimeRequestLoaded) {
           if (state.overtimeRequests.data.isEmpty) {
-            return buildEmptyUI();
+            return Utils.buildEmptyStatePlain("Belum Ada Pengajuan", "tatus Pengajuan akan tampil setelah anda\nmengisi form pengajuan lembur");
           } else {
             return _buildRequestList(state.overtimeRequests.data);
           }
         } else if (state is OvertimeRequestError) {
-          return buildEmptyUI();
+          return Utils.buildEmptyStatePlain("Ada Kesalahan", state.message);
         } else {
           return Container();
         }
@@ -34,25 +34,6 @@ class OvertimeRequestWidget extends StatelessWidget {
     );
   }
 
-  Widget buildEmptyUI() {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Utils.buildEmptyState("Belum ada Pengajuan",
-          "Status Pengajuan akan tampil setelah anda\nmengisi form pengajuan lembur"),
-    );
-  }
 
   Widget _buildRequestList(List<OvertimeRequest> requests) {
     return Padding(
