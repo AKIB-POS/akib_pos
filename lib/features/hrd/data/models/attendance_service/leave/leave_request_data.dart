@@ -6,11 +6,18 @@ class LeaveRequestResponse {
 
   factory LeaveRequestResponse.fromJson(Map<String, dynamic> json) {
     return LeaveRequestResponse(
-      message: json['message'],
-      data: (json['data'] as List)
-          .map((item) => LeaveRequestData.fromJson(item))
-          .toList(),
+      message: json['message'] ?? '',
+      data: (json['data'] as List?)
+              ?.map((item) => LeaveRequestData.fromJson(item))
+              .toList() ?? [],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'data': data.map((e) => e.toJson()).toList(),
+    };
   }
 }
 
@@ -26,16 +33,26 @@ class LeaveRequestData {
     required this.leaveType,
     required this.startDate,
     required this.endDate,
-    required this.approverName,
+    this.approverName,
   });
 
   factory LeaveRequestData.fromJson(Map<String, dynamic> json) {
     return LeaveRequestData(
-      requestDate: json['request_date'],
-      leaveType: json['leave_type'],
-      startDate: json['start_date'],
-      endDate: json['end_date'],
+      requestDate: json['request_date'] ?? '',
+      leaveType: json['leave_type'] ?? '',
+      startDate: json['start_date'] ?? '',
+      endDate: json['end_date'] ?? '',
       approverName: json['approver_name'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'request_date': requestDate,
+      'leave_type': leaveType,
+      'start_date': startDate,
+      'end_date': endDate,
+      'approver_name': approverName,
+    };
   }
 }

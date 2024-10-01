@@ -17,7 +17,7 @@ import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_type.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/submit_permission_request.dart';
 import 'package:akib_pos/features/hrd/data/models/attenddance_recap.dart';
-import 'package:akib_pos/features/hrd/data/models/employee_service/administration/company_rules.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/administration/employee_rules.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/administration/employee_warning.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_all_employee.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/employee_performance.dart';

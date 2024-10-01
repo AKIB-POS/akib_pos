@@ -6,9 +6,16 @@ class LeaveQuotaResponse {
 
   factory LeaveQuotaResponse.fromJson(Map<String, dynamic> json) {
     return LeaveQuotaResponse(
-      message: json['message'],
-      data: LeaveQuotaData.fromJson(json['data']),
+      message: json['message'] ?? '',
+      data: LeaveQuotaData.fromJson(json['data'] ?? {}),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'data': data.toJson(),
+    };
   }
 }
 
@@ -20,8 +27,15 @@ class LeaveQuotaData {
 
   factory LeaveQuotaData.fromJson(Map<String, dynamic> json) {
     return LeaveQuotaData(
-      totalQuota: json['total_quota'],
-      usedQuota: json['used_quota'],
+      totalQuota: (json['total_quota'] as num?)?.toInt() ?? 0,
+      usedQuota: (json['used_quota'] as num?)?.toInt() ?? 0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'total_quota': totalQuota,
+      'used_quota': usedQuota,
+    };
   }
 }

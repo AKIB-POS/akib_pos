@@ -11,9 +11,9 @@ class EmployeeWarning {
 
   factory EmployeeWarning.fromJson(Map<String, dynamic> json) {
     return EmployeeWarning(
-      warningTitle: json['warning_title'],
-      warningNumber: json['warning_number'],
-      action: json['action'],
+      warningTitle: json['warning_title'] ?? '',  // Default to empty string if missing
+      warningNumber: json['warning_number'] ?? '',  // Default to empty string if missing
+      action: json['action'] ?? '',  // Default to empty string if missing
     );
   }
 

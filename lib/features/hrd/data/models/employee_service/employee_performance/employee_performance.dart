@@ -10,16 +10,16 @@ class EmployeePerformance {
     required this.employeeType,
     required this.employeeName,
     required this.role,
-    required this.performanceScore,
+    this.performanceScore,  // Nullable field
   });
 
   factory EmployeePerformance.fromJson(Map<String, dynamic> json) {
     return EmployeePerformance(
-      employeePerformanceId: json['employee_performance_id'],
-      employeeType: json['employee_type'],
-      employeeName: json['employee_name'],
-      role: json['role'],
-      performanceScore: json['performance_score'] != null ? json['performance_score'] as int : null,
+      employeePerformanceId: (json['employee_performance_id'] as num?)?.toInt() ?? 0, // Safe casting and default
+      employeeType: json['employee_type'] ?? '', // Default to empty string if missing
+      employeeName: json['employee_name'] ?? '', // Default to empty string if missing
+      role: json['role'] ?? '', // Default to empty string if missing
+      performanceScore: json['performance_score'] != null ? json['performance_score'] as int : null, // Nullable
     );
   }
 

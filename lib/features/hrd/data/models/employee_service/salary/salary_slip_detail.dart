@@ -13,14 +13,16 @@ class SalarySlipDetail {
 
   factory SalarySlipDetail.fromJson(Map<String, dynamic> json) {
     return SalarySlipDetail(
-      totalSalaryReceived: json['total_salary_received'].toDouble(),
-      totalBonus: json['total_bonus'].toDouble(),
-      earningsDetails: (json['earnings_details'] as List)
-          .map((e) => SalaryDetailItem.fromJson(e))
-          .toList(),
-      deductionsDetails: (json['deductions_details'] as List)
-          .map((e) => SalaryDetailItem.fromJson(e))
-          .toList(),
+      totalSalaryReceived: (json['total_salary_received'] as num?)?.toDouble() ?? 0.0,
+      totalBonus: (json['total_bonus'] as num?)?.toDouble() ?? 0.0,
+      earningsDetails: (json['earnings_details'] as List?)
+              ?.map((e) => SalaryDetailItem.fromJson(e))
+              .toList() ??
+          [],
+      deductionsDetails: (json['deductions_details'] as List?)
+              ?.map((e) => SalaryDetailItem.fromJson(e))
+              .toList() ??
+          [],
     );
   }
 }
@@ -36,8 +38,8 @@ class SalaryDetailItem {
 
   factory SalaryDetailItem.fromJson(Map<String, dynamic> json) {
     return SalaryDetailItem(
-      name: json['name'],
-      amount: json['amount'].toDouble(),
+      name: json['name'] ?? '',
+      amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }

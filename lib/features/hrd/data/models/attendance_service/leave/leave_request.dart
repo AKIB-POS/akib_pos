@@ -4,7 +4,7 @@ class LeaveRequest {
   final String startDate;
   final String endDate;
   final String description;
-  final String? attachmentPath;  // Path ke file attachment (image)
+  final String? attachmentPath;  // Optional path for an attachment file (image)
 
   LeaveRequest({
     required this.leaveType,
@@ -15,7 +15,7 @@ class LeaveRequest {
     this.attachmentPath,
   });
 
-  // Pastikan semua nilai dikonversi menjadi String
+  // Convert all values to String for form data submission
   Map<String, String> toFormData() {
     return {
       'leave_type_id': leaveType.toString(),
@@ -23,7 +23,7 @@ class LeaveRequest {
       'start_date': startDate,
       'end_date': endDate,
       'description': description,
-      if (attachmentPath != null) 'attachment': attachmentPath!, // Konversi ke String
+      if (attachmentPath != null) 'attachment': attachmentPath!,  // Ensure attachment is included if present
     };
   }
 }

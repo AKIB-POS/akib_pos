@@ -8,15 +8,15 @@ class HRDAllEmployee {
     required this.employeeId,
     required this.employeeName,
     required this.employeeType,
-    required this.role,
+    this.role,  // role is nullable, so it's optional
   });
 
   factory HRDAllEmployee.fromJson(Map<String, dynamic> json) {
     return HRDAllEmployee(
-      employeeId: json['employee_id'],
-      employeeName: json['employee_name'],
-      employeeType: json['employee_type'],
-      role: json['role'] , 
+      employeeId: (json['employee_id'] as num?)?.toInt() ?? 0,  // Safe casting with default value
+      employeeName: json['employee_name'] ?? '',  // Default to empty string if null
+      employeeType: json['employee_type'] ?? '',  // Default to empty string if null
+      role: json['role'],  // role is nullable
     );
   }
 

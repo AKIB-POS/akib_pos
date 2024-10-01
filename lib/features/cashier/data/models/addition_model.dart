@@ -13,10 +13,12 @@ class AdditionModel {
 
   factory AdditionModel.fromJson(Map<String, dynamic> json) {
     return AdditionModel(
-      id: json['id'] ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       additionType: json['addition_type'] ?? '',
-      subAdditions: List<SubAddition>.from(
-          json['sub_additions'].map((x) => SubAddition.fromJson(x))),
+      subAdditions: (json['sub_additions'] as List?)
+              ?.map((x) => SubAddition.fromJson(x))
+              .toList() ??
+          [],
     );
   }
 
@@ -24,7 +26,7 @@ class AdditionModel {
     return {
       'id': id,
       'addition_type': additionType,
-      'sub_additions': List<dynamic>.from(subAdditions.map((x) => x.toJson())),
+      'sub_additions': subAdditions.map((x) => x.toJson()).toList(),
     };
   }
 }
@@ -42,10 +44,12 @@ class SubAddition {
 
   factory SubAddition.fromJson(Map<String, dynamic> json) {
     return SubAddition(
-      id: json['id'] ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       subAdditionType: json['sub_addition_type'] ?? '',
-      options: List<AdditionOption>.from(
-          json['options'].map((x) => AdditionOption.fromJson(x))),
+      options: (json['options'] as List?)
+              ?.map((x) => AdditionOption.fromJson(x))
+              .toList() ??
+          [],
     );
   }
 
@@ -53,7 +57,7 @@ class SubAddition {
     return {
       'id': id,
       'sub_addition_type': subAdditionType,
-      'options': List<dynamic>.from(options.map((x) => x.toJson())),
+      'options': options.map((x) => x.toJson()).toList(),
     };
   }
 }
@@ -71,9 +75,9 @@ class AdditionOption {
 
   factory AdditionOption.fromJson(Map<String, dynamic> json) {
     return AdditionOption(
-      id: json['id'] ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       name: json['name'] ?? '',
-      price: json['price'] ?? 0,
+      price: (json['price'] as num?)?.toInt() ?? 0,
     );
   }
 
