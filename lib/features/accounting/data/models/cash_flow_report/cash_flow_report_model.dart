@@ -16,7 +16,7 @@ class CashFlowReportModel {
       operationalActivities: OperationalActivities.fromJson(json['operational_activities']),
       investmentActivities: InvestmentActivities.fromJson(json['investment_activities']),
       financingActivities: FinancingActivities.fromJson(json['financing_activities']),
-      finalCashBalance: json['final_cash_balance'].toDouble(),
+      finalCashBalance: (json['final_cash_balance'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }
@@ -34,9 +34,9 @@ class OperationalActivities {
 
   factory OperationalActivities.fromJson(Map<String, dynamic> json) {
     return OperationalActivities(
-      customerRevenue: json['customer_revenue'].toDouble(),
-      operationalExpense: json['operational_expense'].toDouble(),
-      netOperationalCash: json['net_operational_cash'].toDouble(),
+      customerRevenue: (json['customer_revenue'] as num?)?.toDouble() ?? 0.0,
+      operationalExpense: (json['operational_expense'] as num?)?.toDouble() ?? 0.0,
+      netOperationalCash: (json['net_operational_cash'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }
@@ -54,9 +54,9 @@ class InvestmentActivities {
 
   factory InvestmentActivities.fromJson(Map<String, dynamic> json) {
     return InvestmentActivities(
-      assetSale: json['asset_sale'].toDouble(),
-      assetPurchase: json['asset_purchase'].toDouble(),
-      netInvestmentCash: json['net_investment_cash'].toDouble(),
+      assetSale: (json['asset_sale'] as num?)?.toDouble() ?? 0.0,
+      assetPurchase: (json['asset_purchase'] as num?)?.toDouble() ?? 0.0,
+      netInvestmentCash: (json['net_investment_cash'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }
@@ -76,10 +76,10 @@ class FinancingActivities {
 
   factory FinancingActivities.fromJson(Map<String, dynamic> json) {
     return FinancingActivities(
-      equity: json['equity'].toDouble(),
-      dividendPayment: json['dividend_payment'].toDouble(),
-      prive: json['prive'].toDouble(),
-      netFinancingCash: json['net_financing_cash'].toDouble(),
+      equity: (json['equity'] as num?)?.toDouble() ?? 0.0,
+      dividendPayment: (json['dividend_payment'] as num?)?.toDouble() ?? 0.0,
+      prive: (json['prive'] as num?)?.toDouble() ?? 0.0,
+      netFinancingCash: (json['net_financing_cash'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }

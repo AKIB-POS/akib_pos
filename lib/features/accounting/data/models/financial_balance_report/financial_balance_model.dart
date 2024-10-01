@@ -15,9 +15,18 @@ class FinancialBalanceModel {
     return FinancialBalanceModel(
       assets: Assets.fromJson(json['assets']),
       liabilitiesAndOwnerEquity: LiabilitiesAndOwnerEquity.fromJson(json['liabilities_and_owner_equity']),
-      totalAssets: json['total_assets'],
-      totalLiabilitiesAndEquity: json['total_liabilities_and_equity'],
+      totalAssets: (json['total_assets'] as num?)?.toDouble() ?? 0.0,
+      totalLiabilitiesAndEquity: (json['total_liabilities_and_equity'] as num?)?.toDouble() ?? 0.0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'assets': assets.toJson(),
+      'liabilities_and_owner_equity': liabilitiesAndOwnerEquity.toJson(),
+      'total_assets': totalAssets,
+      'total_liabilities_and_equity': totalLiabilitiesAndEquity,
+    };
   }
 }
 
@@ -33,6 +42,13 @@ class Assets {
       fixedAssets: FixedAssets.fromJson(json['fixed_assets']),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'current_assets': currentAssets.toJson(),
+      'fixed_assets': fixedAssets.toJson(),
+    };
+  }
 }
 
 class CurrentAssets {
@@ -43,9 +59,16 @@ class CurrentAssets {
 
   factory CurrentAssets.fromJson(Map<String, dynamic> json) {
     return CurrentAssets(
-      cash: json['cash'],
-      inventory: json['inventory'],
+      cash: (json['cash'] as num?)?.toDouble() ?? 0.0,
+      inventory: (json['inventory'] as num?)?.toDouble() ?? 0.0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'cash': cash,
+      'inventory': inventory,
+    };
   }
 }
 
@@ -56,8 +79,14 @@ class FixedAssets {
 
   factory FixedAssets.fromJson(Map<String, dynamic> json) {
     return FixedAssets(
-      buildingValue: json['building_value'],
+      buildingValue: (json['building_value'] as num?)?.toDouble() ?? 0.0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'building_value': buildingValue,
+    };
   }
 }
 
@@ -73,6 +102,13 @@ class LiabilitiesAndOwnerEquity {
       ownerEquity: OwnerEquity.fromJson(json['owner_equity']),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'current_liabilities': currentLiabilities.toJson(),
+      'owner_equity': ownerEquity.toJson(),
+    };
+  }
 }
 
 class CurrentLiabilities {
@@ -82,8 +118,14 @@ class CurrentLiabilities {
 
   factory CurrentLiabilities.fromJson(Map<String, dynamic> json) {
     return CurrentLiabilities(
-      tradePayables: json['trade_payables'],
+      tradePayables: (json['trade_payables'] as num?)?.toDouble() ?? 0.0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'trade_payables': tradePayables,
+    };
   }
 }
 
@@ -94,7 +136,13 @@ class OwnerEquity {
 
   factory OwnerEquity.fromJson(Map<String, dynamic> json) {
     return OwnerEquity(
-      retainedEarnings: json['retained_earnings'],
+      retainedEarnings: (json['retained_earnings'] as num?)?.toDouble() ?? 0.0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'retained_earnings': retainedEarnings,
+    };
   }
 }

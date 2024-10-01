@@ -18,8 +18,17 @@ class ProfitLossModel {
       operatingExpenses: (json['operating_expenses'] as List)
           .map((e) => OperatingExpense.fromJson(e))
           .toList(),
-      totalOperatingExpenses: json['total_operating_expenses'],
+      totalOperatingExpenses: (json['total_operating_expenses'] as num?)?.toDouble() ?? 0.0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'sales_revenue': salesRevenue.toJson(),
+      'cost_of_goods_sold': cogs.toJson(),
+      'operating_expenses': operatingExpenses.map((e) => e.toJson()).toList(),
+      'total_operating_expenses': totalOperatingExpenses,
+    };
   }
 }
 
@@ -36,10 +45,18 @@ class SalesRevenue {
 
   factory SalesRevenue.fromJson(Map<String, dynamic> json) {
     return SalesRevenue(
-      sales: json['sales'],
-      salesDiscount: json['sales_discount'],
-      totalSales: json['total_sales'],
+      sales: (json['sales'] as num?)?.toDouble() ?? 0.0,
+      salesDiscount: (json['sales_discount'] as num?)?.toDouble() ?? 0.0,
+      totalSales: (json['total_sales'] as num?)?.toDouble() ?? 0.0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'sales': sales,
+      'sales_discount': salesDiscount,
+      'total_sales': totalSales,
+    };
   }
 }
 
@@ -50,8 +67,14 @@ class COGS {
 
   factory COGS.fromJson(Map<String, dynamic> json) {
     return COGS(
-      totalCogs: json['total_cogs'],
+      totalCogs: (json['total_cogs'] as num?)?.toDouble() ?? 0.0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'total_cogs': totalCogs,
+    };
   }
 }
 
@@ -66,8 +89,15 @@ class OperatingExpense {
 
   factory OperatingExpense.fromJson(Map<String, dynamic> json) {
     return OperatingExpense(
-      name: json['name'],
-      amount: json['amount'],
+      name: json['name'] ?? '',
+      amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'amount': amount,
+    };
   }
 }

@@ -9,8 +9,8 @@ class EmployeeModel {
 
   factory EmployeeModel.fromJson(Map<String, dynamic> json) {
     return EmployeeModel(
-      employeeId: json['employee_id'],
-      employeeName: json['employee_name'],
+      employeeId: (json['employee_id'] as num?)?.toInt() ?? 0,
+      employeeName: json['employee_name'] ?? '',
     );
   }
 
@@ -32,13 +32,20 @@ class EmployeeListResponse {
   });
 
   factory EmployeeListResponse.fromJson(Map<String, dynamic> json) {
-    var employeeList = (json['data'] as List)
-        .map((employee) => EmployeeModel.fromJson(employee))
-        .toList();
+    var employeeList = (json['data'] as List?)
+        ?.map((employee) => EmployeeModel.fromJson(employee))
+        .toList() ?? [];
 
     return EmployeeListResponse(
-      message: json['message'],
+      message: json['message'] ?? '',
       data: employeeList,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'data': data.map((e) => e.toJson()).toList(),
+    };
   }
 }

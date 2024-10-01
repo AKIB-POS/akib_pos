@@ -19,13 +19,25 @@ class PurchaseItemModel {
 
   factory PurchaseItemModel.fromJson(Map<String, dynamic> json) {
     return PurchaseItemModel(
-      date: json['date'],
-      vendorName: json['vendor_name'],
-      productName: json['product_name'],
-      quantity: json['quantity'],
-      unit: json['unit'],
-      productCode: json['product_code'],
-      totalValue: json['total_value'],
+      date: json['date'] ?? '',
+      vendorName: json['vendor_name'] ?? '',
+      productName: json['product_name'] ?? '',
+      quantity: (json['quantity'] as num?)?.toInt() ?? 0,
+      unit: json['unit'] ?? '',
+      productCode: json['product_code'] ?? '',
+      totalValue: (json['total_value'] as num?)?.toDouble() ?? 0.0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'date': date,
+      'vendor_name': vendorName,
+      'product_name': productName,
+      'quantity': quantity,
+      'unit': unit,
+      'product_code': productCode,
+      'total_value': totalValue,
+    };
   }
 }
