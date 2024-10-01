@@ -9,8 +9,8 @@ class PermissionType {
 
   factory PermissionType.fromJson(Map<String, dynamic> json) {
     return PermissionType(
-      id: json['id'],
-      name: json['name'],
+      id: json['permission_type_id'],
+      name: json['permission_type_name'],
     );
   }
 }

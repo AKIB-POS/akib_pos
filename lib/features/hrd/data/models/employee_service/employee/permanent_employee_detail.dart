@@ -31,8 +31,8 @@ class PermanentEmployeeDetail {
 class EmployeeInfoPermanent {
   final String position;
   final String branch;
-  final String confirmationDate;
-  final String confirmationLetterNumber;
+  final String? confirmationDate;
+  final String ?confirmationLetterNumber;
 
   EmployeeInfoPermanent({
     required this.position,

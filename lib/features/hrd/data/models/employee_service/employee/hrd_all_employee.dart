@@ -2,7 +2,7 @@ class HRDAllEmployee {
   final int employeeId;
   final String employeeName;
   final String employeeType;
-  final String role;
+  final String? role;
 
   HRDAllEmployee({
     required this.employeeId,
@@ -16,7 +16,7 @@ class HRDAllEmployee {
       employeeId: json['employee_id'],
       employeeName: json['employee_name'],
       employeeType: json['employee_type'],
-      role: json['role'], 
+      role: json['role'] , 
     );
   }
 

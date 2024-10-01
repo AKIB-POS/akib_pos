@@ -27,7 +27,7 @@ class ContractEmployeeDetail {
 }
 
 class EmployeeInfo {
-  final String position;
+  final String? position;
   final String branch;
   final String contractStart;
   final String contractEnd;

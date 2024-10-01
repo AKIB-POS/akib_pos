@@ -25,6 +25,8 @@ import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
 abstract class AccountingRemoteDataSource {
+
+  
   Future<TransactionSummaryResponse> getTodayTransactionSummary(
       int branchId, int companyId);
   Future<EmployeeListResponse> getAllEmployees(int branchId, int companyId);
@@ -165,7 +167,6 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),
-        'company_id': companyId.toString(),
         'date': date,
       }),
       headers: _buildHeaders(),
@@ -190,8 +191,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     const url = '${URLs.baseUrlMock}/assets-depreciation';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
-        'branch_id': branchId.toString(),
-        'company_id': companyId.toString(),
+        'branch_id': branchId.toString()
       }),
       headers: _buildHeaders(),
     ).timeout(const Duration(seconds: 30));
@@ -214,8 +214,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     const url = '${URLs.baseUrlMock}/tax-charge';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
-        'branch_id': branchId.toString(),
-        'company_id': companyId.toString(),
+        'branch_id': branchId.toString()
       }),
       headers: _buildHeaders(),
     ).timeout(const Duration(seconds: 30));
@@ -242,7 +241,6 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
       headers: _buildHeaders(),
       body: jsonEncode({
         'branch_id': branchId.toString(),
-        'company_id': companyId.toString(),
         'amount': amount.toDouble(),
       }),
     ).timeout(const Duration(seconds: 30));
@@ -271,7 +269,6 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
       headers: _buildHeaders(),
       body: jsonEncode({
         'branch_id': branchId.toString(),
-        'company_id': companyId.toString(),
         'amount': amount.toDouble(),
       }),
     ).timeout(const Duration(seconds: 30));
@@ -298,8 +295,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     const url = '${URLs.baseUrlMock}/service-charge';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
-        'branch_id': branchId.toString(),
-        'company_id': companyId.toString(),
+        'branch_id': branchId.toString()
       }),
       headers: _buildHeaders(),
     ).timeout(const Duration(seconds: 30));
@@ -325,7 +321,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'date': date,
           }),
           headers: _buildHeaders(),
@@ -352,7 +348,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
           }),
           headers: _buildHeaders(),
         )
@@ -380,7 +376,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
           }),
           headers: _buildHeaders(),
         )
@@ -408,7 +404,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
           }),
           headers: _buildHeaders(),
         )
@@ -434,7 +430,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'date': date,
           }),
           headers: _buildHeaders(),
@@ -462,7 +458,6 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
             'date': date,
           }),
           headers: _buildHeaders(),
@@ -490,7 +485,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'date': date,
           }),
           headers: _buildHeaders(),
@@ -517,7 +512,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'date': date,
           }),
           headers: _buildHeaders(),
@@ -547,7 +542,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'date': date,
           }),
           headers: _buildHeaders(),
@@ -574,7 +569,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'date': date,
           }),
           headers: _buildHeaders(),
@@ -604,7 +599,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'date': date,
           }),
           headers: _buildHeaders(),
@@ -632,7 +627,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'employee_id': employeeId.toString(),
             'date': date,
           }),
@@ -662,7 +657,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'employee_id': employeeId.toString(),
             'date': date,
           }),
@@ -692,7 +687,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'employee_id': employeeId.toString(),
             'date': date.toString(),
           }),
@@ -718,7 +713,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
           }),
           headers: _buildHeaders(),
         )
@@ -739,8 +734,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     final url =
         Uri.parse('${URLs.baseUrlMock}/today-transaction-summary').replace(
       queryParameters: {
-        'branch_id': branchId.toString(),
-        'company_id': companyId.toString(),
+        'branch_id': branchId.toString()
       },
     );
 

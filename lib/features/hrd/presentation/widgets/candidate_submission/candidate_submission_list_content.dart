@@ -130,7 +130,7 @@ class CandidateSubmissionListContent extends StatelessWidget {
 
   Widget _buildApprovalStatus(String approverName, String approvalStatus) {
     String assetPath;
-    if (approvalStatus == 'approved') {
+    if (approvalStatus == 'accepted') {
       assetPath = 'assets/icons/hrd/ic_approved.svg';
     } else if (approvalStatus == 'pending') {
       assetPath = 'assets/icons/hrd/ic_clock_pending.svg';

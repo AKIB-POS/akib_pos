@@ -70,7 +70,7 @@ abstract class HRDRepository {
 
   //Salary
   Future<Either<Failure, SalarySlipsResponse>> getSalarySlips(int year);
-  Future<Either<Failure, SalarySlipDetail>> getSalarySlipDetail(int slipId);
+  Future<Either<Failure, SalarySlipDetail>> getSalarySlipDetail(int month, int year);
 
   //Employee
   Future<Either<Failure, List<HRDAllEmployee>>> getAllEmployees(int branchId);
@@ -390,10 +390,10 @@ class HRDRepositoryImpl implements HRDRepository {
 
   @override
   Future<Either<Failure, SalarySlipDetail>> getSalarySlipDetail(
-      int slipId) async {
+      int month,int year) async {
     try {
       final salarySlipDetail =
-          await remoteDataSource.getSalarySlipDetail(slipId);
+          await remoteDataSource.getSalarySlipDetail(month,year);
       return Right(salarySlipDetail);
     } on ServerException {
       return Left(ServerFailure());

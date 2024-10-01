@@ -70,7 +70,7 @@ abstract class HRDRemoteDataSource {
 
    //Salary
   Future<SalarySlipsResponse> getSalarySlips(int year);
-  Future<SalarySlipDetail> getSalarySlipDetail(int slipId);
+  Future<SalarySlipDetail> getSalarySlipDetail(int month,int year);
 
 
   //Employee Service
@@ -136,7 +136,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 201) {
       // Success
       return;
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       // Handle error
       throw GeneralException('Failed to submit leave request');
     } else {
@@ -147,13 +147,13 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
    @override
   Future<EmployeeTrainingResponse> getEmployeeTrainings(int branchId) async {
-    final url = '${URLs.baseUrlMock}/employee-training?branch_id=$branchId';
+    final url = '${URLs.baseUrlProd}/employee-training?branch_id=$branchId';
     final response = await client.get(Uri.parse(url), headers: _buildHeaders());
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return EmployeeTrainingResponse.fromJson(jsonResponse);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -169,7 +169,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return CompanyRulesResponse.fromJson(jsonResponse['data']);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -188,7 +188,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return EmployeeSOPResponse.fromJson(jsonResponse['data']);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -209,7 +209,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
       final jsonResponse = json.decode(response.body);
       final List<dynamic> warnings = jsonResponse['data'];
       return warnings.map((json) => EmployeeWarning.fromJson(json)).toList();
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -232,7 +232,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
       if (jsonResponse['status'] != 'success') {
         throw GeneralException(jsonResponse['message']);
       }
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -258,7 +258,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
           .map((employee) => EmployeePerformance.fromJson(employee))
           .toList();
       return employeePerformances;
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -278,7 +278,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return ContractEmployeeDetail.fromJson(jsonResponse['data']);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -296,7 +296,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return PermanentEmployeeDetail.fromJson(jsonResponse['data']);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -307,7 +307,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<List<HRDAllEmployee>> getAllEmployees(int branchId) async {
-    const url = '${URLs.baseUrlMock}/hrd-all-employee';
+    const url = '${URLs.baseUrlProd}/hrd-all-employee';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {'branch_id': branchId.toString()}),
       headers: _buildHeaders(),
@@ -319,7 +319,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
           .map((employee) => HRDAllEmployee.fromJson(employee))
           .toList();
       return employeeList;
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -329,7 +329,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<void> verifyCandidateSubmission(VerifyCandidateSubmissionRequest request) async {
-    const url = '${URLs.baseUrlMock}/candidate-submissions/verify';
+    const url = '${URLs.baseUrlProd}/candidate-submissions/verify';
     final response = await client
         .post(
           Uri.parse(url),
@@ -340,7 +340,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
     if (response.statusCode != 201) {
       final errorResponse = json.decode(response.body);
-      if (response.statusCode >= 400 && response.statusCode < 500) {
+      if (response.statusCode >= 400 && response.statusCode <= 500) {
         throw GeneralException(errorResponse['message']);
       } else {
         throw ServerException();
@@ -363,7 +363,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200 || response.statusCode == 201) {
       final jsonResponse = json.decode(response.body);
       return VerifyEmployeeSubmissionResponse.fromJson(jsonResponse);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -372,10 +372,10 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
 @override
   Future<ContractSubmissionDetail> getContractSubmissionDetail(int candidateSubmissionId) async {
-    const url = '${URLs.baseUrlMock}/candidate-submission-detail/contract';
+    const url = '${URLs.baseUrlProd}/candidate-submission-detail/contract';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
-        'candidate_submission_id': candidateSubmissionId.toString(),
+        'candidate_id': candidateSubmissionId.toString(),
       }),
       headers: _buildHeaders(),
     ).timeout(const Duration(seconds: 30));
@@ -383,7 +383,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return ContractSubmissionDetail.fromJson(jsonResponse['data']);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -395,7 +395,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     const url = '${URLs.baseUrlProd}/candidate-submission-detail/permanent';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
-        'candidate_submission_id': candidateSubmissionId.toString(),
+        'candidate_id': candidateSubmissionId.toString(),
       }),
       headers: _buildHeaders(),
     ).timeout(const Duration(seconds: 30));
@@ -403,7 +403,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return PermanentSubmissionDetail.fromJson(jsonResponse['data']);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -461,7 +461,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
       final jsonResponse = json.decode(response.body);
       List<dynamic> submissionsData = jsonResponse['data'];
       return submissionsData.map((json) => EmployeeSubmission.fromJson(json)).toList();
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -480,7 +480,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
       final jsonResponse = json.decode(response.body);
       List<dynamic> submissionsData = jsonResponse['data'];
       return submissionsData.map((json) => EmployeeSubmission.fromJson(json)).toList();
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -499,7 +499,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
       final jsonResponse = json.decode(response.body);
       List<dynamic> submissionsData = jsonResponse['data'];
       return submissionsData.map((json) => EmployeeSubmission.fromJson(json)).toList();
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -507,11 +507,12 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
   }
 
    @override
-  Future<SalarySlipDetail> getSalarySlipDetail(int slipId) async {
-    final url = '${URLs.baseUrlMock}/salary-slip-details';
+  Future<SalarySlipDetail> getSalarySlipDetail(int month,int year) async {
+    final url = '${URLs.baseUrlProd}/salary-slips';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
-        'slip_id': slipId.toString(),
+        'month': month.toString(),
+        'year': year.toString(),
       }),
       headers: _buildHeaders(),
     ).timeout(const Duration(seconds: 30));
@@ -519,7 +520,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return SalarySlipDetail.fromJson(jsonResponse['data']);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -538,7 +539,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return SalarySlipsResponse.fromJson(jsonResponse);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -560,7 +561,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return AttendanceRecap.fromJson(jsonResponse['data']);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -579,7 +580,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return OvertimeHistoryResponse.fromJson(jsonResponse);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -597,7 +598,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return OvertimeRequestResponse.fromJson(jsonResponse);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -640,7 +641,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
     if (response.statusCode == 201) {
       return;
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException('Gagal mengirim permintaan izin');
     } else {
       throw ServerException();
@@ -650,7 +651,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<PermissionHistoryResponse> fetchPermissionHistory() async {
-    const url = '${URLs.baseUrlMock}/permission-history';
+    const url = '${URLs.baseUrlProd}/permission-history';
     final response = await client.get(
       Uri.parse(url),
       headers: _buildHeaders(),
@@ -659,7 +660,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return PermissionHistoryResponse.fromJson(jsonResponse);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -668,7 +669,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<PermissionRequestResponse> getPermissionRequests() async {
-    const url = '${URLs.baseUrlMock}/permission-requests';
+    const url = '${URLs.baseUrlProd}/permission-requests';
     final response = await client.get(
       Uri.parse(url),
       headers: _buildHeaders(),
@@ -677,7 +678,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return PermissionRequestResponse.fromJson(jsonResponse);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -686,7 +687,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
   
 @override
   Future<PermissionQuotaResponse> getPermissionQuota() async {
-    const url = '${URLs.baseUrlMock}/permission-quota';
+    const url = '${URLs.baseUrlProd}/permission-quota';
     final response = await client.get(
       Uri.parse(url),
       headers: _buildHeaders(),
@@ -695,7 +696,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return PermissionQuotaResponse.fromJson(jsonResponse);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -713,7 +714,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return LeaveHistoryResponse.fromJson(jsonResponse);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -734,7 +735,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return LeaveRequestResponse.fromJson(jsonResponse);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -754,7 +755,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return LeaveQuotaResponse.fromJson(jsonResponse);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -773,7 +774,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
       final jsonResponse = json.decode(response.body);
       List<dynamic> leaveTypeList = jsonResponse['data'];
       return leaveTypeList.map((json) => LeaveType.fromJson(json)).toList();
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -795,7 +796,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return AttendanceHistoryResponse.fromJson(jsonResponse);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -815,7 +816,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return HRDSummaryResponse.fromJson(jsonResponse['data']);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -836,7 +837,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 201) {
       final jsonResponse = json.decode(response.body);
       return CheckInOutResponse.fromJson(jsonResponse);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
@@ -857,7 +858,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     if (response.statusCode == 201) {
       final jsonResponse = json.decode(response.body);
       return CheckInOutResponse.fromJson(jsonResponse);
-    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+    } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();

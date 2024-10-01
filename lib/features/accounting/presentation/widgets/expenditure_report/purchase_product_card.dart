@@ -22,6 +22,10 @@ class PurchasedProductCard extends StatelessWidget {
         } else if (state is PurchasedProductError) {
           return Center(child: Text(state.message));
         } else if (state is PurchasedProductSuccess) {
+           if(state.products.isEmpty){
+            return Utils.buildEmptyStatePlain("Belum ada Data",
+            "");
+          }
           return Column(
             children: state.products
                 .map((product) => _buildProductCard(product))

@@ -9,10 +9,10 @@ class DetailSalarySlipCubit extends Cubit<DetailSalarySlipState> {
 
   DetailSalarySlipCubit(this.repository) : super(DetailSalarySlipInitial());
 
-  Future<void> fetchDetailSalarySlip(int slipId) async {
+  Future<void> fetchDetailSalarySlip(int month, int year) async {
     emit(DetailSalarySlipLoading());
 
-    final result = await repository.getSalarySlipDetail(slipId);
+    final result = await repository.getSalarySlipDetail(month,year);
 
     result.fold(
       (failure) {

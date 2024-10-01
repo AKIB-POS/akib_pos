@@ -123,7 +123,7 @@ class _EmployeeDetailPageState extends State<EmployeeDetailPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 16),
-        _buildEmployeeInfo(detail.employeeInfo.position, detail.employeeInfo.branch,
+        _buildEmployeeInfo(detail.employeeInfo.position ?? "Belum Ada Jabatan", detail.employeeInfo.branch,
             detail.employeeInfo.contractStart, detail.employeeInfo.contractEnd),
         const SizedBox(height: 16),
         _buildPersonalInfo(detail.personalInfo),
@@ -138,7 +138,7 @@ class _EmployeeDetailPageState extends State<EmployeeDetailPage> {
       children: [
         const SizedBox(height: 16),
         _buildPermanentEmployeeInfo(detail.employeeInfo.position, detail.employeeInfo.branch,
-            detail.employeeInfo.confirmationDate, detail.employeeInfo.confirmationLetterNumber),
+            detail.employeeInfo.confirmationDate ?? "Belum Ada Tanggal", detail.employeeInfo.confirmationLetterNumber ?? "Belum Ada Sk"),
         const SizedBox(height: 16),
         _buildPersonalInfo(detail.personalInfo),
       ],

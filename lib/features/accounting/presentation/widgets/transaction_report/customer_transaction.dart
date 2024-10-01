@@ -8,23 +8,53 @@ import 'package:akib_pos/features/accounting/presentation/bloc/transaction_repor
 import 'package:akib_pos/features/accounting/presentation/widgets/shimmer_widget.dart';
 import 'package:akib_pos/features/accounting/presentation/widgets/transaction_report/accounting_transaction_customer_card.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 
-
 class CustomerTransaction extends StatelessWidget {
   CustomerTransaction({super.key});
-   
-  final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
+
+  late final AuthSharedPref _authSharedPref;
+  late final int branchId;
+  late final int companyId;
 
   @override
   Widget build(BuildContext context) {
+    _authSharedPref = GetIt.instance<AuthSharedPref>();
     final branchId = _authSharedPref.getBranchId() ?? 0;
     final companyId = _authSharedPref.getCompanyId() ?? 0;
     final transactionListCubit = context.read<TransactionListCubit>();
+
+    void _fetchTodayTransactionReport(TransactionReportInteractionState state) {
+      context.read<TransactionReportCubit>().fetchTodayTransactionReport(
+            branchId: branchId,
+            companyId: companyId,
+            employeeId: state.employeeId,
+            date: state.selectedDate,
+          );
+    }
+
+    void _fetchCustomerTransactions(TransactionReportInteractionState state) {
+      if (state.selectedTransactionType == CustomerTransactionType.top10) {
+        context.read<TransactionListCubit>().fetchTop10Transactions(
+              branchId: branchId,
+              companyId: companyId,
+              employeeId: state.employeeId,
+              date: state.selectedDate,
+            );
+      } else {
+        context.read<TransactionListCubit>().fetchDiscountTransactions(
+              branchId: branchId,
+              companyId: companyId,
+              employeeId: state.employeeId,
+              date: state.selectedDate,
+            );
+      }
+    }
 
     return Container(
       margin: const EdgeInsets.only(left: 16, right: 16),
@@ -70,10 +100,27 @@ class CustomerTransaction extends StatelessWidget {
               if (state is TransactionReportLoading) {
                 return _buildShimmerList();
               } else if (state is TransactionReportError) {
-                return Center(child: Text(state.message));
-              } else if (state is Top10TransactionsSuccess || state is DiscountTransactionsSuccess) {
-                final transactions = state is Top10TransactionsSuccess ? state.transactions : (state as DiscountTransactionsSuccess).transactions;
-                return _buildTransactionList(transactions);
+                return Utils.buildErrorState(
+                  title: 'Gagal Memuat Data',
+                  message: state.message,
+                  onRetry: () {
+                    final interactionCubit =
+                        context.read<TransactionReportInteractionCubit>();
+                    _fetchTodayTransactionReport(interactionCubit.state);
+                    _fetchCustomerTransactions(interactionCubit.state);
+                  },
+                );
+              } else if (state is Top10TransactionsSuccess ||
+                  state is DiscountTransactionsSuccess) {
+                final transactions = state is Top10TransactionsSuccess
+                    ? state.transactions
+                    : (state as DiscountTransactionsSuccess).transactions;
+                if (transactions.isEmpty) {
+                  return Utils.buildEmptyState("Belum ada Riwayat",
+                      "Riwayat akan tampil setelah\nizin anda telah selesai");
+                } else {
+                  return _buildTransactionList(transactions);
+                }
               } else {
                 return Container();
               }
@@ -85,11 +132,16 @@ class CustomerTransaction extends StatelessWidget {
   }
 
   Widget _buildChip(BuildContext context,
-      {required String title, required CustomerTransactionType type, required TransactionListCubit cubit, required int branchId, required int companyId}) {
+      {required String title,
+      required CustomerTransactionType type,
+      required TransactionListCubit cubit,
+      required int branchId,
+      required int companyId}) {
     return Expanded(
       child: GestureDetector(
         onTap: () {
-          final interactionCubit = context.read<TransactionReportInteractionCubit>();
+          final interactionCubit =
+              context.read<TransactionReportInteractionCubit>();
           interactionCubit.selectTransactionType(type);
           final state = interactionCubit.state;
 
@@ -109,7 +161,8 @@ class CustomerTransaction extends StatelessWidget {
             );
           }
         },
-        child: BlocBuilder<TransactionReportInteractionCubit, TransactionReportInteractionState>(
+        child: BlocBuilder<TransactionReportInteractionCubit,
+            TransactionReportInteractionState>(
           builder: (context, state) {
             final isSelected = state.selectedTransactionType == type;
             return Container(
@@ -145,9 +198,8 @@ class CustomerTransaction extends StatelessWidget {
     );
   }
 
-  
-
-  Widget _buildTransactionList(List<AccountingTransactionReportModel> transactions) {
+  Widget _buildTransactionList(
+      List<AccountingTransactionReportModel> transactions) {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -165,7 +217,7 @@ class CustomerTransaction extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: 5, // Simulate 5 shimmer items
       itemBuilder: (context, index) {
-        return  ShimmerWidget.rectangular(
+        return ShimmerWidget.rectangular(
           width: double.infinity,
           height: 10.h, // Adjust this to match your card height
         );

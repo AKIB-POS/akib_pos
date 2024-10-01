@@ -1,31 +1,17 @@
 class LeaveType {
   final int id;
   final String name;
-  final int quota;
-  final String type;
 
   LeaveType({
     required this.id,
-    required this.name,
-    required this.quota,
-    required this.type,
+    required this.name
   });
 
   factory LeaveType.fromJson(Map<String, dynamic> json) {
     return LeaveType(
-      id: json['id'],
-      name: json['name'],
-      quota: json['quota'],
-      type: json['type'],
+      id: json['leave_type_id'],
+      name: json['leave_type_name']
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'quota': quota,
-      'type': type,
-    };
-  }
 }

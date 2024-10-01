@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 import 'package:akib_pos/common/app_themes.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/verify_candidate_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/verify_candidate_submission_request.dart';
 import 'package:akib_pos/util/utils.dart';
@@ -15,6 +16,7 @@ import 'package:akib_pos/features/hrd/data/models/submission/candidate/contract_
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/permanent_submission_detail_model.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/contract_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/permanent_submission_cubit.dart';
+import 'package:get_it/get_it.dart';
 
 class CandidateSubmissionDetailPage extends StatefulWidget {
   final int candidateId;
@@ -51,7 +53,7 @@ class _CandidateSubmissionDetailPageState extends State<CandidateSubmissionDetai
     });
 
     try {
-      if (widget.submissionType == 'Calon Pegawai Kontrak') {
+      if (widget.submissionType == 'Calon pegawai kontrak') {
         await context.read<ContractSubmissionCubit>().fetchContractSubmissionDetail(widget.candidateId);
         final submission = context.read<ContractSubmissionCubit>().state;
         if (submission is ContractSubmissionLoaded) {
@@ -59,7 +61,7 @@ class _CandidateSubmissionDetailPageState extends State<CandidateSubmissionDetai
             contractSubmission = submission.contractSubmissionDetail;
           });
         }
-      } else if (widget.submissionType == 'Calon Pegawai Tetap') {
+      } else if (widget.submissionType == 'Calon pegawai tetap') {
         await context.read<PermanentSubmissionCubit>().fetchPermanentSubmissionDetail(widget.candidateId);
         final submission = context.read<PermanentSubmissionCubit>().state;
         if (submission is PermanentSubmissionLoaded) {
@@ -81,6 +83,7 @@ class _CandidateSubmissionDetailPageState extends State<CandidateSubmissionDetai
 
   @override
   Widget build(BuildContext context) {
+    final role = GetIt.instance<AuthSharedPref>().getEmployeeRole();
     return Scaffold(
       backgroundColor: AppColors.backgroundGrey,
       appBar: AppBar(
@@ -129,12 +132,12 @@ class _CandidateSubmissionDetailPageState extends State<CandidateSubmissionDetai
             ? const Center(child: CircularProgressIndicator())
             : errorMessage != null
                 ? Center(child: Text('Error: $errorMessage'))
-                : _buildBodyContent(),
+                : _buildBodyContent(role),
       ),
     );
   }
 
-  Widget _buildBodyContent() {
+  Widget _buildBodyContent(String? role) {
     return Column(
       children: [
         Expanded(
@@ -144,7 +147,7 @@ class _CandidateSubmissionDetailPageState extends State<CandidateSubmissionDetai
               physics: const AlwaysScrollableScrollPhysics(),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: widget.submissionType == 'Calon Pegawai Kontrak'
+                child: widget.submissionType == 'Calon pegawai kontrak'
                     ? contractSubmission != null
                         ? _buildContractDetail(contractSubmission!)
                         : const Center(child: Text('Invalid submission type'))
@@ -155,7 +158,7 @@ class _CandidateSubmissionDetailPageState extends State<CandidateSubmissionDetai
             ),
           ),
         ),
-        if (widget.approvalStatus == "pending") _buildActionButtons(),
+        if (widget.approvalStatus == "pending" && role == "owner") _buildActionButtons(),
       ],
     );
   }

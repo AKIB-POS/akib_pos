@@ -9,13 +9,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 
 class SalarySlipDetails extends StatefulWidget {
-  final int slipId;
+
+  final int month;
   final String monthName;
   final int year;
 
   const SalarySlipDetails({
     Key? key,
-    required this.slipId,
+    required this.month,
     required this.monthName,
     required this.year,
   }) : super(key: key);
@@ -32,7 +33,7 @@ class _SalarySlipDetailsState extends State<SalarySlipDetails> {
   }
 
   void _fetchSalarySlipDetail() {
-    context.read<DetailSalarySlipCubit>().fetchDetailSalarySlip(widget.slipId);
+    context.read<DetailSalarySlipCubit>().fetchDetailSalarySlip(widget.month,widget.year);
   }
 
   Future<void> _refreshData() async {
@@ -54,7 +55,7 @@ class _SalarySlipDetailsState extends State<SalarySlipDetails> {
         onRefresh: _refreshData,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          child: SalarySlipsDetailContent(slipId: widget.slipId),
+          child: SalarySlipsDetailContent(slipId: widget.month),
         ),
       ),
     );

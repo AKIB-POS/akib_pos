@@ -16,26 +16,31 @@ class SalarySlipPage extends StatefulWidget {
 
 class _SalarySlipPageState extends State<SalarySlipPage> {
   final int currentYear = DateTime.now().year;
+  final int currentMonth = DateTime.now().month;
   int selectedYear = DateTime.now().year;
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchSalarySlips();
-  }
+  // List of months
+  final List<String> months = [
+    'Januari',
+    'Februari',
+    'Maret',
+    'April',
+    'Mei',
+    'Juni',
+    'Juli',
+    'Agustus',
+    'September',
+    'Oktober',
+    'November',
+    'Desember',
+  ];
 
-  void _fetchSalarySlips() {
-    context.read<SalarySlipCubit>().fetchSalarySlips(year: selectedYear);
-  }
-
-  Future<void> _selectYear() async {
-    int? year = await showYearPickerDialog(context, selectedYear, currentYear);
-    if (year != null && year != selectedYear) {
-      setState(() {
-        selectedYear = year;
-      });
-      _fetchSalarySlips();
+  // Get the list of months up to the current month if the selected year is the current year
+  List<String> _getAvailableMonths() {
+    if (selectedYear == currentYear) {
+      return months.sublist(0, currentMonth); // Limit months to the current month
     }
+    return months; // Otherwise, show all months
   }
 
   @override
@@ -44,7 +49,6 @@ class _SalarySlipPageState extends State<SalarySlipPage> {
       backgroundColor: AppColors.backgroundGrey,
       body: Column(
         children: [
-          // AppBar is outside the scrollable content
           SalarySlipTop(
             selectedYear: selectedYear,
             onYearTap: _selectYear,
@@ -52,22 +56,11 @@ class _SalarySlipPageState extends State<SalarySlipPage> {
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
-                _fetchSalarySlips();
+                // No data fetch, just refresh the UI
+                setState(() {});
               },
               color: AppColors.primaryMain,
-              child: BlocBuilder<SalarySlipCubit, SalarySlipState>(
-                builder: (context, state) {
-                  if (state is SalarySlipLoading) {
-                    return _buildShimmerLoading();
-                  } else if (state is SalarySlipError) {
-                    return Center(child: Text(state.message));
-                  } else if (state is SalarySlipLoaded) {
-                    return _buildSalarySlipList(state.salarySlips.salarySlips);
-                  } else {
-                    return Container();
-                  }
-                },
-              ),
+              child: _buildSalarySlipList(),
             ),
           ),
         ],
@@ -75,50 +68,24 @@ class _SalarySlipPageState extends State<SalarySlipPage> {
     );
   }
 
-  Widget _buildShimmerLoading() {
-    return ListView.builder(
-      shrinkWrap: true,
-      itemCount: 6,
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      physics: const AlwaysScrollableScrollPhysics(),
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: Container(
-              height: 50,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildSalarySlipList(List<SalarySlip> slips) {
+  Widget _buildSalarySlipList() {
+    List<String> availableMonths = _getAvailableMonths();
     return ListView.builder(
       shrinkWrap: true,
       padding: const EdgeInsets.symmetric(vertical: 12),
-      itemCount: slips.length,
+      itemCount: availableMonths.length,
       physics: const AlwaysScrollableScrollPhysics(),
       itemBuilder: (context, index) {
-        final slip = slips[index];
+        final monthName = availableMonths[index];
         return GestureDetector(
           onTap: () {
-            // Navigate to SalarySlipDetails page with parameters
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => SalarySlipDetails(
-                  monthName: slip.monthName,
+                  month: index+1,
                   year: selectedYear,
-                  slipId: slip.slipId,
-                  
+                  monthName: monthName,
                 ),
               ),
             );
@@ -135,7 +102,7 @@ class _SalarySlipPageState extends State<SalarySlipPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '${slip.monthName} $selectedYear',
+                    '$monthName $selectedYear',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -148,10 +115,17 @@ class _SalarySlipPageState extends State<SalarySlipPage> {
           ),
         );
       },
-    
     );
   }
-  
+
+  Future<void> _selectYear() async {
+    int? year = await showYearPickerDialog(context, selectedYear, currentYear);
+    if (year != null && year != selectedYear) {
+      setState(() {
+        selectedYear = year;
+      });
+    }
+  }
 
   Future<int?> showYearPickerDialog(
       BuildContext context, int initialYear, int maxYear) async {
@@ -186,7 +160,6 @@ class _SalarySlipPageState extends State<SalarySlipPage> {
                         setState(() {
                           selectedYear = dateTime.year;
                         });
-                        // Close the dialog and return the selected year
                         Navigator.of(context).pop(dateTime.year);
                       },
                     ),

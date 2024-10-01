@@ -29,7 +29,7 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final role = GetIt.instance<AuthSharedPref>().getEmployeeRole();
+    
     return Scaffold(
       backgroundColor: AppColors.backgroundGrey,
       resizeToAvoidBottomInset: true, // Hindari overflow saat keyboard muncul
@@ -101,7 +101,7 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
                   ),
                 ),
               ),              
-              if (submission.approvalStatus == 'pending' && role == "owner")
+              if (submission.approvalStatus == 'pending')
                 _buildActionButtons(context),
             ],
           );

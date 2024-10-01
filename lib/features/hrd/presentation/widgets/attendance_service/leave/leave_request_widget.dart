@@ -28,8 +28,11 @@ class LeaveRequestWidget extends StatelessWidget {
             return _buildRequestList(state.leaveRequests.data);
           }
         } else if (state is LeaveRequestError) {
-          return Utils.buildEmptyStatePlain("Ada Kesalahan",
-            state.message);
+          return Utils.buildErrorStatePlain(title: 'Gagal Memuat Data',
+          message: state.message,
+          onRetry: () {
+            context.read<LeaveRequestCubit>().fetchLeaveRequests();
+          },);
         } else {
           return Container();
         }

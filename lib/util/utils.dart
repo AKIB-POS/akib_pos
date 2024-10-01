@@ -426,6 +426,54 @@ class Utils {
       ),
     );
   }
+  static Widget buildErrorStatePlain({
+    required String title,
+    required String message,
+    required VoidCallback onRetry, // Parameter untuk menangani tombol retry
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              'assets/images/accounting/empty_report.svg', // Ganti dengan path icon error yang sesuai
+              height: 80,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: AppTextStyle.bigCaptionBold,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: AppTextStyle.caption,
+            ),
+            const SizedBox(height: 4),
+            ElevatedButton(
+              onPressed: onRetry, // Callback saat tombol ditekan
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 24, vertical: 12), // Atur padding di sini
+                backgroundColor:
+                    AppColors.primaryMain, // Atur warna latar belakang
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8), // Atur radius sudut
+                ),
+              ),
+              child: const Text(
+                'Coba Lagi',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   static Widget buildEmptyState(String title, String? message) {
     return Container(
@@ -458,7 +506,7 @@ class Utils {
       ),
     );
   }
-  static Widget buildEmptyStatePlain(String title, String? message) {
+  static Widget buildEmptyStatePlain(String? title , String? message) {
     return Container(
       padding: const EdgeInsets.all(16),
       child: Center(
@@ -471,7 +519,7 @@ class Utils {
             ),
             const SizedBox(height: 12),
             Text(
-              title,
+              title ?? "Belum Ada Data",
               style: AppTextStyle.bigCaptionBold,
             ),
             const SizedBox(height: 4),
