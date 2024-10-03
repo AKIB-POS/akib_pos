@@ -8,6 +8,8 @@ import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_type.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/overtime_history.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/overtime_request.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/overtime_type.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/submit_overtime.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_history.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_quota.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_request.dart';
@@ -22,6 +24,8 @@ import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/employee_performance.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/submit_employee_request.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_training.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/employee_tasking.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/subordinate_tasking_model.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/candidate_submission.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip_detail.dart';
@@ -35,6 +39,7 @@ import 'package:akib_pos/features/hrd/data/models/submission/candidate/verify_ca
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/contract_employee_detail.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/permanent_employee_detail.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/administration/employee_sop.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/performance_metric_model.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class HRDRepository {
@@ -67,6 +72,8 @@ abstract class HRDRepository {
   //Overtime
   Future<Either<Failure, OvertimeRequestResponse>> getOvertimeRequests();
   Future<Either<Failure, OvertimeHistoryResponse>> fetchOvertimeHistory();
+  Future<Either<Failure, void>> submitOvertimeRequest(SubmitOvertimeRequest request);
+   Future<Either<Failure, List<OvertimeType>>> getOvertimeTypes();
 
   //Salary
   Future<Either<Failure, SalarySlipsResponse>> getSalarySlips(int year);
@@ -80,12 +87,19 @@ abstract class HRDRepository {
       int employeeId);
   Future<Either<Failure, List<EmployeePerformance>>> getEmployeePerformance(int branchId, String month, String year);
   Future<Either<Failure, void>> submitEmployeePerformance(SubmitEmployeePerformanceRequest request);
+  Future<Either<Failure, List<PerformanceMetricModel>>> getPerformanceMetrics();
   //administration
   Future<Either<Failure, List<EmployeeWarning>>> getEmployeeWarnings();
   Future<Either<Failure, EmployeeSOPResponse>> getEmployeeSOP();
   Future<Either<Failure, CompanyRulesResponse>> getCompanyRules();
   //training
   Future<Either<Failure, EmployeeTrainingResponse>> getEmployeeTrainings(int branchId);
+  //Tasking
+  Future<Either<Failure, List<EmployeeTask>>> fetchEmployeeTasks();
+  Future<Either<Failure, List<SubordinateTaskModel>>> getSubordinateTasks({
+    required int branchId,
+    required String status,
+  });
 
   //Employee Submission
   Future<Either<Failure, List<EmployeeSubmission>>> getPendingSubmissions(
@@ -117,6 +131,39 @@ class HRDRepositoryImpl implements HRDRepository {
   final HRDRemoteDataSource remoteDataSource;
 
   HRDRepositoryImpl({required this.remoteDataSource});
+
+
+  @override
+  Future<Either<Failure, List<SubordinateTaskModel>>> getSubordinateTasks({
+    required int branchId,
+    required String status,
+  }) async {
+    try {
+      final tasks = await remoteDataSource.getSubordinateTasks(
+        branchId: branchId,
+        status: status,
+      );
+      return Right(tasks);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+
+  @override
+  Future<Either<Failure, List<EmployeeTask>>> fetchEmployeeTasks() async {
+    try {
+      final tasks = await remoteDataSource.fetchEmployeeTasks();
+      return Right(tasks);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
 
 
   @override
@@ -181,18 +228,35 @@ class HRDRepositoryImpl implements HRDRepository {
     }
   }
 
-
-
   @override
-  Future<Either<Failure, void>> submitEmployeePerformance(SubmitEmployeePerformanceRequest request) async {
+  Future<Either<Failure, List<PerformanceMetricModel>>> getPerformanceMetrics() async {
     try {
-      await remoteDataSource.submitEmployeePerformance(request);
-      return const Right(null); // Jika sukses, return `Right(null)`
+      final metrics = await remoteDataSource.getPerformanceMetrics();
+      return Right(metrics);
     } on ServerException {
       return Left(ServerFailure());
     } catch (e) {
       return Left(GeneralFailure(e.toString()));
     }
+  }
+
+
+
+  @override
+  Future<Either<Failure, void>> submitEmployeePerformance(SubmitEmployeePerformanceRequest request) async {
+    try {
+  await remoteDataSource.submitEmployeePerformance(request);
+  return const Right(null); // Jika sukses, return `Right(null)`
+} on ServerException {
+  return Left(ServerFailure());
+} on GeneralException catch (e) {
+  // Pastikan hanya GeneralException yang ditangkap, tanpa menangkap `201`
+  return Left(GeneralFailure(e.message));
+} catch (e) {
+  // Ini adalah tangkapan umum, tapi pastikan ini hanya untuk error yang tidak diharapkan
+  return Left(GeneralFailure(e.toString()));
+}
+
   }
 
 
@@ -428,6 +492,29 @@ class HRDRepositoryImpl implements HRDRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, List<OvertimeType>>> getOvertimeTypes() async {
+    try {
+      final overtimeTypes = await remoteDataSource.getOvertimeTypes();
+      return Right(overtimeTypes);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> submitOvertimeRequest(SubmitOvertimeRequest request) async {
+    try {
+      await remoteDataSource.submitOvertimeRequest(request);
+      return const Right(null);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
   @override
   Future<Either<Failure, OvertimeHistoryResponse>>
       fetchOvertimeHistory() async {

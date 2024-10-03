@@ -1,7 +1,7 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/overtime_request.dart';
-import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_request)cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_request_cubit.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,7 +21,7 @@ class OvertimeRequestWidget extends StatelessWidget {
           );
         } else if (state is OvertimeRequestLoaded) {
           if (state.overtimeRequests.data.isEmpty) {
-            return Utils.buildEmptyStatePlain("Belum Ada Pengajuan", "tatus Pengajuan akan tampil setelah anda\nmengisi form pengajuan lembur");
+            return Utils.buildEmptyStatePlain("Belum Ada Pengajuan", "Status Pengajuan akan tampil setelah anda\nmengisi form pengajuan lembur");
           } else {
             return _buildRequestList(state.overtimeRequests.data);
           }
@@ -78,18 +78,18 @@ class OvertimeRequestWidget extends StatelessWidget {
                         style: AppTextStyle.headline5,
                       ),
                     ),
-                    OutlinedButton(
-                      onPressed: () {
-                        // Handle detail button press
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.primaryMain),
-                        shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                      ),
-                      child: Text('Detail', style: TextStyle(color: AppColors.primaryMain)),
-                    ),
+                    // OutlinedButton(
+                    //   onPressed: () {
+                    //     // Handle detail button press
+                    //   },
+                    //   style: OutlinedButton.styleFrom(
+                    //     side: const BorderSide(color: AppColors.primaryMain),
+                    //     shape: RoundedRectangleBorder(
+                    //             borderRadius: BorderRadius.circular(4),
+                    //           ),
+                    //   ),
+                    //   child: Text('Detail', style: TextStyle(color: AppColors.primaryMain)),
+                    // ),
                   ],
                 ),
                 const SizedBox(height: 8),

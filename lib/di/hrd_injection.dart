@@ -10,7 +10,9 @@ import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_type_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/submit_leave_request_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_history_cubit.dart';
-import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_request)cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_request_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_type_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/submit_overtime_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_history_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_quota_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_request_cubit.dart';
@@ -31,15 +33,18 @@ import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employe
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/hrd_employee_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/permanent_employee_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee_performance/employee_performance_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee_performance/performance_metric_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee_performance/submit_employee_performance_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee_training_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/detail_salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/salary_slip_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/employee_task_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/verify_employee_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/approved_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/pending_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/rejected_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/subordinate_tasking_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 final hrdInjection = GetIt.instance;
@@ -120,6 +125,12 @@ Future<void> initHRDModule() async {
   hrdInjection.registerFactory(
     () => OvertimeHistoryCubit(hrdInjection()),
   );
+  hrdInjection.registerFactory(
+    () => OvertimeTypeCubit(hrdInjection()),
+  );
+  hrdInjection.registerFactory(
+    () => SubmitOvertimeRequestCubit(hrdInjection()),
+  );
 
   //Salary
   hrdInjection.registerFactory(
@@ -142,6 +153,9 @@ Future<void> initHRDModule() async {
   hrdInjection.registerFactory(
     () => PermanentEmployeeCubit(hrdInjection()),
   );
+   hrdInjection.registerFactory(
+    () => PerformanceMetricCubit(hrdInjection()),
+  );
   hrdInjection.registerFactory(
     () => EmployeePerformanceCubit(hrdInjection()),
   );
@@ -158,6 +172,13 @@ Future<void> initHRDModule() async {
   //training
   hrdInjection.registerFactory(
     () => EmployeeTrainingCubit(hrdInjection()),
+  );
+  //Tasking
+  hrdInjection.registerFactory(
+    () => EmployeeTaskCubit(hrdInjection()),
+  );
+  hrdInjection.registerFactory(
+    () => SubordinateTaskCubit(hrdInjection()),
   );
 
   

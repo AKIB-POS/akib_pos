@@ -158,12 +158,7 @@ class AttendanceHistoryWidget extends StatelessWidget {
                             history.clockOutTime,
                             style: AppTextStyle.bigCaptionBold
                                 .copyWith(color: AppColors.errorMain),
-                          ),
-                          Text(
-                            " - ${history.clockOutStatus}",
-                            style: AppTextStyle.bigCaptionBold
-                                .copyWith(color: AppColors.errorMain),
-                          ),
+                          )
                         ],
                       ),
                     ),

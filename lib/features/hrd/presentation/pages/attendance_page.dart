@@ -260,7 +260,7 @@ class _AttendancePageState extends State<AttendancePage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "${widget.data.expectedClockInTime} - ${widget.data.expectedClockOutTime}",
+                  "${widget.data.expectedClockInTime ?? ""} - ${widget.data.expectedClockOutTime ?? ""}",
                   style: AppTextStyle.headline5.copyWith(fontWeight: FontWeight.bold),
                 ),
               ],

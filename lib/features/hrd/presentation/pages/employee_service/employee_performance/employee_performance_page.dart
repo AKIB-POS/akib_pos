@@ -118,12 +118,12 @@ class _EmployeePerformancePageState extends State<EmployeePerformancePage> {
       itemCount: performances.length,
       itemBuilder: (context, index) {
         final employee = performances[index];
-        return _buildEmployeeCard(employee);
+        return _buildEmployeeCard(employee,index);
       },
     );
   }
 
-  Widget _buildEmployeeCard(EmployeePerformance employee) {
+  Widget _buildEmployeeCard(EmployeePerformance employee, int index) {
     Color backgroundColor;
     Color textColor;
     if (employee.employeeType == 'Contract Employee') {
@@ -190,9 +190,11 @@ class _EmployeePerformancePageState extends State<EmployeePerformancePage> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => SubmitEmployeePerformancePage(
-                          employeePerformanceId: employee.employeePerformanceId,
+                          employeeId: employee.employeePerformanceId,
                           employeeName: employee.employeeName,
                           role: employee.role,
+                          month: Utils.getMonthNumber(selectedMonth),
+                          year: selectedYear,
                         ),
                       ),
                     );

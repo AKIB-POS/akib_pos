@@ -445,24 +445,24 @@ void _showPermanentDeniedDialog() {
                           },
                         ),
         
-                        const SizedBox(height: 16),
-                        const Text('Total Hari',
-                            style: AppTextStyle.bigCaptionBold),
-                        const SizedBox(height: 8),
-                        TextFormField(
-                          keyboardType: TextInputType.number,
-                          decoration: AppThemes.inputDecorationStyle
-                              .copyWith(hintText: 'Masukkan Total Hari'),
-                          validator: (value) {
-                            if (value?.isEmpty ?? true) {
-                              return "Total hari tidak boleh kosong";
-                            }
-                            return null;
-                          },
-                          onChanged: (value) {
-                            totalDays = int.tryParse(value);
-                          },
-                        ),
+                        // const SizedBox(height: 16),
+                        // const Text('Total Hari',
+                        //     style: AppTextStyle.bigCaptionBold),
+                        // const SizedBox(height: 8),
+                        // TextFormField(
+                        //   keyboardType: TextInputType.number,
+                        //   decoration: AppThemes.inputDecorationStyle
+                        //       .copyWith(hintText: 'Masukkan Total Hari'),
+                        //   validator: (value) {
+                        //     if (value?.isEmpty ?? true) {
+                        //       return "Total hari tidak boleh kosong";
+                        //     }
+                        //     return null;
+                        //   },
+                        //   onChanged: (value) {
+                        //     totalDays = int.tryParse(value);
+                        //   },
+                        // ),
                         const SizedBox(height: 16),
                         Row(
                           children: [

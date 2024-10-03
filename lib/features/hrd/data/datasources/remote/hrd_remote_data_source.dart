@@ -9,6 +9,8 @@ import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_type.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/overtime_history.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/overtime_request.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/overtime_type.dart';
+import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/submit_overtime.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_history.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_quota.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/permission/permission_request.dart';
@@ -23,6 +25,8 @@ import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/employee_performance.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/submit_employee_request.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_training.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/employee_tasking.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/subordinate_tasking_model.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/candidate_submission.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip_detail.dart';
@@ -36,6 +40,7 @@ import 'package:akib_pos/features/hrd/data/models/submission/candidate/verify_ca
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/contract_employee_detail.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/permanent_employee_detail.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/administration/employee_sop.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/performance_metric_model.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
@@ -67,6 +72,9 @@ abstract class HRDRemoteDataSource {
    //Overtime
   Future<OvertimeRequestResponse> getOvertimeRequests();
   Future<OvertimeHistoryResponse> fetchOvertimeHistory();
+  Future<void> submitOvertimeRequest(SubmitOvertimeRequest request);
+  Future<List<OvertimeType>> getOvertimeTypes();
+  
 
    //Salary
   Future<SalarySlipsResponse> getSalarySlips(int year);
@@ -79,12 +87,20 @@ abstract class HRDRemoteDataSource {
   Future<PermanentEmployeeDetail> getPermanentEmployeeDetail(int employeeId);
   Future<List<EmployeePerformance>> getEmployeePerformance(int branchId, String month, String year);
   Future<void> submitEmployeePerformance(SubmitEmployeePerformanceRequest request);
+  Future<List<PerformanceMetricModel>> getPerformanceMetrics();
   //administration
   Future<List<EmployeeWarning>> getEmployeeWarnings();
   Future<EmployeeSOPResponse> getEmployeeSOP();
   Future<CompanyRulesResponse> getCompanyRules();
   //training
   Future<EmployeeTrainingResponse> getEmployeeTrainings(int branchId);
+  //tasking
+  Future<List<EmployeeTask>> fetchEmployeeTasks();
+  Future<List<SubordinateTaskModel>> getSubordinateTasks({
+    required int branchId,
+    required String status,
+  });
+
 
 
 
@@ -113,6 +129,48 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
   final AuthSharedPref sharedPrefsHelper = GetIt.instance<AuthSharedPref>();
 
   HRDRemoteDataSourceImpl({required this.client});
+
+  @override
+  Future<List<SubordinateTaskModel>> getSubordinateTasks({
+    required int branchId,
+    required String status,
+  }) async {
+    final url = '${URLs.baseUrlMock}/subordinate-task';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branch_id': branchId.toString(),
+        'status': status,
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      final List<dynamic> data = jsonResponse['data'];
+      return data.map((task) => SubordinateTaskModel.fromJson(task)).toList();
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+
+  @override
+  Future<List<EmployeeTask>> fetchEmployeeTasks() async {
+    const url = '${URLs.baseUrlMock}/employee-task';
+
+    final response = await client.get(Uri.parse(url), headers: _buildHeaders());
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return (jsonResponse['data'] as List)
+          .map((task) => EmployeeTask.fromJson(task))
+          .toList();
+    } else {
+      throw ServerException();
+    }
+  }
 
 
    @override
@@ -163,7 +221,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<CompanyRulesResponse> getCompanyRules() async {
-    const url = '${URLs.baseUrlMock}/company-rules';
+    const url = '${URLs.baseUrlProd}/company-rules';
     final response = await client.get(Uri.parse(url), headers: _buildHeaders());
 
     if (response.statusCode == 200) {
@@ -179,7 +237,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<EmployeeSOPResponse> getEmployeeSOP() async {
-    const url = '${URLs.baseUrlMock}/employee-sop'; // URL endpoint yang sesuai
+    const url = '${URLs.baseUrlProd}/employee-sop'; // URL endpoint yang sesuai
     final response = await client.get(
       Uri.parse(url),
       headers: _buildHeaders(),
@@ -198,7 +256,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<List<EmployeeWarning>> getEmployeeWarnings() async {
-    const url = '${URLs.baseUrlMock}/employee-warnings';
+    const url = '${URLs.baseUrlProd}/employee-warnings';
 
     final response = await client.get(
       Uri.parse(url),
@@ -216,10 +274,32 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     }
   }
 
+  @override
+  Future<List<PerformanceMetricModel>> getPerformanceMetrics() async {
+    const url = '${URLs.baseUrlProd}/performance-metrics';
+    final response = await client.get(
+      Uri.parse(url),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      final List<dynamic> metricsList = jsonResponse['data'];
+      return metricsList
+          .map((json) => PerformanceMetricModel.fromJson(json))
+          .toList();
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+
 
   @override
   Future<void> submitEmployeePerformance(SubmitEmployeePerformanceRequest request) async {
-    const url = '${URLs.baseUrlMock}/submit-employee-performance';
+    const url = '${URLs.baseUrlProd}/submit-employee-performance';
 
     final response = await client.post(
       Uri.parse(url),
@@ -227,11 +307,8 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
       body: json.encode(request.toJson()),
     ).timeout(const Duration(seconds: 30));
 
-    if (response.statusCode == 201) {
-      final jsonResponse = json.decode(response.body);
-      if (jsonResponse['status'] != 'success') {
-        throw GeneralException(jsonResponse['message']);
-      }
+    if (response.statusCode == 201 ) {
+       return;
     } else if (response.statusCode >= 400 && response.statusCode <= 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
@@ -242,7 +319,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
    @override
   Future<List<EmployeePerformance>> getEmployeePerformance(int branchId, String month, String year) async {
-    const url = '${URLs.baseUrlMock}/employee-performance';
+    const url = '${URLs.baseUrlProd}/employee-performance';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),
@@ -549,7 +626,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<AttendanceRecap> getAttendanceRecap(int branchId, String date) async {
-    const url = '${URLs.baseUrlMock}/attendance-recap';
+    const url = '${URLs.baseUrlProd}/attendance-recap';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),
@@ -568,10 +645,57 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     }
   }
 
+  @override
+  Future<List<OvertimeType>> getOvertimeTypes() async {
+    const url = '${URLs.baseUrlProd}/overtime-type';
+    final response = await client.get(
+      Uri.parse(url),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      final List<dynamic> overtimeTypesJson = jsonResponse['data'];
+      return overtimeTypesJson.map((json) => OvertimeType.fromJson(json)).toList();
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+  @override
+  Future<void> submitOvertimeRequest(SubmitOvertimeRequest request) async {
+    const url = '${URLs.baseUrlProd}/overtime-request';
+
+    var multipartRequest = http.MultipartRequest('POST', Uri.parse(url));
+    multipartRequest.headers.addAll(_buildHeaders());
+
+    // Add form-data fields
+    multipartRequest.fields.addAll(request.toFormData());
+
+    // Add file if exists
+    if (request.attachmentPath != null) {
+      var file = await http.MultipartFile.fromPath('attachment', request.attachmentPath!);
+      multipartRequest.files.add(file);
+    }
+
+    var response = await multipartRequest.send().timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 201) {
+      // Success
+      return;
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException('Failed to submit overtime request');
+    } else {
+      throw ServerException();
+    }
+  }
+
 
   @override
   Future<OvertimeHistoryResponse> fetchOvertimeHistory() async {
-    const url = '${URLs.baseUrlMock}/overtime-history';
+    const url = '${URLs.baseUrlProd}/overtime-history';
     final response = await client.get(
       Uri.parse(url),
       headers: _buildHeaders(),
@@ -589,7 +713,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<OvertimeRequestResponse> getOvertimeRequests() async {
-    const url = '${URLs.baseUrlMock}/overtime-requests';
+    const url = '${URLs.baseUrlProd}/overtime-requests';
     final response = await client.get(
       Uri.parse(url),
       headers: _buildHeaders(),
@@ -785,7 +909,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
   @override
   Future<AttendanceHistoryResponse> getAttendanceHistory() async {
     // No parameters required
-    const url = '${URLs.baseUrlMock}/attendance-history';
+    const url = '${URLs.baseUrlProd}/attendance-history';
     final response = await client
         .get(
           Uri.parse(url),
@@ -825,7 +949,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<CheckInOutResponse> checkIn(CheckInOutRequest request) async {
-    const url = '${URLs.baseUrlMock}/check-in';
+    const url = '${URLs.baseUrlProd}/check-in';
     final response = await client
         .post(
           Uri.parse(url),
@@ -834,7 +958,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
         )
         .timeout(const Duration(seconds: 30));
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 201 && response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return CheckInOutResponse.fromJson(jsonResponse);
     } else if (response.statusCode >= 400 && response.statusCode <= 500) {
@@ -846,7 +970,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<CheckInOutResponse> checkOut(CheckInOutRequest request) async {
-    const url = '${URLs.baseUrlMock}/check-out';
+    const url = '${URLs.baseUrlProd}/check-out';
     final response = await client
         .post(
           Uri.parse(url),
@@ -855,7 +979,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
         )
         .timeout(const Duration(seconds: 30));
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 201 && response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return CheckInOutResponse.fromJson(jsonResponse);
     } else if (response.statusCode >= 400 && response.statusCode <= 500) {

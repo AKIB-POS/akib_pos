@@ -50,6 +50,14 @@ class _EmployeeWarningPageState extends State<EmployeeWarningPage> {
             _fetchEmployeeWarnings();
           },);
           } else if (state is EmployeeWarningLoaded) {
+            if(state.employeeWarnings.isEmpty){
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(child: Utils.buildEmptyStatePlain("Belum Ada Surat Peringatan", "")),
+                ],
+              );
+            }
             return ListView.builder(
               padding: const EdgeInsets.all(16.0),
               itemCount: state.employeeWarnings.length,

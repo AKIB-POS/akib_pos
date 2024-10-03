@@ -15,7 +15,7 @@ class EmployeePerformance {
 
   factory EmployeePerformance.fromJson(Map<String, dynamic> json) {
     return EmployeePerformance(
-      employeePerformanceId: (json['employee_performance_id'] as num?)?.toInt() ?? 0, // Safe casting and default
+      employeePerformanceId: (json['employee_id'] as num?)?.toInt() ?? 0, // Safe casting and default
       employeeType: json['employee_type'] ?? '', // Default to empty string if missing
       employeeName: json['employee_name'] ?? '', // Default to empty string if missing
       role: json['role'] ?? '', // Default to empty string if missing

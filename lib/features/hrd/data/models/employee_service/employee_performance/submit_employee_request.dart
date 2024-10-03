@@ -1,22 +1,22 @@
 class SubmitEmployeePerformanceRequest {
-  final int employeePerformanceId;
-  final PerformanceScore attendance;
-  final PerformanceScore collaboration;
-  final PerformanceScore workInnovation;
+  final int employeeId;
+  final int month;
+  final int year;
+  final Map<int, PerformanceScore> performanceMetrics;
 
   SubmitEmployeePerformanceRequest({
-    required this.employeePerformanceId,
-    required this.attendance,
-    required this.collaboration,
-    required this.workInnovation,
+    required this.employeeId,
+    required this.month,
+    required this.year,
+    required this.performanceMetrics,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'employee_performance_id': employeePerformanceId,
-      'attendance': attendance.toJson(),
-      'collaboration': collaboration.toJson(),
-      'work_innovation': workInnovation.toJson(),
+      'employee_id': employeeId,
+      'month': month,
+      'year': year,
+      'performance_metrics': performanceMetrics.map((key, score) => MapEntry(key.toString(), score.toJson())),
     };
   }
 }

@@ -14,7 +14,9 @@ import 'package:akib_pos/features/hrd/presentation/pages/employee_service/employ
 import 'package:akib_pos/features/hrd/presentation/pages/employee_service/employee_performance/employee_performance_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/employee_service/employee_training_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/attendance_service/leave/leave_page.dart';
-import 'package:akib_pos/features/hrd/presentation/pages/overtime_page.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/employee_service/tasking/employee_tasking_page.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/employee_service/tasking/manager_tasking_menu.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/attendance_service/overtime/overtime_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/attendance_service/permission/permission_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/employee_service/salary/salary_%20slip_page.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/appbar_hrd_page.dart';
@@ -300,7 +302,8 @@ class _HrdPage extends State<HrdPage> {
                     'Pegawai', 'assets/icons/hrd/ic_employee.svg'),
               _buildServiceItem(
                   'Administrasi', 'assets/icons/hrd/ic_administration.svg'),
-              _buildServiceItem('Kinerja Pegawai',
+              if (_authSharedPref.getEmployeeRole() != "employee")
+                _buildServiceItem('Kinerja Pegawai',
                   'assets/icons/hrd/ic_employee_performance.svg'),
               _buildServiceItem('Slip Gaji', 'assets/icons/hrd/ic_salary.svg'),
               _buildServiceItem('Tasking', 'assets/icons/hrd/ic_tasking.svg'),
@@ -355,6 +358,14 @@ class _HrdPage extends State<HrdPage> {
             break;
           case 'Pelatihan':
             Utils.navigateToPage(context, const EmployeeTrainingPage());
+            break;
+          case 'Tasking':
+            switch(_authSharedPref.getEmployeeRole()){
+              case 'employee' : 
+                Utils.navigateToPage(context, EmployeeTaskingPage());
+              case 'manager' : 
+                Utils.navigateToPage(context, ManagerTaskingMenu());
+            }
             break;
           default:
             break;

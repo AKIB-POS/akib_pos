@@ -51,7 +51,7 @@ class _LeavePageState extends State<LeavePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        forceMaterialTransparency: true,
+        surfaceTintColor: Colors.white,
         title: const Text('Cuti', style: AppTextStyle.headline5),
         backgroundColor: Colors.white,
         titleSpacing: 0,
