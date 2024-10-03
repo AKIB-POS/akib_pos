@@ -25,7 +25,9 @@ import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/employee_performance.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/submit_employee_request.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_training.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/detail_employee_task_response.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/employee_tasking.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/submit_employee_tasking_request.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/subordinate_task_detail.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/subordinate_tasking_model.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/candidate_submission.dart';
@@ -107,6 +109,8 @@ abstract class HRDRemoteDataSource {
     required String status,
   });
   Future<SubordinateTaskDetail> getDetailSubordinateTask(int taskingId);
+  Future<DetailEmployeeTaskResponse> getDetailEmployeeTask(int taskingId);
+  Future<void> submitEmployeeTasking(SubmitEmployeeTaskingRequest request);
 
 
 
@@ -152,6 +156,56 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
       return employees.map((e) => SubordinateEmployeeModel.fromJson(e)).toList();
     } else if (response.statusCode >= 400 && response.statusCode < 500) {
       throw GeneralException('Failed to fetch subordinate employees');
+    } else {
+      throw ServerException();
+    }
+  }
+
+  @override
+  Future<void> submitEmployeeTasking(SubmitEmployeeTaskingRequest request) async {
+    const url = '${URLs.baseUrlProd}/submit-employee-task';
+
+    var httpRequest = http.MultipartRequest('POST', Uri.parse(url));
+    httpRequest.headers.addAll(_buildHeaders());
+
+    // Add form-data fields
+    httpRequest.fields.addAll(request.toFormData());
+
+    // Add file if exists
+    if (request.attachmentPath != null) {
+      var file = await http.MultipartFile.fromPath('attachment', request.attachmentPath!);
+      httpRequest.files.add(file);
+    }
+
+    var response = await httpRequest.send().timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return;
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException('Failed to submit employee tasking');
+    } else {
+      throw ServerException();
+    }
+  }
+
+
+
+
+  @override
+  Future<DetailEmployeeTaskResponse> getDetailEmployeeTask(int taskingId) async {
+    final url = '${URLs.baseUrlProd}/detail-employee-task';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'tasking_id': taskingId.toString(),
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body)['data'];
+      return DetailEmployeeTaskResponse.fromJson(jsonResponse);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
     } else {
       throw ServerException();
     }

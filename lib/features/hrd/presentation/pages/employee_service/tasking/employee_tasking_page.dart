@@ -3,6 +3,7 @@ import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/employee_tasking.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/employee_task_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/employee_service/tasking/detail_employee_task_page.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -146,7 +147,7 @@ class _EmployeeTaskingPageState extends State<EmployeeTaskingPage> {
             padding: const EdgeInsets.only(right: 16),
             child: OutlinedButton(
               onPressed: () {
-                // Navigate to task detail or perform action
+                Utils.navigateToPage(context, DetailEmployeeTaskPage(taskingId: task.taskingId));
               },
               style: AppThemes.outlineButtonPrimaryStylePadding,
               child: Text(

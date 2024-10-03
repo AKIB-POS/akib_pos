@@ -85,8 +85,10 @@ import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employe
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee_training_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/detail_salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/salary_slip_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/detail_employee_tasking_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/employee_task_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/finished_subordinate_task_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/submit_employee_tasking_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/unfinished_subordinate_task_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/verify_employee_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/hrd_subordinate_employee_cubit.dart';
@@ -407,6 +409,12 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => DetailSubordinateTaskCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => DetailEmployeeTaskCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => SubmitEmployeeTaskingCubit(hrdInjection()),
         ),
         
 

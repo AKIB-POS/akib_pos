@@ -25,7 +25,9 @@ import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/employee_performance.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/submit_employee_request.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_training.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/detail_employee_task_response.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/employee_tasking.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/submit_employee_tasking_request.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/subordinate_task_detail.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/subordinate_tasking_model.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/candidate_submission.dart';
@@ -109,6 +111,8 @@ abstract class HRDRepository {
     required String status,
   });
   Future<Either<Failure, SubordinateTaskDetail>> getDetailSubordinateTask(int taskingId);
+  Future<Either<Failure, DetailEmployeeTaskResponse>> getDetailEmployeeTask(int taskingId);
+   Future<Either<Failure, void>> submitEmployeeTasking(SubmitEmployeeTaskingRequest request);
 
   //Employee Submission
   Future<Either<Failure, List<EmployeeSubmission>>> getPendingSubmissions(
@@ -177,6 +181,29 @@ class HRDRepositoryImpl implements HRDRepository {
   }
 
 
+  @override
+  Future<Either<Failure, void>> submitEmployeeTasking(SubmitEmployeeTaskingRequest request) async {
+    try {
+      await remoteDataSource.submitEmployeeTasking(request);
+      return const Right(null); // Success
+    } on ServerException {
+      return Left(ServerFailure());
+    } on GeneralException catch (e) {
+      return Left(GeneralFailure(e.message));
+    }
+  }
+
+@override
+  Future<Either<Failure, DetailEmployeeTaskResponse>> getDetailEmployeeTask(int taskingId) async {
+    try {
+      final detailEmployeeTask = await remoteDataSource.getDetailEmployeeTask(taskingId);
+      return Right(detailEmployeeTask);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
   @override
   Future<Either<Failure, SubordinateTaskDetail>> getDetailSubordinateTask(int taskingId) async {
