@@ -29,18 +29,9 @@ class AttendanceRecapContentWidget extends StatelessWidget {
         if (state is AttendanceRecapLoading) {
           return _buildShimmerLoading();
         } else if (state is AttendanceRecapError) {
-          return Utils.buildErrorState(
-            title: 'Gagal Memuat Data',
-            message: state.message,
-            onRetry: () {
-              final dateRangeCubit = context.read<DateRangeAttendanceCubit>();
-              final dateRange = dateRangeCubit.state;
-
-            
-              context.read<AttendanceRecapCubit>().fetchAttendanceRecap(
-                  branchId: _authSharedPref.getBranchId() ?? 0,
-                  date: dateRange);
-            },
+          return Utils.buildEmptyState(
+            'Gagal Memuat Data',
+             state.message,
           );
         } else if (state is AttendanceRecapLoaded) {
           return _buildAttendanceRecapContent(state.attendanceRecap);

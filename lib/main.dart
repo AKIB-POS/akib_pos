@@ -89,6 +89,7 @@ import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/finished_subordinate_task_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/unfinished_subordinate_task_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/verify_employee_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/hrd_subordinate_employee_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/approved_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/pending_submission_cubit.dart';
@@ -286,6 +287,10 @@ void main() async {
         //HRD
         BlocProvider(
           create: (context) => HRDSummaryCubit(hrdInjection()),
+        ),
+    
+        BlocProvider(
+          create: (context) => HRDAllSubordinateEmployeeCubit(hrdInjection()),
         ),
     
         BlocProvider(

@@ -6,6 +6,7 @@ import 'package:akib_pos/features/home/widget/my_drawer.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/employee_performance.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_training.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee_training_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/hrd_subordinate_employee_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/employee_service/administration_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/attendance_page.dart';
@@ -36,16 +37,17 @@ class HrdPage extends StatefulWidget {
   const HrdPage({super.key});
 
   @override
-  createState() => _HrdPage();
+  _HrdPageState createState() => _HrdPageState();
 }
 
-class _HrdPage extends State<HrdPage> {
+class _HrdPageState extends State<HrdPage> {
   final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
 
   @override
   void initState() {
     super.initState();
     _fetchHRDSummary();
+    _fetchAllSubordinateEmployees();
     if (_authSharedPref.getEmployeeRole() == "owner") {
       _fetchEmployeeTrainings();
     }
@@ -53,16 +55,18 @@ class _HrdPage extends State<HrdPage> {
 
   void _fetchEmployeeTrainings() {
     final branchId = _authSharedPref.getBranchId() ?? 0;
-    context
-        .read<EmployeeTrainingCubit>()
-        .fetchEmployeeTrainings(branchId: branchId);
+    context.read<EmployeeTrainingCubit>().fetchEmployeeTrainings(branchId: branchId);
   }
 
   void _fetchHRDSummary() {
     final branchId = _authSharedPref.getBranchId() ?? 0;
-
-    // Fetch HRD summary
     context.read<HRDSummaryCubit>().fetchHRDSummary(branchId);
+  }
+
+  // Fetch all subordinate employees
+  void _fetchAllSubordinateEmployees() {
+    final branchId = _authSharedPref.getBranchId() ?? 0;
+    context.read<HRDAllSubordinateEmployeeCubit>().fetchAllSubordinateEmployees(branchId: branchId);
   }
 
   @override
@@ -85,42 +89,70 @@ class _HrdPage extends State<HrdPage> {
           ),
         ),
       ),
-      body: RefreshIndicator(
-        color: AppColors.primaryMain,
-        onRefresh: () async {
-          _fetchHRDSummary();
-          if (isOwner) _fetchEmployeeTrainings();
+      body: BlocListener<HRDAllSubordinateEmployeeCubit, HRDAllSubordinateEmployeeState>(
+        listener: (context, state) {
+          if (state is HRDAllSubordinateEmployeeError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Error: ${state.message}'),
+                backgroundColor: Colors.red,
+                action: SnackBarAction(
+                  label: 'Ulang',
+                  textColor: Colors.white,
+                  onPressed: () {
+                    _fetchAllSubordinateEmployees();
+                  },
+                ),
+              ),
+            );
+          }
         },
-        child: ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          children: [
-            Container(
-              color: AppColors.backgroundGrey,
-              child: Column(
-                children: [
-                  SummaryHRD(),
-                  const SizedBox(height: 10),
-                  Container(
-                    width: double.infinity,
-                    height: 20,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(30),
-                        topRight: Radius.circular(30),
+        child: RefreshIndicator(
+          color: AppColors.primaryMain,
+          onRefresh: () async {
+            _fetchHRDSummary();
+            _fetchAllSubordinateEmployees();
+            if (isOwner) _fetchEmployeeTrainings();
+          },
+          child: BlocBuilder<HRDAllSubordinateEmployeeCubit, HRDAllSubordinateEmployeeState>(
+            builder: (context, state) {
+              if (state is HRDAllSubordinateEmployeeLoading) {
+                return Center(child: CircularProgressIndicator());
+              } else {
+                return ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    Container(
+                      color: AppColors.backgroundGrey,
+                      child: Column(
+                        children: [
+                          SummaryHRD(),
+                          const SizedBox(height: 10),
+                          Container(
+                            width: double.infinity,
+                            height: 20,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(30),
+                                topRight: Radius.circular(30),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            if (_authSharedPref.getEmployeeRole() != "employee")
-              _attendanceRecap(),
-            if (!isOwner) _attendanceService(),
-            if (!isOwner) _employeeService(),
-            if (isOwner) _ownerMenuBar(),
-            if (isOwner) _trainingSection(),
-          ],
+                    if (_authSharedPref.getEmployeeRole() != "employee")
+                      _attendanceRecap(),
+                    if (!isOwner) _attendanceService(),
+                    if (!isOwner) _employeeService(),
+                    if (isOwner) _ownerMenuBar(),
+                    if (isOwner) _trainingSection(),
+                  ],
+                );
+              }
+            },
+          ),
         ),
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/core/error/failures.dart';
+import 'package:akib_pos/features/hrd/data/datasources/local/hrd_shared_pref.dart';
 import 'package:akib_pos/features/hrd/data/datasources/remote/hrd_remote_data_source.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/attendance_history_item.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/leave/leave_history.dart';
@@ -41,11 +42,15 @@ import 'package:akib_pos/features/hrd/data/models/employee_service/employee/cont
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/permanent_employee_detail.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/administration/employee_sop.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/performance_metric_model.dart';
+import 'package:akib_pos/features/hrd/data/models/subordinate_employee.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class HRDRepository {
   //HRDPage
   Future<Either<Failure, HRDSummaryResponse>> getHRDSummary(int branchId);
+  Future<Either<Failure, List<SubordinateEmployeeModel>>> getAllSubordinateEmployees(int branchId);
+
 
   //Attendance
   Future<Either<Failure, CheckInOutResponse>> checkIn(
@@ -54,7 +59,9 @@ abstract class HRDRepository {
       CheckInOutRequest request);
   Future<Either<Failure, AttendanceHistoryResponse>> getAttendanceHistory();
   Future<Either<Failure, AttendanceRecap>> getAttendanceRecap(
-      int branchId, String date);
+      int branchId, 
+    int employeeId,  // Add employeeId as a parameter
+    String date,);
 
   //Leave
   Future<Either<Failure, LeaveQuotaResponse>> getLeaveQuota();
@@ -131,8 +138,44 @@ abstract class HRDRepository {
 
 class HRDRepositoryImpl implements HRDRepository {
   final HRDRemoteDataSource remoteDataSource;
+  final HRDSharedPref sharedPref;
+  final Connectivity connectivity;
 
-  HRDRepositoryImpl({required this.remoteDataSource});
+  HRDRepositoryImpl({
+    required this.remoteDataSource,
+    required this.sharedPref,
+    required this.connectivity,
+  });
+
+  @override
+  Future<Either<Failure, List<SubordinateEmployeeModel>>> getAllSubordinateEmployees(int branchId) async {
+    try {
+      final connectivityResult = await connectivity.checkConnectivity();
+
+      if (connectivityResult == ConnectivityResult.none) {
+        final cachedEmployees = sharedPref.getEmployeeList();
+        if (cachedEmployees.isNotEmpty) {
+          return Right(cachedEmployees);
+        } else {
+          return Left(CacheFailure('No cached data available'));
+        }
+      } else {
+        final response = await remoteDataSource.getAllSubordinateEmployees(branchId);
+        await sharedPref.clearEmployeeList();
+        await sharedPref.saveEmployeeList(response);
+        return Right(response);
+      }
+    } catch (e) {
+      if (e is GeneralException) {
+        return Left(GeneralFailure(e.message));
+      } else if (e is ServerException) {
+        return Left(ServerFailure());
+      } else {
+        return Left(GeneralFailure("Unexpected error occurred"));
+      }
+    }
+  }
+
 
 
   @override
@@ -495,10 +538,13 @@ class HRDRepositoryImpl implements HRDRepository {
 
   @override
   Future<Either<Failure, AttendanceRecap>> getAttendanceRecap(
-      int branchId, String date) async {
+    int branchId, 
+    int employeeId,  // Add employeeId as a parameter
+    String date,
+  ) async {
     try {
       final attendanceRecap =
-          await remoteDataSource.getAttendanceRecap(branchId, date);
+          await remoteDataSource.getAttendanceRecap(branchId, employeeId, date);
       return Right(attendanceRecap);
     } on ServerException {
       return Left(ServerFailure());

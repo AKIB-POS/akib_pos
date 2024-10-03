@@ -42,19 +42,24 @@ import 'package:akib_pos/features/hrd/data/models/employee_service/employee/cont
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/permanent_employee_detail.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/administration/employee_sop.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/performance_metric_model.dart';
+import 'package:akib_pos/features/hrd/data/models/subordinate_employee.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
 
 abstract class HRDRemoteDataSource {
   Future<HRDSummaryResponse> getHRDSummary(int branchId);
+  Future<List<SubordinateEmployeeModel>> getAllSubordinateEmployees(int branchId);
+
 
   //HRDPage
   //Attendance
   Future<CheckInOutResponse> checkIn(CheckInOutRequest request);
   Future<CheckInOutResponse> checkOut(CheckInOutRequest request);
   Future<AttendanceHistoryResponse> getAttendanceHistory();
-  Future<AttendanceRecap> getAttendanceRecap(int branchId, String date);
+  Future<AttendanceRecap> getAttendanceRecap(  int branchId, 
+    int employeeId,  // Add employeeId as a parameter
+    String date,);
 
   //Leave
   Future<LeaveRequestResponse> getLeaveRequests();
@@ -131,6 +136,26 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
   final AuthSharedPref sharedPrefsHelper = GetIt.instance<AuthSharedPref>();
 
   HRDRemoteDataSourceImpl({required this.client});
+
+
+   @override
+  Future<List<SubordinateEmployeeModel>> getAllSubordinateEmployees(int branchId) async {
+    final url = '${URLs.baseUrlProd}/hrd-all-subordinate-employee?branch_id=$branchId';
+    final response = await client.get(
+      Uri.parse(url),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      final List employees = jsonResponse['data'];
+      return employees.map((e) => SubordinateEmployeeModel.fromJson(e)).toList();
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException('Failed to fetch subordinate employees');
+    } else {
+      throw ServerException();
+    }
+  }
 
 
   @override
@@ -646,11 +671,12 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
 
   @override
-  Future<AttendanceRecap> getAttendanceRecap(int branchId, String date) async {
+   Future<AttendanceRecap> getAttendanceRecap(int branchId, int employeeId, String date) async {
     const url = '${URLs.baseUrlProd}/attendance-recap';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),
+        'employee_id': employeeId.toString(),  // Add employeeId to the query params
         'date': date,
       }),
       headers: _buildHeaders(),
@@ -664,7 +690,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
     } else {
       throw ServerException();
     }
-  }
+    }
 
   @override
   Future<List<OvertimeType>> getOvertimeTypes() async {

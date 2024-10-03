@@ -37,18 +37,21 @@ class _AttendanceRecapPageState extends State<AttendanceRecapPage> {
 
 
  void _fetchAttendanceRecap() {
-    final dateRangeCubit = context.read<DateRangeAttendanceCubit>();
-    final dateRange = dateRangeCubit.state;
+  final dateRangeCubit = context.read<DateRangeAttendanceCubit>();
+  final dateRange = dateRangeCubit.state;
 
-    final cubit = context.read<AttendanceRecapCubit>();
+  // Ambil employeeId dari AttendanceRecapInteractionCubit
+  final interactionCubit = context.read<AttendanceRecapInteractionCubit>();
+  final employeeId = interactionCubit.state.employeeId;
 
-    
-      cubit.fetchAttendanceRecap(
-        branchId: branchId,
-        date: dateRange, // Assuming date formatting as needed
-      );
- 
-  }
+  final cubit = context.read<AttendanceRecapCubit>();
+
+  cubit.fetchAttendanceRecap(
+    branchId: branchId,
+    employeeId: employeeId,  // Ambil employeeId dari state cubit
+    date: dateRange, 
+  );
+}
 
  @override
   Widget build(BuildContext context) {

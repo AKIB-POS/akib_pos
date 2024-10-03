@@ -1,3 +1,4 @@
+import 'package:akib_pos/features/hrd/data/datasources/local/hrd_shared_pref.dart';
 import 'package:akib_pos/features/hrd/data/datasources/remote/hrd_remote_data_source.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/candidate_submission.dart';
@@ -42,6 +43,7 @@ import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/finished_subordinate_task_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/unfinished_subordinate_task_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/verify_employee_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/hrd_subordinate_employee_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/approved_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/pending_submission_cubit.dart';
@@ -58,15 +60,21 @@ Future<void> initHRDModule() async {
   hrdInjection.registerLazySingleton<HRDRemoteDataSource>(
     () => HRDRemoteDataSourceImpl(client: hrdInjection()),
   );
+  hrdInjection.registerLazySingleton<HRDSharedPref>(
+    () => HRDSharedPref(hrdInjection()),
+  );
 
   // Repository
   hrdInjection.registerLazySingleton<HRDRepository>(
-    () => HRDRepositoryImpl(remoteDataSource: hrdInjection()),
+    () => HRDRepositoryImpl(remoteDataSource: hrdInjection(),connectivity: hrdInjection(),sharedPref: hrdInjection()),
   );
 
   // Cubits
   hrdInjection.registerFactory(
     () => HRDSummaryCubit(hrdInjection()),
+  );
+  hrdInjection.registerFactory(
+    () => HRDAllSubordinateEmployeeCubit(hrdInjection()),
   );
   //attendance
 
