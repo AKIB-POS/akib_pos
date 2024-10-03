@@ -1,5 +1,7 @@
+import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
-import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/subordinate_tasking_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/finished_subordinate_task_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/unfinished_subordinate_task_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/employee_service/tasking/finished_subordinate_employee_tasking.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/employee_service/tasking/unfinished_subordinate_employee_tasking.dart';
 import 'package:flutter/material.dart';
@@ -25,11 +27,11 @@ class _SubOrdinateTaskingPageState extends State<SubOrdinateTaskingPage>
     final branchId = GetIt.instance<AuthSharedPref>().getBranchId() ?? 0;
 
     // Fetch data for both tabs
-    context.read<SubordinateTaskCubit>().fetchSubordinateTasks(
-      branchId: branchId, status: 'FINISHED',
+    context.read<FinishedSubordinateTaskCubit>().fetchFinishedSubordinateTasks(
+      branchId: branchId,
     );
-    context.read<SubordinateTaskCubit>().fetchSubordinateTasks(
-      branchId: branchId, status: 'UNFINISHED',
+    context.read<UnfinishedSubordinateTaskCubit>().fetchUnfinishedSubordinateTasks(
+      branchId: branchId,
     );
   }
 
@@ -42,6 +44,7 @@ class _SubOrdinateTaskingPageState extends State<SubOrdinateTaskingPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundGrey,
       appBar: AppBar(
         title: const Text(
           'Tasking Bawahan',

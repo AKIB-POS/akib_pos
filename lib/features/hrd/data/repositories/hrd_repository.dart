@@ -25,6 +25,7 @@ import 'package:akib_pos/features/hrd/data/models/employee_service/employee_perf
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/submit_employee_request.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_training.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/employee_tasking.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/subordinate_task_detail.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/subordinate_tasking_model.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/candidate_submission.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip.dart';
@@ -100,6 +101,7 @@ abstract class HRDRepository {
     required int branchId,
     required String status,
   });
+  Future<Either<Failure, SubordinateTaskDetail>> getDetailSubordinateTask(int taskingId);
 
   //Employee Submission
   Future<Either<Failure, List<EmployeeSubmission>>> getPendingSubmissions(
@@ -131,6 +133,19 @@ class HRDRepositoryImpl implements HRDRepository {
   final HRDRemoteDataSource remoteDataSource;
 
   HRDRepositoryImpl({required this.remoteDataSource});
+
+
+  @override
+  Future<Either<Failure, SubordinateTaskDetail>> getDetailSubordinateTask(int taskingId) async {
+    try {
+      final detail = await remoteDataSource.getDetailSubordinateTask(taskingId);
+      return Right(detail);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
 
   @override

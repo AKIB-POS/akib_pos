@@ -26,6 +26,7 @@ import 'package:akib_pos/features/hrd/data/models/employee_service/employee_perf
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/submit_employee_request.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_training.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/employee_tasking.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/subordinate_task_detail.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/subordinate_tasking_model.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/candidate/candidate_submission.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/salary/salary_slip.dart';
@@ -100,6 +101,7 @@ abstract class HRDRemoteDataSource {
     required int branchId,
     required String status,
   });
+  Future<SubordinateTaskDetail> getDetailSubordinateTask(int taskingId);
 
 
 
@@ -130,12 +132,31 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   HRDRemoteDataSourceImpl({required this.client});
 
+
+  @override
+  Future<SubordinateTaskDetail> getDetailSubordinateTask(int taskingId) async {
+    final url = '${URLs.baseUrlProd}/detail-subordinate-task';
+    final response = await client.get(
+      Uri.parse('$url?tasking_id=$taskingId'),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return SubordinateTaskDetail.fromJson(jsonResponse['data']);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
   @override
   Future<List<SubordinateTaskModel>> getSubordinateTasks({
     required int branchId,
     required String status,
   }) async {
-    final url = '${URLs.baseUrlMock}/subordinate-task';
+    const url = '${URLs.baseUrlProd}/subordinate-task';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),
@@ -158,7 +179,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<List<EmployeeTask>> fetchEmployeeTasks() async {
-    const url = '${URLs.baseUrlMock}/employee-task';
+    const url = '${URLs.baseUrlProd}/employee-task';
 
     final response = await client.get(Uri.parse(url), headers: _buildHeaders());
 
@@ -346,7 +367,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<ContractEmployeeDetail> getContractEmployeeDetail(int employeeId) async {
-    const url = '${URLs.baseUrlMock}/employee/contract/details';
+    const url = '${URLs.baseUrlProd}/employee/contract/details';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {'employee_id': employeeId.toString()}),
       headers: _buildHeaders(),
@@ -364,7 +385,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
   @override
   Future<PermanentEmployeeDetail> getPermanentEmployeeDetail(int employeeId) async {
-    const url = '${URLs.baseUrlMock}/employee/permanent/details';
+    const url = '${URLs.baseUrlProd}/employee/permanent/details';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {'employee_id': employeeId.toString()}),
       headers: _buildHeaders(),
@@ -607,7 +628,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
 
     @override
   Future<SalarySlipsResponse> getSalarySlips(int year) async {
-    final url = '${URLs.baseUrlMock}/salary-slips?year=$year';
+    final url = '${URLs.baseUrlProd}/salary-slips?year=$year';
     final response = await client.get(
       Uri.parse(url),
       headers: _buildHeaders(),
