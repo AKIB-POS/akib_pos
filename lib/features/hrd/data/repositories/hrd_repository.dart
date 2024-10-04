@@ -766,27 +766,33 @@ class HRDRepositoryImpl implements HRDRepository {
 
   @override
   Future<Either<Failure, CheckInOutResponse>> checkIn(
-      CheckInOutRequest request) async {
-    try {
-      final checkInResponse = await remoteDataSource.checkIn(request);
-      return Right(checkInResponse);
-    } on ServerException {
-      return Left(ServerFailure());
-    } catch (e) {
-      return Left(GeneralFailure(e.toString()));
-    }
+    CheckInOutRequest request) async {
+  try {
+    final checkInResponse = await remoteDataSource.checkIn(request);
+    return Right(checkInResponse);
+  } on ServerException {
+    return Left(ServerFailure());
+  } on GeneralException catch (e) {
+    return Left(GeneralFailure(e.message));
+  } catch (e) {
+    return Left(GeneralFailure(e.toString()));
   }
+}
+
 
   @override
   Future<Either<Failure, CheckInOutResponse>> checkOut(
-      CheckInOutRequest request) async {
-    try {
-      final checkOutResponse = await remoteDataSource.checkOut(request);
-      return Right(checkOutResponse);
-    } on ServerException {
-      return Left(ServerFailure());
-    } catch (e) {
-      return Left(GeneralFailure(e.toString()));
-    }
+    CheckInOutRequest request) async {
+  try {
+    final checkInResponse = await remoteDataSource.checkOut(request);
+    return Right(checkInResponse);
+  } on ServerException {
+    return Left(ServerFailure());
+  } on GeneralException catch (e) {
+    return Left(GeneralFailure(e.message));
+  } catch (e) {
+    return Left(GeneralFailure(e.toString()));
   }
+}
+
 }

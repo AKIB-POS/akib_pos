@@ -38,60 +38,15 @@ class _AttendancePageState extends State<AttendancePage> {
     context.read<AttendanceHistoryCubit>().fetchAttendanceHistory(); // No parameters needed
   }
 
-  Future<Position> _getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+  // Removed _getCurrentLocation from here
 
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    return await Geolocator.getCurrentPosition();
+  // Updated _performCheckIn and _performCheckOut methods
+  void _performCheckIn(BuildContext context) {
+    context.read<CheckInCubit>().checkIn();
   }
 
-  void _performCheckIn(BuildContext context) async {
-    final time = DateFormat('HH:mm').format(DateTime.now());
-    final position = await _getCurrentLocation(); // Get the user's location
-    final lat = position.latitude;
-    final long = position.longitude;
-
-    final request = CheckInOutRequest(
-      time: time,
-      lat: lat,
-      long: long,
-    );
-
-    context.read<CheckInCubit>().checkIn(request);
-  }
-
-  void _performCheckOut(BuildContext context) async {
-    final time = DateFormat('HH:mm').format(DateTime.now());
-
-    final position = await _getCurrentLocation(); // Get the user's location
-    final lat = position.latitude;
-    final long = position.longitude;
-
-    final request = CheckInOutRequest(
-      time: time,
-      lat: lat,
-      long: long,
-    );
-
-    context.read<CheckOutCubit>().checkOut(request);
+  void _performCheckOut(BuildContext context) {
+    context.read<CheckOutCubit>().checkOut();
   }
 
   @override
@@ -105,93 +60,103 @@ class _AttendancePageState extends State<AttendancePage> {
         elevation: 0,
         titleSpacing: 0,
       ),
-      body: BlocListener<CheckInCubit, CheckInState>(
-        listener: (context, state) {
-          if (state is CheckInLoading) {
-            // Show loading dialog
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (_) => const Center(child: CircularProgressIndicator()),
-            );
-          } else if (state is CheckInSuccess) {
-            // Close loading dialog
-            Navigator.of(context).pop();
+      body: MultiBlocListener(
+        listeners: [
+          BlocListener<CheckInCubit, CheckInState>(
+            listener: (context, state) {
+              if (state is CheckInLoading) {
+                // Show loading dialog
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (_) => const Center(child: CircularProgressIndicator()),
+                );
+              } else if (state is CheckInSuccess) {
+                // Close loading dialog
+                Navigator.of(context).pop();
 
-            // Show success snackbar
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.green,
-              ),
-            );
+                // Show success snackbar
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.message),
+                    backgroundColor: Colors.green,
+                  ),
+                );
 
-            // Refresh attendance history data
-            _fetchAttendanceHistory();
-          } else if (state is CheckInError) {
-            // Close loading dialog
-            Navigator.of(context).pop();
+                Navigator.of(context).pop(true);
+                
 
-            // Show error snackbar
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        },
-        child: BlocListener<CheckOutCubit, CheckOutState>(
-          listener: (context, state) {
-            if (state is CheckOutLoading) {
-              // Show loading dialog
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (_) => const Center(child: CircularProgressIndicator()),
-              );
-            } else if (state is CheckOutSuccess) {
-              // Close loading dialog
-              Navigator.of(context).pop();
+                // Refresh attendance history data
+                _fetchAttendanceHistory();
+                
+              } else if (state is CheckInError) {
+                // Close loading dialog
+                Navigator.of(context).pop();
 
-              // Show success snackbar
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.green,
-                ),
-              );
-
-              // Refresh attendance history data
-              _fetchAttendanceHistory();
-            } else if (state is CheckOutError) {
-              // Close loading dialog
-              Navigator.of(context).pop();
-
-              // Show error snackbar
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          },
-          child: RefreshIndicator(
-            onRefresh: () async {
-              _fetchAttendanceHistory(); // Refresh the attendance history
+                // Show error snackbar
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.message),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
             },
-            color: AppColors.primaryMain,
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Column(
-                children: [
-                  Container(
-                    color: AppColors.backgroundGrey,
-                    child: Column(
-                      children: [
-                        _buildAttendanceBody(context),
-                        Container(
+          ),
+          BlocListener<CheckOutCubit, CheckOutState>(
+            listener: (context, state) {
+              if (state is CheckOutLoading) {
+                // Show loading dialog
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (_) => const Center(child: CircularProgressIndicator()),
+                );
+              } else if (state is CheckOutSuccess) {
+                // Close loading dialog
+                Navigator.of(context).pop();
+
+                // Show success snackbar
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.message),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+                Navigator.of(context).pop(true);
+
+                // Refresh attendance history data
+                _fetchAttendanceHistory();
+              } else if (state is CheckOutError) {
+                // Close loading dialog
+                Navigator.of(context).pop();
+
+                // Show error snackbar
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.message),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+        child: RefreshIndicator(
+          onRefresh: () async {
+            _fetchAttendanceHistory(); // Refresh the attendance history
+          },
+          color: AppColors.primaryMain,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                Container(
+                  color: AppColors.backgroundGrey,
+                  child: Column(
+                    children: [
+                      _buildAttendanceBody(context),
+                      Container(
                         width: double.infinity,
                         height: 20,
                         decoration: const BoxDecoration(
@@ -200,12 +165,11 @@ class _AttendancePageState extends State<AttendancePage> {
                                 topLeft: Radius.circular(30),
                                 topRight: Radius.circular(30))),
                       ),
-                      ],
-                    )),
-                  AttendanceHistoryWidget(), 
-                  
-                ],
-              ),
+                    ],
+                  ),
+                ),
+                AttendanceHistoryWidget(),
+              ],
             ),
           ),
         ),
@@ -223,9 +187,11 @@ class _AttendancePageState extends State<AttendancePage> {
       expectedClockInDateTime = DateFormat('HH:mm').parse(widget.data.expectedClockInTime!);
     }
 
-    // Determine button colors
+    // Update button logic based on conditions
     bool isClockInEnabled = widget.data.clockInTime == null &&
-                            (expectedClockInDateTime != null && now.isAfter(expectedClockInDateTime));
+        (widget.data.expectedClockInTime == null ||
+            (expectedClockInDateTime != null && now.isAfter(expectedClockInDateTime)));
+
     bool isClockOutEnabled = widget.data.clockInTime != null && widget.data.clockOutTime == null;
 
     return Container(
@@ -346,7 +312,6 @@ class _AttendancePageState extends State<AttendancePage> {
           ),
         ],
       ),
-      
     );
   }
 

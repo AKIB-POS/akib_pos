@@ -1059,7 +1059,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
         )
         .timeout(const Duration(seconds: 30));
 
-    if (response.statusCode == 201 && response.statusCode == 200) {
+    if (response.statusCode == 201 || response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return CheckInOutResponse.fromJson(jsonResponse);
     } else if (response.statusCode >= 400 && response.statusCode <= 500) {
@@ -1080,7 +1080,7 @@ class HRDRemoteDataSourceImpl implements HRDRemoteDataSource {
         )
         .timeout(const Duration(seconds: 30));
 
-    if (response.statusCode == 201 && response.statusCode == 200) {
+    if (response.statusCode == 201 || response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return CheckInOutResponse.fromJson(jsonResponse);
     } else if (response.statusCode >= 400 && response.statusCode <= 500) {

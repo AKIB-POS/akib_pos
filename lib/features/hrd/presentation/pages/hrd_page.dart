@@ -352,15 +352,18 @@ class _HrdPageState extends State<HrdPage> {
     );
   }
 
-  void _navigateToAttendancePage(BuildContext context) {
+  void _navigateToAttendancePage(BuildContext context) async{
     final attendanceData = context.read<HRDSummaryCubit>().state;
     if (attendanceData is HRDSummaryLoaded) {
-      Navigator.push(
+      final result = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => AttendancePage(data: attendanceData.hrdSummary),
         ),
       );
+      if (result == true) {
+              _fetchHRDSummary(); // Panggil fungsi untuk refresh data
+            }
     }
   }
 

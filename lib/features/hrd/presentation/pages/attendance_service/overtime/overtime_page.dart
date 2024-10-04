@@ -101,7 +101,10 @@ class _OvertimePageState extends State<OvertimePage> {
                     child: Text('Riwayat Lembur',
                         style: AppTextStyle.bigCaptionBold),
                   ),
-                  OvertimeHistoryWidget(),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 100),
+                    child: OvertimeHistoryWidget(),
+                  ),
                 ],
               ),
             ],
