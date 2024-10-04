@@ -1,10 +1,12 @@
 import 'package:akib_pos/features/accounting/data/datasources/local/employee_shared_pref.dart';
 import 'package:akib_pos/features/accounting/data/models/transaction_report/employee.dart';
+import 'package:akib_pos/features/hrd/data/datasources/local/hrd_shared_pref.dart';
+import 'package:akib_pos/features/hrd/data/models/subordinate_employee.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 class AttendanceRecapInteractionCubit extends Cubit<AttendanceRecapInteractionState> {
-  final EmployeeSharedPref employeeSharedPref;
+  final HRDSharedPref employeeSharedPref;
 
   AttendanceRecapInteractionCubit({required this.employeeSharedPref})
       : super(AttendanceRecapInteractionState(
@@ -32,7 +34,7 @@ class AttendanceRecapInteractionCubit extends Cubit<AttendanceRecapInteractionSt
     emit(state.copyWith(selectedDate: formattedDate));
   }
 
-  List<EmployeeModel> getEmployeeList() {
+  List<SubordinateEmployeeModel> getEmployeeList() {
     return employeeSharedPref.getEmployeeList();
   }
 }

@@ -7,7 +7,13 @@ class TotalPurchaseModel {
 
   factory TotalPurchaseModel.fromJson(Map<String, dynamic> json) {
     return TotalPurchaseModel(
-      totalPurchase: json['total_purchase'],
+      totalPurchase: (json['total_purchase'] as num?)?.toDouble() ?? 0.0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'total_purchase': totalPurchase,
+    };
   }
 }

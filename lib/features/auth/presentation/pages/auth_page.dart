@@ -3,6 +3,7 @@ import 'package:akib_pos/common/app_themes.dart';
 import 'package:akib_pos/features/auth/presentation/bloc/auth/auth_cubit.dart';
 import 'package:akib_pos/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:akib_pos/features/home/home_screen.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:io';
 import 'package:akib_pos/common/app_colors.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 
 class AuthPage extends StatefulWidget {
@@ -24,6 +26,12 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPage extends State<AuthPage> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+  
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -55,6 +63,7 @@ class _AuthPage extends State<AuthPage> {
   void _unfocusAllFields() {
     FocusScope.of(context).unfocus();
   }
+  
 
   switchPage(){
     currentSteps = 0;
@@ -139,17 +148,27 @@ class _AuthPage extends State<AuthPage> {
    
   }
 
-  void _login(BuildContext context) {
+  void _login(BuildContext context) async{
     _unfocusAllFields();
 
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       setState(() {
         _isLoading = true;
       });
-      final email = _emailController.text.trim();
+      if (await Permission.phone.request().isGranted) {
+   final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
 
       context.read<AuthCubit>().login(email, password);
+    } else {
+      // Handle jika izin tidak diberikan
+      setState(() {
+        ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Harap menyetujui izin")),
+      );
+      });
+    }
+   
     } else {
       _unfocusAllFields();
       ScaffoldMessenger.of(context).showSnackBar(

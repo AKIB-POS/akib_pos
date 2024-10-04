@@ -16,7 +16,7 @@ import 'package:get_it/get_it.dart';
 class CandidateSubmissionListContent extends StatelessWidget {
   final CandidateSubmission submission;
 
-  const CandidateSubmissionListContent({Key? key, required this.submission}) : super(key: key);
+  const CandidateSubmissionListContent({super.key, required this.submission});
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +85,7 @@ class CandidateSubmissionListContent extends StatelessWidget {
                     ),
                   ],
                 ),
-                _buildApprovalStatus(submission.approverName, submission.approvalStatus),
+                _buildApprovalStatus(submission.approverName ?? "Belum Disetujui", submission.approvalStatus),
               ],
             ),
           ),
@@ -130,7 +130,7 @@ class CandidateSubmissionListContent extends StatelessWidget {
 
   Widget _buildApprovalStatus(String approverName, String approvalStatus) {
     String assetPath;
-    if (approvalStatus == 'approved') {
+    if (approvalStatus == 'accepted') {
       assetPath = 'assets/icons/hrd/ic_approved.svg';
     } else if (approvalStatus == 'pending') {
       assetPath = 'assets/icons/hrd/ic_clock_pending.svg';

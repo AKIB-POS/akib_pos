@@ -18,7 +18,27 @@ class FinalCashBalanceWidget extends StatelessWidget {
         } else if (state is CashFlowReportSuccess) {
           return _buildFinalCashBalance(state.report.finalCashBalance);
         } else if (state is CashFlowReportError) {
-          return Center(child: Text('Error: ${state.message}'));
+          return  Column(
+            children: [
+              Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              color: AppColors.textGrey200,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+              ),
+            ),
+            child: const Text(
+              "Saldo  Kas Akhir",
+              style: AppTextStyle.bigCaptionBold,
+            ),
+          ),
+              Utils.buildEmptyStatePlain(state.message,
+                          "Silahkan Swipe Kebawah\nUntuk Memuat Ulang"),
+            ],
+          );
         } else {
           return Container();
         }

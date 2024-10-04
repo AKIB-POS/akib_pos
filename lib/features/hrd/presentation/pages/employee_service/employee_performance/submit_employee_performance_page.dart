@@ -1,22 +1,27 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/performance_metric_model.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee_performance/submit_employee_request.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee_performance/performance_metric_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee_performance/submit_employee_performance_cubit.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 class SubmitEmployeePerformancePage extends StatefulWidget {
-  final int employeePerformanceId;
+  final int employeeId;
   final String employeeName;
   final String role;
+  final int month;
+  final int year;
 
   const SubmitEmployeePerformancePage({
     Key? key,
-    required this.employeePerformanceId,
+    required this.employeeId,
     required this.employeeName,
     required this.role,
+    required this.month,
+    required this.year,
   }) : super(key: key);
 
   @override
@@ -27,50 +32,60 @@ class SubmitEmployeePerformancePage extends StatefulWidget {
 class _SubmitEmployeePerformancePageState
     extends State<SubmitEmployeePerformancePage> {
   final _formKey = GlobalKey<FormState>();
-  final _attendanceScoreController = TextEditingController();
-  final _attendanceRemarksController = TextEditingController();
-  final _collaborationScoreController = TextEditingController();
-  final _collaborationRemarksController = TextEditingController();
-  final _innovationScoreController = TextEditingController();
-  final _innovationRemarksController = TextEditingController();
-
+  final Map<int, TextEditingController> _scoreControllers = {};
+  final Map<int, TextEditingController> _remarksControllers = {};
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-
-    // Add listeners to controllers
-    _attendanceScoreController.addListener(_updateFormState);
-    _attendanceRemarksController.addListener(_updateFormState);
-    _collaborationScoreController.addListener(_updateFormState);
-    _collaborationRemarksController.addListener(_updateFormState);
-    _innovationScoreController.addListener(_updateFormState);
-    _innovationRemarksController.addListener(_updateFormState);
+    // Fetch performance metrics dynamically
+    context.read<PerformanceMetricCubit>().fetchPerformanceMetrics();
   }
 
   @override
   void dispose() {
-    _attendanceScoreController.dispose();
-    _attendanceRemarksController.dispose();
-    _collaborationScoreController.dispose();
-    _collaborationRemarksController.dispose();
-    _innovationScoreController.dispose();
-    _innovationRemarksController.dispose();
+    // Dispose all controllers when page is destroyed
+    for (var controller in _scoreControllers.values) {
+      controller.dispose();
+    }
+    for (var controller in _remarksControllers.values) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
-  void _updateFormState() {
-    setState(() {});
+  bool _isFormValid() {
+    // Check if all score and remarks fields are filled
+    for (var controller in _scoreControllers.values) {
+      if (controller.text.isEmpty) return false;
+    }
+    for (var controller in _remarksControllers.values) {
+      if (controller.text.isEmpty) return false;
+    }
+    return true;
   }
 
-  bool _isFormValid() {
-    return _attendanceScoreController.text.isNotEmpty &&
-        _attendanceRemarksController.text.isNotEmpty &&
-        _collaborationScoreController.text.isNotEmpty &&
-        _collaborationRemarksController.text.isNotEmpty &&
-        _innovationScoreController.text.isNotEmpty &&
-        _innovationRemarksController.text.isNotEmpty;
+  void _submit() {
+    if (_formKey.currentState!.validate()) {
+      final Map<int, PerformanceScore> performanceMetrics = {};
+
+      _scoreControllers.forEach((metricsId, controller) {
+        performanceMetrics[metricsId] = PerformanceScore(
+          score: int.parse(controller.text),
+          remarks: _remarksControllers[metricsId]!.text,
+        );
+      });
+
+      final request = SubmitEmployeePerformanceRequest(
+        employeeId: widget.employeeId,
+        month: widget.month,
+        year: widget.year,
+        performanceMetrics: performanceMetrics,
+      );
+
+      context.read<SubmitEmployeePerformanceCubit>().submitPerformance(request);
+    }
   }
 
   @override
@@ -87,8 +102,7 @@ class _SubmitEmployeePerformancePageState
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: BlocListener<SubmitEmployeePerformanceCubit,
-          SubmitEmployeePerformanceState>(
+      body: BlocListener<SubmitEmployeePerformanceCubit, SubmitEmployeePerformanceState>(
         listener: (context, state) {
           if (state is SubmitEmployeePerformanceLoading) {
             setState(() {
@@ -117,43 +131,52 @@ class _SubmitEmployeePerformancePageState
             );
           }
         },
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      _buildEmployeeInfo(),
-                      const SizedBox(height: 16),
-                      _buildPerformanceSection(
-                        'Tingkat Kehadiran',
-                        _attendanceScoreController,
-                        _attendanceRemarksController,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildPerformanceSection(
-                        'Kerjasama',
-                        _collaborationScoreController,
-                        _collaborationRemarksController,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildPerformanceSection(
-                        'Inovasi Kerja',
-                        _innovationScoreController,
-                        _innovationRemarksController,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _buildSubmitButton(),
-              ],
+        child: BlocBuilder<PerformanceMetricCubit, PerformanceMetricState>(
+          builder: (context, state) {
+            if (state is PerformanceMetricLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is PerformanceMetricLoaded) {
+              return _buildForm(state.metrics);
+            } else if (state is PerformanceMetricError) {
+              return Center(child: Text('Error: ${state.message}'));
+            }
+            return const Center(child: Text('Tidak ada data'));
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildForm(List<PerformanceMetricModel> metrics) {
+    return Form(
+      key: _formKey,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  _buildEmployeeInfo(),
+                  const SizedBox(height: 16),
+                  for (var metric in metrics)
+                    Column(
+                      children: [
+                        _buildPerformanceSection(
+                          metric.metricsName,
+                          _getController(metric.metricsId, true),
+                          _getController(metric.metricsId, false),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                ],
+              ),
             ),
-          ),
+            const SizedBox(height: 24),
+            _buildSubmitButton(),
+          ],
         ),
       ),
     );
@@ -231,6 +254,7 @@ class _SubmitEmployeePerformancePageState
             decoration: AppThemes.inputDecorationStyle.copyWith(
               hintText: 'Masukkan Nilai',
             ),
+            onChanged: (_) => setState(() {}), // Trigger validation
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Nilai tidak boleh kosong';
@@ -246,6 +270,7 @@ class _SubmitEmployeePerformancePageState
             decoration: AppThemes.inputDecorationStyle.copyWith(
               hintText: 'Masukkan keterangan',
             ),
+            onChanged: (_) => setState(() {}), // Trigger validation
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Keterangan tidak boleh kosong';
@@ -265,9 +290,8 @@ class _SubmitEmployeePerformancePageState
       decoration: AppThemes.bottomBoxDecorationDialog,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: _isFormValid() && !isLoading
-              ? AppColors.primaryMain
-              : Colors.grey,
+          backgroundColor:
+              _isFormValid() && !isLoading ? AppColors.primaryMain : Colors.grey,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
@@ -293,25 +317,15 @@ class _SubmitEmployeePerformancePageState
     );
   }
 
-  void _submit() {
-    if (_formKey.currentState!.validate()) {
-      final request = SubmitEmployeePerformanceRequest(
-        employeePerformanceId: widget.employeePerformanceId,
-        attendance: PerformanceScore(
-          score: int.parse(_attendanceScoreController.text),
-          remarks: _attendanceRemarksController.text,
-        ),
-        collaboration: PerformanceScore(
-          score: int.parse(_collaborationScoreController.text),
-          remarks: _collaborationRemarksController.text,
-        ),
-        workInnovation: PerformanceScore(
-          score: int.parse(_innovationScoreController.text),
-          remarks: _innovationRemarksController.text,
-        ),
-      );
-
-      context.read<SubmitEmployeePerformanceCubit>().submitPerformance(request);
+  TextEditingController _getController(int metricId, bool isScore) {
+    if (isScore) {
+      _scoreControllers.putIfAbsent(
+          metricId, () => TextEditingController());
+      return _scoreControllers[metricId]!;
+    } else {
+      _remarksControllers.putIfAbsent(
+          metricId, () => TextEditingController());
+      return _remarksControllers[metricId]!;
     }
   }
 }

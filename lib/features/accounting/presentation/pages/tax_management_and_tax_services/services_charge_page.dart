@@ -94,7 +94,7 @@ class _ServiceChargePageState extends State<ServiceChargePage> {
                     ); // Jika ada nilai serviceChargePercentage
                   }
                 } else if (state is ServiceChargeError) {
-                  return Center(child: Text("Error: ${state.message}"));
+                  return _buildEmptyServiceCharge(context);
                 }
                 return const SizedBox.shrink(); // Default state
               },

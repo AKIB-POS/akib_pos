@@ -2,6 +2,7 @@ import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/administration/employee_warning.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/administration/employee_warning_cubit.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -42,8 +43,21 @@ class _EmployeeWarningPageState extends State<EmployeeWarningPage> {
           if (state is EmployeeWarningLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is EmployeeWarningError) {
-            return Center(child: Text(state.message));
+            return  Utils.buildErrorState(
+          title: 'Gagal Memuat Data',
+          message: state.message,
+          onRetry: () {
+            _fetchEmployeeWarnings();
+          },);
           } else if (state is EmployeeWarningLoaded) {
+            if(state.employeeWarnings.isEmpty){
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(child: Utils.buildEmptyStatePlain("Belum Ada Surat Peringatan", "")),
+                ],
+              );
+            }
             return ListView.builder(
               padding: const EdgeInsets.all(16.0),
               itemCount: state.employeeWarnings.length,
@@ -53,7 +67,9 @@ class _EmployeeWarningPageState extends State<EmployeeWarningPage> {
               },
             );
           }
-          return const Center(child: Text('Tidak ada data peringatan.'));
+          return  Utils.buildEmptyState(
+              "Belum ada Data",null
+            );
         },
       ),
     );

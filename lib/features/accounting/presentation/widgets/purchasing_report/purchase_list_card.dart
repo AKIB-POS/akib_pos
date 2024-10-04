@@ -19,8 +19,13 @@ class PurchaseListCard extends StatelessWidget {
         if (state is PurchaseListLoading) {
           return _buildLoadingShimmer();
         } else if (state is PurchaseListError) {
-          return Center(child: Text(state.message));
+          return Utils.buildEmptyState(state.message,
+                      "Silahkan Swipe Kebawah\nUntuk Memuat Ulang");
         } else if (state is PurchaseListSuccess) {
+          if (state.purchases.isEmpty) {
+                  return Utils.buildEmptyState("Belum ada Data",
+                      "");
+          }
           return Column(
             children: state.purchases
                 .map((purchase) => _buildPurchaseCard(purchase))

@@ -100,7 +100,7 @@ class HRDEmployeeListWidget extends StatelessWidget {
               const SizedBox(height: 4),
               // Jabatan pegawai
               Text(
-                employee.role,
+                employee.role ?? "Belum Ada Role",
                 style: const TextStyle(fontSize: 14, color: Colors.grey),
               ),
             ],

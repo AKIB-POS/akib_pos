@@ -1,7 +1,7 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/overtime/overtime_request.dart';
-import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_request)cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_request_cubit.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,12 +21,12 @@ class OvertimeRequestWidget extends StatelessWidget {
           );
         } else if (state is OvertimeRequestLoaded) {
           if (state.overtimeRequests.data.isEmpty) {
-            return buildEmptyUI();
+            return Utils.buildEmptyStatePlain("Belum Ada Pengajuan", "Status Pengajuan akan tampil setelah anda\nmengisi form pengajuan lembur");
           } else {
             return _buildRequestList(state.overtimeRequests.data);
           }
         } else if (state is OvertimeRequestError) {
-          return buildEmptyUI();
+          return Utils.buildEmptyStatePlain("Ada Kesalahan", state.message);
         } else {
           return Container();
         }
@@ -34,25 +34,6 @@ class OvertimeRequestWidget extends StatelessWidget {
     );
   }
 
-  Widget buildEmptyUI() {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Utils.buildEmptyState("Belum ada Pengajuan",
-          "Status Pengajuan akan tampil setelah anda\nmengisi form pengajuan lembur"),
-    );
-  }
 
   Widget _buildRequestList(List<OvertimeRequest> requests) {
     return Padding(
@@ -97,18 +78,18 @@ class OvertimeRequestWidget extends StatelessWidget {
                         style: AppTextStyle.headline5,
                       ),
                     ),
-                    OutlinedButton(
-                      onPressed: () {
-                        // Handle detail button press
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.primaryMain),
-                        shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                      ),
-                      child: Text('Detail', style: TextStyle(color: AppColors.primaryMain)),
-                    ),
+                    // OutlinedButton(
+                    //   onPressed: () {
+                    //     // Handle detail button press
+                    //   },
+                    //   style: OutlinedButton.styleFrom(
+                    //     side: const BorderSide(color: AppColors.primaryMain),
+                    //     shape: RoundedRectangleBorder(
+                    //             borderRadius: BorderRadius.circular(4),
+                    //           ),
+                    //   ),
+                    //   child: Text('Detail', style: TextStyle(color: AppColors.primaryMain)),
+                    // ),
                   ],
                 ),
                 const SizedBox(height: 8),

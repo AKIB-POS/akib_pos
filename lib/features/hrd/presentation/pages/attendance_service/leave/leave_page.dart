@@ -4,6 +4,7 @@ import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_quota_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_request_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_history_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/attendance_service/leave/submit_leave_request_page.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/leave/leave_history_widget.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/leave/leave_quota_widget.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/attendance_service/leave/leave_request_widget.dart';
@@ -50,7 +51,7 @@ class _LeavePageState extends State<LeavePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        forceMaterialTransparency: true,
+        surfaceTintColor: Colors.white,
         title: const Text('Cuti', style: AppTextStyle.headline5),
         backgroundColor: Colors.white,
         titleSpacing: 0,
@@ -59,7 +60,7 @@ class _LeavePageState extends State<LeavePage> {
           IconButton(
             icon: const Icon(Icons.info_outline, color: AppColors.primaryMain),
             onPressed: () {
-              // Handle info button press
+              
             },
           )
         ],
@@ -119,16 +120,29 @@ class _LeavePageState extends State<LeavePage> {
                         style: AppTextStyle.bigCaptionBold),
                   ),
                   const SizedBox(height: 8,),
-                  const LeaveHistoryWidget(), // Display leave history
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 60),
+                    child: LeaveHistoryWidget(),
+                  ), // Display leave history
                 ],
               ),
             ),
           ],
         ),
       ),
-      floatingActionButton: Utils.buildFloatingActionButton(onPressed: () {
-        
-      },)
+       floatingActionButton: Utils.buildFloatingActionButton(onPressed: () async {
+        // Await the result from the SubmitLeaveRequestPage
+        final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const SubmitLeaveRequestPage(),
+      ),
+    );
+
+    // Jika result true, refresh data cuti
+    if (result == true) {
+      _refreshLeaveData();  // Panggil fungsi untuk refresh data
+    }
+      }),
     );
   }
 }

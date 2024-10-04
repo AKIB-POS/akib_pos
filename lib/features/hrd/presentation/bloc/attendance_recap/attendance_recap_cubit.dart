@@ -10,11 +10,12 @@ class AttendanceRecapCubit extends Cubit<AttendanceRecapState> {
 
   Future<void> fetchAttendanceRecap({
     required int branchId,
+    required int employeeId, // Added employeeId here
     required String date,
   }) async {
     emit(AttendanceRecapLoading());
 
-    final result = await repository.getAttendanceRecap(branchId, date);
+    final result = await repository.getAttendanceRecap(branchId, employeeId, date);
 
     result.fold(
       (failure) {
@@ -30,6 +31,7 @@ class AttendanceRecapCubit extends Cubit<AttendanceRecapState> {
     );
   }
 }
+
 
 abstract class AttendanceRecapState {
   get attendanceSummary => null;

@@ -13,9 +13,9 @@ class PermanentEmployeeDetail {
 
   factory PermanentEmployeeDetail.fromJson(Map<String, dynamic> json) {
     return PermanentEmployeeDetail(
-      employeeType: json['employee_type'],
-      employeeInfo: EmployeeInfoPermanent.fromJson(json['employee_info']),
-      personalInfo: PersonalInfo.fromJson(json['personal_info']),
+      employeeType: json['employee_type'] ?? '',  // Default to empty string if missing
+      employeeInfo: EmployeeInfoPermanent.fromJson(json['employee_info'] ?? {}),  // Safe handling of nested objects
+      personalInfo: PersonalInfo.fromJson(json['personal_info'] ?? {}),
     );
   }
 
@@ -31,22 +31,22 @@ class PermanentEmployeeDetail {
 class EmployeeInfoPermanent {
   final String position;
   final String branch;
-  final String confirmationDate;
-  final String confirmationLetterNumber;
+  final String? confirmationDate;
+  final String? confirmationLetterNumber;
 
   EmployeeInfoPermanent({
     required this.position,
     required this.branch,
-    required this.confirmationDate,
-    required this.confirmationLetterNumber,
+    this.confirmationDate,  // Nullable
+    this.confirmationLetterNumber,  // Nullable
   });
 
   factory EmployeeInfoPermanent.fromJson(Map<String, dynamic> json) {
     return EmployeeInfoPermanent(
-      position: json['position'],
-      branch: json['branch'],
-      confirmationDate: json['confirmation_date'],
-      confirmationLetterNumber: json['confirmation_letter_number'],
+      position: json['position'] ?? '',  // Default to empty string if missing
+      branch: json['branch'] ?? '',  // Default to empty string if missing
+      confirmationDate: json['confirmation_date'],  // Nullable
+      confirmationLetterNumber: json['confirmation_letter_number'],  // Nullable
     );
   }
 
