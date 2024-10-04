@@ -3,6 +3,7 @@ import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/detail_employee_task_response.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/detail_employee_tasking_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/employee_task_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/employee_service/tasking/submit_employee_tasking_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,6 +28,11 @@ class _DetailEmployeeTaskPageState extends State<DetailEmployeeTaskPage> {
   void _fetchData(){
     context.read<DetailEmployeeTaskCubit>().fetchDetailEmployeeTask(widget.taskingId);
   }
+
+  void _fetchEmployeeTasks() {
+    context.read<EmployeeTaskCubit>().fetchEmployeeTasks();
+  }
+
 
 
 
@@ -142,7 +148,7 @@ class _DetailEmployeeTaskPageState extends State<DetailEmployeeTaskPage> {
 
             // Jika result true, refresh data cuti
             if (result == true) {
-              _fetchData(); // Panggil fungsi untuk refresh data
+              _fetchEmployeeTasks(); // Panggil fungsi untuk refresh data
             }
         },
         child: const Text('Upload Tugas', style: TextStyle(color: Colors.white)),

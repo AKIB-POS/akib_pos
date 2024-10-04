@@ -2,6 +2,8 @@ import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/tasking/subordinate_task_detail.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/detail_subordinate_task_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/preview_attachment_page.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -112,7 +114,7 @@ class _DetailSubordinateTaskPageState extends State<DetailSubordinateTaskPage> {
   Widget _buildAttachmentButton(String attachmentUrl) {
     return ElevatedButton(
       onPressed: () {
-        // Logika untuk membuka lampiran atau mendownloadnya
+        Utils.navigateToPage(context, PreviewAttachmentPage(url: attachmentUrl));
       },
       style: OutlinedButton.styleFrom(
         backgroundColor: Colors.white,

@@ -5,6 +5,7 @@ import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/a
 import 'package:akib_pos/features/hrd/data/models/submission/employee/employee_submission.dart';
 import 'package:akib_pos/features/hrd/data/models/submission/employee/verify_employee_submission_request.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/verify_employee_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/preview_attachment_page.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -92,7 +93,7 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
                           _buildStatusInfo(),
                         ],
                         const SizedBox(height: 16),
-                        _buildSubmissionInfo(),
+                        _buildSubmissionInfo(context),
                         const SizedBox(height: 16),
                         _buildEmployeeInfo(),
                         const SizedBox(height: 16),
@@ -139,7 +140,7 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSubmissionInfo() {
+  Widget _buildSubmissionInfo(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -174,7 +175,7 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
               _buildColumn('Keterangan',
                   submission.description ?? 'Tidak ada keterangan'),
               const SizedBox(height: 8),
-              _buildAttachmentButton(),
+              _buildAttachmentButton(context),
             ],
           ),
         ),
@@ -220,11 +221,11 @@ class EmployeeSubmissionDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAttachmentButton() {
+  Widget _buildAttachmentButton(BuildContext context) {
     if (submission.attachment != null) {
       return ElevatedButton(
         onPressed: () {
-          // Tambahkan logika unduh lampiran
+          Utils.navigateToPage(context, PreviewAttachmentPage(url: submission.attachment ?? ""));
         },
         style: OutlinedButton.styleFrom(
           backgroundColor: Colors.white,

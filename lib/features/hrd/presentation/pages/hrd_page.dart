@@ -20,6 +20,7 @@ import 'package:akib_pos/features/hrd/presentation/pages/employee_service/taskin
 import 'package:akib_pos/features/hrd/presentation/pages/attendance_service/overtime/overtime_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/attendance_service/permission/permission_page.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/employee_service/salary/salary_%20slip_page.dart';
+import 'package:akib_pos/features/hrd/presentation/pages/employee_service/tasking/subordinate_tasking_page.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/appbar_hrd_page.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/employee_service/employee_training_card_widget.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/summary_hrd.dart';
@@ -230,8 +231,11 @@ class _HrdPageState extends State<HrdPage> {
           case 'Pegawai':
             Utils.navigateToPage(context, const HRDEmployeePage());
             break;
-          case 'Kinerja Pegawai':
+          case 'Kinerja':
             Utils.navigateToPage(context, const EmployeePerformancePage());
+            break;
+          case 'Tasking':
+            Utils.navigateToPage(context, const SubOrdinateTaskingPage());
             break;
         }
       },
