@@ -9,11 +9,21 @@ import 'package:sizer/sizer.dart';
 class AppbarDashboardPage extends StatelessWidget {
    AppbarDashboardPage({super.key});
    final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
+     bool isTabletDevice(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final width = mediaQuery.size.width;
+    final height = mediaQuery.size.height;
+
+    final aspectRatio = width / height;
+
+    return aspectRatio >= 1.0 && width >= 600;
+  }
 
   @override
   Widget build(BuildContext context) {
+     bool isTablet = isTabletDevice(context);
     return Padding(
-      padding: const EdgeInsets.only(top:4,bottom: 4),
+      padding: isTablet ? const EdgeInsets.symmetric(vertical: 8) : const EdgeInsets.only(top:4,bottom: 4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
