@@ -30,7 +30,7 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
   @override
   Future<LoginResponse> login({required String email, required String password}) async {
     final response = await http.post(
-      Uri.parse('${URLs.baseUrlMock}/login'),
+      Uri.parse('${URLs.baseUrlProd}/login'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'email': email,
@@ -39,7 +39,12 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      return LoginResponse.fromJson(jsonDecode(response.body));
+      try{
+        return LoginResponse.fromJson(jsonDecode(response.body));
+      } catch(e, stacktrace){
+        print(stacktrace);
+        throw GeneralException(e.toString());
+      }
     } else {
       final errorResponse = jsonDecode(response.body);
       throw GeneralException(errorResponse['message'] ?? 'Failed to login');
@@ -73,6 +78,8 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
         'company_address': companyAddress,
       },
     );
+
+    print(response.body);
 
     if (response.statusCode == 201) {
       return true;

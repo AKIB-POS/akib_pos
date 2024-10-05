@@ -10,32 +10,47 @@ import 'package:akib_pos/features/cashier/presentation/widgets/app_bar_content.d
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../../../common/util.dart';
+
 
 class CashierPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
-
-    bool isLandscape = width > height;
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-          onPressed: (){
-
+      floatingActionButton: isLandscape(context) ? null : Builder(
+        builder: (context) => FloatingActionButton(
+          backgroundColor: AppColors.primaryMain,
+          child: Icon(Icons.shopping_cart, color: AppColors.backgroundWhite,),
+          onPressed: () {
+            // Opens the end drawer
+            Scaffold.of(context).openEndDrawer();
           },
-          label: Icon(Icons.shopping_cart)
+        ),
       ),
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.backgroundGrey,
       drawer: MyDrawer(),
+      endDrawer: isLandscape(context) ? null : Drawer(
+          width: MediaQuery.of(context).size.width * 0.8,
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.white,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(0),
+              bottomRight: Radius.circular(0),
+            ),
+          ),
+        child: RightBody(),
+      ),
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color.fromRGBO(248, 248, 248, 1),
         elevation: 0,
         flexibleSpace: AppBarContent(),
+        actions: [Container()],
       ),
-      body: isLandscape ? Row(
+      body: isLandscape(context) ? Row(
         children: [
           Expanded(
             flex: 5,
