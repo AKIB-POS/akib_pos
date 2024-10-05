@@ -31,7 +31,7 @@ class LoginResponse {
       branchId: json['branch_id'],
       role: json['role'],
       employeeName: json['employee_name'],
-      employeeRole: json['employee_role'], // Parse from JSON
+      employeeRole: json['employee_role'] ?? "OWNER", // Parse from JSON
       permissions: List<String>.from(json['permissions']),
       email: json['email'] ?? "",
       token: json['token'],
