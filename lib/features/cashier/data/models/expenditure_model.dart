@@ -4,7 +4,7 @@ class ExpenditureModel {
   final String category;
   final String description;
   final int branchId;
-  final int cashRegisterId; // New field for cash register ID
+  final int cashRegisterId; // Field for cash register ID
 
   ExpenditureModel({
     required this.date,
@@ -12,7 +12,7 @@ class ExpenditureModel {
     required this.category,
     required this.description,
     this.branchId = 0,
-    this.cashRegisterId = 0, // Initialize the new field
+    this.cashRegisterId = 0, // Default to 0 if not provided
   });
 
   Map<String, dynamic> toJson() {
@@ -21,19 +21,19 @@ class ExpenditureModel {
       'amount': amount,
       'category': category,
       'description': description,
-      'branch_id': branchId, // Corrected JSON key
-      'cash_register_id': cashRegisterId, // Include in JSON output
+      'branch_id': branchId, // Correct JSON key
+      'cash_register_id': cashRegisterId, // Include cash register ID
     };
   }
 
   factory ExpenditureModel.fromJson(Map<String, dynamic> json) {
     return ExpenditureModel(
-      date: json['date'],
-      amount: double.parse(json['amount']), // Parsing the amount as double
-      category: json['category'],
-      description: json['description'],
-      branchId: json['branch_id'], // Corrected JSON key
-      cashRegisterId: json['cash_register_id'], // Parse the new field
+      date: json['date'] ?? '', // Default to empty string if null
+      amount: (json['amount'] as num?)?.toDouble() ?? 0.0, // Safely cast to double, default to 0.0
+      category: json['category'] ?? '', // Default to empty string if null
+      description: json['description'] ?? '', // Default to empty string if null
+      branchId: (json['branch_id'] as num?)?.toInt() ?? 0, // Safely cast to int, default to 0
+      cashRegisterId: (json['cash_register_id'] as num?)?.toInt() ?? 0, // Safely cast to int, default to 0
     );
   }
 }

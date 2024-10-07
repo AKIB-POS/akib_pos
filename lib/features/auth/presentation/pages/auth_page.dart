@@ -3,6 +3,7 @@ import 'package:akib_pos/common/app_themes.dart';
 import 'package:akib_pos/features/auth/presentation/bloc/auth/auth_cubit.dart';
 import 'package:akib_pos/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:akib_pos/features/home/home_screen.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:io';
 import 'package:akib_pos/common/app_colors.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 
 class AuthPage extends StatefulWidget {
@@ -24,6 +26,12 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPage extends State<AuthPage> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+  
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -55,6 +63,7 @@ class _AuthPage extends State<AuthPage> {
   void _unfocusAllFields() {
     FocusScope.of(context).unfocus();
   }
+  
 
   switchPage(){
     currentSteps = 0;
@@ -71,10 +80,10 @@ class _AuthPage extends State<AuthPage> {
   Widget build(BuildContext context) {
     bool isTablet = isTabletDevice(context);
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: SafeArea(
-        child: Stack(
+    return SafeArea(
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: Stack(
           children: [
             BlocListener<AuthCubit, AuthState>(
               listener: (context, state) {
@@ -103,7 +112,6 @@ class _AuthPage extends State<AuthPage> {
                   setState(() {
                     _isLoading = false;
                      currentPage = "Login";
-                     print("apakahhh $currentPage");
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("Registrasi berhasil, silakan login")),
@@ -139,17 +147,27 @@ class _AuthPage extends State<AuthPage> {
    
   }
 
-  void _login(BuildContext context) {
+  void _login(BuildContext context) async{
     _unfocusAllFields();
 
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       setState(() {
         _isLoading = true;
       });
-      final email = _emailController.text.trim();
+      if (await Permission.phone.request().isGranted) {
+   final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
 
       context.read<AuthCubit>().login(email, password);
+    } else {
+      // Handle jika izin tidak diberikan
+      setState(() {
+        ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Harap menyetujui izin")),
+      );
+      });
+    }
+   
     } else {
       _unfocusAllFields();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -245,7 +263,7 @@ class _AuthPage extends State<AuthPage> {
             ),
           ],
         ),
-        padding: EdgeInsets.all(60),
+        padding: isTabletDevice(context)  ? EdgeInsets.all(40) :EdgeInsets.all(24)  ,
         child: SingleChildScrollView(
           child: FormBuilder(
             key: _formKey,
@@ -254,7 +272,7 @@ class _AuthPage extends State<AuthPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("Login untuk memulai", style: AppTextStyle.headline4),
+                Text("Login untuk memulai", style: isTabletDevice(context) ? AppTextStyle.headline4 : AppTextStyle.headline5) ,
                 const SizedBox(height: 12),
                 const Text("*Email atau Username", style: AppTextStyle.body2),
                 const SizedBox(height: 8),
@@ -313,8 +331,8 @@ class _AuthPage extends State<AuthPage> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           SizedBox(
-                            width: 24,
-                            height: 24,
+                            width: 18,
+                            height: 18,
                             child: Checkbox(
                               checkColor: AppColors.backgroundWhite,
                               hoverColor: AppColors.primaryDark,
@@ -332,8 +350,8 @@ class _AuthPage extends State<AuthPage> {
                               },
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Text("Tetap Masuk", style: AppTextStyle.body4),
+                          const SizedBox(width: 4),
+                          Text("Tetap Masuk", style: AppTextStyle.body3),
                         ],
                       ),
                     ),
@@ -346,7 +364,7 @@ class _AuthPage extends State<AuthPage> {
                       },
                       child: Text(
                         "Lupa Password?",
-                        style: AppTextStyle.body4.copyWith(color: AppColors.primaryMain),
+                        style: AppTextStyle.body3.copyWith(color: AppColors.primaryMain),
                       ),
                     ),
                   ],
@@ -424,7 +442,7 @@ class _AuthPage extends State<AuthPage> {
                   )
                 ]
             ),
-            padding: EdgeInsets.all(60),
+            padding: isTabletDevice(context) ? EdgeInsets.all(40) : EdgeInsets.all(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -513,7 +531,7 @@ class _AuthPage extends State<AuthPage> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Halaman Pengguna", style: AppTextStyle.headline6,),
+          Text("Halaman Pengguna", style: AppTextStyle.headline5,),
           const SizedBox(height: 12,),
           const Text("*Nama", style: AppTextStyle.body2,),
           const SizedBox(height: 8,),
@@ -533,7 +551,7 @@ class _AuthPage extends State<AuthPage> {
               )
           ),
           const SizedBox(height: 12,),
-          Row(
+          isTabletDevice(context) ? Row(
             children: [
               Expanded(child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -578,6 +596,43 @@ class _AuthPage extends State<AuthPage> {
                   ),
                 ],
               )),
+            ],
+          ) : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text("*Email", style: AppTextStyle.body2,),
+              const SizedBox(height: 8,),
+              FormBuilderTextField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  name: 'email',
+                  controller: _emailController,
+                  validator: (value){
+                    if (value == null || value.isEmpty) {
+                      return 'Harap isi email anda';
+                    }
+
+                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                      return 'Harap masukkan email yang valid';
+                    }
+
+                    return null;
+                  },
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: AppThemes.inputDecorationStyle.copyWith(
+                      hintText: "Email"
+                  )
+              ),
+              const SizedBox(height: 12,),
+              const Text("No Telepon", style: AppTextStyle.body2,),
+              const SizedBox(height: 8,),
+              FormBuilderTextField(
+                  name: 'phone',
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: AppThemes.inputDecorationStyle.copyWith(
+                      hintText: "No Telepon"
+                  )
+              ),
             ],
           ),
           const SizedBox(height: 12,),
@@ -659,7 +714,7 @@ class _AuthPage extends State<AuthPage> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Halaman Perusahaan", style: AppTextStyle.headline6,),
+          Text("Halaman Perusahaan", style: AppTextStyle.headline5,),
           const SizedBox(height: 12,),
           const Text("Nama Perusahaan ", style: AppTextStyle.body2,),
           const SizedBox(height: 8,),
@@ -672,7 +727,7 @@ class _AuthPage extends State<AuthPage> {
               )
           ),
           const SizedBox(height: 12,),
-          Row(
+          isTabletDevice(context) ? Row(
             children: [
               Expanded(
                   child: Column(
@@ -716,6 +771,38 @@ class _AuthPage extends State<AuthPage> {
                     ],
                   )
               )
+            ],
+          ) : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text("*Email Perusahaan ", style: AppTextStyle.body2,),
+              const SizedBox(height: 8,),
+              FormBuilderTextField(
+                  name: 'companyEmail',
+                  controller: _companyEmailController,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value){
+                    if(value == null || value.isEmpty){
+                      return "Harap isi email perusahaan";
+                    }
+                    return null;
+                  },
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: AppThemes.inputDecorationStyle.copyWith(
+                      hintText: "Email Perusahaan "
+                  )
+              ),
+              const SizedBox(height: 12,),
+              const Text("Nomor Perusahaan ", style: AppTextStyle.body2,),
+              const SizedBox(height: 8,),
+              FormBuilderTextField(
+                  name: 'companyPhone',
+                  controller: _companyPhoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: AppThemes.inputDecorationStyle.copyWith(
+                      hintText: "Nomor Telepon Perusahaan "
+                  )
+              ),
             ],
           ),
           const SizedBox(height: 12,),
@@ -762,12 +849,12 @@ class _AuthPage extends State<AuthPage> {
                 },
                 child: RichText(
                     text: TextSpan(
-                        style: AppTextStyle.body4.copyWith(
+                        style: AppTextStyle.body3.copyWith(
                             color: AppColors.black
                         ),
                         children: [
                           TextSpan(text: "Saya telah menyetujui ",),
-                          TextSpan(text: "syarat dan ketentuan", style: AppTextStyle.body4.copyWith(
+                          TextSpan(text: "syarat dan ketentuan", style: AppTextStyle.body3.copyWith(
                               color: AppColors.primaryMain
                           ))
                         ]

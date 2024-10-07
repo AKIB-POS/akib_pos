@@ -24,7 +24,6 @@ class OpenCashierRequest {
   }
 }
 
-
 class OpenCashierResponse {
   final String message;
   final int cashRegisterId;
@@ -36,9 +35,16 @@ class OpenCashierResponse {
 
   factory OpenCashierResponse.fromJson(Map<String, dynamic> json) {
     return OpenCashierResponse(
-      message: json['message'],
-      cashRegisterId: json['cash_register_id'],
+      message: json['message'] ?? '', // Default to empty string if null
+      cashRegisterId: (json['cash_register_id'] as num?)?.toInt() ?? 0, // Safely cast to int
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'cash_register_id': cashRegisterId,
+    };
   }
 }
 
@@ -51,7 +57,13 @@ class PostCloseCashierResponse {
 
   factory PostCloseCashierResponse.fromJson(Map<String, dynamic> json) {
     return PostCloseCashierResponse(
-      message: json['message'],
+      message: json['message'] ?? '', // Default to empty string if null
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+    };
   }
 }

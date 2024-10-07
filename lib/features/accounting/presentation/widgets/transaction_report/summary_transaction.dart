@@ -142,7 +142,8 @@ class SummaryTransaction extends StatelessWidget {
             ),
           );
         } else if (state is TransactionReportError) {
-          return Center(child: Text(state.message));
+          return Utils.buildEmptyStatePlain("Ada Kesalahan",
+            state.message);
         } else {
           return Container();
         }

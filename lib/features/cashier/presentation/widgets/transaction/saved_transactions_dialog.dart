@@ -120,23 +120,29 @@ class _SavedTransactionsDialogState extends State<SavedTransactionsDialog> {
                 ],
                 Expanded(
                   child: _isListEmpty
-                      ? Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            SvgPicture.asset(
-                              "assets/images/empty_saved.svg",
-                            ),
-                            SizedBox(height: 16),
-                            Text(
-                              'Belum ada pesanan tersimpan',
-                              style: AppTextStyle.headline5,
-                            ),
-                            Text(
-                              'Silahkan tambahkan pesanan di keranjang',
-                              style: AppTextStyle.body2,
-                            ),
-                          ],
-                        )
+                      ? Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SvgPicture.asset(
+                                "assets/images/empty_saved.svg",
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                'Belum ada pesanan tersimpan',
+                                style: AppTextStyle.headline5,
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: 12),
+                              Text(
+                                'Silahkan tambahkan pesanan di keranjang',
+                                style: AppTextStyle.body2,
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                      )
                       : ListView.builder(
                           itemCount: _filteredTransactions.length,
                           itemBuilder: (context, index) {

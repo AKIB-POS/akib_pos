@@ -2,8 +2,11 @@ import 'package:akib_pos/api/urls.dart';
 import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/features/auth/data/models/login_response.dart';
 import 'package:akib_pos/util/utils.dart';
+import 'package:device_information/device_information.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
 abstract class RemoteAuthDataSource {
   Future<LoginResponse> login({required String email, required String password});
   Future<bool> register({
@@ -29,17 +32,30 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
 
   @override
   Future<LoginResponse> login({required String email, required String password}) async {
+    String? deviceId;
+    try {
+      deviceId = await DeviceInformation.deviceIMEINumber;
+    } on PlatformException {
+         throw GeneralException('Gagal Mendapatkan Device Id');
+    }
     final response = await http.post(
       Uri.parse('${URLs.baseUrlProd}/login'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'email': email,
         'password': password,
+        'device_id' : deviceId
+
       }),
     );
 
-    if (response.statusCode == 200) {
-      return LoginResponse.fromJson(jsonDecode(response.body));
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      try{
+        return LoginResponse.fromJson(jsonDecode(response.body));
+      } catch(e, stacktrace){
+        print(stacktrace);
+        throw GeneralException(e.toString());
+      }
     } else {
       final errorResponse = jsonDecode(response.body);
       throw GeneralException(errorResponse['message'] ?? 'Failed to login');
@@ -73,6 +89,8 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
         'company_address': companyAddress,
       },
     );
+
+    print(response.body);
 
     if (response.statusCode == 201) {
       return true;

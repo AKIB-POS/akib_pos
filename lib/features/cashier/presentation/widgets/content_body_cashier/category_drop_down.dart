@@ -89,7 +89,7 @@ class CategoryDropdown extends StatelessWidget {
         color: isSelected ? AppColors.primaryBackgorund.withOpacity(0.8) : Colors.white,
         borderRadius: BorderRadius.circular(8.0),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

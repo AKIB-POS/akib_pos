@@ -6,6 +6,7 @@ import 'package:akib_pos/features/accounting/presentation/pages/asset_management
 import 'package:akib_pos/features/accounting/presentation/pages/asset_management/asset_depreciation.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/asset_management/pending_asset.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/asset_management/sold_asset.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 
 class AssetManagement extends StatelessWidget {
@@ -34,25 +35,25 @@ class AssetManagement extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            _buildMenuItem(
-              context,
-              title: 'Aset Tertunda',
-              onTap: () => _navigateToPage(context,  const PendingAssetPage()),
-            ),
-            const SizedBox(height: 16),
-            _buildMenuItem(
+            // Utils.buildMenuItem(
+            //   context,
+            //   title: 'Aset Tertunda',
+            //   onTap: () => _navigateToPage(context,  const PendingAssetPage()),
+            // ),
+            // const SizedBox(height: 16),
+            Utils.buildMenuItem(
               context,
               title: 'Aset Aktif',
               onTap: () => _navigateToPage(context,  const ActiveAssetPage()),
             ),
             const SizedBox(height: 16),
-            _buildMenuItem(
+            Utils.buildMenuItem(
               context,
               title: 'Dijual/Dilepas',
               onTap: () => _navigateToPage(context,  const SoldAssetPage()),
             ),
             const SizedBox(height: 16),
-            _buildMenuItem(
+            Utils.buildMenuItem(
               context,
               title: 'Penyusutan',
               onTap: () => _navigateToPage(context, const AssetDepreciationPage()),
@@ -63,38 +64,7 @@ class AssetManagement extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(BuildContext context,
-      {required String title, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 3,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: AppTextStyle.bigCaptionBold
-            ),
-            const Icon(Icons.arrow_forward_ios, size: 18),
-          ],
-        ),
-      ),
-    );
-  }
+  
 
   void _navigateToPage(BuildContext context, Widget page) {
     Navigator.push(

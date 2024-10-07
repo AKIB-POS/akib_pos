@@ -1,26 +1,56 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/accounting/data/models/sales_report/sold_product_model.dart';
+import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/date_range_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/sales_report.dart/sales_product_report_cubit.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProductSoldCard extends StatelessWidget {
-  const ProductSoldCard({
+   ProductSoldCard({
     Key? key,
   }) : super(key: key);
+   late final AuthSharedPref _authSharedPref;
+  late final int branchId;
+  late final int companyId;
+  DateTime? customStartDate = DateTime.now();
+  DateTime? customEndDate = DateTime.now();
+
+ 
 
   @override
   Widget build(BuildContext context) {
+     _authSharedPref = GetIt.instance<AuthSharedPref>();
+    branchId = _authSharedPref.getBranchId() ?? 0;
+    companyId = _authSharedPref.getCompanyId() ?? 0;
+  void _fetchSoldProducts() {
+    final dateRange = context.read<DateRangeCubit>().state;
+    context.read<SalesProductReportCubit>().fetchSoldProducts(
+          branchId: branchId,
+          companyId: companyId,
+          date: dateRange,
+        );
+  }
     return BlocBuilder<SalesProductReportCubit, SalesProductReportState>(
       builder: (context, state) {
         if (state is SalesProductReportLoading) {
           return _buildLoadingShimmer();
         } else if (state is SalesProductReportError) {
-          return Center(child: Text(state.message));
+          return Utils.buildErrorState(title: 'Gagal Memuat Data',
+          message: state.message,
+          onRetry: () {
+            _fetchSoldProducts();
+          },);
         } else if (state is SalesProductReportSuccess) {
+          if(state.products.isEmpty){
+            return Utils.buildEmptyStatePlain("Belum ada Data",
+            "");
+          }
           return Column(
             children: state.products
                 .map((product) => _buildProductCard(product))

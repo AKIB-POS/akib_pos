@@ -17,7 +17,27 @@ class InvestmentActivityWidget extends StatelessWidget {
         if (state is CashFlowReportLoading) {
           return _buildLoadingShimmer();
         } else if (state is CashFlowReportError) {
-          return Center(child: Text(state.message));
+           return Column(
+            children: [
+              Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              color: AppColors.textGrey200,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+              ),
+            ),
+            child: const Text(
+              "Aktivitas Investasi",
+              style: AppTextStyle.bigCaptionBold,
+            ),
+          ),
+              Utils.buildEmptyStatePlain(state.message,
+                          "Silahkan Swipe Kebawah\nUntuk Memuat Ulang"),
+            ],
+          );
         } else if (state is CashFlowReportSuccess) {
           return _buildInvestmentActivity(state.report.investmentActivities);
         } else {

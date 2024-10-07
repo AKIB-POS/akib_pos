@@ -9,8 +9,15 @@ class SalesReportModel {
 
   factory SalesReportModel.fromJson(Map<String, dynamic> json) {
     return SalesReportModel(
-      totalSales: json['total_sales'],
-      totalCostOfGoodsSold: json['total_cost_of_goods_sold'],
+      totalSales: (json['total_sales'] as num?)?.toDouble() ?? 0.0,
+      totalCostOfGoodsSold: (json['total_cost_of_goods_sold'] as num?)?.toDouble() ?? 0.0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'total_sales': totalSales,
+      'total_cost_of_goods_sold': totalCostOfGoodsSold,
+    };
   }
 }

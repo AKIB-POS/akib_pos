@@ -126,6 +126,5 @@ Future<void> init() async {
   sl.registerLazySingleton<SharedPrefsHelper>(
     () => SharedPrefsHelper(sl()),
   );
-
   
 }

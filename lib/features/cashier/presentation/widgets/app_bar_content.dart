@@ -4,6 +4,7 @@ import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.da
 import 'package:akib_pos/features/cashier/presentation/bloc/close_cashier/close_cashier_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/app_bar_right.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/close_cashier_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/expenditure_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/content_body_cashier/open_cashier_dialog.dart';
@@ -21,10 +22,23 @@ import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:badges/badges.dart' as badges;
 
-class AppBarContent extends StatelessWidget {
+import '../../../../common/util.dart';
+
+class AppBarContent extends StatefulWidget {
+  const AppBarContent({super.key});
+
+  @override
+  State<AppBarContent> createState() => _AppBarContentState();
+}
+
+class _AppBarContentState extends State<AppBarContent> {
   final TextEditingController _controller = TextEditingController();
+
   final FocusNode _focusNode = FocusNode();
+
   final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
+
+  bool isPerformSearch = false;
 
   @override
   Widget build(BuildContext context) {
@@ -41,92 +55,13 @@ class AppBarContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           appBarLeft(_controller, context, _focusNode),
-          appBarRight(context, customerName,
-              customerPhone), // Pass the phone number to the method
+          isLandscape(context) ? Expanded(
+            flex: 3,
+            child: AppBarRight(buildContext: context, customerName: customerName,
+                customerPhone: customerPhone),
+          ) : Container(), // Pass the phone number to the method
         ],
       ),
-    );
-  }
-
-  Expanded appBarRight(
-      BuildContext context, String? customerName, String? customerPhone) {
-    // Add customerPhone parameter
-    return Expanded(
-      flex: 3,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 1,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            GestureDetector(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return VoucherDialog();
-                  },
-                );
-              },
-              child: SvgPicture.asset(
-                "assets/icons/ic_disc.svg",
-                height: 3.5.h,
-                width: 3.5.w,
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  customerName ?? 'Nama Pelanggan',
-                  style: AppTextStyle.headline5
-                      .copyWith(color: AppColors.textGrey800),
-                ),
-                const SizedBox(height: 0.5),
-                Visibility(
-                  visible: customerPhone == "null" ? false : true,
-                  child: Text(
-                    customerPhone ?? '',
-                    style: AppTextStyle.body3
-                        .copyWith(color: AppColors.textGrey500),
-                  ),
-                ),
-              ],
-            ),
-            GestureDetector(
-              onTap: () {
-                _showMemberDialog(
-                    context); // Panggil fungsi untuk menampilkan MemberDialog
-              },
-              child: SvgPicture.asset(
-                "assets/icons/ic_note.svg",
-                height: 3.5.h,
-                width: 3.5.w,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showMemberDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return MemberDialog();
-      },
     );
   }
 
@@ -220,9 +155,9 @@ class AppBarContent extends StatelessWidget {
                 );
               },
             ),
-
             const SizedBox(width: 10),
-            GestureDetector(
+            if(!isLandscape(context) && !isPerformSearch) Expanded(child: Container()),
+            if((!isPerformSearch && !isLandscape(context)) || isLandscape(context)) GestureDetector(
               onTap: () {
                 showDialog(
                   context: context,
@@ -244,8 +179,8 @@ class AppBarContent extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 10),
-            GestureDetector(
+            if((!isPerformSearch && !isLandscape(context)) || isLandscape(context)) const SizedBox(width: 10),
+            if((!isPerformSearch && !isLandscape(context)) || isLandscape(context)) GestureDetector(
               onTap: () {
                 showDialog(
                   context: context,
@@ -267,8 +202,8 @@ class AppBarContent extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 10),
-            Expanded(
+            if((!isPerformSearch && !isLandscape(context)) || isLandscape(context)) const SizedBox(width: 10),
+            if(isPerformSearch || isLandscape(context)) Expanded(
               child: SizedBox(
                 child: Center(
                   child: FocusScope(
@@ -280,6 +215,12 @@ class AppBarContent extends StatelessWidget {
                     child: TextField(
                       controller: controller,
                       focusNode: focusNode,
+                      onTapOutside: (pde){
+                        _focusNode.unfocus();
+                        setState(() {
+                          isPerformSearch = false;
+                        });
+                      },
                       decoration: InputDecoration(
                         hintText: 'Cari Produk',
                         border: OutlineInputBorder(
@@ -306,8 +247,27 @@ class AppBarContent extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 10),
-            Container(
+            if(!isLandscape(context) && !isPerformSearch) Container(
+              height: 50,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                color: Colors.white, // White background color
+                borderRadius: BorderRadius.circular(4.0), // Border radius of 4
+              ),
+              child: Center(
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      isPerformSearch = true;
+                    });
+                    _focusNode.requestFocus();
+                  },
+                  child: Icon(Icons.search, color: AppColors.textGrey800, size: 20,),
+                ),
+              ),
+            ),
+            if((!isPerformSearch && !isLandscape(context)) || isLandscape(context)) const SizedBox(width: 10),
+            if((!isPerformSearch && !isLandscape(context)) || isLandscape(context)) Container(
               height: 50,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
@@ -349,6 +309,7 @@ class AppBarContent extends StatelessWidget {
                 ),
               ),
             ),
+            if(isLandscape(context) == false) const SizedBox(width: 10),
           ],
         ),
       ),
@@ -410,6 +371,9 @@ class AppBarContent extends StatelessWidget {
 
   void _performSearch(BuildContext context, String text) {
     BlocProvider.of<CashierCubit>(context).updateSearchText(text);
+    setState(() {
+      isPerformSearch = false;
+    });
     _focusNode.unfocus();
   }
 }

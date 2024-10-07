@@ -13,10 +13,19 @@ class PurchasedProductModel {
 
   factory PurchasedProductModel.fromJson(Map<String, dynamic> json) {
     return PurchasedProductModel(
-      date: json['date'],
-      amount: json['amount'].toDouble(),
-      productName: json['product_name'],
-      expenditureCategory: json['expenditure_category'],
+      date: json['date'] ?? '',
+      amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
+      productName: json['product_name'] ?? '',
+      expenditureCategory: json['expenditure_category'] ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'date': date,
+      'amount': amount,
+      'product_name': productName,
+      'expenditure_category': expenditureCategory,
+    };
   }
 }

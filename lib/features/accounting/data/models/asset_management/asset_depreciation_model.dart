@@ -21,8 +21,8 @@ class AssetsDepreciationModel {
       assetName: json['asset_name'],
       invoiceNumber: json['invoice_number'],
       usefulLife: json['useful_life'],
-      valuePerYear: json['value_per_year'].toDouble(),
-      accumulatedDepreciation: json['accumulated_depreciation'].toDouble(),
+      valuePerYear: (json['value_per_year'] as num).toDouble(),
+      accumulatedDepreciation: (json['accumulated_depreciation'] as num).toDouble(),
     );
   }
 }

@@ -7,6 +7,7 @@ class LoginResponse {
   final String? email;
   final String? role;
   final String employeeName;
+  final String employeeRole; // New field for employee role
   final List<String> permissions;
 
   LoginResponse({
@@ -18,6 +19,7 @@ class LoginResponse {
     this.email,
     this.role,
     required this.employeeName,
+    required this.employeeRole, // Include in constructor
     required this.permissions,
   });
 
@@ -29,7 +31,8 @@ class LoginResponse {
       branchId: json['branch_id'],
       role: json['role'],
       employeeName: json['employee_name'],
-      permissions: List.from(json['permissions']),
+      employeeRole: json['employee_role'] ?? "OWNER", // Parse from JSON
+      permissions: List<String>.from(json['permissions']),
       email: json['email'] ?? "",
       token: json['token'],
     );

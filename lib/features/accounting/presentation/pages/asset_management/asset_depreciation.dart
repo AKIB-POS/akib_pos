@@ -67,8 +67,13 @@ class _AssetDepreciationPageState extends State<AssetDepreciationPage> {
             if (state is AssetsDepreciationLoading) {
               return _buildLoadingShimmer();
             } else if (state is AssetsDepreciationError) {
-              return Center(child: Text(state.message));
+              return Utils.buildErrorStatePlain(title: "Gagal Mendapatkan data", message: state.message, onRetry: () {
+                _fetchAssetDepreciation();
+              },);
             } else if (state is AssetsDepreciationLoaded) {
+              if (state.depreciations.isEmpty){
+                Utils.buildEmptyState("Belum Ada Aset", "");
+              }
               return _buildAssetDepreciationList(state.depreciations);
             } else {
               return Container();
