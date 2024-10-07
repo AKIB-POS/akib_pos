@@ -17,7 +17,7 @@ class PendingAssetModel {
       date: json['date'] ?? '',
       itemName: json['item_name'] ?? '',
       invoiceNumber: json['invoice_number'] ?? '',
-      acquisitionCost: (json['acquisition_cost'] ?? 0).toDouble(),
+      acquisitionCost: (json['acquisition_cost'] as num?)?.toDouble() ?? 0.0,
     );
   }
 

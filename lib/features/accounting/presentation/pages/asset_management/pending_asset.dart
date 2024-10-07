@@ -68,8 +68,13 @@ class _PendingAssetPageState extends State<PendingAssetPage> {
             if (state is PendingAssetLoading) {
               return _buildLoadingShimmer();
             } else if (state is PendingAssetError) {
-              return Center(child: Text(state.message));
+              return Utils.buildErrorStatePlain(title: "Gagal Mendapatkan data", message: state.message, onRetry: () {
+                _fetchPendingAssets();
+              },);
             } else if (state is PendingAssetLoaded) {
+              if (state.pendingAssets.isEmpty){
+                Utils.buildEmptyState("Belum Ada Aset", "");
+              }
               return _buildPendingAssetList(state.pendingAssets);
             } else {
               return Container();

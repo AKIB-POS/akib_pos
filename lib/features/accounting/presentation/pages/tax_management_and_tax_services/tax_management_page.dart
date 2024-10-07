@@ -100,7 +100,7 @@ class _TaxManagementPageState extends State<TaxManagementPage> {
                       ); // Jika ada nilai
                     }
                   } else if (state is TaxManagementError) {
-                    return Center(child: Text("Error: ${state.message}"));
+                    return _buildEmptyTaxCharge(context);
                   }
                   return const SizedBox.shrink(); // Default state
                 },

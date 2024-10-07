@@ -17,7 +17,13 @@ class LeaveHistoryWidget extends StatelessWidget {
         if (state is LeaveHistoryLoading) {
           return _buildLoadingShimmer(); // Display shimmer when loading
         } else if (state is LeaveHistoryError) {
-          return Center(child: Text(state.message)); // Display error message
+          return Utils.buildErrorState(
+          title: 'Gagal Memuat Data',
+          message: state.message,
+          onRetry: () {
+            context.read<LeaveHistoryCubit>().fetchLeaveHistory();
+          },
+        );
         } else if (state is LeaveHistoryLoaded) {
           if (state.leaveHistory.data.isEmpty) {
             return Utils.buildEmptyState("Belum ada Riwayat",

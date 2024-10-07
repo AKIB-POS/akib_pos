@@ -14,7 +14,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
 class ProfitLossPage extends StatefulWidget {
-  const ProfitLossPage({Key? key}) : super(key: key);
+  const ProfitLossPage({super.key});
 
   @override
   State<ProfitLossPage> createState() => _ProfitLossPageState();
@@ -62,7 +62,7 @@ class _ProfitLossPageState extends State<ProfitLossPage> {
               padding: const EdgeInsets.only(bottom: 150), // Menambah jarak untuk widget fixed
               child: Column(
                 children: [
-                  ProfitLossTopWidget(onDateTap: _selectDate),
+                  ProfitLossTopWidget(onDateTap: () =>_selectDate(context)),
                   const SalesRevenueWidget(),
                   const COGSWidget(),
                   const OperatingExpensesWidget(),
@@ -87,7 +87,16 @@ class _ProfitLossPageState extends State<ProfitLossPage> {
                 } else if (state is ProfitLossLoading) {
                   return Utils.buildLoadingCardShimmer();
                 } else if (state is ProfitLossError) {
-                  return Center(child: Text(state.message));
+                  return Container(
+                   color: Colors.white,
+                padding: const EdgeInsets.all(16),
+                    child: Center(child: Column(
+                      children: [
+                        Text(state.message),
+                        Text("Swipe Kebawah Untuk Load Ulang"),
+                      ],
+                    )),
+                  );
                 } else {
                   return Container();
                 }
@@ -99,7 +108,8 @@ class _ProfitLossPageState extends State<ProfitLossPage> {
     );
   }
 
-  void _selectDate(BuildContext context) async {
+void _selectDate(BuildContext context) async {
+  print("kjnasfad");
     await showModalBottomSheet(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
@@ -295,6 +305,7 @@ class _ProfitLossPageState extends State<ProfitLossPage> {
 
                           // Setelah memilih rentang tanggal, muat ulang data
                           _fetchProfitLossData();
+                         
                         },
                         child: const Text(
                           'Terapkan',
@@ -310,6 +321,8 @@ class _ProfitLossPageState extends State<ProfitLossPage> {
       },
     );
   }
+
+
 
   Future<DateTime?> _selectCustomDate(BuildContext context,
       DateTime initialDate, DateTime firstDate, DateTime lastDate) async {

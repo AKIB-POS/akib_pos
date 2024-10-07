@@ -1,6 +1,7 @@
 
 import 'package:akib_pos/core/error/failures.dart';
-import 'package:akib_pos/features/hrd/data/models/employee_service/administration/company_rules.dart';
+import 'package:akib_pos/features/hrd/data/models/employee_service/administration/employee_rules.dart';
+
 import 'package:akib_pos/features/hrd/data/repositories/hrd_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

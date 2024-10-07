@@ -1,10 +1,14 @@
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_rejected_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/candidate_submission/candidate_submission_list_content.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
 class CandidateRejectedSubmissionTab extends StatelessWidget {
-  const CandidateRejectedSubmissionTab({Key? key}) : super(key: key);
+   CandidateRejectedSubmissionTab({Key? key}) : super(key: key);
+ final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
 
   @override
   Widget build(BuildContext context) {
@@ -13,10 +17,16 @@ class CandidateRejectedSubmissionTab extends StatelessWidget {
         if (state is CandidateRejectedSubmissionsLoading) {
           return const Center(child: CircularProgressIndicator());
         } else if (state is CandidateRejectedSubmissionsError) {
-          return Center(child: Text('Error: ${state.message}'));
+          return Utils.buildErrorState(
+          title: 'Gagal Memuat Data',
+          message: state.message,
+          onRetry: () {
+            context.read<CandidateRejectedSubmissionsCubit>().fetchRejectedSubmissions(branchId: _authSharedPref.getBranchId() ?? 0);
+          },
+        );
         } else if (state is CandidateRejectedSubmissionsLoaded) {
           if (state.rejectedSubmissions.isEmpty) {
-            return const Center(child: Text('Tidak ada pengajuan yang ditolak'));
+            return Utils.buildEmptyState("Belum Ada Pengajuan", null);
           } else {
             return Container(
               padding: const EdgeInsets.symmetric(vertical: 16),

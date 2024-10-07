@@ -4,9 +4,9 @@ class EmployeeSubmission {
   final String submissionType;
   final String name;
   final String role;
-  final String submissionDate;
+  final String? submissionDate;
   final List<SubmissionInfo> submissionDetails;
-  final String approverName;
+  final String? approverName;
   final String approvalStatus;
   final String? description;  // Nullable because it may not always have a description
   final String? attachment;   // Nullable because it may not always have an attachment
@@ -27,23 +27,24 @@ class EmployeeSubmission {
     this.reason,
   });
 
+  // JSON Factory with null safety handling
   factory EmployeeSubmission.fromJson(Map<String, dynamic> json) {
     var submissionDetails = (json['submission_details'] as List)
         .map((detail) => SubmissionInfo.fromJson(detail))
         .toList();
     return EmployeeSubmission(
       employeeSubmissionId: json['employee_submission_id'],
-      type: json['type'],
-      submissionType: json['submission_type'],
-      name: json['name'],
-      role: json['role'],
-      submissionDate: json['submission_date'],
+      type: json['type'] ?? '', // Default value if null
+      submissionType: json['submission_type'] ?? '', // Default value if null
+      name: json['name'] ?? '', // Default value if null
+      role: json['role'] ?? '', // Default value if null
+      submissionDate: json['submission_date'], // Nullable
       submissionDetails: submissionDetails,
-      approverName: json['approver_name'],
-      approvalStatus: json['approval_status'],
-      description: json['description'],
-      attachment: json['attachment'],
-      reason: json['reason'],
+      approverName: json['approver_name'], // Nullable
+      approvalStatus: json['approval_status'] ?? '', // Default value if null
+      description: json['description'], // Nullable
+      attachment: json['attachment'], // Nullable
+      reason: json['reason'], // Nullable
     );
   }
 

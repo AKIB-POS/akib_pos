@@ -54,13 +54,19 @@ import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/atten
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_quota_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_request_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_history_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/leave_type_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/leave/submit_leave_request_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_history_cubit.dart';
-import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_request)cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_request_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/overtime_type_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/overtime/submit_overtime_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_history_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_quota_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_request_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_in_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/check_out_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_type_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/submit_permission_request_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_approved_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_pending_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/candidate_submission/candidate_rejected_submission_cubit.dart';
@@ -74,14 +80,23 @@ import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employe
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/hrd_employee_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee/permanent_employee_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee_performance/employee_performance_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee_performance/performance_metric_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee_performance/submit_employee_performance_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/employee_training_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/detail_salary_slip_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/salary/salary_slip_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/detail_employee_tasking_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/employee_task_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/finished_subordinate_task_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/submit_employee_tasking_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/unfinished_subordinate_task_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/verify_employee_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/hrd_subordinate_employee_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/approved_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/pending_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/rejected_submission_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/detail_subordinate_task_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/employee_submission/pending_approval_tab.dart';
 import 'package:akib_pos/splash_screen.dart';
 import 'package:akib_pos/util/bloc_providers.dart';
@@ -277,6 +292,10 @@ void main() async {
         ),
     
         BlocProvider(
+          create: (context) => HRDAllSubordinateEmployeeCubit(hrdInjection()),
+        ),
+    
+        BlocProvider(
           create: (context) => CheckInCubit(hrdInjection()),
         ),
         BlocProvider(
@@ -304,6 +323,12 @@ void main() async {
         BlocProvider(
           create: (context) => LeaveHistoryCubit(hrdInjection()),
         ),
+        BlocProvider(
+          create: (context) => SubmitLeaveRequestCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => LeaveTypeCubit(hrdInjection()),
+        ),
 
         BlocProvider(
           create: (context) => PermissionQuotaCubit(hrdInjection()),
@@ -314,12 +339,24 @@ void main() async {
         BlocProvider(
           create: (context) => PermissionHistoryCubit(hrdInjection()),
         ),
+        BlocProvider(
+          create: (context) => PermissionTypeCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => SubmitPermissionRequestCubit(hrdInjection()),
+        ),
 
         BlocProvider(
           create: (context) => OvertimeRequestCubit(hrdInjection()),
         ),
         BlocProvider(
           create: (context) => OvertimeHistoryCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => OvertimeTypeCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => SubmitOvertimeRequestCubit(hrdInjection()),
         ),
 
 
@@ -338,6 +375,9 @@ void main() async {
           create: (context) => ContractEmployeeCubit(hrdInjection()),
         ),
         BlocProvider(
+          create: (context) => PerformanceMetricCubit(hrdInjection()),
+        ),
+        BlocProvider(
           create: (context) => PermanentEmployeeCubit(hrdInjection()),
         ),
         BlocProvider(
@@ -353,6 +393,30 @@ void main() async {
         BlocProvider(
           create: (context) => CompanyRulesCubit(hrdInjection()),
         ),
+        //training
+        BlocProvider(
+          create: (context) => EmployeeTrainingCubit(hrdInjection()),
+        ),
+        //Tasking
+        BlocProvider(
+          create: (context) => EmployeeTaskCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => FinishedSubordinateTaskCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => UnfinishedSubordinateTaskCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => DetailSubordinateTaskCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => DetailEmployeeTaskCubit(hrdInjection()),
+        ),
+        BlocProvider(
+          create: (context) => SubmitEmployeeTaskingCubit(hrdInjection()),
+        ),
+        
 
         //Employee Submission
         BlocProvider(

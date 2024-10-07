@@ -6,11 +6,18 @@ class LeaveHistoryResponse {
 
   factory LeaveHistoryResponse.fromJson(Map<String, dynamic> json) {
     return LeaveHistoryResponse(
-      message: json['message'],
-      data: List<LeaveHistoryData>.from(
-        json['data'].map((item) => LeaveHistoryData.fromJson(item)),
-      ),
+      message: json['message'] ?? '',
+      data: (json['data'] as List?)
+              ?.map((item) => LeaveHistoryData.fromJson(item))
+              .toList() ?? [],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'data': data.map((e) => e.toJson()).toList(),
+    };
   }
 }
 
@@ -29,10 +36,19 @@ class LeaveHistoryData {
 
   factory LeaveHistoryData.fromJson(Map<String, dynamic> json) {
     return LeaveHistoryData(
-      leaveType: json['leave_type'],
-      startDate: json['start_date'],
-      endDate: json['end_date'],
-      status: json['status'],
+      leaveType: json['leave_type'] ?? '',
+      startDate: json['start_date'] ?? '',
+      endDate: json['end_date'] ?? '',
+      status: json['status'] ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'leave_type': leaveType,
+      'start_date': startDate,
+      'end_date': endDate,
+      'status': status,
+    };
   }
 }

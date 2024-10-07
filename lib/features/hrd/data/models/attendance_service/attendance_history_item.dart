@@ -15,15 +15,24 @@ class AttendanceHistoryItem {
 
   factory AttendanceHistoryItem.fromJson(Map<String, dynamic> json) {
     return AttendanceHistoryItem(
-      date: json['date'],
-      clockInTime: json['clock_in_time'],
-      clockInStatus: json['clock_in_status'],
-      clockOutTime: json['clock_out_time'],
-      clockOutStatus: json['clock_out_status'],
+      date: json['date'] ?? '',
+      clockInTime: json['clock_in_time'] ?? '',
+      clockInStatus: json['clock_in_status'] ?? '',
+      clockOutTime: json['clock_out_time'] ?? '',
+      clockOutStatus: json['clock_out_status'] ?? '',
     );
   }
-}
 
+  Map<String, dynamic> toJson() {
+    return {
+      'date': date,
+      'clock_in_time': clockInTime,
+      'clock_in_status': clockInStatus,
+      'clock_out_time': clockOutTime,
+      'clock_out_status': clockOutStatus,
+    };
+  }
+}
 class AttendanceHistoryResponse {
   final String message;
   final List<AttendanceHistoryItem> data;
@@ -31,11 +40,18 @@ class AttendanceHistoryResponse {
   AttendanceHistoryResponse({required this.message, required this.data});
 
   factory AttendanceHistoryResponse.fromJson(Map<String, dynamic> json) {
+    var dataList = (json['data'] as List?) ?? [];
+    List<AttendanceHistoryItem> data = dataList.map((item) => AttendanceHistoryItem.fromJson(item)).toList();
     return AttendanceHistoryResponse(
-      message: json['message'],
-      data: (json['data'] as List)
-          .map((item) => AttendanceHistoryItem.fromJson(item))
-          .toList(),
+      message: json['message'] ?? '',
+      data: data,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'data': data.map((item) => item.toJson()).toList(),
+    };
   }
 }

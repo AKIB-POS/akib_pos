@@ -21,8 +21,8 @@ class ActiveAssetModel {
       assetName: json['asset_name'],
       assetAccountNumber: json['asset_account_number'],
       assetAccountCode: json['asset_account_code'],
-      accumulatedCost: json['accumulated_cost'],
-      bookValue: json['book_value'],
+      accumulatedCost: (json['accumulated_cost'] as num).toDouble(),
+      bookValue: (json['book_value'] as num).toDouble(),
     );
   }
 }

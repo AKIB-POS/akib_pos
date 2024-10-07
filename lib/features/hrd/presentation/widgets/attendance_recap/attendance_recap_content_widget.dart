@@ -1,9 +1,13 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/hrd/data/models/attenddance_recap.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_recap/attendance_recap_cubit.dart';
+import 'package:akib_pos/features/hrd/presentation/bloc/attendance_recap/date_range_attendance_cubit.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:shimmer/shimmer.dart';
 
 import 'package:flutter/material.dart';
@@ -11,7 +15,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 
 class AttendanceRecapContentWidget extends StatelessWidget {
-  const AttendanceRecapContentWidget({super.key});
+  AttendanceRecapContentWidget({super.key});
+  final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
+  late final int branchId;
+  late final int companyId;
+  DateTime? customStartDate = DateTime.now();
+  DateTime? customEndDate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -20,11 +29,14 @@ class AttendanceRecapContentWidget extends StatelessWidget {
         if (state is AttendanceRecapLoading) {
           return _buildShimmerLoading();
         } else if (state is AttendanceRecapError) {
-          return Center(child: Text(state.message));
+          return Utils.buildEmptyState(
+            'Gagal Memuat Data',
+             state.message,
+          );
         } else if (state is AttendanceRecapLoaded) {
           return _buildAttendanceRecapContent(state.attendanceRecap);
         } else {
-          return Container(); // Placeholder for the initial state
+          return Utils.buildEmptyState("Tidak Ada Data", null);
         }
       },
     );
@@ -66,7 +78,8 @@ class AttendanceRecapContentWidget extends StatelessWidget {
           children: [
             Text(
               title,
-              style: AppTextStyle.headline5.copyWith(fontWeight: FontWeight.normal),
+              style: AppTextStyle.headline5
+                  .copyWith(fontWeight: FontWeight.normal),
             ),
             const SizedBox(height: 12),
             Container(
@@ -131,14 +144,12 @@ class AttendanceRecapContentWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-
           // Alpha Section
           _buildSection(
             title: 'Alpa',
             content: attendanceRecap.alpha,
           ),
           const SizedBox(height: 16),
-
           // Overtime Duration Section
           _buildSection(
             title: 'Lembur',
@@ -149,7 +160,8 @@ class AttendanceRecapContentWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildSection({required String title, String? content, Widget? child}) {
+  Widget _buildSection(
+      {required String title, String? content, Widget? child}) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -164,11 +176,13 @@ class AttendanceRecapContentWidget extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: AppTextStyle.headline5.copyWith(fontWeight: FontWeight.normal),
+                style: AppTextStyle.headline5
+                    .copyWith(fontWeight: FontWeight.normal),
               ),
               if (content != null)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: AppColors.backgroundGrey,
                     borderRadius: BorderRadius.circular(4),

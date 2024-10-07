@@ -25,6 +25,8 @@ import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
 abstract class AccountingRemoteDataSource {
+
+  
   Future<TransactionSummaryResponse> getTodayTransactionSummary(
       int branchId, int companyId);
   Future<EmployeeListResponse> getAllEmployees(int branchId, int companyId);
@@ -161,11 +163,10 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int companyId,
     required String date,
   }) async {
-    const url = '${URLs.baseUrlMock}/profit-loss';
+    const url = '${URLs.baseUrlProd}/profit-loss';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),
-        'company_id': companyId.toString(),
         'date': date,
       }),
       headers: _buildHeaders(),
@@ -187,11 +188,10 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int branchId,
     required int companyId,
   }) async {
-    const url = '${URLs.baseUrlMock}/assets-depreciation';
+    const url = '${URLs.baseUrlProd}/assets-depreciation';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
-        'branch_id': branchId.toString(),
-        'company_id': companyId.toString(),
+        'branch_id': branchId.toString()
       }),
       headers: _buildHeaders(),
     ).timeout(const Duration(seconds: 30));
@@ -211,11 +211,10 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int branchId,
     required int companyId,
   }) async {
-    const url = '${URLs.baseUrlMock}/tax-charge';
+    const url = '${URLs.baseUrlProd}/tax-charge';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
-        'branch_id': branchId.toString(),
-        'company_id': companyId.toString(),
+        'branch_id': branchId.toString()
       }),
       headers: _buildHeaders(),
     ).timeout(const Duration(seconds: 30));
@@ -236,13 +235,12 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int companyId,
     required double amount,
   }) async {
-    const url = '${URLs.baseUrlMock}/tax-charge';
+    const url = '${URLs.baseUrlProd}/tax-charge';
     final response = await client.post(
       Uri.parse(url),
       headers: _buildHeaders(),
       body: jsonEncode({
         'branch_id': branchId.toString(),
-        'company_id': companyId.toString(),
         'amount': amount.toDouble(),
       }),
     ).timeout(const Duration(seconds: 30));
@@ -265,13 +263,12 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int companyId,
     required double amount,
   }) async {
-    const url = '${URLs.baseUrlMock}/service-charge';
+    const url = '${URLs.baseUrlProd}/service-charge';
     final response = await client.post(
       Uri.parse(url),
       headers: _buildHeaders(),
       body: jsonEncode({
         'branch_id': branchId.toString(),
-        'company_id': companyId.toString(),
         'amount': amount.toDouble(),
       }),
     ).timeout(const Duration(seconds: 30));
@@ -295,11 +292,10 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int branchId,
     required int companyId,
   }) async {
-    const url = '${URLs.baseUrlMock}/service-charge';
+    const url = '${URLs.baseUrlProd}/service-charge';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
-        'branch_id': branchId.toString(),
-        'company_id': companyId.toString(),
+        'branch_id': branchId.toString()
       }),
       headers: _buildHeaders(),
     ).timeout(const Duration(seconds: 30));
@@ -320,12 +316,12 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int companyId,
     required String date,
   }) async {
-    const url = '${URLs.baseUrlMock}/financial-balance';
+    const url = '${URLs.baseUrlProd}/financial-balance';
     final response = await client
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'date': date,
           }),
           headers: _buildHeaders(),
@@ -347,12 +343,12 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int branchId,
     required int companyId,
   }) async {
-    const url = '${URLs.baseUrlMock}/sold-assets';
+    const url = '${URLs.baseUrlProd}/sold-assets';
     final response = await client
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
           }),
           headers: _buildHeaders(),
         )
@@ -375,12 +371,12 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int branchId,
     required int companyId,
   }) async {
-    const url = '${URLs.baseUrlMock}/active-assets';
+    const url = '${URLs.baseUrlProd}/active-assets';
     final response = await client
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
           }),
           headers: _buildHeaders(),
         )
@@ -403,12 +399,12 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int branchId,
     required int companyId,
   }) async {
-    const url = '${URLs.baseUrlMock}/pending-assets';
+    const url = '${URLs.baseUrlProd}/pending-assets';
     final response = await client
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
           }),
           headers: _buildHeaders(),
         )
@@ -429,12 +425,12 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
   @override
   Future<CashFlowReportModel> getCashFlowReport(
       int branchId, int companyId, String date) async {
-    const url = '${URLs.baseUrlMock}/cash-flow-report';
+    const url = '${URLs.baseUrlProd}/cash-flow-report';
     final response = await client
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'date': date,
           }),
           headers: _buildHeaders(),
@@ -457,12 +453,11 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int companyId,
     required String date,
   }) async {
-    const url = '${URLs.baseUrlMock}/purchased-products';
+    const url = '${URLs.baseUrlProd}/purchased-products';
     final response = await client
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
             'date': date,
           }),
           headers: _buildHeaders(),
@@ -485,12 +480,12 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int companyId,
     required String date,
   }) async {
-    const url = '${URLs.baseUrlMock}/total-expenditure';
+    const url = '${URLs.baseUrlProd}/total-expenditure';
     final response = await client
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'date': date,
           }),
           headers: _buildHeaders(),
@@ -512,12 +507,12 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int companyId,
     required String date,
   }) async {
-    const url = '${URLs.baseUrlMock}/total-purchase-list';
+    const url = '${URLs.baseUrlProd}/total-purchase-list';
     final response = await client
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'date': date,
           }),
           headers: _buildHeaders(),
@@ -542,12 +537,12 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int companyId,
     required String date,
   }) async {
-    const url = '${URLs.baseUrlMock}/total-purchase';
+    const url = '${URLs.baseUrlProd}/total-purchase';
     final response = await client
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'date': date,
           }),
           headers: _buildHeaders(),
@@ -569,12 +564,12 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int companyId,
     required String date,
   }) async {
-    const url = '${URLs.baseUrlMock}/sold-products';
+    const url = '${URLs.baseUrlProd}/sold-products';
     final response = await client
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'date': date,
           }),
           headers: _buildHeaders(),
@@ -599,12 +594,12 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int companyId,
     required String date,
   }) async {
-    const url = '${URLs.baseUrlMock}/sales-report-summary';
+    const url = '${URLs.baseUrlProd}/sales-report-summary';
     final response = await client
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'date': date,
           }),
           headers: _buildHeaders(),
@@ -627,12 +622,12 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int employeeId,
     required String date,
   }) async {
-    const url = '${URLs.baseUrlMock}/today-top-transaction-report';
+    const url = '${URLs.baseUrlProd}/today-top-transaction-report';
     final response = await client
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'employee_id': employeeId.toString(),
             'date': date,
           }),
@@ -657,12 +652,12 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int employeeId,
     required String date,
   }) async {
-    const url = '${URLs.baseUrlMock}/today-discount-transaction-report';
+    const url = '${URLs.baseUrlProd}/today-discount-transaction-report';
     final response = await client
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'employee_id': employeeId.toString(),
             'date': date,
           }),
@@ -687,12 +682,12 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int employeeId,
     required String date,
   }) async {
-    const url = '${URLs.baseUrlMock}/today-transaction-report';
+    const url = '${URLs.baseUrlProd}/today-transaction-report';
     final response = await client
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
             'employee_id': employeeId.toString(),
             'date': date.toString(),
           }),
@@ -713,12 +708,12 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
   @override
   Future<EmployeeListResponse> getAllEmployees(
       int branchId, int companyId) async {
-    const url = '${URLs.baseUrlMock}/all-employee';
+    const url = '${URLs.baseUrlProd}/acounting-all-employee';
     final response = await client
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-            'company_id': companyId.toString(),
+
           }),
           headers: _buildHeaders(),
         )
@@ -737,10 +732,9 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
   Future<TransactionSummaryResponse> getTodayTransactionSummary(
       int branchId, int companyId) async {
     final url =
-        Uri.parse('${URLs.baseUrlMock}/today-transaction-summary').replace(
+        Uri.parse('${URLs.baseUrlProd}/today-transaction-summary').replace(
       queryParameters: {
-        'branch_id': branchId.toString(),
-        'company_id': companyId.toString(),
+        'branch_id': branchId.toString()
       },
     );
 

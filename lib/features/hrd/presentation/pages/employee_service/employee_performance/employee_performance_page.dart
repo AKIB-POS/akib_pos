@@ -80,11 +80,17 @@ class _EmployeePerformancePageState extends State<EmployeePerformancePage> {
                   if (state is EmployeePerformanceLoading) {
                     return _buildShimmerLoading();
                   } else if (state is EmployeePerformanceError) {
-                    return Center(child: Text(state.message));
+                    return Utils.buildErrorState(
+                      title: 'Gagal Memuat Data',
+                      message: state.message,
+                      onRetry: () {
+                        _fetchEmployeePerformanceData();
+                      },
+                    );
                   } else if (state is EmployeePerformanceLoaded) {
                     return state.employeePerformances.isEmpty
-                        ? const Center(
-                            child: Text('Tidak ada data kinerja pegawai.'))
+                        ? Utils.buildEmptyState("Belum ada Riwayat",
+                            "Riwayat akan tampil setelah\nizin anda telah selesai")
                         : _buildEmployeePerformanceList(
                             state.employeePerformances);
                   }
@@ -112,12 +118,12 @@ class _EmployeePerformancePageState extends State<EmployeePerformancePage> {
       itemCount: performances.length,
       itemBuilder: (context, index) {
         final employee = performances[index];
-        return _buildEmployeeCard(employee);
+        return _buildEmployeeCard(employee,index);
       },
     );
   }
 
-  Widget _buildEmployeeCard(EmployeePerformance employee) {
+  Widget _buildEmployeeCard(EmployeePerformance employee, int index) {
     Color backgroundColor;
     Color textColor;
     if (employee.employeeType == 'Contract Employee') {
@@ -179,22 +185,24 @@ class _EmployeePerformancePageState extends State<EmployeePerformancePage> {
               ),
               if (employee.performanceScore == null)
                 OutlinedButton(
-                  onPressed: () async{
+                  onPressed: () async {
                     final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SubmitEmployeePerformancePage(
-                        employeePerformanceId: employee.employeePerformanceId,
-                        employeeName: employee.employeeName,
-                        role: employee.role,
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SubmitEmployeePerformancePage(
+                          employeeId: employee.employeePerformanceId,
+                          employeeName: employee.employeeName,
+                          role: employee.role,
+                          month: Utils.getMonthNumber(selectedMonth),
+                          year: selectedYear,
+                        ),
                       ),
-                    ),
-                  );
+                    );
 
-                  // If the result is true, refresh the employee data
-                  if (result == true) {
-                    _fetchEmployeePerformanceData();
-                  }
+                    // If the result is true, refresh the employee data
+                    if (result == true) {
+                      _fetchEmployeePerformanceData();
+                    }
                   },
                   style: AppThemes.outlineButtonPrimaryStyle,
                   child: const Text('Nilai',

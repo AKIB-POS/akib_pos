@@ -15,7 +15,24 @@ class OperatingExpensesWidget extends StatelessWidget {
         if (state is ProfitLossLoading) {
           return Utils.buildLoadingCardShimmer();
         } else if (state is ProfitLossError) {
-          return Center(child: Text(state.message));
+          return Container(
+            margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
+      ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                 const Text("Beban Operasional", style: AppTextStyle.bigCaptionBold),
+                  Center(
+                    child: Utils.buildEmptyStatePlain(state.message,
+                        "Silahkan Swipe Kebawah\nUntuk Memuat Ulang"),
+                  )
+              ],
+            ),
+          );
         } else if (state is ProfitLossLoaded) {
           return _buildOperatingExpenses(state.profitLoss.operatingExpenses);
         } else {

@@ -35,12 +35,12 @@ class AssetManagement extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Utils.buildMenuItem(
-              context,
-              title: 'Aset Tertunda',
-              onTap: () => _navigateToPage(context,  const PendingAssetPage()),
-            ),
-            const SizedBox(height: 16),
+            // Utils.buildMenuItem(
+            //   context,
+            //   title: 'Aset Tertunda',
+            //   onTap: () => _navigateToPage(context,  const PendingAssetPage()),
+            // ),
+            // const SizedBox(height: 16),
             Utils.buildMenuItem(
               context,
               title: 'Aset Aktif',

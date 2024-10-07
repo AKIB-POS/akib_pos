@@ -75,7 +75,7 @@ class _ExpenditureReportState extends State<ExpenditureReport> {
               ExpenditureReportTop(
                 onDateTap: () => _selectDate(context),
               ),
-              const ExpenditureReportSummary(),
+               ExpenditureReportSummary(),
               const Padding(
                 padding: EdgeInsets.only(left: 16,bottom: 16),
                 child: Text("Produk Dibeli",style: AppTextStyle.headline5,),

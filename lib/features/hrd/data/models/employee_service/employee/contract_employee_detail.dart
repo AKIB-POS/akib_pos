@@ -11,9 +11,9 @@ class ContractEmployeeDetail {
 
   factory ContractEmployeeDetail.fromJson(Map<String, dynamic> json) {
     return ContractEmployeeDetail(
-      employeeType: json['employee_type'],
-      employeeInfo: EmployeeInfo.fromJson(json['employee_info']),
-      personalInfo: PersonalInfo.fromJson(json['personal_info']),
+      employeeType: json['employee_type'] ?? '',
+      employeeInfo: EmployeeInfo.fromJson(json['employee_info'] ?? {}),
+      personalInfo: PersonalInfo.fromJson(json['personal_info'] ?? {}),
     );
   }
 
@@ -27,7 +27,7 @@ class ContractEmployeeDetail {
 }
 
 class EmployeeInfo {
-  final String position;
+  final String? position;
   final String branch;
   final String contractStart;
   final String contractEnd;
@@ -42,9 +42,9 @@ class EmployeeInfo {
   factory EmployeeInfo.fromJson(Map<String, dynamic> json) {
     return EmployeeInfo(
       position: json['position'],
-      branch: json['branch'],
-      contractStart: json['contract_start'],
-      contractEnd: json['contract_end'],
+      branch: json['branch'] ?? '',
+      contractStart: json['contract_start'] ?? '',
+      contractEnd: json['contract_end'] ?? '',
     );
   }
 
@@ -77,12 +77,12 @@ class PersonalInfo {
 
   factory PersonalInfo.fromJson(Map<String, dynamic> json) {
     return PersonalInfo(
-      name: json['name'],
-      gender: json['gender'],
-      birthDate: json['birth_date'],
-      phoneNumber: json['phone_number'],
-      email: json['email'],
-      address: json['address'],
+      name: json['name'] ?? '',
+      gender: json['gender'] ?? '',
+      birthDate: json['birth_date'] ?? '',
+      phoneNumber: json['phone_number'] ?? '',
+      email: json['email'] ?? '',
+      address: json['address'] ?? '',
     );
   }
 
@@ -97,4 +97,3 @@ class PersonalInfo {
     };
   }
 }
-

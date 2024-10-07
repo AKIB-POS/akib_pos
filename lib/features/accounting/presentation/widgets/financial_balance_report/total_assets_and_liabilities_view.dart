@@ -19,7 +19,12 @@ class TotalAssetsAndLiabilitiesView extends StatelessWidget {
           final totalLiabilitiesAndEquity = state.financialBalance.totalLiabilitiesAndEquity;
           return _buildTotalView(totalAssets, totalLiabilitiesAndEquity);
         } else if (state is FinancialBalanceError) {
-          return Center(child: Text("Error: ${state.message}"));
+          return Container(
+             decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
+            child: Center(child: Text("Error: ${state.message} Swipe Kebawah Untul load Ulang")));
         }
         return const SizedBox.shrink();
       },

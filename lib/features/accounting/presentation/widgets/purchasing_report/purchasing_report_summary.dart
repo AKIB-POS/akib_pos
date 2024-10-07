@@ -67,7 +67,8 @@ class PurchasingReportSummary extends StatelessWidget {
             ),
           );
         } else if (state is TotalPurchaseError) {
-          return Center(child: Text(state.message));
+           return Utils.buildEmptyStatePlain(state.message,
+                      "Silahkan Swipe Kebawah\nUntuk Memuat Ulang");
         } else {
           return Container();
         }

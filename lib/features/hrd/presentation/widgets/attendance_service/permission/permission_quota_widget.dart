@@ -1,5 +1,6 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/permission/permission_quota_cubit.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
@@ -12,7 +13,7 @@ class PermissionQuotaWidget extends StatelessWidget {
         if (state is PermissionQuotaLoading) {
           return _buildLoadingShimmer();
         } else if (state is PermissionQuotaError) {
-          return Center(child: Text(state.message));
+          return Utils.buildEmptyStatePlain("Ada Kesalahan", state.message);
         } else if (state is PermissionQuotaLoaded) {
           final data = state.permissionQuota.data;
           return _buildPermissionQuotaContent(data.totalQuota, data.usedQuota);

@@ -3,7 +3,7 @@ class CandidateSubmission {
   final String candidateName;
   final String submissionDate;
   final String submissionType;
-  final String approverName;
+  final String? approverName;
   final String approvalStatus;
 
   CandidateSubmission({
@@ -21,7 +21,7 @@ class CandidateSubmission {
       candidateName: json['candidate_name'],
       submissionDate: json['submission_date'],
       submissionType: json['submission_type'],
-      approverName: json['approver_name'],
+      approverName: json['approver_name'] ,
       approvalStatus: json['approval_status'],
     );
   }

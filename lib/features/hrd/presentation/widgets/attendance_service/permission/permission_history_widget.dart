@@ -16,7 +16,12 @@ class PermissionHistoryWidget extends StatelessWidget {
         if (state is PermissionHistoryLoading) {
           return _buildLoadingShimmer(); // Display shimmer when loading
         } else if (state is PermissionHistoryError) {
-          return Center(child: Text(state.message)); // Display error message
+          return Utils.buildErrorState(
+          title: 'Gagal Memuat Data',
+          message: state.message,
+          onRetry: () {
+            context.read<PermissionHistoryCubit>().fetchPermissionHistory();
+          },);// Display error message
         } else if (state is PermissionHistoryLoaded) {
           if (state.permissionHistory.data.isEmpty) {
             return Utils.buildEmptyState(

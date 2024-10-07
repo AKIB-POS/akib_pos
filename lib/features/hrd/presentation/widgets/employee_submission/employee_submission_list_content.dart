@@ -38,7 +38,7 @@ class EmployeeSubmissionListContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Submission Date and Type
-          _buildHeader(submission.submissionDate, submission.type),
+          _buildHeader(submission.submissionDate ?? "", submission.type),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Column(
@@ -96,7 +96,7 @@ class EmployeeSubmissionListContent extends StatelessWidget {
                     children: [
                   _buildSubmissionDetails(submission.submissionDetails),
                   const SizedBox(height: 8),
-                  _buildApprovalStatus(submission.approverName, submission.approvalStatus),
+                  _buildApprovalStatus(submission.approverName ?? "", submission.approvalStatus),
                     ],
                   ),
                 ),

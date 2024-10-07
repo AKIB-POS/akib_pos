@@ -19,11 +19,20 @@ class SoldProductModel {
         : null;
 
     return SoldProductModel(
-      date: json['date'],
-      categoryName: json['category_name'],
-      totalItemsSold: json['total_items_sold'],
+      date: json['date'] ?? '',
+      categoryName: json['category_name'] ?? '',
+      totalItemsSold: (json['total_items_sold'] as num?)?.toInt() ?? 0,
       subCategories: subCategoryList,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'date': date,
+      'category_name': categoryName,
+      'total_items_sold': totalItemsSold,
+      'sub_categories': subCategories?.map((e) => e.toJson()).toList(),
+    };
   }
 }
 
@@ -38,8 +47,15 @@ class SubCategoryModel {
 
   factory SubCategoryModel.fromJson(Map<String, dynamic> json) {
     return SubCategoryModel(
-      subCategoryName: json['sub_category_name'],
-      itemsSold: json['items_sold'],
+      subCategoryName: json['sub_category_name'] ?? '',
+      itemsSold: (json['items_sold'] as num?)?.toInt() ?? 0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'sub_category_name': subCategoryName,
+      'items_sold': itemsSold,
+    };
   }
 }

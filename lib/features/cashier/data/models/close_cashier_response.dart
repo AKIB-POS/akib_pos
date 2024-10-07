@@ -6,9 +6,16 @@ class CloseCashierResponse {
 
   factory CloseCashierResponse.fromJson(Map<String, dynamic> json) {
     return CloseCashierResponse(
-      message: json['message'],
-      data: CashierData.fromJson(json['data']),
+      message: json['message'] ?? '', // Default to empty string if missing
+      data: CashierData.fromJson(json['data'] ?? {}), // Safely handle missing data field
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'data': data.toJson(),
+    };
   }
 }
 
@@ -35,14 +42,27 @@ class CashierData {
 
   factory CashierData.fromJson(Map<String, dynamic> json) {
     return CashierData(
-      cashierName: json['cashier_name'],
-      cashierOpenTime: json['cashier_open_time'],
-      cashierCloseTime: json['cashier_close_time'],
-      initialCash: json['initial_cash'].toDouble(),
-      outletExpenditure: json['outlet_expenditure'].toDouble(),
-      cashPayment: json['cash_payment'].toDouble(),
-      nonCashPayment: json['non_cash_payment'].toDouble(),
-      totalCash: json['total_cash'].toDouble(),
+      cashierName: json['cashier_name'] ?? '', // Default to empty string if missing
+      cashierOpenTime: json['cashier_open_time'] ?? '', // Default to empty string if missing
+      cashierCloseTime: json['cashier_close_time'] ?? '', // Default to empty string if missing
+      initialCash: (json['initial_cash'] as num?)?.toDouble() ?? 0.0, // Safely cast to double, default to 0.0
+      outletExpenditure: (json['outlet_expenditure'] as num?)?.toDouble() ?? 0.0, // Safely cast
+      cashPayment: (json['cash_payment'] as num?)?.toDouble() ?? 0.0, // Safely cast
+      nonCashPayment: (json['non_cash_payment'] as num?)?.toDouble() ?? 0.0, // Safely cast
+      totalCash: (json['total_cash'] as num?)?.toDouble() ?? 0.0, // Safely cast
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'cashier_name': cashierName,
+      'cashier_open_time': cashierOpenTime,
+      'cashier_close_time': cashierCloseTime,
+      'initial_cash': initialCash,
+      'outlet_expenditure': outletExpenditure,
+      'cash_payment': cashPayment,
+      'non_cash_payment': nonCashPayment,
+      'total_cash': totalCash,
+    };
   }
 }

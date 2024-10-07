@@ -1,4 +1,3 @@
-// OvertimeHistoryData.dart
 class OvertimeHistoryData {
   final String overtimeDescription;
   final String startDatetime;
@@ -14,23 +13,36 @@ class OvertimeHistoryData {
 
   factory OvertimeHistoryData.fromJson(Map<String, dynamic> json) {
     return OvertimeHistoryData(
-      overtimeDescription: json['overtime_description'],
-      startDatetime: json['start_datetime'],
-      endDatetime: json['end_datetime'],
-      status: json['status'],
+      overtimeDescription: json['overtime_description'] ?? '',
+      startDatetime: json['start_datetime'] ?? '',
+      endDatetime: json['end_datetime'] ?? '',
+      status: json['status'] ?? '',
     );
   }
-}
 
-// OvertimeHistoryResponse.dart
+  Map<String, dynamic> toJson() {
+    return {
+      'overtime_description': overtimeDescription,
+      'start_datetime': startDatetime,
+      'end_datetime': endDatetime,
+      'status': status,
+    };
+  }
+}
 class OvertimeHistoryResponse {
   final List<OvertimeHistoryData> data;
 
   OvertimeHistoryResponse({required this.data});
 
   factory OvertimeHistoryResponse.fromJson(Map<String, dynamic> json) {
-    var dataList = json['data'] as List;
+    var dataList = (json['data'] as List?) ?? [];
     List<OvertimeHistoryData> data = dataList.map((i) => OvertimeHistoryData.fromJson(i)).toList();
     return OvertimeHistoryResponse(data: data);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'data': data.map((item) => item.toJson()).toList(),
+    };
   }
 }

@@ -2,6 +2,7 @@ import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/hrd/data/models/attendance_service/attendance_history_item.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_service/attendance_history_cubit.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
@@ -14,7 +15,12 @@ class AttendanceHistoryWidget extends StatelessWidget {
         if (state is AttendanceHistoryLoading) {
           return _buildLoadingShimmer();
         } else if (state is AttendanceHistoryError) {
-          return Center(child: Text(state.message));
+          return Utils.buildErrorState(
+          title: 'Gagal Memuat Data',
+          message: state.message,
+          onRetry: () {
+            context.read<AttendanceHistoryCubit>().fetchAttendanceHistory();
+          },);
         } else if (state is AttendanceHistoryLoaded) {
           return Padding(
             padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
@@ -152,12 +158,7 @@ class AttendanceHistoryWidget extends StatelessWidget {
                             history.clockOutTime,
                             style: AppTextStyle.bigCaptionBold
                                 .copyWith(color: AppColors.errorMain),
-                          ),
-                          Text(
-                            " - ${history.clockOutStatus}",
-                            style: AppTextStyle.bigCaptionBold
-                                .copyWith(color: AppColors.errorMain),
-                          ),
+                          )
                         ],
                       ),
                     ),

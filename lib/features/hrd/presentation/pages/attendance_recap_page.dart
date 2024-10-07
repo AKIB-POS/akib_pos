@@ -37,18 +37,21 @@ class _AttendanceRecapPageState extends State<AttendanceRecapPage> {
 
 
  void _fetchAttendanceRecap() {
-    final dateRangeCubit = context.read<DateRangeAttendanceCubit>();
-    final dateRange = dateRangeCubit.state;
+  final dateRangeCubit = context.read<DateRangeAttendanceCubit>();
+  final dateRange = dateRangeCubit.state;
 
-    final cubit = context.read<AttendanceRecapCubit>();
+  // Ambil employeeId dari AttendanceRecapInteractionCubit
+  final interactionCubit = context.read<AttendanceRecapInteractionCubit>();
+  final employeeId = interactionCubit.state.employeeId;
 
-    
-      cubit.fetchAttendanceRecap(
-        branchId: branchId,
-        date: dateRange, // Assuming date formatting as needed
-      );
- 
-  }
+  final cubit = context.read<AttendanceRecapCubit>();
+
+  cubit.fetchAttendanceRecap(
+    branchId: branchId,
+    employeeId: employeeId,  // Ambil employeeId dari state cubit
+    date: dateRange, 
+  );
+}
 
  @override
   Widget build(BuildContext context) {
@@ -67,150 +70,14 @@ class _AttendanceRecapPageState extends State<AttendanceRecapPage> {
                 onDateTap: () => _selectDate(context),
                 onEmployeeTap: () => _showEmployeePicker(context),
               ),
-              AttendanceRecapContentWidget(),
+               AttendanceRecapContentWidget(),
             ],
           ),
         ),
       ),
     );
   }
-  Widget _buildAttendanceRecapContent(AttendanceRecap attendanceRecap) {
-  return Padding(
-    padding: const EdgeInsets.all(16.0),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Work Duration Section
-        _buildSection(
-          title: 'Durasi Jam Kerja',
-          content: attendanceRecap.workDuration,
-        ),
-        const SizedBox(height: 16),
-
-        // Leave Balance Section
-        _buildSection(
-          title: 'Saldo Cuti',
-          content: attendanceRecap.leaveBalance.totalLeave,
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: AppColors.textGrey100
-            ),
-            child: Column(
-              children: attendanceRecap.leaveBalance.details.map((detail) {
-                return _buildDetailRow(detail.leaveType, detail.days);
-              }).toList(),
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        // Permissions Section
-        _buildSection(
-          title: 'Izin',
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: AppColors.textGrey100
-            ),
-            child: Column(
-              children: attendanceRecap.permissions.map((permission) {
-                return _buildDetailRow(
-                    permission.permissionType, permission.duration);
-              }).toList(),
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        // Alpha Section
-        _buildSection(
-          title: 'Alpa',
-          content: attendanceRecap.alpha,
-        ),
-        const SizedBox(height: 16),
-
-        // Overtime Duration Section
-        _buildSection(
-          title: 'Lembur',
-          content: attendanceRecap.overtimeDuration,
-        ),
-      ],
-    ),
-  );
-}
-
-
-Widget _buildSection({required String title, String? content, Widget? child}) {
-  return Container(
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(8),
-      
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: AppTextStyle.headline5.copyWith(fontWeight: FontWeight.normal),
-            ),
-            if (content != null)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.backgroundGrey,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  content,
-                  style: AppTextStyle.bigCaptionBold.copyWith(
-                    color: AppColors.textGrey800,
-                  ),
-                ),
-              ),
-          ],
-        ),
-        if (child != null) ...[
-          const SizedBox(height: 12),
-          child,
-        ]
-      ],
-    ),
-  );
-}
-
-Widget _buildDetailRow(String title, String value) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: AppTextStyle.caption.copyWith(color: AppColors.textGrey800),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: AppColors.textGrey300,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Text(
-            value,
-            style: AppTextStyle.caption.copyWith(fontWeight: FontWeight.bold),
-          ),
-        ),
-      ],
-    ),
-  );
-}
+  
 
 
   void _selectDate(BuildContext context) async {

@@ -23,7 +23,7 @@ class SalarySlipsDetailContent extends StatelessWidget {
         } else if (state is DetailSalarySlipLoaded) {
           return _buildContent(state.salarySlipDetail);
         } else if (state is DetailSalarySlipError) {
-          return Center(child: Text(state.message));
+          return Utils.buildEmptyState("${state.message}", "Swipe Kebawah Untuk Refresh");
         } else {
           return Container();
         }

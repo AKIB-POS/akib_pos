@@ -69,8 +69,13 @@ class _SoldAssetPageState extends State<SoldAssetPage> {
             if (state is SoldAssetLoading) {
               return _buildLoadingShimmer();
             } else if (state is SoldAssetError) {
-              return Center(child: Text(state.message));
+              return Utils.buildErrorStatePlain(title: "Gagal Mendapatkan data", message: state.message, onRetry: () {
+                _fetchSoldAssets();
+              },);
             } else if (state is SoldAssetLoaded) {
+              if (state.soldAssets.isEmpty){
+                Utils.buildEmptyState("Belum Ada Aset", "");
+              }
               return _buildSoldAssetList(state.soldAssets);
             } else {
               return Container();

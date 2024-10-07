@@ -84,10 +84,10 @@ class _CandidateSubmissionPageState extends State<CandidateSubmissionPage>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [
+        children: [
           CandidatePendingSubmissionTab(),
           CandidateApprovedSubmissionTab(),
-          CandidateRejectedSubmissionTab(),
+           CandidateRejectedSubmissionTab(),
         ],
       ),
     );

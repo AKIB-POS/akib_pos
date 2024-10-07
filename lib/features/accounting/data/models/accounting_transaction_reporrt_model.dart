@@ -17,13 +17,24 @@ class AccountingTransactionReportModel {
 
   factory AccountingTransactionReportModel.fromJson(Map<String, dynamic> json) {
     return AccountingTransactionReportModel(
-      transactionCode: json['transaction_code'],
+      transactionCode: json['transaction_code'] ?? '',
       customerName: json['customer_name'],
-      price: json['price'],
-      discount: json['discount'],
-      orderType: json['order_type'],
-      paymentType: json['payment_type'],
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,
+      discount: (json['discount'] as num?)?.toDouble(),
+      orderType: json['order_type'] ?? '',
+      paymentType: json['payment_type'] ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'transaction_code': transactionCode,
+      'customer_name': customerName,
+      'price': price,
+      'discount': discount,
+      'order_type': orderType,
+      'payment_type': paymentType,
+    };
   }
 }
 
@@ -37,13 +48,21 @@ class AccountingTransactionListResponse {
   });
 
   factory AccountingTransactionListResponse.fromJson(Map<String, dynamic> json) {
-    var transactions = (json['data'] as List)
-        .map((transaction) => AccountingTransactionReportModel.fromJson(transaction))
-        .toList();
+    var transactions = (json['data'] as List?)
+        ?.map((transaction) =>
+            AccountingTransactionReportModel.fromJson(transaction))
+        .toList() ?? [];
 
     return AccountingTransactionListResponse(
-      message: json['message'],
+      message: json['message'] ?? '',
       data: transactions,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'data': data.map((e) => e.toJson()).toList(),
+    };
   }
 }
