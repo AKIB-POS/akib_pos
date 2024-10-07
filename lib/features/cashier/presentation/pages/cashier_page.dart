@@ -38,8 +38,5 @@ class CashierPage extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  
-  
+  }  
 }
