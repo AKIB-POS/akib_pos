@@ -13,6 +13,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../../../common/util.dart';
+
 class MenuGrid extends StatelessWidget {
   MenuGrid();
 
@@ -33,8 +35,8 @@ class MenuGrid extends StatelessWidget {
 
         return GridView.builder(
           padding: const EdgeInsets.only(right: 8),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: isLandscape(context) ? 4 : 3,
             crossAxisSpacing: 8.0,
             mainAxisSpacing: 8.0,
             childAspectRatio: 0.8,
@@ -173,7 +175,8 @@ class MenuCard extends StatelessWidget {
                         ? item.imageUrl!
                         : 'assets/images/no_imgproduk.png', // Placeholder URL atau path lokal
                     width: double.infinity,
-                    fit: BoxFit.fill,
+                    fit: BoxFit.cover,
+                    alignment: Alignment.center,
                     height: 11.h,
                     clearMemoryCacheWhenDispose: true,
                     cache: true,
@@ -205,7 +208,8 @@ class MenuCard extends StatelessWidget {
                             child: Image.asset(
                               'assets/images/no_imgproduk.png',
                               width: double.infinity,
-                              fit: BoxFit.fill,
+                              fit: BoxFit.cover,
+                              alignment: Alignment.center,
                               height: 11.h,
                             ),
                           );
