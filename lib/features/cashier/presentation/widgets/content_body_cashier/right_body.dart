@@ -1,5 +1,6 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/common/util.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/cashier/data/models/full_transaction_model.dart';
 import 'package:akib_pos/features/cashier/data/models/save_transaction_model.dart';
@@ -7,6 +8,7 @@ import 'package:akib_pos/features/cashier/data/models/transaction_model.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/badge/badge_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/process_transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/widgets/app_bar_right.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/printer_management_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/confirm_remove_transaction_dialog.dart';
 import 'package:akib_pos/features/cashier/presentation/widgets/transaction/payment_dialog.dart';
@@ -24,8 +26,15 @@ import 'package:sizer/sizer.dart';
 
 class RightBody extends StatelessWidget {
   final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
+
+  RightBody({super.key});
   @override
   Widget build(BuildContext context) {
+    final customerName =
+    context.select((TransactionCubit cubit) => cubit.state.customerName);
+    final customerPhone = context.select(
+            (TransactionCubit cubit) => cubit.state.customerPhone); // Add this line
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -40,6 +49,12 @@ class RightBody extends StatelessWidget {
       ),
       child: Column(
         children: [
+          if(!isLandscape(context)) Container(
+            margin: EdgeInsets.only(top: 30, bottom: 12),
+            height: 2,
+            color: AppColors.textGrey800.withOpacity(0.1),
+          ),
+          if(!isLandscape(context)) AppBarRight(buildContext: context, customerPhone: customerPhone, customerName: customerName,),
           Expanded(
             child: BlocBuilder<TransactionCubit, TransactionState>(
               builder: (context, state) {
