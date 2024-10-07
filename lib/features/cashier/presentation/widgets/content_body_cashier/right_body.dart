@@ -111,7 +111,7 @@ class RightBody extends StatelessWidget {
                                 _buildOptionButton(
                                   context,
                                   label: 'Take Away',
-                                  value: 'take_away',
+                                  value: 'takeaway',
                                   selected: state.orderType == 'take_away',
                                 ),
                               ],
@@ -426,11 +426,11 @@ class RightBody extends StatelessWidget {
                                 children: [
                                   const Text('Diskon',
                                       style: AppTextStyle.body3),
-                                  Text(
-                                      Utils.formatCurrencyDouble(
+                                  Text("-${Utils.formatCurrencyDouble(
                                           _calculateDiscount(context
                                               .read<TransactionCubit>()
-                                              .state)),
+                                              .state))}"
+                                      ,
                                       style: AppTextStyle.body3),
                                 ],
                               ),

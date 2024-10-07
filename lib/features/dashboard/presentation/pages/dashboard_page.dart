@@ -6,14 +6,25 @@ import 'package:flutter_svg/svg.dart';
 import 'package:sizer/sizer.dart';
 
 class DashboardPage extends StatelessWidget {
+   bool isTabletDevice(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final width = mediaQuery.size.width;
+    final height = mediaQuery.size.height;
+
+    final aspectRatio = width / height;
+
+    return aspectRatio >= 1.0 && width >= 600;
+  }
+  
   @override
   Widget build(BuildContext context) {
+     bool isTablet = isTabletDevice(context);
     return Scaffold(
       backgroundColor: AppColors.backgroundGrey,
     drawer: MyDrawer(),
       resizeToAvoidBottomInset: false,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(10.h),
+        preferredSize: isTablet ? Size.fromHeight(8.h) : Size.fromHeight(10.h),
         child: AppBar(
           backgroundColor: Colors.white,
           surfaceTintColor: Colors.white,
