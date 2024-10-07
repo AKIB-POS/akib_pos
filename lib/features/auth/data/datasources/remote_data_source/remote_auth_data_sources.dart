@@ -50,7 +50,12 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      return LoginResponse.fromJson(jsonDecode(response.body));
+      try{
+        return LoginResponse.fromJson(jsonDecode(response.body));
+      } catch(e, stacktrace){
+        print(stacktrace);
+        throw GeneralException(e.toString());
+      }
     } else {
       final errorResponse = jsonDecode(response.body);
       throw GeneralException(errorResponse['message'] ?? 'Failed to login');
@@ -84,6 +89,8 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
         'company_address': companyAddress,
       },
     );
+
+    print(response.body);
 
     if (response.statusCode == 201) {
       return true;
