@@ -25,17 +25,6 @@ class _StockistPage extends State<StockistPage> {
         flexibleSpace: SafeArea(child: AppbarStockistContent()),
       ),
       ),
-      body: RefreshIndicator(
-        color: AppColors.primaryMain,
-        onRefresh: () {
-          
-        },
-        child: ListView(
-          children: [
-            
-          ],
-        ),
-        )
-    );
+      body: const SizedBox());
 	}
 }
