@@ -1,6 +1,8 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/stockist/data/models/stockist_summary.dart';
+import 'package:akib_pos/features/stockist/presentation/pages/expired_stock_page.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:shimmer/shimmer.dart';
@@ -25,7 +27,11 @@ class BuildStockistSummary extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                Expanded(child: _buildExpiredStockCard(summary.expiredStockCount)),
+                Expanded(child: GestureDetector(
+                  onTap: () {
+                    Utils.navigateToPage(context, ExpiredStockPage());
+                  },
+                  child: _buildExpiredStockCard(summary.expiredStockCount))),
                 Expanded(child: _buildRunningOutStockCard(summary.runningOutStockCount)),
               ],
             ),
@@ -102,7 +108,7 @@ class BuildStockistSummary extends StatelessWidget {
       padding: const EdgeInsets.only(right: 8),
       child: _buildVerificationCard(
         expiredStockCount,
-        'Stok\nKadaluarsa',
+        'Stok\nKedaluarsa',
         'assets/icons/stockist/ic_expired_stock.svg',
       ),
     );

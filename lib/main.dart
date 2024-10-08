@@ -2,6 +2,7 @@ import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/di/accounting_injection.dart';
 import 'package:akib_pos/di/hrd_injection.dart';
 import 'package:akib_pos/di/injection_container.dart';
+import 'package:akib_pos/di/stockist_injection.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/active_asset_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/asset_depreciation_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/pending_asset_cubit.dart';
@@ -98,6 +99,7 @@ import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/pend
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/rejected_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/detail_subordinate_task_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/employee_submission/pending_approval_tab.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/expired_stock_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/stockist_recent_purchase_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/stockist_summary_cubit.dart';
 import 'package:akib_pos/splash_screen.dart';
@@ -465,10 +467,13 @@ void main() async {
 
         //Stockist
         BlocProvider(
-          create: (context) => StockistSummaryCubit(hrdInjection()),
+          create: (context) => StockistSummaryCubit(stockistInjection()),
         ),
         BlocProvider(
-          create: (context) => StockistRecentPurchasesCubit(hrdInjection()),
+          create: (context) => StockistRecentPurchasesCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => ExpiredStockCubit(stockistInjection()),
         ),
 
 

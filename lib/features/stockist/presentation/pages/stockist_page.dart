@@ -195,7 +195,7 @@ class _StockistPageState extends State<StockistPage> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                _buildVendorAndPriceRow(vendor, price),
+                _buildVendorAndPriceColumn(vendor, price),
               ],
             ),
           ),
@@ -224,7 +224,7 @@ class _StockistPageState extends State<StockistPage> {
     );
   }
 
-  Widget _buildVendorAndPriceRow(String vendor, double price) {
+  Widget _buildVendorAndPriceColumn(String vendor, double price) {
     return Container(
       padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
