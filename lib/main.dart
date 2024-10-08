@@ -2,6 +2,7 @@ import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/di/accounting_injection.dart';
 import 'package:akib_pos/di/hrd_injection.dart';
 import 'package:akib_pos/di/injection_container.dart';
+import 'package:akib_pos/di/stockist_injection.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/active_asset_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/asset_depreciation_cubit.dart';
 import 'package:akib_pos/features/accounting/presentation/bloc/asset_management/pending_asset_cubit.dart';
@@ -98,6 +99,9 @@ import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/pend
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/rejected_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/detail_subordinate_task_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/employee_submission/pending_approval_tab.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/expired_stock_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/stockist_recent_purchase_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/stockist_summary_cubit.dart';
 import 'package:akib_pos/splash_screen.dart';
 import 'package:akib_pos/util/bloc_providers.dart';
 import 'package:flutter/material.dart';
@@ -110,6 +114,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:akib_pos/di/injection_container.dart' as di;
 import 'package:akib_pos/di/accounting_injection.dart' as accounting;
 import 'package:akib_pos/di/hrd_injection.dart' as hrd;
+import 'package:akib_pos/di/stockist_injection.dart' as stockist;
 import 'firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart'; // <-- This line imports the initializeDateFormatting function
 
@@ -127,6 +132,7 @@ void main() async {
   //for accounting injection initialization
   await accounting.initAccountingModule();
   await hrd.initHRDModule();
+  await stockist.initStockistModule();
 
   runApp(
     MultiBlocProvider(
@@ -454,6 +460,22 @@ void main() async {
         BlocProvider(
           create: (context) => VerifyCandidateSubmissionCubit(hrdInjection()),
         ),
+        BlocProvider(
+          create: (context) => StockistSummaryCubit(hrdInjection()),
+        ),
+
+
+        //Stockist
+        BlocProvider(
+          create: (context) => StockistSummaryCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => StockistRecentPurchasesCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => ExpiredStockCubit(stockistInjection()),
+        ),
+
 
       ],
       child: const MyApp(),
