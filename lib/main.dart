@@ -99,7 +99,10 @@ import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/pend
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/rejected_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/detail_subordinate_task_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/employee_submission/pending_approval_tab.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/add_vendor.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/expired_stock_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_vendor_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/running_out_stock_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/stockist_recent_purchase_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/stockist_summary_cubit.dart';
 import 'package:akib_pos/splash_screen.dart';
@@ -475,6 +478,17 @@ void main() async {
         BlocProvider(
           create: (context) => ExpiredStockCubit(stockistInjection()),
         ),
+        BlocProvider(
+          create: (context) => RunningOutStockCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetVendorCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => AddVendorCubit(stockistInjection()),
+        ),
+
+
 
 
       ],

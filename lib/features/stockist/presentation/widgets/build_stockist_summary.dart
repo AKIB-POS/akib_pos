@@ -2,6 +2,8 @@ import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/stockist/data/models/stockist_summary.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/expired_stock_page.dart';
+import 'package:akib_pos/features/stockist/presentation/pages/running_out_stock_page.dart';
+import 'package:akib_pos/features/stockist/presentation/pages/vendor/vendor_list_page.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -32,7 +34,11 @@ class BuildStockistSummary extends StatelessWidget {
                     Utils.navigateToPage(context, ExpiredStockPage());
                   },
                   child: _buildExpiredStockCard(summary.expiredStockCount))),
-                Expanded(child: _buildRunningOutStockCard(summary.runningOutStockCount)),
+                Expanded(child: GestureDetector(
+                  onTap: () {
+                    Utils.navigateToPage(context, RunningOutStockPage());
+                  },
+                  child: _buildRunningOutStockCard(summary.runningOutStockCount))),
               ],
             ),
           ),
@@ -42,7 +48,11 @@ class BuildStockistSummary extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(child: _buildRawMaterialCard()),
-                Expanded(child: _buildVendorListCard()),
+                Expanded(child: GestureDetector(
+                  onTap: () {
+                    Utils.navigateToPage(context, const VendorListPage());
+                  },
+                  child: _buildVendorListCard())),
               ],
             ),
           ),
