@@ -25,15 +25,13 @@ class _AddVendorPageState extends State<AddVendorPage> {
   void initState() {
     super.initState();
 
-    // Add listeners to the text fields to update the form validation state
     _vendorNameController.addListener(_onFormFieldChanged);
     _phoneNumberController.addListener(_onFormFieldChanged);
     _addressController.addListener(_onFormFieldChanged);
   }
 
-  // This method is triggered whenever a form field is updated
   void _onFormFieldChanged() {
-    setState(() {});  // Triggers a rebuild to re-check the form's validity
+    setState(() {}); 
   }
 
   bool _isFormValid() {

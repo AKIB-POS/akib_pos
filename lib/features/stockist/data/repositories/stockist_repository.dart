@@ -1,8 +1,10 @@
 import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/core/error/failures.dart';
 import 'package:akib_pos/features/stockist/data/datasources/stockist_remote_data_source.dart';
+import 'package:akib_pos/features/stockist/data/models/add_raw_material.dart';
 import 'package:akib_pos/features/stockist/data/models/add_vendor.dart';
 import 'package:akib_pos/features/stockist/data/models/expired_stock.dart';
+import 'package:akib_pos/features/stockist/data/models/raw_material.dart';
 import 'package:akib_pos/features/stockist/data/models/running_out_stock.dart';
 import 'package:akib_pos/features/stockist/data/models/stockist_recent_purchase.dart';
 import 'package:akib_pos/features/stockist/data/models/stockist_summary.dart';
@@ -16,12 +18,39 @@ abstract class StockistRepository {
   Future<Either<Failure, RunningOutStockResponse>> getRunningOutStock(int branchId);
   Future<Either<Failure, VendorListResponse>> getVendors(int branchId);
   Future<Either<Failure, AddVendorResponse>> addVendor(AddVendorRequest request);
+  Future<Either<Failure, RawMaterialListResponse>> getRawMaterials(int branchId);
+  Future<Either<Failure, AddRawMaterialResponse>> addRawMaterial(AddRawMaterialRequest request);
 }
 
 class StockistRepositoryImpl implements StockistRepository {
   final StockistRemoteDataSource remoteDataSource;
 
   StockistRepositoryImpl({required this.remoteDataSource});
+
+
+  @override
+  Future<Either<Failure, AddRawMaterialResponse>> addRawMaterial(AddRawMaterialRequest request) async {
+    try {
+      final response = await remoteDataSource.addRawMaterial(request);
+      return Right(response);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, RawMaterialListResponse>> getRawMaterials(int branchId) async {
+    try {
+      final rawMaterials = await remoteDataSource.getRawMaterials(branchId);
+      return Right(rawMaterials);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
   @override
   Future<Either<Failure, AddVendorResponse>> addVendor(AddVendorRequest request) async {

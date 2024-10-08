@@ -2,6 +2,7 @@ import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/stockist/data/models/stockist_summary.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/expired_stock_page.dart';
+import 'package:akib_pos/features/stockist/presentation/pages/raw_material/raw_material_page.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/running_out_stock_page.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/vendor/vendor_list_page.dart';
 import 'package:akib_pos/util/utils.dart';
@@ -47,7 +48,11 @@ class BuildStockistSummary extends StatelessWidget {
             padding: const EdgeInsets.only(left: 16,right: 16,bottom: 16),
             child: Row(
               children: [
-                Expanded(child: _buildRawMaterialCard()),
+                Expanded(child: GestureDetector(
+                  onTap: () {
+                    Utils.navigateToPage(context, RawMaterialPage());
+                  },
+                  child: _buildRawMaterialCard())),
                 Expanded(child: GestureDetector(
                   onTap: () {
                     Utils.navigateToPage(context, const VendorListPage());
@@ -104,7 +109,7 @@ class BuildStockistSummary extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
             ),
             child: Text(
-              "Detail Bahan",
+              "Lihat Pembelian",
               style: AppTextStyle.bigCaptionBold.copyWith(color: AppColors.primaryMain),
             ),
           ),

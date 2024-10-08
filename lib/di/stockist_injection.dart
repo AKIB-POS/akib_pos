@@ -1,7 +1,9 @@
 import 'package:akib_pos/features/stockist/data/datasources/stockist_remote_data_source.dart';
 import 'package:akib_pos/features/stockist/data/repositories/stockist_repository.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/add_material_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/add_vendor.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/expired_stock_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_raw_material_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_vendor_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/running_out_stock_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/stockist_recent_purchase_cubit.dart';
@@ -40,6 +42,12 @@ Future<void> initStockistModule() async {
   );
   stockistInjection.registerFactory(
     () => AddVendorCubit(stockistInjection()),
+  );
+  stockistInjection.registerFactory(
+    () => GetRawMaterialCubit(stockistInjection()),
+  );
+  stockistInjection.registerFactory(
+    () => AddRawMaterialCubit(stockistInjection()),
   );
 
 }
