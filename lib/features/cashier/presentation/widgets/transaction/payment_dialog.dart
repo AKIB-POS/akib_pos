@@ -1,5 +1,6 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_themes.dart';
+import 'package:akib_pos/common/util.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/cashier/data/models/full_transaction_model.dart';
 import 'package:akib_pos/features/cashier/data/repositories/kasir_repository.dart';
@@ -320,7 +321,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
         child: Center(
           child: Text(label,
               style: TextStyle(
-                  fontSize: 16,
+                  fontSize: isLandscape(context) ? 16 : 12,
                   color: isSelected ? Colors.black : Colors.grey)),
         ),
       ),

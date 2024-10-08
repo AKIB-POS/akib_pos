@@ -1,6 +1,7 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
+import 'package:akib_pos/common/util.dart';
 import 'package:akib_pos/features/cashier/data/models/full_transaction_model.dart';
 import 'package:akib_pos/features/cashier/presentation/finished_transaction_print.dart';
 import 'package:akib_pos/util/utils.dart';
@@ -40,54 +41,83 @@ class PaymentSummaryDialog extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              child: Column(
-                children: [
-                  SizedBox(height: 8.h),
-                  SvgPicture.asset(
-                    "assets/icons/ic_check.svg",
-                    height: 8.h,
-                    width: 8.h,
-                  ),
-                  const SizedBox(height: 16),
-                  const Text('Pembayaran Berhasil',
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${DateFormat('d MMMM yyyy, HH:mm').format(DateTime.now())}',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 4.h),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _buildSummaryItem('Jenis Pembayaran', paymentMethod),
-                        const SizedBox(
-                          width: 12,
-                        ),
-                        _buildSummaryItem('Total Tagihan',
-                            Utils.formatCurrencyDouble(totalAmount)),
-                        const SizedBox(
-                          width: 12,
-                        ),
-                        _buildSummaryItem('Diterima',
-                            Utils.formatCurrencyDouble(receivedAmount)),
-                        const SizedBox(
-                          width: 12,
-                        ),
-                        _buildSummaryItem(
-                            'Kembalian', Utils.formatCurrencyDouble(change)),
-                      ],
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(height: 8.h),
+                    SvgPicture.asset(
+                      "assets/icons/ic_check.svg",
+                      height: 8.h,
+                      width: 8.h,
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+                    const Text('Pembayaran Berhasil',
+                        style:
+                            TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${DateFormat('d MMMM yyyy, HH:mm').format(DateTime.now())}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    SizedBox(height: 4.h),
+                    if(isLandscape(context)) Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildSummaryItem('Jenis Pembayaran', paymentMethod),
+                          const SizedBox(
+                            width: 12,
+                          ),
+                          _buildSummaryItem('Total Tagihan', Utils.formatCurrencyDouble(totalAmount)),
+                          const SizedBox(
+                            width: 12,
+                          ),
+                          _buildSummaryItem('Diterima', Utils.formatCurrencyDouble(receivedAmount)),
+                          const SizedBox(
+                            width: 12,
+                          ),
+                          _buildSummaryItem('Kembalian', Utils.formatCurrencyDouble(change)),
+                        ],
+                      ),
+                    ),
+                    if(!isLandscape(context)) Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildSummaryItem('Jenis Pembayaran', paymentMethod),
+                          const SizedBox(
+                            width: 12,
+                          ),
+              
+                          _buildSummaryItem('Total Tagihan', Utils.formatCurrencyDouble(totalAmount)),
+                        ],
+                      ),
+                    ),
+                    if(!isLandscape(context)) SizedBox(height: 12),
+                    if(!isLandscape(context)) Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildSummaryItem('Diterima', Utils.formatCurrencyDouble(receivedAmount)),
+                          const SizedBox(
+                            width: 12,
+                          ),
+                          _buildSummaryItem('Kembalian', Utils.formatCurrencyDouble(change)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            const Spacer(),
+            const SizedBox(height: 12,),
             _buildActions(context),
           ],
         ),
@@ -101,16 +131,14 @@ class PaymentSummaryDialog extends StatelessWidget {
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8.0), color: Colors.white),
         padding: const EdgeInsets.symmetric(vertical: 16.0),
-        child: Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(label, style: const TextStyle(fontSize: 16)),
-              Text(value,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold)),
-            ],
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(label, style: const TextStyle(fontSize: 16)),
+            Text(value,
+                style: const TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.bold)),
+          ],
         ),
       ),
     );
