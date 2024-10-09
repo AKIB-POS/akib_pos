@@ -6,6 +6,9 @@ import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/a
 import 'package:akib_pos/features/stockist/data/models/add_raw_material.dart';
 import 'package:akib_pos/features/stockist/data/models/add_vendor.dart';
 import 'package:akib_pos/features/stockist/data/models/expired_stock.dart';
+import 'package:akib_pos/features/stockist/data/models/material_detail.dart';
+import 'package:akib_pos/features/stockist/data/models/purchase.dart';
+import 'package:akib_pos/features/stockist/data/models/purchase_history.dart';
 import 'package:akib_pos/features/stockist/data/models/raw_material.dart';
 import 'package:akib_pos/features/stockist/data/models/running_out_stock.dart';
 import 'package:akib_pos/features/stockist/data/models/stockist_recent_purchase.dart';
@@ -24,6 +27,9 @@ abstract class StockistRemoteDataSource {
   Future<AddVendorResponse> addVendor(AddVendorRequest request);
   Future<RawMaterialListResponse> getRawMaterials(int branchId);
   Future<AddRawMaterialResponse> addRawMaterial(AddRawMaterialRequest request);
+  Future<PurchasesListResponse> getPurchases(int branchId);
+  Future<MaterialDetailResponse> getMaterialDetail(int branchId, int materialId);
+  Future<PurchaseHistoryResponse> getPurchaseHistory(int branchId, int materialId);
 }
 
 class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
@@ -31,6 +37,75 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
   final AuthSharedPref sharedPrefsHelper = GetIt.instance<AuthSharedPref>();
 
   StockistRemoteDataSourceImpl({required this.client});
+
+
+@override
+  Future<PurchaseHistoryResponse> getPurchaseHistory(int branchId, int materialId) async {
+    const url = '${URLs.baseUrlMock}/purchase-history';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branchId': branchId.toString(),
+        'material_id': materialId.toString(),
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return PurchaseHistoryResponse.fromJson(jsonResponse);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+
+  
+@override
+  Future<MaterialDetailResponse> getMaterialDetail(int branchId, int materialId) async {
+    final url = '${URLs.baseUrlMock}/material-detail';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branchId': branchId.toString(),
+        'material_id': materialId.toString(),
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return MaterialDetailResponse.fromJson(jsonResponse['data']);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+  
+  @override
+  Future<PurchasesListResponse> getPurchases(int branchId) async {
+    const url = '${URLs.baseUrlMock}/purchases';
+    
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branchId': branchId.toString(),
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${sharedPrefsHelper.getToken()}',
+      },
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return PurchasesListResponse.fromJson(jsonResponse);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
 
   @override
   Future<AddRawMaterialResponse> addRawMaterial(AddRawMaterialRequest request) async {

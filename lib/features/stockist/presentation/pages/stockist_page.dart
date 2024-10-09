@@ -41,7 +41,6 @@ class _StockistPageState extends State<StockistPage> {
         context.read<StockistRecentPurchasesCubit>().fetchStockistRecentPurchases(branchId: branchId),
       ]);
     } catch (error, stacktrace) {
-      // Log the error for debugging purposes
       print('Error fetching data: $error');
       print(stacktrace);
     }
@@ -140,10 +139,10 @@ class _StockistPageState extends State<StockistPage> {
   }
 
   Widget _buildPurchaseItem(StockistRecentPurchase purchase) {
-    final itemName = purchase.itemName ?? "Unknown Item";
-    final quantity = purchase.quantity ?? "0";
-    final vendor = purchase.vendor ?? "Unknown Vendor";
-    final price = purchase.purchasePrice ?? 0.0;
+    final itemName = purchase.itemName;
+    final quantity = purchase.quantity;
+    final vendor = purchase.vendor;
+    final price = purchase.purchasePrice;
 
     return Container(
       width: double.infinity,

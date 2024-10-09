@@ -4,6 +4,9 @@ import 'package:akib_pos/features/stockist/data/datasources/stockist_remote_data
 import 'package:akib_pos/features/stockist/data/models/add_raw_material.dart';
 import 'package:akib_pos/features/stockist/data/models/add_vendor.dart';
 import 'package:akib_pos/features/stockist/data/models/expired_stock.dart';
+import 'package:akib_pos/features/stockist/data/models/material_detail.dart';
+import 'package:akib_pos/features/stockist/data/models/purchase.dart';
+import 'package:akib_pos/features/stockist/data/models/purchase_history.dart';
 import 'package:akib_pos/features/stockist/data/models/raw_material.dart';
 import 'package:akib_pos/features/stockist/data/models/running_out_stock.dart';
 import 'package:akib_pos/features/stockist/data/models/stockist_recent_purchase.dart';
@@ -20,12 +23,53 @@ abstract class StockistRepository {
   Future<Either<Failure, AddVendorResponse>> addVendor(AddVendorRequest request);
   Future<Either<Failure, RawMaterialListResponse>> getRawMaterials(int branchId);
   Future<Either<Failure, AddRawMaterialResponse>> addRawMaterial(AddRawMaterialRequest request);
+  Future<Either<Failure, PurchasesListResponse>> getPurchases(int branchId);
+  Future<Either<Failure, MaterialDetailResponse>> getMaterialDetail(int branchId, int materialId);
+  Future<Either<Failure, PurchaseHistoryResponse>> getPurchaseHistory(int branchId, int materialId);
 }
 
 class StockistRepositoryImpl implements StockistRepository {
   final StockistRemoteDataSource remoteDataSource;
 
   StockistRepositoryImpl({required this.remoteDataSource});
+
+  @override
+  Future<Either<Failure, PurchaseHistoryResponse>> getPurchaseHistory(int branchId, int materialId) async {
+    try {
+      final purchaseHistory = await remoteDataSource.getPurchaseHistory(branchId, materialId);
+      return Right(purchaseHistory);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, MaterialDetailResponse>> getMaterialDetail(int branchId, int materialId) async {
+    try {
+      final materialDetail = await remoteDataSource.getMaterialDetail(branchId, materialId);
+      return Right(materialDetail);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+
+
+  @override
+  Future<Either<Failure, PurchasesListResponse>> getPurchases(int branchId) async {
+    try {
+      final response = await remoteDataSource.getPurchases(branchId);
+      return Right(response);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
 
   @override

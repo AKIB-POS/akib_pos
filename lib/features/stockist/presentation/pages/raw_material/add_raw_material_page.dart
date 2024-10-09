@@ -27,7 +27,8 @@ class _AddRawMaterialPageState extends State<AddRawMaterialPage> {
   void _submit() {
     if (_formKey.currentState!.validate()) {
       final branchId = _authSharedPref.getBranchId() ?? 0;
-      final request = AddRawMaterialRequest(branchId: branchId, rawMaterialName: rawMaterialName!);
+      final request = AddRawMaterialRequest(
+          branchId: branchId, rawMaterialName: rawMaterialName!);
       context.read<AddRawMaterialCubit>().addRawMaterial(request);
     }
   }
@@ -37,7 +38,10 @@ class _AddRawMaterialPageState extends State<AddRawMaterialPage> {
     return Scaffold(
       backgroundColor: AppColors.backgroundGrey,
       appBar: AppBar(
-        title: const Text('Tambah Bahan Baku',style: AppTextStyle.headline5,),
+        title: const Text(
+          'Tambah Bahan Baku',
+          style: AppTextStyle.headline5,
+        ),
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
         titleSpacing: 0,
@@ -52,7 +56,8 @@ class _AddRawMaterialPageState extends State<AddRawMaterialPage> {
               const Text('Nama Bahan', style: AppTextStyle.bigCaptionBold),
               const SizedBox(height: 8),
               TextFormField(
-                decoration: AppThemes.inputDecorationStyle.copyWith(hintText: 'Masukkan Nama Bahan'),
+                decoration: AppThemes.inputDecorationStyle
+                    .copyWith(hintText: 'Masukkan Nama Bahan'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return "Nama bahan tidak boleh kosong";
@@ -70,49 +75,49 @@ class _AddRawMaterialPageState extends State<AddRawMaterialPage> {
         ),
       ),
       bottomNavigationBar: Container(
-                decoration: AppThemes.bottomBoxDecorationDialog,
-                padding: const EdgeInsets.all(16.0),
-                child: BlocConsumer<AddRawMaterialCubit, AddRawMaterialState>(
-                  listener: (context, state) {
-                    if (state is AddRawMaterialSuccess) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Bahan baku berhasil ditambahkan'),
-                          backgroundColor: AppColors.successMain,
-                        ),
-                      );
-                      Navigator.of(context).pop(true);
-                    } else if (state is AddRawMaterialError) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(state.message),
-                          backgroundColor: AppColors.errorMain,
-                        ),
-                      );
-                    }
-                  },
-                  builder: (context, state) {
-                    return ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _isFormValid() ? AppColors.primaryMain : Colors.grey,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        minimumSize: const Size.fromHeight(50),
-                      ),
-                      onPressed: _isFormValid() && state is! AddRawMaterialLoading
-                          ? _submit
-                          : null,
-                      child: state is AddRawMaterialLoading
-                          ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white))
-                          : const Text('Simpan', style: TextStyle(color: Colors.white)),
-                    );
-                  },
-                  
+        decoration: AppThemes.bottomBoxDecorationDialog,
+        padding: const EdgeInsets.all(16.0),
+        child: BlocConsumer<AddRawMaterialCubit, AddRawMaterialState>(
+          listener: (context, state) {
+            if (state is AddRawMaterialSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Bahan baku berhasil ditambahkan'),
+                  backgroundColor: AppColors.successMain,
                 ),
+              );
+              Navigator.of(context).pop(true);
+            } else if (state is AddRawMaterialError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: AppColors.errorMain,
+                ),
+              );
+            }
+          },
+          builder: (context, state) {
+            return ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    _isFormValid() ? AppColors.primaryMain : Colors.grey,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                minimumSize: const Size.fromHeight(50),
               ),
+              onPressed: _isFormValid() && state is! AddRawMaterialLoading
+                  ? _submit
+                  : null,
+              child: state is AddRawMaterialLoading
+                  ? const CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white))
+                  : const Text('Simpan', style: TextStyle(color: Colors.white)),
+            );
+          },
+        ),
+      ),
     );
   }
-
 }

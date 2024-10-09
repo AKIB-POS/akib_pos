@@ -102,8 +102,11 @@ import 'package:akib_pos/features/hrd/presentation/widgets/employee_submission/p
 import 'package:akib_pos/features/stockist/presentation/bloc/add_material_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/add_vendor.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/expired_stock_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_purchase_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_purchase_history_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_raw_material_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_vendor_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/material_detail_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/running_out_stock_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/stockist_recent_purchase_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/stockist_summary_cubit.dart';
@@ -494,6 +497,15 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => AddRawMaterialCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetPurchasesCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetMaterialDetailCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetPurchaseHistoryCubit(stockistInjection()),
         ),
 
 

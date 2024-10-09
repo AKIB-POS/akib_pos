@@ -2,6 +2,7 @@ import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/stockist/data/models/stockist_summary.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/expired_stock_page.dart';
+import 'package:akib_pos/features/stockist/presentation/pages/purchase/purchase_list_page.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/raw_material/raw_material_page.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/running_out_stock_page.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/vendor/vendor_list_page.dart';
@@ -23,7 +24,7 @@ class BuildStockistSummary extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: _buildUiTotalMaterials(summary.totalMaterials),
+            child: _buildUiTotalMaterials(summary.totalMaterials,context),
           ),
           const SizedBox(height: 16),
           Padding(
@@ -78,7 +79,7 @@ class BuildStockistSummary extends StatelessWidget {
     );
   }
 
-  Widget _buildUiTotalMaterials(int totalMaterials) {
+  Widget _buildUiTotalMaterials(int totalMaterials,BuildContext context) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only( top: 21, bottom: 8),
@@ -99,7 +100,7 @@ class BuildStockistSummary extends StatelessWidget {
           const SizedBox(height: 10),
           ElevatedButton(
             onPressed: () {
-              // Handle button press
+              Utils.navigateToPage(context, PurchasesListPage());
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
