@@ -5,6 +5,7 @@ import 'package:akib_pos/features/stockist/data/models/material_detail.dart';
 import 'package:akib_pos/features/stockist/data/models/purchase_history.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_purchase_history_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/material_detail_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/pages/purchase/add_raw_material_stock_page.dart';
 import 'package:akib_pos/features/stockist/presentation/widgets/appbar_stockist_content.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
@@ -50,101 +51,102 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Detail bahan', style: AppTextStyle.headline5),
         backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        titleSpacing: 0,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ),
-      body: RefreshIndicator(
-        color: AppColors.primaryMain,
-        onRefresh: () async {
-          await _fetchMaterialDetail();
-          await _fetchPurchaseHistory();
-        },
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              BlocBuilder<GetMaterialDetailCubit, GetMaterialDetailState>(
-                builder: (context, state) {
-                  if (state is GetMaterialDetailLoading) {
-                    return Utils.buildLoadingCardShimmer();
-                  } else if (state is GetMaterialDetailError) {
-                    return Utils.buildErrorStatePlain(
-                      title: 'Gagal Memuat Data Material',
-                      message: state.message,
-                      onRetry: _fetchMaterialDetail,
-                    );
-                  } else if (state is GetMaterialDetailLoaded) {
-                    return Container(
-                        color: AppColors.backgroundGrey,
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: _buildMaterialDetailContent(
-                                  state.materialDetail),
-                            ),
-                            Container(
-                              width: double.infinity,
-                              height: 20,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(30),
-                                  topRight: Radius.circular(30),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ));
-                  } else {
-                    return const SizedBox.shrink();
-                  }
-                },
-              ),
-              const Padding(
-                padding: EdgeInsets.only(bottom: 21, left: 16),
-                child: Text('Riwayat Pembelian', style: AppTextStyle.headline5),
-              ),
-              BlocBuilder<GetPurchaseHistoryCubit, GetPurchaseHistoryState>(
-                builder: (context, state) {
-                  if (state is GetPurchaseHistoryLoading) {
-                    return _buildLoadingShimmer();
-                  } else if (state is GetPurchaseHistoryError) {
-                    return Utils.buildErrorStatePlain(
-                      title: 'Gagal Memuat Riwayat Pembelian',
-                      message: state.message,
-                      onRetry: _fetchPurchaseHistory,
-                    );
-                  } else if (state is GetPurchaseHistoryLoaded) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: _buildPurchaseHistoryList(
-                          state.purchaseHistoryResponse.purchaseHistories),
-                    );
-                  } else {
-                    return const SizedBox.shrink();
-                  }
-                },
-              ),
-            ],
+        appBar: AppBar(
+          title: const Text('Detail bahan', style: AppTextStyle.headline5),
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.white,
+          titleSpacing: 0,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
           ),
         ),
-      ),
-      floatingActionButton: Utils.buildFloatingActionButton(onPressed: () async {
+        body: RefreshIndicator(
+          color: AppColors.primaryMain,
+          onRefresh: () async {
+            await _fetchMaterialDetail();
+            await _fetchPurchaseHistory();
+          },
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                BlocBuilder<GetMaterialDetailCubit, GetMaterialDetailState>(
+                  builder: (context, state) {
+                    if (state is GetMaterialDetailLoading) {
+                      return Utils.buildLoadingCardShimmer();
+                    } else if (state is GetMaterialDetailError) {
+                      return Utils.buildErrorStatePlain(
+                        title: 'Gagal Memuat Data Material',
+                        message: state.message,
+                        onRetry: _fetchMaterialDetail,
+                      );
+                    } else if (state is GetMaterialDetailLoaded) {
+                      return Container(
+                          color: AppColors.backgroundGrey,
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: _buildMaterialDetailContent(
+                                    state.materialDetail),
+                              ),
+                              Container(
+                                width: double.infinity,
+                                height: 20,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(30),
+                                    topRight: Radius.circular(30),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ));
+                    } else {
+                      return const SizedBox.shrink();
+                    }
+                  },
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 21, left: 16),
+                  child:
+                      Text('Riwayat Pembelian', style: AppTextStyle.headline5),
+                ),
+                BlocBuilder<GetPurchaseHistoryCubit, GetPurchaseHistoryState>(
+                  builder: (context, state) {
+                    if (state is GetPurchaseHistoryLoading) {
+                      return _buildLoadingShimmer();
+                    } else if (state is GetPurchaseHistoryError) {
+                      return Utils.buildErrorStatePlain(
+                        title: 'Gagal Memuat Riwayat Pembelian',
+                        message: state.message,
+                        onRetry: _fetchPurchaseHistory,
+                      );
+                    } else if (state is GetPurchaseHistoryLoaded) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: _buildPurchaseHistoryList(
+                            state.purchaseHistoryResponse.purchaseHistories),
+                      );
+                    } else {
+                      return const SizedBox.shrink();
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+        floatingActionButton:
+            Utils.buildFloatingActionButton(onPressed: () async {
           _showMaterialTypeDialog(context);
-        })
-    );
+        }));
   }
 
   Widget _buildMaterialDetailContent(MaterialDetailResponse materialDetail) {
@@ -389,12 +391,14 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
       ),
       builder: (BuildContext context) {
         return Container(
-          
           decoration: BoxDecoration(
-            borderRadius: BorderRadiusDirectional.only(topEnd: Radius.circular(21),topStart: Radius.circular(21)),
+            borderRadius: BorderRadiusDirectional.only(
+                topEnd: Radius.circular(21), topStart: Radius.circular(21)),
             color: Colors.white,
           ),
-          padding: const EdgeInsets.symmetric(vertical: 16,),
+          padding: const EdgeInsets.symmetric(
+            vertical: 16,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -418,7 +422,7 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Pilih Bahan', style: AppTextStyle.headline5),
+                    const Text('Pilih Bahan', style: AppTextStyle.headline5),
                     IconButton(
                       icon: const Icon(Icons.close),
                       onPressed: () => Navigator.of(context).pop(),
@@ -426,13 +430,24 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                   ],
                 ),
               ),
-              SizedBox(height: 16,),
+              SizedBox(
+                height: 16,
+              ),
               ListTile(
                 title: const Text('Bahan Baku', style: AppTextStyle.body2),
                 trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-                  // Handle "Bahan Baku" tap
+                onTap: () async {
                   Navigator.of(context).pop();
+                  final result = await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const AddRawMaterialStockPage(),
+                    ),
+                  );
+
+                  // Jika result true, refresh data cuti
+                  if (result == true) {
+                    _fetchMaterialDetail(); // Panggil fungsi untuk refresh data
+                  }
                 },
               ),
               Padding(
@@ -441,10 +456,10 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
               ), // Divider between "Bahan Baku" and "Non Bahan Baku"
               // Second option: "Non Bahan Baku"
               ListTile(
-                title:
-                    const Text('Non Bahan Baku', style: AppTextStyle.body2),
+                title: const Text('Non Bahan Baku', style: AppTextStyle.body2),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
+
                   // Handle "Non Bahan Baku" tap
                   Navigator.of(context).pop();
                 },

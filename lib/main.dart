@@ -100,12 +100,16 @@ import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/reje
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/detail_subordinate_task_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/employee_submission/pending_approval_tab.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/add_material_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/add_raw_material_stock_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/add_vendor.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/expired_stock_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_order_status_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_purchase_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_purchase_history_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_raw_material_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_unit_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_vendor_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_warehouses_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/material_detail_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/running_out_stock_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/stockist_recent_purchase_cubit.dart';
@@ -507,8 +511,18 @@ void main() async {
         BlocProvider(
           create: (context) => GetPurchaseHistoryCubit(stockistInjection()),
         ),
-
-
+        BlocProvider(
+          create: (context) => GetUnitCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetWarehousesCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetOrderStatusCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => AddRawMaterialStockCubit(stockistInjection()),
+        ),
 
       ],
       child: const MyApp(),

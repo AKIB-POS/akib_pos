@@ -77,18 +77,6 @@ class _PurchasesListPageState extends State<PurchasesListPage> {
           ),
         ],
       ),
-      floatingActionButton: Utils.buildFloatingActionButton(onPressed: () async {
-          // final result = await Navigator.of(context).push(
-          //   MaterialPageRoute(
-          //     builder: (context) => const AddRawMaterialPage(),
-          //   ),
-          // );
-
-          // // Jika result true, refresh data cuti
-          // if (result == true) {
-          //   _fetchRawMaterials(); // Panggil fungsi untuk refresh data
-          // }
-        })
     );
   }
 
