@@ -22,6 +22,8 @@ import 'package:akib_pos/features/stockist/data/models/stock/stockist_summary.da
 import 'package:akib_pos/features/stockist/data/models/unit.dart';
 import 'package:akib_pos/features/stockist/data/models/vendor.dart';
 import 'package:akib_pos/features/stockist/data/models/warehouse.dart';
+import 'package:akib_pos/features/stockist/data/models/equipment/add_equipment_stock.dart';
+import 'package:akib_pos/features/stockist/presentation/pages/equipment/equipment_purchase_history.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
@@ -38,7 +40,7 @@ abstract class StockistRemoteDataSource {
   Future<AddRawMaterialResponse> addRawMaterial(AddRawMaterialRequest request);
   Future<RawMaterialPurchasesResponse> getRawMaterialPurcases(int branchId);
   Future<MaterialDetailResponse> getMaterialDetail(int branchId, int materialId);
-  Future<PurchaseHistoryResponse> getPurchaseHistory(int branchId, int materialId);
+  Future<RawMaterialPurchaseHistoryResponse> getRawMaterialPurchaseHistory(int branchId, int materialId);
 
   Future<GetUnitsResponse> getUnits(int branchId);
   Future<GetWarehousesResponse> getWarehouses(int branchId);
@@ -49,6 +51,8 @@ abstract class StockistRemoteDataSource {
 
   Future<EquipmentPurchaseResponse> getEquipmentPurchases(int branchId);
   Future<EquipmentDetailResponse> getEquipmentDetail(int branchId, int equipmentId);
+  Future<EquipmentPurchaseHistoryResponse> getEquipmentPurchaseHistory(int branchId, int equipmentId);
+  Future<AddEquipmentStockResponse> addEquipmentStock(AddEquipmentStockRequest request);
 }
 
 class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
@@ -58,8 +62,46 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
   StockistRemoteDataSourceImpl({required this.client});
 
   @override
+  Future<AddEquipmentStockResponse> addEquipmentStock(AddEquipmentStockRequest request) async {
+    const url = '${URLs.baseUrlMock}/add-equipment-stock';
+    
+    final response = await client.post(
+      Uri.parse(url),
+      headers: _buildHeaders(),
+      body: json.encode(request.toJson()),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 201) {
+      return AddEquipmentStockResponse.fromJson(json.decode(response.body));
+    } else {
+      throw GeneralException(json.decode(response.body)['message']);
+    }
+  }
+
+  @override
+  Future<EquipmentPurchaseHistoryResponse> getEquipmentPurchaseHistory(int branchId, int equipmentId) async {
+    const url = '${URLs.baseUrlMock}/equipment-purchase-history';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branchId': branchId.toString(),
+        'equipment_id': equipmentId.toString(),
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return EquipmentPurchaseHistoryResponse.fromJson(jsonResponse);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+  @override
   Future<EquipmentDetailResponse> getEquipmentDetail(int branchId, int equipmentId) async {
-    final url = '${URLs.baseUrlMock}/equipment-detail';
+    const url = '${URLs.baseUrlMock}/equipment-detail';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branchId': branchId.toString(),
@@ -218,8 +260,8 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
 
   @override
-  Future<PurchaseHistoryResponse> getPurchaseHistory(int branchId, int materialId) async {
-    const url = '${URLs.baseUrlMock}/purchase-history';
+  Future<RawMaterialPurchaseHistoryResponse> getRawMaterialPurchaseHistory(int branchId, int materialId) async {
+    const url = '${URLs.baseUrlMock}/raw-material-purchase-history';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branchId': branchId.toString(),
@@ -230,7 +272,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
-      return PurchaseHistoryResponse.fromJson(jsonResponse);
+      return RawMaterialPurchaseHistoryResponse.fromJson(jsonResponse);
     } else if (response.statusCode >= 400 && response.statusCode < 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {

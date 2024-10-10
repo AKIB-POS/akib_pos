@@ -1,6 +1,6 @@
-class AddRawMaterialStockRequest {
+class AddEquipmentStockRequest {
   final int branchId;
-  final int materialId;
+  final int equipmentId;
   final int quantity;
   final String unitName;
   final double price;
@@ -8,11 +8,10 @@ class AddRawMaterialStockRequest {
   final int warehouseId;
   final int orderStatusId;
   final String purchaseDate;
-  final String expiryDate;
 
-  AddRawMaterialStockRequest({
+  AddEquipmentStockRequest({
     required this.branchId,
-    required this.materialId,
+    required this.equipmentId,
     required this.quantity,
     required this.unitName,
     required this.price,
@@ -20,13 +19,12 @@ class AddRawMaterialStockRequest {
     required this.warehouseId,
     required this.orderStatusId,
     required this.purchaseDate,
-    required this.expiryDate,
   });
 
   Map<String, dynamic> toJson() {
     return {
       'branch_id': branchId,
-      'material_id': materialId,
+      'equipment_id': equipmentId,
       'quantity': quantity,
       'unit_name': unitName,
       'price': price,
@@ -34,26 +32,18 @@ class AddRawMaterialStockRequest {
       'warehouse_id': warehouseId,
       'order_status_id': orderStatusId,
       'purchase_date': purchaseDate,
-      'expiry_date': expiryDate,
     };
   }
 }
 
-class AddRawMaterialStockResponse {
+class AddEquipmentStockResponse {
   final String message;
 
-  AddRawMaterialStockResponse({required this.message});
+  AddEquipmentStockResponse({required this.message});
 
-  factory AddRawMaterialStockResponse.fromJson(Map<String, dynamic> json) {
-    return AddRawMaterialStockResponse(
+  factory AddEquipmentStockResponse.fromJson(Map<String, dynamic> json) {
+    return AddEquipmentStockResponse(
       message: json['message'] ?? '',
     );
   }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'message': message,
-    };
-  }
 }
-

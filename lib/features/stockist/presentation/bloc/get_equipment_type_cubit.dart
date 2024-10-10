@@ -3,7 +3,7 @@ import 'package:akib_pos/features/stockist/data/models/equipment/equipment.dart'
 import 'package:akib_pos/features/stockist/data/repositories/stockist_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class GetEquipmentTypeCubit extends Cubit<GetEquipmentListState> {
+class GetEquipmentTypeCubit extends Cubit<GetEquipmentTypeState> {
   final StockistRepository repository;
 
   GetEquipmentTypeCubit(this.repository) : super(GetEquipmentListInitial());
@@ -27,19 +27,19 @@ class GetEquipmentTypeCubit extends Cubit<GetEquipmentListState> {
     );
   }
 }
-abstract class GetEquipmentListState {}
+abstract class GetEquipmentTypeState {}
 
-class GetEquipmentListInitial extends GetEquipmentListState {}
+class GetEquipmentListInitial extends GetEquipmentTypeState {}
 
-class GetEquipmentListLoading extends GetEquipmentListState {}
+class GetEquipmentListLoading extends GetEquipmentTypeState {}
 
-class GetEquipmentListLoaded extends GetEquipmentListState {
+class GetEquipmentListLoaded extends GetEquipmentTypeState {
   final List<Equipment> equipmentList;
 
   GetEquipmentListLoaded(this.equipmentList);
 }
 
-class GetEquipmentListError extends GetEquipmentListState {
+class GetEquipmentListError extends GetEquipmentTypeState {
   final String message;
 
   GetEquipmentListError(this.message);

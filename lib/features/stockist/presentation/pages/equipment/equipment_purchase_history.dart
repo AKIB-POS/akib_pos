@@ -1,62 +1,62 @@
-class RawMaterialPurchaseHistory {
+class EquipmentPurchaseHistory {
   final String purchaseName;
   final String purchaseDate;
   final String quantity;
   final String vendor;
-  final String expirationDate;
   final double purchasePrice;
   final String orderStatus;
 
-  RawMaterialPurchaseHistory({
+  EquipmentPurchaseHistory({
     required this.purchaseName,
     required this.purchaseDate,
     required this.quantity,
     required this.vendor,
-    required this.expirationDate,
     required this.purchasePrice,
     required this.orderStatus,
   });
 
-  factory RawMaterialPurchaseHistory.fromJson(Map<String, dynamic> json) {
-    return RawMaterialPurchaseHistory(
+  // Factory constructor to create an instance from JSON
+  factory EquipmentPurchaseHistory.fromJson(Map<String, dynamic> json) {
+    return EquipmentPurchaseHistory(
       purchaseName: json['purchase_name'] ?? '',
       purchaseDate: json['purchase_date'] ?? '',
-      quantity: json['quantity'] ?? '',
+      quantity: json['quantity'] ?? '0',
       vendor: json['vendor'] ?? '',
-      expirationDate: json['expiration_date'] ?? '',
       purchasePrice: (json['purchase_price'] as num?)?.toDouble() ?? 0.0,
       orderStatus: json['order_status'] ?? '',
     );
   }
 
+  // Method to convert an instance to JSON
   Map<String, dynamic> toJson() {
     return {
       'purchase_name': purchaseName,
       'purchase_date': purchaseDate,
       'quantity': quantity,
       'vendor': vendor,
-      'expiration_date': expirationDate,
       'purchase_price': purchasePrice,
       'order_status': orderStatus,
     };
   }
 }
 
-class RawMaterialPurchaseHistoryResponse {
-  final List<RawMaterialPurchaseHistory> purchaseHistories;
+class EquipmentPurchaseHistoryResponse {
+  final List<EquipmentPurchaseHistory> purchaseHistories;
 
-  RawMaterialPurchaseHistoryResponse({required this.purchaseHistories});
+  EquipmentPurchaseHistoryResponse({required this.purchaseHistories});
 
-  factory RawMaterialPurchaseHistoryResponse.fromJson(Map<String, dynamic> json) {
-    var historyList = (json['data'] as List)
-        .map((history) => RawMaterialPurchaseHistory.fromJson(history))
+  // Factory constructor to create an instance from JSON
+  factory EquipmentPurchaseHistoryResponse.fromJson(Map<String, dynamic> json) {
+    var purchases = (json['data'] as List)
+        .map((purchase) => EquipmentPurchaseHistory.fromJson(purchase))
         .toList();
-    return RawMaterialPurchaseHistoryResponse(purchaseHistories: historyList);
+    return EquipmentPurchaseHistoryResponse(purchaseHistories: purchases);
   }
 
+  // Method to convert an instance to JSON
   Map<String, dynamic> toJson() {
     return {
-      'data': purchaseHistories.map((history) => history.toJson()).toList(),
+      'data': purchaseHistories.map((purchase) => purchase.toJson()).toList(),
     };
   }
 }

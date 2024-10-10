@@ -164,7 +164,7 @@ class _RawMaterialPurchasesPageState
               OutlinedButton(
                 onPressed: () {
                   Utils.navigateToPage(context,
-                      MaterialDetailPage(materialId: purchase.materialId));
+                      RawMaterialDetailPage(materialId: purchase.materialId));
                 },
                 style: AppThemes.outlineButtonPrimaryStyle,
                 child: const Text(

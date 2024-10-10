@@ -99,17 +99,19 @@ import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/pend
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/rejected_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/detail_subordinate_task_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/employee_submission/pending_approval_tab.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/add_equipment_stock_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/add_equipment_type_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/add_material_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/add_raw_material_stock_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/add_vendor.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/expired_stock_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_equipment_detail_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_equipment_purchase_history_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_equipment_type_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_equipment_purchase_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_order_status_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_raw_material_purchase_cubit.dart';
-import 'package:akib_pos/features/stockist/presentation/bloc/get_purchase_history_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_raw_material_purchase_history_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_raw_material_type_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_unit_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_vendor_cubit.dart';
@@ -516,7 +518,7 @@ void main() async {
           create: (context) => GetMaterialDetailCubit(stockistInjection()),
         ),
         BlocProvider(
-          create: (context) => GetPurchaseHistoryCubit(stockistInjection()),
+          create: (context) => GetRawMaterialPurchaseHistoryCubit(stockistInjection()),
         ),
         BlocProvider(
           create: (context) => GetUnitCubit(stockistInjection()),
@@ -537,8 +539,18 @@ void main() async {
           create: (context) => GetEquipmentPurchaseCubit(stockistInjection()),
         ),
         BlocProvider(
+          create: (context) => GetEquipmentPurchaseCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetEquipmentPurchaseHistoryCubit(stockistInjection()),
+        ),
+        BlocProvider(
           create: (context) => GetEquipmentDetailCubit(stockistInjection()),
         ),
+        BlocProvider(
+          create: (context) => AddEquipmentStockCubit(stockistInjection()),
+        ),
+        
 
       ],
       child: const MyApp(),

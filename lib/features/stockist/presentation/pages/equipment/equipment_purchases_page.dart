@@ -2,8 +2,11 @@ import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
+import 'package:akib_pos/features/stockist/presentation/pages/equipment/add_equipment_stock_page.dart';
 import 'package:akib_pos/features/stockist/data/models/equipment/equipment_purchase.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_equipment_purchase_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/pages/equipment/add_equipment_page_type.dart';
+import 'package:akib_pos/features/stockist/presentation/pages/equipment/equipment_detail_page.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -83,15 +86,15 @@ class _EquipmentPurchasesPageState extends State<EquipmentPurchasesPage> {
       ),
       floatingActionButton:
           Utils.buildFloatingActionButton(onPressed: () async {
-        // final result = await Navigator.of(context).push(
-        //   MaterialPageRoute(
-        //     builder: (context) => const AddEquipmentTypePage(),
-        //   ),
-        // );
+        final result = await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const AddEquipmentStockPage(),
+          ),
+        );
 
-        // if (result == true) {
-        //   _fetchPurchasesData();
-        // }
+        if (result == true) {
+          _fetchPurchasesData();
+        }
       }),
     );
   }
@@ -158,8 +161,8 @@ class _EquipmentPurchasesPageState extends State<EquipmentPurchasesPage> {
               ),
               OutlinedButton(
                 onPressed: () {
-                  // Utils.navigateToPage(context,
-                  //     EquipmentDetailPage(equipmentId: purchase.equipmentId));
+                  Utils.navigateToPage(context,
+                      EquipmentDetailPage(equipmentId: purchase.equipmentId));
                 },
                 style: AppThemes.outlineButtonPrimaryStyle,
                 child: const Text(

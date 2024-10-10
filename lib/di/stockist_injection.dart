@@ -1,16 +1,18 @@
 import 'package:akib_pos/features/stockist/data/datasources/stockist_remote_data_source.dart';
 import 'package:akib_pos/features/stockist/data/repositories/stockist_repository.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/add_equipment_stock_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/add_equipment_type_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/add_material_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/add_raw_material_stock_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/add_vendor.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/expired_stock_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_equipment_detail_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_equipment_purchase_history_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_equipment_type_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_equipment_purchase_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_order_status_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_raw_material_purchase_cubit.dart';
-import 'package:akib_pos/features/stockist/presentation/bloc/get_purchase_history_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_raw_material_purchase_history_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_raw_material_type_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_unit_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_vendor_cubit.dart';
@@ -70,7 +72,7 @@ Future<void> initStockistModule() async {
     () => GetMaterialDetailCubit(stockistInjection()),
   );
   stockistInjection.registerFactory(
-    () => GetPurchaseHistoryCubit(stockistInjection()),
+    () => GetRawMaterialPurchaseHistoryCubit(stockistInjection()),
   );
   stockistInjection.registerFactory(
     () => GetUnitCubit(stockistInjection()),
@@ -92,6 +94,12 @@ Future<void> initStockistModule() async {
   );
   stockistInjection.registerFactory(
     () => GetEquipmentDetailCubit(stockistInjection()),
+  );
+  stockistInjection.registerFactory(
+    () => GetEquipmentPurchaseHistoryCubit(stockistInjection()),
+  );
+  stockistInjection.registerFactory(
+    () => AddEquipmentStockCubit(stockistInjection()),
   );
   
 

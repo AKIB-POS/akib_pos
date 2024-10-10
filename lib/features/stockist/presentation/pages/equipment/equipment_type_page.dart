@@ -50,7 +50,7 @@ class _EquipmentTypePageState extends State<EquipmentTypePage> {
       body: RefreshIndicator(
         onRefresh: _fetchEquipments,
         color: AppColors.primaryMain,
-        child: BlocBuilder<GetEquipmentTypeCubit, GetEquipmentListState>(
+        child: BlocBuilder<GetEquipmentTypeCubit, GetEquipmentTypeState>(
           builder: (context, state) {
             if (state is GetEquipmentListLoading) {
               return _buildLoading();

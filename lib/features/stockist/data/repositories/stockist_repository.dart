@@ -20,6 +20,8 @@ import 'package:akib_pos/features/stockist/data/models/stock/stockist_summary.da
 import 'package:akib_pos/features/stockist/data/models/unit.dart';
 import 'package:akib_pos/features/stockist/data/models/vendor.dart';
 import 'package:akib_pos/features/stockist/data/models/warehouse.dart';
+import 'package:akib_pos/features/stockist/data/models/equipment/add_equipment_stock.dart';
+import 'package:akib_pos/features/stockist/presentation/pages/equipment/equipment_purchase_history.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class StockistRepository {
@@ -33,7 +35,7 @@ abstract class StockistRepository {
   Future<Either<Failure, AddRawMaterialResponse>> addRawMaterial(AddRawMaterialRequest request);
   Future<Either<Failure, RawMaterialPurchasesResponse>> getRawMaterialPurcases(int branchId);
   Future<Either<Failure, MaterialDetailResponse>> getMaterialDetail(int branchId, int materialId);
-  Future<Either<Failure, PurchaseHistoryResponse>> getPurchaseHistory(int branchId, int materialId);
+  Future<Either<Failure, RawMaterialPurchaseHistoryResponse>> getRawMaterialPurchaseHistory(int branchId, int materialId);
 
   Future<Either<Failure, GetUnitsResponse>> getUnits(int branchId);
   Future<Either<Failure, GetWarehousesResponse>> getWarehouses(int branchId);
@@ -45,6 +47,8 @@ abstract class StockistRepository {
 
   Future<Either<Failure, EquipmentPurchaseResponse>> getEquipmentPurchases(int branchId);
   Future<Either<Failure, EquipmentDetailResponse>> getEquipmentDetail(int branchId, int equipmentId);
+  Future<Either<Failure, EquipmentPurchaseHistoryResponse>> getEquipmentPurchaseHistory(int branchId, int equipmentId);
+  Future<Either<Failure, AddEquipmentStockResponse>> addEquipmentStock(AddEquipmentStockRequest request);
 
   
 }
@@ -53,6 +57,28 @@ class StockistRepositoryImpl implements StockistRepository {
   final StockistRemoteDataSource remoteDataSource;
 
   StockistRepositoryImpl({required this.remoteDataSource});
+
+  @override
+  Future<Either<Failure, AddEquipmentStockResponse>> addEquipmentStock(AddEquipmentStockRequest request) async {
+    try {
+      final response = await remoteDataSource.addEquipmentStock(request);
+      return Right(response);
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, EquipmentPurchaseHistoryResponse>> getEquipmentPurchaseHistory(int branchId, int equipmentId) async {
+    try {
+      final purchaseHistory = await remoteDataSource.getEquipmentPurchaseHistory(branchId, equipmentId);
+      return Right(purchaseHistory);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
 
   @override
@@ -156,10 +182,10 @@ class StockistRepositoryImpl implements StockistRepository {
   }
 
   @override
-  Future<Either<Failure, PurchaseHistoryResponse>> getPurchaseHistory(int branchId, int materialId) async {
+  Future<Either<Failure, RawMaterialPurchaseHistoryResponse>> getRawMaterialPurchaseHistory(int branchId, int materialId) async {
     try {
-      final purchaseHistory = await remoteDataSource.getPurchaseHistory(branchId, materialId);
-      return Right(purchaseHistory);
+      final RawMaterialpurchaseHistory = await remoteDataSource.getRawMaterialPurchaseHistory(branchId, materialId);
+      return Right(RawMaterialpurchaseHistory);
     } on ServerException {
       return Left(ServerFailure());
     } catch (e) {
