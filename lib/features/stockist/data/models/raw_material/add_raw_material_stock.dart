@@ -2,7 +2,7 @@ class AddRawMaterialStockRequest {
   final int branchId;
   final int materialId;
   final int quantity;
-  final int unitId;
+  final String unitName;
   final double price;
   final int vendorId;
   final int warehouseId;
@@ -14,7 +14,7 @@ class AddRawMaterialStockRequest {
     required this.branchId,
     required this.materialId,
     required this.quantity,
-    required this.unitId,
+    required this.unitName,
     required this.price,
     required this.vendorId,
     required this.warehouseId,
@@ -28,7 +28,7 @@ class AddRawMaterialStockRequest {
       'branch_id': branchId,
       'material_id': materialId,
       'quantity': quantity,
-      'unit_id': unitId,
+      'unit_id': unitName,
       'price': price,
       'vendor_id': vendorId,
       'warehouse_id': warehouseId,

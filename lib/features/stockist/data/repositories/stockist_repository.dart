@@ -1,17 +1,19 @@
 import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/core/error/failures.dart';
 import 'package:akib_pos/features/stockist/data/datasources/stockist_remote_data_source.dart';
-import 'package:akib_pos/features/stockist/data/models/add_equipment_type.dart';
-import 'package:akib_pos/features/stockist/data/models/stock/raw_material/add_raw_material.dart';
-import 'package:akib_pos/features/stockist/data/models/stock/raw_material/add_raw_material_stock.dart';
+import 'package:akib_pos/features/stockist/data/models/equipment/add_equipment_type.dart';
+import 'package:akib_pos/features/stockist/data/models/equipment/equipment_detail.dart';
+import 'package:akib_pos/features/stockist/data/models/equipment/equipment_purchase.dart';
+import 'package:akib_pos/features/stockist/data/models/raw_material/add_raw_material.dart';
+import 'package:akib_pos/features/stockist/data/models/raw_material/add_raw_material_stock.dart';
 import 'package:akib_pos/features/stockist/data/models/add_vendor.dart';
 import 'package:akib_pos/features/stockist/data/models/expired_stock.dart';
-import 'package:akib_pos/features/stockist/data/models/material_detail.dart';
+import 'package:akib_pos/features/stockist/data/models/raw_material/material_detail.dart';
 import 'package:akib_pos/features/stockist/data/models/order_status.dart';
-import 'package:akib_pos/features/stockist/data/models/raw_material_purchase.dart';
+import 'package:akib_pos/features/stockist/data/models/raw_material/raw_material_purchase.dart';
 import 'package:akib_pos/features/stockist/data/models/purchase_history.dart';
 import 'package:akib_pos/features/stockist/data/models/equipment/equipment.dart';
-import 'package:akib_pos/features/stockist/data/models/stock/raw_material/raw_material.dart';
+import 'package:akib_pos/features/stockist/data/models/raw_material/raw_material.dart';
 import 'package:akib_pos/features/stockist/data/models/stock/running_out_stock.dart';
 import 'package:akib_pos/features/stockist/data/models/stock/stockist_recent_purchase.dart';
 import 'package:akib_pos/features/stockist/data/models/stock/stockist_summary.dart';
@@ -40,6 +42,10 @@ abstract class StockistRepository {
   Future<Either<Failure, AddRawMaterialStockResponse>> addRawMaterialStock(AddRawMaterialStockRequest request);
   Future<Either<Failure, EquipmentTypeResponse>> getEquipmentType(int branchId, String category);
   Future<Either<Failure, AddEquipmentTypeResponse>> addEquipmentType(AddEquipmentTypeRequest request);
+
+  Future<Either<Failure, EquipmentPurchaseResponse>> getEquipmentPurchases(int branchId);
+  Future<Either<Failure, EquipmentDetailResponse>> getEquipmentDetail(int branchId, int equipmentId);
+
   
 }
 
@@ -47,6 +53,31 @@ class StockistRepositoryImpl implements StockistRepository {
   final StockistRemoteDataSource remoteDataSource;
 
   StockistRepositoryImpl({required this.remoteDataSource});
+
+
+  @override
+  Future<Either<Failure, EquipmentDetailResponse>> getEquipmentDetail(int branchId, int equipmentId) async {
+    try {
+      final equipmentDetail = await remoteDataSource.getEquipmentDetail(branchId, equipmentId);
+      return Right(equipmentDetail);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, EquipmentPurchaseResponse>> getEquipmentPurchases(int branchId) async {
+    try {
+      final equipmentPurchases = await remoteDataSource.getEquipmentPurchases(branchId);
+      return Right(equipmentPurchases);
+    } on ServerException {
+      return Left(ServerFailure());
+    } catch (e) {
+      return Left(GeneralFailure(e.toString()));
+    }
+  }
 
    @override
   Future<Either<Failure, AddEquipmentTypeResponse>> addEquipmentType(AddEquipmentTypeRequest request) async {

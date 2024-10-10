@@ -3,17 +3,19 @@ import 'dart:convert';
 import 'package:akib_pos/api/urls.dart';
 import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
-import 'package:akib_pos/features/stockist/data/models/add_equipment_type.dart';
-import 'package:akib_pos/features/stockist/data/models/stock/raw_material/add_raw_material.dart';
-import 'package:akib_pos/features/stockist/data/models/stock/raw_material/add_raw_material_stock.dart';
+import 'package:akib_pos/features/stockist/data/models/equipment/add_equipment_type.dart';
+import 'package:akib_pos/features/stockist/data/models/equipment/equipment_detail.dart';
+import 'package:akib_pos/features/stockist/data/models/equipment/equipment_purchase.dart';
+import 'package:akib_pos/features/stockist/data/models/raw_material/add_raw_material.dart';
+import 'package:akib_pos/features/stockist/data/models/raw_material/add_raw_material_stock.dart';
 import 'package:akib_pos/features/stockist/data/models/add_vendor.dart';
 import 'package:akib_pos/features/stockist/data/models/expired_stock.dart';
-import 'package:akib_pos/features/stockist/data/models/material_detail.dart';
+import 'package:akib_pos/features/stockist/data/models/raw_material/material_detail.dart';
 import 'package:akib_pos/features/stockist/data/models/order_status.dart';
-import 'package:akib_pos/features/stockist/data/models/raw_material_purchase.dart';
+import 'package:akib_pos/features/stockist/data/models/raw_material/raw_material_purchase.dart';
 import 'package:akib_pos/features/stockist/data/models/purchase_history.dart';
 import 'package:akib_pos/features/stockist/data/models/equipment/equipment.dart';
-import 'package:akib_pos/features/stockist/data/models/stock/raw_material/raw_material.dart';
+import 'package:akib_pos/features/stockist/data/models/raw_material/raw_material.dart';
 import 'package:akib_pos/features/stockist/data/models/stock/running_out_stock.dart';
 import 'package:akib_pos/features/stockist/data/models/stock/stockist_recent_purchase.dart';
 import 'package:akib_pos/features/stockist/data/models/stock/stockist_summary.dart';
@@ -44,6 +46,9 @@ abstract class StockistRemoteDataSource {
   Future<AddRawMaterialStockResponse> addRawMaterialStock(AddRawMaterialStockRequest request);
   Future<EquipmentTypeResponse> getEquipmentType(int branchId, String category);
   Future<AddEquipmentTypeResponse> addEquipmentType(AddEquipmentTypeRequest request);
+
+  Future<EquipmentPurchaseResponse> getEquipmentPurchases(int branchId);
+  Future<EquipmentDetailResponse> getEquipmentDetail(int branchId, int equipmentId);
 }
 
 class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
@@ -51,6 +56,49 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
   final AuthSharedPref sharedPrefsHelper = GetIt.instance<AuthSharedPref>();
 
   StockistRemoteDataSourceImpl({required this.client});
+
+  @override
+  Future<EquipmentDetailResponse> getEquipmentDetail(int branchId, int equipmentId) async {
+    final url = '${URLs.baseUrlMock}/equipment-detail';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branchId': branchId.toString(),
+        'equipment_id': equipmentId.toString(),
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return EquipmentDetailResponse.fromJson(jsonResponse);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+
+  @override
+  Future<EquipmentPurchaseResponse> getEquipmentPurchases(int branchId) async {
+    const url = '${URLs.baseUrlMock}/purchases';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branchId': branchId.toString(),
+        'category': 'equipment',
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return EquipmentPurchaseResponse.fromJson(jsonResponse);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
 
   @override
   Future<AddEquipmentTypeResponse> addEquipmentType(AddEquipmentTypeRequest request) async {

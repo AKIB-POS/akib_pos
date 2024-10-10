@@ -1,9 +1,10 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/stockist/data/models/stock/stockist_summary.dart';
+import 'package:akib_pos/features/stockist/presentation/pages/equipment/equipment_purchases_page.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/equipment/equipment_type_page.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/expired_stock_page.dart';
-import 'package:akib_pos/features/stockist/presentation/pages/purchase/purchase_list_page.dart';
+import 'package:akib_pos/features/stockist/presentation/pages/purchase/raw_material_purchase_page.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/raw_material/raw_material_page.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/running_out_stock_page.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/vendor/vendor_list_page.dart';
@@ -169,7 +170,7 @@ class BuildStockistSummary extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Pilih Bahan', style: AppTextStyle.headline5),
+                    const Text('Pilih Tipe Pembelian', style: AppTextStyle.headline5),
                     IconButton(
                       icon: const Icon(Icons.close),
                       onPressed: () => Navigator.of(context).pop(),
@@ -184,7 +185,8 @@ class BuildStockistSummary extends StatelessWidget {
                 title: const Text('Bahan Baku', style: AppTextStyle.body2),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () async {
-                  Utils.navigateToPage(context, RawMaterialPurchasesListPage());
+                  Navigator.of(context).pop();
+                  Utils.navigateToPage(context, const RawMaterialPurchasesPage());
                 },
               ),
               Padding(
@@ -193,12 +195,13 @@ class BuildStockistSummary extends StatelessWidget {
               ), // Divider between "Bahan Baku" and "Non Bahan Baku"
               // Second option: "Non Bahan Baku"
               ListTile(
-                title: const Text('Non Bahan Baku', style: AppTextStyle.body2),
+                title: const Text('Peralatan', style: AppTextStyle.body2),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
 
-                  // Handle "Non Bahan Baku" tap
                   Navigator.of(context).pop();
+                  Utils.navigateToPage(context, EquipmentPurchasesPage());
+
                 },
               ),
               const SizedBox(height: 8), // Spacing after the options

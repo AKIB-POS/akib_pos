@@ -1,7 +1,7 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
-import 'package:akib_pos/features/stockist/data/models/stock/raw_material/add_raw_material_stock.dart';
+import 'package:akib_pos/features/stockist/data/models/raw_material/add_raw_material_stock.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/add_raw_material_stock_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_order_status_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_raw_material_type_cubit.dart';
@@ -15,7 +15,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
-
 class AddRawMaterialStockPage extends StatefulWidget {
   const AddRawMaterialStockPage({Key? key}) : super(key: key);
 
@@ -28,7 +27,7 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
   final _formKey = GlobalKey<FormState>();
 
   int? rawMaterialId;
-  int? unitId;
+  String? unitName; // Instead of unitId, we now store the unitName
   int? vendorId;
   int? warehouseId;
   int? orderStatusId;
@@ -44,8 +43,7 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
   }
 
   void _fetchInitialData() {
-    final branchId =
-        1; // Example branch ID, replace with dynamic data if needed
+    final branchId = 1; // Example branch ID, replace with dynamic data if needed
     context.read<GetRawMaterialTypeCubit>().fetchRawMaterialTypes(branchId: branchId);
     context.read<GetUnitCubit>().fetchUnits(branchId: branchId);
     context.read<GetVendorCubit>().fetchVendors(branchId: branchId);
@@ -99,14 +97,10 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
                 ),
                 onPressed: () {
                   setState(() {
-                    if (selectedDate != null) {
-                      setState(() {
-                        if (isPurchaseDate) {
-                          purchaseDate = selectedDate;
-                        } else {
-                          expiryDate = selectedDate;
-                        }
-                      });
+                    if (isPurchaseDate) {
+                      purchaseDate = selectedDate;
+                    } else {
+                      expiryDate = selectedDate;
                     }
                   });
                   Navigator.of(context).pop();
@@ -122,7 +116,7 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
 
   bool _isFormValid() {
     return rawMaterialId != null &&
-        unitId != null &&
+        unitName != null && // Checking unitName instead of unitId
         vendorId != null &&
         warehouseId != null &&
         orderStatusId != null &&
@@ -139,7 +133,7 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
         branchId: 1, // Replace with actual branch ID
         materialId: rawMaterialId!,
         quantity: quantity!,
-        unitId: unitId!,
+        unitName: unitName!, // Pass unitName instead of unitId
         price: price!,
         vendorId: vendorId!,
         warehouseId: warehouseId!,
@@ -232,7 +226,9 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
                           decoration: AppThemes.inputDecorationStyle
                               .copyWith(hintText: 'Jumlah'),
                           onChanged: (value) {
-                            quantity = int.tryParse(value);
+                            setState(() {
+                              quantity = int.tryParse(value);
+                            });
                           },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -249,26 +245,25 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Satuan',
-                            style: AppTextStyle.bigCaptionBold),
+                        const Text('Satuan', style: AppTextStyle.bigCaptionBold),
                         const SizedBox(height: 8),
                         BlocBuilder<GetUnitCubit, GetUnitState>(
                           builder: (context, state) {
                             if (state is GetUnitLoading) {
                               return _loadingDropdown();
                             } else if (state is GetUnitLoaded) {
-                              return _buildDropdown<int>(
-                                value: unitId,
+                              return _buildDropdown<String>(
+                                value: unitName, // Now store unitName
                                 hint: 'Pilih Satuan',
                                 items: state.unitsResponse.units.map((unit) {
-                                  return DropdownMenuItem<int>(
-                                    value: unit.unitId,
+                                  return DropdownMenuItem<String>(
+                                    value: unit.unitName, // Store unitName
                                     child: Text(unit.unitName),
                                   );
                                 }).toList(),
                                 onChanged: (value) {
                                   setState(() {
-                                    unitId = value;
+                                    unitName = value;
                                   });
                                 },
                               );
@@ -286,26 +281,31 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
               const Text('Harga', style: AppTextStyle.bigCaptionBold),
               const SizedBox(height: 8),
               TextFormField(
-                keyboardType: TextInputType.number,
-                inputFormatters: <TextInputFormatter>[
-                  CurrencyTextInputFormatter.currency(
-                    locale: 'id',
-                    decimalDigits: 0,
-                    symbol: 'Rp.  ',
-                  ),
-                ],
-                decoration:
-                    AppThemes.inputDecorationStyle.copyWith(hintText: 'Harga'),
-                onChanged: (value) {
-                  price = double.tryParse(value);
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Harga tidak boleh kosong';
-                  }
-                  return null;
-                },
-              ),
+  keyboardType: TextInputType.number,
+  inputFormatters: <TextInputFormatter>[
+    CurrencyTextInputFormatter.currency(
+      locale: 'id',
+      decimalDigits: 0,
+      symbol: 'Rp.  ', // Symbol for Rupiah
+    ),
+  ],
+  decoration: AppThemes.inputDecorationStyle.copyWith(hintText: 'Harga'),
+  onChanged: (value) {
+    // Remove 'Rp. ' and any extra spaces before parsing to double
+    String cleanedValue = value.replaceAll('Rp. ', '').replaceAll(',', '').trim();
+    
+    setState(() {
+      price = double.tryParse(cleanedValue);
+    });
+  },
+  validator: (value) {
+    if (value == null || value.isEmpty || price == null) {
+      return 'Harga tidak boleh kosong';
+    }
+    return null;
+  },
+),
+
               const SizedBox(height: 16),
               const Text('Nama Vendor', style: AppTextStyle.bigCaptionBold),
               const SizedBox(height: 8),

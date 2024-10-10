@@ -1,7 +1,7 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
-import 'package:akib_pos/features/stockist/data/models/material_detail.dart';
+import 'package:akib_pos/features/stockist/data/models/raw_material/material_detail.dart';
 import 'package:akib_pos/features/stockist/data/models/purchase_history.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_purchase_history_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/material_detail_cubit.dart';
@@ -142,7 +142,8 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
               ],
             ),
           ),
-        ),);
+        ),
+        );
   }
 
   Widget _buildMaterialDetailContent(MaterialDetailResponse materialDetail) {
@@ -378,6 +379,5 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
       },
     );
   }
-
 
 }

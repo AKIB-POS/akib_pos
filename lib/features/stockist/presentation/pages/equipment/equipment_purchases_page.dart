@@ -2,25 +2,21 @@ import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
-import 'package:akib_pos/features/stockist/data/models/raw_material_purchase.dart';
-import 'package:akib_pos/features/stockist/presentation/bloc/get_raw_material_purchase_cubit.dart';
-import 'package:akib_pos/features/stockist/presentation/pages/purchase/add_raw_material_stock_page.dart';
-import 'package:akib_pos/features/stockist/presentation/pages/purchase/raw_material_detail_page.dart';
+import 'package:akib_pos/features/stockist/data/models/equipment/equipment_purchase.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_equipment_purchase_cubit.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
-class RawMaterialPurchasesListPage extends StatefulWidget {
-  const RawMaterialPurchasesListPage({Key? key}) : super(key: key);
+class EquipmentPurchasesPage extends StatefulWidget {
+  const EquipmentPurchasesPage({Key? key}) : super(key: key);
 
   @override
-  _RawMaterialPurchasesListPageState createState() =>
-      _RawMaterialPurchasesListPageState();
+  _EquipmentPurchasesPageState createState() => _EquipmentPurchasesPageState();
 }
 
-class _RawMaterialPurchasesListPageState
-    extends State<RawMaterialPurchasesListPage> {
+class _EquipmentPurchasesPageState extends State<EquipmentPurchasesPage> {
   final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
 
   @override
@@ -32,8 +28,8 @@ class _RawMaterialPurchasesListPageState
   Future<void> _fetchPurchasesData() async {
     final branchId = _authSharedPref.getBranchId() ?? 0;
     context
-        .read<GetRawMaterialPurchaseCubit>()
-        .fetchPurchases(branchId: branchId);
+        .read<GetEquipmentPurchaseCubit>()
+        .fetchEquipmentPurchases(branchId: branchId);
   }
 
   @override
@@ -42,7 +38,7 @@ class _RawMaterialPurchasesListPageState
       backgroundColor: AppColors.backgroundGrey,
       appBar: AppBar(
         title: const Text(
-          'Daftar Pembelian',
+          'Daftar Pembelian Peralatan',
           style: AppTextStyle.headline5,
         ),
         backgroundColor: Colors.white,
@@ -59,12 +55,12 @@ class _RawMaterialPurchasesListPageState
             child: RefreshIndicator(
               color: AppColors.primaryMain,
               onRefresh: _fetchPurchasesData,
-              child: BlocBuilder<GetRawMaterialPurchaseCubit,
-                  GetRawmaterialPurchasesState>(
+              child: BlocBuilder<GetEquipmentPurchaseCubit,
+                  GetEquipmentPurchaseState>(
                 builder: (context, state) {
-                  if (state is GetRawMaterialPurchasesLoading) {
+                  if (state is GetEquipmentPurchaseLoading) {
                     return _buildShimmerLoading();
-                  } else if (state is GetRawMaterialPurchasesError) {
+                  } else if (state is GetEquipmentPurchaseError) {
                     return Utils.buildErrorState(
                       title: 'Gagal Memuat Data',
                       message: state.message,
@@ -72,11 +68,11 @@ class _RawMaterialPurchasesListPageState
                         _fetchPurchasesData();
                       },
                     );
-                  } else if (state is GetRawMaterialPurchasesLoaded) {
-                    return state.purchases.purchases.isEmpty
+                  } else if (state is GetEquipmentPurchaseLoaded) {
+                    return state.equipmentPurchases.equipmentPurchases.isEmpty
                         ? Utils.buildEmptyState("Belum ada Pembelian",
                             "Data pembelian akan tampil setelah transaksi.")
-                        : _buildPurchasesList(state.purchases.purchases);
+                        : _buildPurchasesList(state.equipmentPurchases.equipmentPurchases);
                   }
                   return const Center(child: Text('Tidak ada data.'));
                 },
@@ -87,16 +83,15 @@ class _RawMaterialPurchasesListPageState
       ),
       floatingActionButton:
           Utils.buildFloatingActionButton(onPressed: () async {
-        final result = await Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => const AddRawMaterialStockPage(),
-          ),
-        );
+        // final result = await Navigator.of(context).push(
+        //   MaterialPageRoute(
+        //     builder: (context) => const AddEquipmentTypePage(),
+        //   ),
+        // );
 
-        // Jika result true, refresh data cuti
-        if (result == true) {
-          _fetchPurchasesData(); // Panggil fungsi untuk refresh data
-        }
+        // if (result == true) {
+        //   _fetchPurchasesData();
+        // }
       }),
     );
   }
@@ -109,7 +104,7 @@ class _RawMaterialPurchasesListPageState
     );
   }
 
-  Widget _buildPurchasesList(List<RawMaterialPurchase> purchases) {
+  Widget _buildPurchasesList(List<EquipmentPurchase> purchases) {
     return ListView.builder(
       padding: const EdgeInsets.only(left: 16, right: 16, bottom: 70),
       itemCount: purchases.length,
@@ -120,7 +115,7 @@ class _RawMaterialPurchasesListPageState
     );
   }
 
-  Widget _buildPurchaseCard(RawMaterialPurchase purchase) {
+  Widget _buildPurchaseCard(EquipmentPurchase purchase) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       padding: const EdgeInsets.all(16.0),
@@ -147,7 +142,7 @@ class _RawMaterialPurchasesListPageState
                   //
                   const SizedBox(height: 8),
                   Text(
-                    purchase.materialName,
+                    purchase.equipmentName,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -163,8 +158,8 @@ class _RawMaterialPurchasesListPageState
               ),
               OutlinedButton(
                 onPressed: () {
-                  Utils.navigateToPage(context,
-                      MaterialDetailPage(materialId: purchase.materialId));
+                  // Utils.navigateToPage(context,
+                  //     EquipmentDetailPage(equipmentId: purchase.equipmentId));
                 },
                 style: AppThemes.outlineButtonPrimaryStyle,
                 child: const Text(
