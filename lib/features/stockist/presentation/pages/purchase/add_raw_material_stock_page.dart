@@ -1,15 +1,17 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
-import 'package:akib_pos/features/stockist/data/models/add_raw_material_stock.dart';
+import 'package:akib_pos/features/stockist/data/models/stock/raw_material/add_raw_material_stock.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/add_raw_material_stock_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_order_status_cubit.dart';
-import 'package:akib_pos/features/stockist/presentation/bloc/get_raw_material_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_raw_material_type_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_unit_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_vendor_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_warehouses_cubit.dart';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
@@ -18,7 +20,8 @@ class AddRawMaterialStockPage extends StatefulWidget {
   const AddRawMaterialStockPage({Key? key}) : super(key: key);
 
   @override
-  _AddRawMaterialStockPageState createState() => _AddRawMaterialStockPageState();
+  _AddRawMaterialStockPageState createState() =>
+      _AddRawMaterialStockPageState();
 }
 
 class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
@@ -41,33 +44,16 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
   }
 
   void _fetchInitialData() {
-    final branchId = 1; // Example branch ID, replace with dynamic data if needed
-    context.read<GetRawMaterialCubit>().fetchRawMaterials(branchId: branchId);
+    final branchId =
+        1; // Example branch ID, replace with dynamic data if needed
+    context.read<GetRawMaterialTypeCubit>().fetchRawMaterialTypes(branchId: branchId);
     context.read<GetUnitCubit>().fetchUnits(branchId: branchId);
     context.read<GetVendorCubit>().fetchVendors(branchId: branchId);
     context.read<GetWarehousesCubit>().fetchWarehouses(branchId: branchId);
     context.read<GetOrderStatusCubit>().fetchOrderStatuses(branchId: branchId);
   }
 
-  // Future<void> _selectDate(BuildContext context, bool isPurchaseDate) async {
-  //   DateTime selectedDate = DateTime.now();
-  //   final DateTime? pickedDate = await showDatePicker(
-  //     context: context,
-  //     initialDate: selectedDate,
-  //     firstDate: DateTime(2000),
-  //     lastDate: DateTime(2100),
-  //   );
-  //   if (pickedDate != null) {
-  //     setState(() {
-  //       if (isPurchaseDate) {
-  //         purchaseDate = pickedDate;
-  //       } else {
-  //         expiryDate = pickedDate;
-  //       }
-  //     });
-  //   }
-  // }
-  Future<void> _selectDate(BuildContext context,bool  isPurchaseDate) async {
+  Future<void> _selectDate(BuildContext context, bool isPurchaseDate) async {
     DateTime selectedDate = DateTime.now();
     await showDialog(
       context: context,
@@ -114,14 +100,14 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
                 onPressed: () {
                   setState(() {
                     if (selectedDate != null) {
-      setState(() {
-        if (isPurchaseDate) {
-          purchaseDate = selectedDate;
-        } else {
-          expiryDate = selectedDate;
-        }
-      });
-    }
+                      setState(() {
+                        if (isPurchaseDate) {
+                          purchaseDate = selectedDate;
+                        } else {
+                          expiryDate = selectedDate;
+                        }
+                      });
+                    }
                   });
                   Navigator.of(context).pop();
                 },
@@ -148,7 +134,8 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
-      final AddRawMaterialStockRequest stockRequest = AddRawMaterialStockRequest(
+      final AddRawMaterialStockRequest stockRequest =
+          AddRawMaterialStockRequest(
         branchId: 1, // Replace with actual branch ID
         materialId: rawMaterialId!,
         quantity: quantity!,
@@ -205,11 +192,11 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
             children: [
               const Text('Jenis Bahan', style: AppTextStyle.bigCaptionBold),
               const SizedBox(height: 8),
-              BlocBuilder<GetRawMaterialCubit, GetRawMaterialState>(
+              BlocBuilder<GetRawMaterialTypeCubit, GetRawMaterialTypeState>(
                 builder: (context, state) {
-                  if (state is GetRawMaterialLoading) {
+                  if (state is GetRawMaterialTypeLoading) {
                     return _loadingDropdown();
-                  } else if (state is GetRawMaterialLoaded) {
+                  } else if (state is GetRawMaterialTypeLoaded) {
                     return _buildDropdown<int>(
                       value: rawMaterialId,
                       hint: 'Pilih Jenis Bahan',
@@ -237,11 +224,13 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Jumlah', style: AppTextStyle.bigCaptionBold),
+                        const Text('Jumlah',
+                            style: AppTextStyle.bigCaptionBold),
                         const SizedBox(height: 8),
                         TextFormField(
                           keyboardType: TextInputType.number,
-                          decoration: AppThemes.inputDecorationStyle.copyWith(hintText: 'Jumlah'),
+                          decoration: AppThemes.inputDecorationStyle
+                              .copyWith(hintText: 'Jumlah'),
                           onChanged: (value) {
                             quantity = int.tryParse(value);
                           },
@@ -260,7 +249,8 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Satuan', style: AppTextStyle.bigCaptionBold),
+                        const Text('Satuan',
+                            style: AppTextStyle.bigCaptionBold),
                         const SizedBox(height: 8),
                         BlocBuilder<GetUnitCubit, GetUnitState>(
                           builder: (context, state) {
@@ -297,7 +287,15 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
               const SizedBox(height: 8),
               TextFormField(
                 keyboardType: TextInputType.number,
-                decoration: AppThemes.inputDecorationStyle.copyWith(hintText: 'Harga'),
+                inputFormatters: <TextInputFormatter>[
+                  CurrencyTextInputFormatter.currency(
+                    locale: 'id',
+                    decimalDigits: 0,
+                    symbol: 'Rp.  ',
+                  ),
+                ],
+                decoration:
+                    AppThemes.inputDecorationStyle.copyWith(hintText: 'Harga'),
                 onChanged: (value) {
                   price = double.tryParse(value);
                 },
@@ -347,7 +345,8 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
                     return _buildDropdown<int>(
                       value: warehouseId,
                       hint: 'Pilih Gudang',
-                      items: state.warehousesResponse.warehouses.map((warehouse) {
+                      items:
+                          state.warehousesResponse.warehouses.map((warehouse) {
                         return DropdownMenuItem<int>(
                           value: warehouse.warehouseId,
                           child: Text(warehouse.warehouseName),
@@ -399,19 +398,23 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Tanggal Beli', style: AppTextStyle.bigCaptionBold),
+                        const Text('Tanggal Beli',
+                            style: AppTextStyle.bigCaptionBold),
                         const SizedBox(height: 8),
                         GestureDetector(
                           onTap: () => _selectDate(context, true),
                           child: AbsorbPointer(
                             child: TextFormField(
-                              decoration: AppThemes.inputDecorationStyle.copyWith(
+                              decoration:
+                                  AppThemes.inputDecorationStyle.copyWith(
                                 hintText: purchaseDate != null
                                     ? _formatDate(purchaseDate!)
                                     : 'Pilih',
                                 suffixIcon: const Icon(Icons.calendar_today),
                               ),
-                              validator: (value) => purchaseDate == null ? 'Pilih Tanggal Beli' : null,
+                              validator: (value) => purchaseDate == null
+                                  ? 'Pilih Tanggal Beli'
+                                  : null,
                             ),
                           ),
                         ),
@@ -423,19 +426,23 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Tanggal Kedaluwarsa', style: AppTextStyle.bigCaptionBold),
+                        const Text('Tanggal Kedaluwarsa',
+                            style: AppTextStyle.bigCaptionBold),
                         const SizedBox(height: 8),
                         GestureDetector(
                           onTap: () => _selectDate(context, false),
                           child: AbsorbPointer(
                             child: TextFormField(
-                              decoration: AppThemes.inputDecorationStyle.copyWith(
+                              decoration:
+                                  AppThemes.inputDecorationStyle.copyWith(
                                 hintText: expiryDate != null
                                     ? _formatDate(expiryDate!)
                                     : 'Pilih',
                                 suffixIcon: const Icon(Icons.calendar_today),
                               ),
-                              validator: (value) => expiryDate == null ? 'Pilih Tanggal Kedaluwarsa' : null,
+                              validator: (value) => expiryDate == null
+                                  ? 'Pilih Tanggal Kedaluwarsa'
+                                  : null,
                             ),
                           ),
                         ),
@@ -445,42 +452,43 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
                 ],
               ),
               const SizedBox(height: 16),
-              
             ],
           ),
         ),
       ),
       bottomNavigationBar: Container(
-                decoration: AppThemes.bottomBoxDecorationDialog,
-                padding: const EdgeInsets.all(16.0),
-                child: BlocBuilder<AddRawMaterialStockCubit, AddRawMaterialStockState>(
-                  builder: (context, state) {
-                    return ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _isFormValid() ? AppColors.primaryMain : Colors.grey,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        minimumSize: const Size.fromHeight(50),
-                      ),
-                      onPressed: _isFormValid() && state is! AddRawMaterialStockLoading
-                          ? _submit
-                          : null,
-                      child: state is AddRawMaterialStockLoading
-                          ? const SizedBox(
-                              height: 24,
-                              width: 24,
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : const Text('Simpan Stok', style: TextStyle(color: Colors.white)),
-                    );
-                  },
+        decoration: AppThemes.bottomBoxDecorationDialog,
+        padding: const EdgeInsets.all(16.0),
+        child: BlocBuilder<AddRawMaterialStockCubit, AddRawMaterialStockState>(
+          builder: (context, state) {
+            return ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    _isFormValid() ? AppColors.primaryMain : Colors.grey,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                minimumSize: const Size.fromHeight(50),
               ),
+              onPressed: _isFormValid() && state is! AddRawMaterialStockLoading
+                  ? _submit
+                  : null,
+              child: state is AddRawMaterialStockLoading
+                  ? const SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Text('Simpan Stok',
+                      style: TextStyle(color: Colors.white)),
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -489,7 +497,8 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
       baseColor: Colors.grey[300]!,
       highlightColor: Colors.grey[100]!,
       child: DropdownButtonFormField<int>(
-        decoration: AppThemes.inputDecorationStyle.copyWith(contentPadding: const EdgeInsets.all(0)),
+        decoration: AppThemes.inputDecorationStyle
+            .copyWith(contentPadding: const EdgeInsets.all(0)),
         items: const [],
         onChanged: null,
         hint: const Text('Memuat...'),
@@ -505,16 +514,17 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
   }) {
     return DropdownButtonFormField2<T>(
       value: value,
-      decoration: AppThemes.inputDecorationStyle.copyWith(contentPadding: const EdgeInsets.all(0)),
+      decoration: AppThemes.inputDecorationStyle
+          .copyWith(contentPadding: const EdgeInsets.all(0)),
       items: items,
       onChanged: onChanged,
       dropdownStyleData: DropdownStyleData(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  maxHeight: 200,
-                                ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        maxHeight: 200,
+      ),
       hint: Text(hint),
       validator: (value) => value == null ? 'Field ini harus dipilih' : null,
     );

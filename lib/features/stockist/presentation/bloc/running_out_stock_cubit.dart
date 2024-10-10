@@ -1,5 +1,5 @@
 import 'package:akib_pos/core/error/failures.dart';
-import 'package:akib_pos/features/stockist/data/models/running_out_stock.dart';
+import 'package:akib_pos/features/stockist/data/models/stock/running_out_stock.dart';
 import 'package:akib_pos/features/stockist/data/repositories/stockist_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

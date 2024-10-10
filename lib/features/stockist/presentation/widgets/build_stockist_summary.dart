@@ -1,6 +1,7 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
-import 'package:akib_pos/features/stockist/data/models/stockist_summary.dart';
+import 'package:akib_pos/features/stockist/data/models/stock/stockist_summary.dart';
+import 'package:akib_pos/features/stockist/presentation/pages/equipment/equipment_type_page.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/expired_stock_page.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/purchase/purchase_list_page.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/raw_material/raw_material_page.dart';
@@ -46,7 +47,7 @@ class BuildStockistSummary extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Padding(
-            padding: const EdgeInsets.only(left: 16,right: 16,bottom: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
                 Expanded(child: GestureDetector(
@@ -56,11 +57,19 @@ class BuildStockistSummary extends StatelessWidget {
                   child: _buildRawMaterialCard())),
                 Expanded(child: GestureDetector(
                   onTap: () {
-                    Utils.navigateToPage(context, const VendorListPage());
+                    Utils.navigateToPage(context, const EquipmentTypePage());
                   },
-                  child: _buildVendorListCard())),
+                  child: _buildEquipmentListCard())),
               ],
             ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 16,bottom: 16,right: 16,left: 10),
+            child: GestureDetector(
+                    onTap: () {
+                      Utils.navigateToPage(context, const VendorListPage());
+                    },
+                    child: _buildVendorListCard()),
           ),
           const SizedBox(height: 10),
                           Container(
@@ -100,7 +109,9 @@ class BuildStockistSummary extends StatelessWidget {
           const SizedBox(height: 10),
           ElevatedButton(
             onPressed: () {
-              Utils.navigateToPage(context, PurchasesListPage());
+            
+          _showMaterialTypeDialog(context);
+    
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
@@ -116,6 +127,85 @@ class BuildStockistSummary extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showMaterialTypeDialog(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadiusDirectional.only(
+                topEnd: Radius.circular(21), topStart: Radius.circular(21)),
+            color: Colors.white,
+          ),
+          padding: const EdgeInsets.symmetric(
+            vertical: 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Grey bar at the top center
+              Center(
+                child: Container(
+                  width: 40, // Width of the grey bar
+                  height: 4, // Height of the grey bar
+                  decoration: BoxDecoration(
+                    color: Colors.grey[400],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                  height: 16), // Spacing between grey bar and the header
+              // Header Row with "Pilih Bahan" and Close Icon
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Pilih Bahan', style: AppTextStyle.headline5),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              ListTile(
+                title: const Text('Bahan Baku', style: AppTextStyle.body2),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () async {
+                  Utils.navigateToPage(context, RawMaterialPurchasesListPage());
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: const Divider(),
+              ), // Divider between "Bahan Baku" and "Non Bahan Baku"
+              // Second option: "Non Bahan Baku"
+              ListTile(
+                title: const Text('Non Bahan Baku', style: AppTextStyle.body2),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+
+                  // Handle "Non Bahan Baku" tap
+                  Navigator.of(context).pop();
+                },
+              ),
+              const SizedBox(height: 8), // Spacing after the options
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -159,6 +249,16 @@ class BuildStockistSummary extends StatelessWidget {
         null,
         'Daftar\nVendor',
         'assets/icons/stockist/ic_list_on_vendor.svg',
+      ),
+    );
+  }
+  Widget _buildEquipmentListCard() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8),
+      child: _buildVerificationCard(
+        null,
+        'Jenis\nPeralatan',
+        'assets/icons/stockist/ic_equipment.svg',
       ),
     );
   }

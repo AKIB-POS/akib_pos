@@ -1,8 +1,8 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
-import 'package:akib_pos/features/stockist/data/models/raw_material.dart';
-import 'package:akib_pos/features/stockist/presentation/bloc/get_raw_material_cubit.dart';
+import 'package:akib_pos/features/stockist/data/models/stock/raw_material/raw_material.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_raw_material_type_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/pages/raw_material/add_raw_material_page.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +26,7 @@ class _RawMaterialPageState extends State<RawMaterialPage> {
 
   Future<void> _fetchRawMaterials() async {
     final branchId = _authSharedPref.getBranchId() ?? 0;// Ganti dengan branchId dinamis jika diperlukan
-    context.read<GetRawMaterialCubit>().fetchRawMaterials(branchId: branchId);
+    context.read<GetRawMaterialTypeCubit>().fetchRawMaterialTypes(branchId: branchId);
   }
 
   @override
@@ -49,14 +49,24 @@ class _RawMaterialPageState extends State<RawMaterialPage> {
       body: RefreshIndicator(
         onRefresh: _fetchRawMaterials,
         color: AppColors.primaryMain,
-        child: BlocBuilder<GetRawMaterialCubit, GetRawMaterialState>(
+        child: BlocBuilder<GetRawMaterialTypeCubit, GetRawMaterialTypeState>(
           builder: (context, state) {
-            if (state is GetRawMaterialLoading) {
+            if (state is GetRawMaterialTypeLoading) {
               return _buildLoading();
-            } else if (state is GetRawMaterialLoaded) {
+            } else if (state is GetRawMaterialTypeLoaded) {
+              if(state.rawMaterials.rawMaterials.isEmpty){
+                return Utils.buildEmptyState(
+                            "Belum ada Bahan Baku","");
+              }
               return _buildRawMaterialList(state.rawMaterials.rawMaterials);
-            } else if (state is GetRawMaterialError) {
-              return _buildError(state.message);
+            } else if (state is GetRawMaterialTypeError) {
+              return Utils.buildErrorState(
+                      title: 'Gagal Memuat Data',
+                      message: state.message,
+                      onRetry: () {
+                        _fetchRawMaterials();
+                      },
+                    );
             } else {
               return const SizedBox.shrink();
             }
@@ -83,37 +93,10 @@ class _RawMaterialPageState extends State<RawMaterialPage> {
     return const Center(child: CircularProgressIndicator());
   }
 
-  // Widget untuk menampilkan error
-  Widget _buildError(String message) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Gagal Memuat Data',
-              style: TextStyle(color: Colors.red, fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.red, fontSize: 14),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _fetchRawMaterials,
-              child: const Text('Coba Lagi'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+
 
   // Widget untuk menampilkan daftar bahan baku
-  Widget _buildRawMaterialList(List<RawMaterial> rawMaterials) {
+  Widget _buildRawMaterialList(List<RawMaterialType> rawMaterials) {
     if (rawMaterials.isEmpty) {
       return const Center(
         child: Text('Tidak ada bahan baku ditemukan', style: TextStyle(fontSize: 16)),

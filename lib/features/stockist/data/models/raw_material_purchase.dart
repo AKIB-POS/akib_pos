@@ -1,21 +1,18 @@
-class Purchase {
-  final int purchaseId;
-  final String purchaseType;
+class RawMaterialPurchase {
+  final int materialId;
   final String materialName;
   final String quantity;
 
-  Purchase({
-    required this.purchaseId,
-    required this.purchaseType,
+  RawMaterialPurchase({
+    required this.materialId,
     required this.materialName,
     required this.quantity,
   });
 
   // Factory constructor for creating an instance from JSON
-  factory Purchase.fromJson(Map<String, dynamic> json) {
-    return Purchase(
-      purchaseId: json['material_id'] ?? 0,
-      purchaseType: json['purchase_type'] ?? '',
+  factory RawMaterialPurchase.fromJson(Map<String, dynamic> json) {
+    return RawMaterialPurchase(
+      materialId: json['material_id'] ?? 0,
       materialName: json['material_name'] ?? '',
       quantity: json['quantity'] ?? '',
     );
@@ -24,25 +21,24 @@ class Purchase {
   // Method for converting an instance to JSON
   Map<String, dynamic> toJson() {
     return {
-      'purchase_id': purchaseId,
-      'purchase_type': purchaseType,
+      'material_id': materialId,
       'material_name': materialName,
       'quantity': quantity,
     };
   }
 }
 
-class PurchasesListResponse {
-  final List<Purchase> purchases;
+class RawMaterialPurchasesResponse {
+  final List<RawMaterialPurchase> purchases;
 
-  PurchasesListResponse({required this.purchases});
+  RawMaterialPurchasesResponse({required this.purchases});
 
   // Factory constructor for creating an instance from JSON
-  factory PurchasesListResponse.fromJson(Map<String, dynamic> json) {
+  factory RawMaterialPurchasesResponse.fromJson(Map<String, dynamic> json) {
     var purchases = (json['data'] as List)
-        .map((purchase) => Purchase.fromJson(purchase))
+        .map((purchase) => RawMaterialPurchase.fromJson(purchase))
         .toList();
-    return PurchasesListResponse(purchases: purchases);
+    return RawMaterialPurchasesResponse(purchases: purchases);
   }
 
   // Method for converting an instance to JSON

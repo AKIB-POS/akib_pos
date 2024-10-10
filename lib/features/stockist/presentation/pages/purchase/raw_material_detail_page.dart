@@ -142,11 +142,7 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
               ],
             ),
           ),
-        ),
-        floatingActionButton:
-            Utils.buildFloatingActionButton(onPressed: () async {
-          _showMaterialTypeDialog(context);
-        }));
+        ),);
   }
 
   Widget _buildMaterialDetailContent(MaterialDetailResponse materialDetail) {
@@ -383,92 +379,5 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
     );
   }
 
-  void _showMaterialTypeDialog(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (BuildContext context) {
-        return Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadiusDirectional.only(
-                topEnd: Radius.circular(21), topStart: Radius.circular(21)),
-            color: Colors.white,
-          ),
-          padding: const EdgeInsets.symmetric(
-            vertical: 16,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Grey bar at the top center
-              Center(
-                child: Container(
-                  width: 40, // Width of the grey bar
-                  height: 4, // Height of the grey bar
-                  decoration: BoxDecoration(
-                    color: Colors.grey[400],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                  height: 16), // Spacing between grey bar and the header
-              // Header Row with "Pilih Bahan" and Close Icon
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Pilih Bahan', style: AppTextStyle.headline5),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 16,
-              ),
-              ListTile(
-                title: const Text('Bahan Baku', style: AppTextStyle.body2),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () async {
-                  Navigator.of(context).pop();
-                  final result = await Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const AddRawMaterialStockPage(),
-                    ),
-                  );
 
-                  // Jika result true, refresh data cuti
-                  if (result == true) {
-                    _fetchMaterialDetail(); // Panggil fungsi untuk refresh data
-                  }
-                },
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: const Divider(),
-              ), // Divider between "Bahan Baku" and "Non Bahan Baku"
-              // Second option: "Non Bahan Baku"
-              ListTile(
-                title: const Text('Non Bahan Baku', style: AppTextStyle.body2),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-
-                  // Handle "Non Bahan Baku" tap
-                  Navigator.of(context).pop();
-                },
-              ),
-              const SizedBox(height: 8), // Spacing after the options
-            ],
-          ),
-        );
-      },
-    );
-  }
 }

@@ -1,16 +1,23 @@
 class AddRawMaterialRequest {
   final int branchId;
-  final String rawMaterialName;
+  final String name;
+  final String category;
 
-  AddRawMaterialRequest({required this.branchId, required this.rawMaterialName});
+  AddRawMaterialRequest({
+    required this.branchId,
+    required this.name,
+    required this.category,
+  });
 
   Map<String, dynamic> toJson() {
     return {
       'branch_id': branchId,
-      'raw_material_name': rawMaterialName,
+      'name': name,
+      'category': category,
     };
   }
 }
+
 
 class AddRawMaterialResponse {
   final String message;

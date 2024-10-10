@@ -3,18 +3,20 @@ import 'dart:convert';
 import 'package:akib_pos/api/urls.dart';
 import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
-import 'package:akib_pos/features/stockist/data/models/add_raw_material.dart';
-import 'package:akib_pos/features/stockist/data/models/add_raw_material_stock.dart';
+import 'package:akib_pos/features/stockist/data/models/add_equipment_type.dart';
+import 'package:akib_pos/features/stockist/data/models/stock/raw_material/add_raw_material.dart';
+import 'package:akib_pos/features/stockist/data/models/stock/raw_material/add_raw_material_stock.dart';
 import 'package:akib_pos/features/stockist/data/models/add_vendor.dart';
 import 'package:akib_pos/features/stockist/data/models/expired_stock.dart';
 import 'package:akib_pos/features/stockist/data/models/material_detail.dart';
 import 'package:akib_pos/features/stockist/data/models/order_status.dart';
-import 'package:akib_pos/features/stockist/data/models/purchase.dart';
+import 'package:akib_pos/features/stockist/data/models/raw_material_purchase.dart';
 import 'package:akib_pos/features/stockist/data/models/purchase_history.dart';
-import 'package:akib_pos/features/stockist/data/models/raw_material.dart';
-import 'package:akib_pos/features/stockist/data/models/running_out_stock.dart';
-import 'package:akib_pos/features/stockist/data/models/stockist_recent_purchase.dart';
-import 'package:akib_pos/features/stockist/data/models/stockist_summary.dart';
+import 'package:akib_pos/features/stockist/data/models/equipment/equipment.dart';
+import 'package:akib_pos/features/stockist/data/models/stock/raw_material/raw_material.dart';
+import 'package:akib_pos/features/stockist/data/models/stock/running_out_stock.dart';
+import 'package:akib_pos/features/stockist/data/models/stock/stockist_recent_purchase.dart';
+import 'package:akib_pos/features/stockist/data/models/stock/stockist_summary.dart';
 import 'package:akib_pos/features/stockist/data/models/unit.dart';
 import 'package:akib_pos/features/stockist/data/models/vendor.dart';
 import 'package:akib_pos/features/stockist/data/models/warehouse.dart';
@@ -29,9 +31,10 @@ abstract class StockistRemoteDataSource {
   Future<RunningOutStockResponse> getRunningOutStock(int branchId);
   Future<VendorListResponse> getVendors(int branchId);
   Future<AddVendorResponse> addVendor(AddVendorRequest request);
-  Future<RawMaterialListResponse> getRawMaterials(int branchId);
+  Future<RawMaterialTypeResponse> getRawMaterialTypes(int branchId);
+
   Future<AddRawMaterialResponse> addRawMaterial(AddRawMaterialRequest request);
-  Future<PurchasesListResponse> getPurchases(int branchId);
+  Future<RawMaterialPurchasesResponse> getRawMaterialPurcases(int branchId);
   Future<MaterialDetailResponse> getMaterialDetail(int branchId, int materialId);
   Future<PurchaseHistoryResponse> getPurchaseHistory(int branchId, int materialId);
 
@@ -39,6 +42,8 @@ abstract class StockistRemoteDataSource {
   Future<GetWarehousesResponse> getWarehouses(int branchId);
   Future<OrderStatusResponse> getOrderStatuses(int branchId);
   Future<AddRawMaterialStockResponse> addRawMaterialStock(AddRawMaterialStockRequest request);
+  Future<EquipmentTypeResponse> getEquipmentType(int branchId, String category);
+  Future<AddEquipmentTypeResponse> addEquipmentType(AddEquipmentTypeRequest request);
 }
 
 class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
@@ -46,6 +51,43 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
   final AuthSharedPref sharedPrefsHelper = GetIt.instance<AuthSharedPref>();
 
   StockistRemoteDataSourceImpl({required this.client});
+
+  @override
+  Future<AddEquipmentTypeResponse> addEquipmentType(AddEquipmentTypeRequest request) async {
+    const url = '${URLs.baseUrlMock}/stock-type';
+    final response = await client.post(
+      Uri.parse(url),
+      headers: _buildHeaders(),
+      body: jsonEncode(request.toJson()),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 201) {
+      final jsonResponse = json.decode(response.body);
+      return AddEquipmentTypeResponse.fromJson(jsonResponse);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
+
+  @override
+  Future<EquipmentTypeResponse> getEquipmentType(int branchId, String category) async {
+    final url = '${URLs.baseUrlMock}/stock-type?branch_id=$branchId&category=$category';
+    final response = await client.get(
+      Uri.parse(url),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return EquipmentTypeResponse.fromJson(jsonResponse);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
 
 
   @override
@@ -127,7 +169,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
   }
 
 
-@override
+  @override
   Future<PurchaseHistoryResponse> getPurchaseHistory(int branchId, int materialId) async {
     const url = '${URLs.baseUrlMock}/purchase-history';
     final response = await client.get(
@@ -172,12 +214,13 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
   }
   
   @override
-  Future<PurchasesListResponse> getPurchases(int branchId) async {
+  Future<RawMaterialPurchasesResponse> getRawMaterialPurcases(int branchId) async {
     const url = '${URLs.baseUrlMock}/purchases';
     
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branchId': branchId.toString(),
+        'category': 'raw-material',
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -187,7 +230,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
-      return PurchasesListResponse.fromJson(jsonResponse);
+      return RawMaterialPurchasesResponse.fromJson(jsonResponse);
     } else if (response.statusCode >= 400 && response.statusCode < 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {
@@ -197,7 +240,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
   @override
   Future<AddRawMaterialResponse> addRawMaterial(AddRawMaterialRequest request) async {
-    const url = '${URLs.baseUrlMock}/raw-materials';
+    const url = '${URLs.baseUrlMock}/stock-type';
     
     final response = await client.post(
       Uri.parse(url),
@@ -220,18 +263,19 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
 
   @override
-  Future<RawMaterialListResponse> getRawMaterials(int branchId) async {
-    const url = '${URLs.baseUrlMock}/raw-materials';
+  Future<RawMaterialTypeResponse> getRawMaterialTypes(int branchId) async {
+    const url = '${URLs.baseUrlMock}/stock-type';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),
+        'category': 'raw-material',
       }),
       headers: _buildHeaders(),
     ).timeout(const Duration(seconds: 30));
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
-      return RawMaterialListResponse.fromJson(jsonResponse);
+      return RawMaterialTypeResponse.fromJson(jsonResponse);
     } else if (response.statusCode >= 400 && response.statusCode < 500) {
       throw GeneralException(json.decode(response.body)['message']);
     } else {

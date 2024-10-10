@@ -2,22 +2,25 @@ import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
-import 'package:akib_pos/features/stockist/data/models/purchase.dart';
-import 'package:akib_pos/features/stockist/presentation/bloc/get_purchase_cubit.dart';
-import 'package:akib_pos/features/stockist/presentation/pages/purchase/material_detail_page.dart';
+import 'package:akib_pos/features/stockist/data/models/raw_material_purchase.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_raw_material_purchase_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/pages/purchase/add_raw_material_stock_page.dart';
+import 'package:akib_pos/features/stockist/presentation/pages/purchase/raw_material_detail_page.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
-class PurchasesListPage extends StatefulWidget {
-  const PurchasesListPage({Key? key}) : super(key: key);
+class RawMaterialPurchasesListPage extends StatefulWidget {
+  const RawMaterialPurchasesListPage({Key? key}) : super(key: key);
 
   @override
-  _PurchasesListPageState createState() => _PurchasesListPageState();
+  _RawMaterialPurchasesListPageState createState() =>
+      _RawMaterialPurchasesListPageState();
 }
 
-class _PurchasesListPageState extends State<PurchasesListPage> {
+class _RawMaterialPurchasesListPageState
+    extends State<RawMaterialPurchasesListPage> {
   final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
 
   @override
@@ -28,7 +31,9 @@ class _PurchasesListPageState extends State<PurchasesListPage> {
 
   Future<void> _fetchPurchasesData() async {
     final branchId = _authSharedPref.getBranchId() ?? 0;
-    context.read<GetPurchasesCubit>().fetchPurchases(branchId: branchId);
+    context
+        .read<GetRawMaterialPurchaseCubit>()
+        .fetchPurchases(branchId: branchId);
   }
 
   @override
@@ -36,7 +41,10 @@ class _PurchasesListPageState extends State<PurchasesListPage> {
     return Scaffold(
       backgroundColor: AppColors.backgroundGrey,
       appBar: AppBar(
-        title: const Text('Daftar Pembelian',style: AppTextStyle.headline5,),
+        title: const Text(
+          'Daftar Pembelian',
+          style: AppTextStyle.headline5,
+        ),
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
         titleSpacing: 0,
@@ -51,11 +59,12 @@ class _PurchasesListPageState extends State<PurchasesListPage> {
             child: RefreshIndicator(
               color: AppColors.primaryMain,
               onRefresh: _fetchPurchasesData,
-              child: BlocBuilder<GetPurchasesCubit, GetPurchasesState>(
+              child: BlocBuilder<GetRawMaterialPurchaseCubit,
+                  GetRawmaterialPurchasesState>(
                 builder: (context, state) {
-                  if (state is GetPurchasesLoading) {
+                  if (state is GetRawMaterialPurchasesLoading) {
                     return _buildShimmerLoading();
-                  } else if (state is GetPurchasesError) {
+                  } else if (state is GetRawMaterialPurchasesError) {
                     return Utils.buildErrorState(
                       title: 'Gagal Memuat Data',
                       message: state.message,
@@ -63,10 +72,9 @@ class _PurchasesListPageState extends State<PurchasesListPage> {
                         _fetchPurchasesData();
                       },
                     );
-                  } else if (state is GetPurchasesLoaded) {
+                  } else if (state is GetRawMaterialPurchasesLoaded) {
                     return state.purchases.purchases.isEmpty
-                        ? Utils.buildEmptyState(
-                            "Belum ada Pembelian",
+                        ? Utils.buildEmptyState("Belum ada Pembelian",
                             "Data pembelian akan tampil setelah transaksi.")
                         : _buildPurchasesList(state.purchases.purchases);
                   }
@@ -77,6 +85,19 @@ class _PurchasesListPageState extends State<PurchasesListPage> {
           ),
         ],
       ),
+      floatingActionButton:
+          Utils.buildFloatingActionButton(onPressed: () async {
+        final result = await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const AddRawMaterialStockPage(),
+          ),
+        );
+
+        // Jika result true, refresh data cuti
+        if (result == true) {
+          _fetchPurchasesData(); // Panggil fungsi untuk refresh data
+        }
+      }),
     );
   }
 
@@ -88,9 +109,9 @@ class _PurchasesListPageState extends State<PurchasesListPage> {
     );
   }
 
-  Widget _buildPurchasesList(List<Purchase> purchases) {
+  Widget _buildPurchasesList(List<RawMaterialPurchase> purchases) {
     return ListView.builder(
-      padding: const EdgeInsets.only(left: 16,right: 16,bottom: 70),
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 70),
       itemCount: purchases.length,
       itemBuilder: (context, index) {
         final purchase = purchases[index];
@@ -99,19 +120,7 @@ class _PurchasesListPageState extends State<PurchasesListPage> {
     );
   }
 
-  Widget _buildPurchaseCard(Purchase purchase) {
-    Color backgroundColor;
-    Color textColor;
-
-    // Set warna sesuai tipe pembelian
-    if (purchase.purchaseType == 'Non Bahan Baku') {
-      backgroundColor = AppColors.secondaryMain.withOpacity(0.1); // Biru
-      textColor = AppColors.secondaryMain;
-    } else {
-      backgroundColor = AppColors.successMain.withOpacity(0.1); // Hijau
-      textColor = AppColors.successMain;
-    }
-
+  Widget _buildPurchaseCard(RawMaterialPurchase purchase) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       padding: const EdgeInsets.all(16.0),
@@ -135,19 +144,7 @@ class _PurchasesListPageState extends State<PurchasesListPage> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                    decoration: BoxDecoration(
-                      color: backgroundColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      purchase.purchaseType,
-                      style: TextStyle(
-                        color: textColor,
-                      ),
-                    ),
-                  ),
+                  //
                   const SizedBox(height: 8),
                   Text(
                     purchase.materialName,
@@ -159,13 +156,15 @@ class _PurchasesListPageState extends State<PurchasesListPage> {
                   const SizedBox(height: 4),
                   Text(
                     purchase.quantity,
-                    style: AppTextStyle.bigCaptionBold.copyWith(color: AppColors.primaryMain),
+                    style: AppTextStyle.bigCaptionBold
+                        .copyWith(color: AppColors.primaryMain),
                   ),
                 ],
               ),
               OutlinedButton(
                 onPressed: () {
-                  Utils.navigateToPage(context, MaterialDetailPage(materialId: purchase.purchaseId));
+                  Utils.navigateToPage(context,
+                      MaterialDetailPage(materialId: purchase.materialId));
                 },
                 style: AppThemes.outlineButtonPrimaryStyle,
                 child: const Text(

@@ -1,7 +1,7 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
-import 'package:akib_pos/features/stockist/data/models/running_out_stock.dart';
+import 'package:akib_pos/features/stockist/data/models/stock/running_out_stock.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/running_out_stock_cubit.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
