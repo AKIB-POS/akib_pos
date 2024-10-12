@@ -3,8 +3,8 @@ import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/accounting_page.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/home/widget/my_drawer.dart';
-import 'package:akib_pos/features/stockist/data/models/stockist_recent_purchase.dart';
-import 'package:akib_pos/features/stockist/data/models/stockist_summary.dart';
+import 'package:akib_pos/features/stockist/data/models/stock/stockist_recent_purchase.dart';
+import 'package:akib_pos/features/stockist/data/models/stock/stockist_summary.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/stockist_recent_purchase_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/stockist_summary_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/widgets/appbar_stockist_content.dart';
@@ -41,7 +41,6 @@ class _StockistPageState extends State<StockistPage> {
         context.read<StockistRecentPurchasesCubit>().fetchStockistRecentPurchases(branchId: branchId),
       ]);
     } catch (error, stacktrace) {
-      // Log the error for debugging purposes
       print('Error fetching data: $error');
       print(stacktrace);
     }
@@ -140,10 +139,10 @@ class _StockistPageState extends State<StockistPage> {
   }
 
   Widget _buildPurchaseItem(StockistRecentPurchase purchase) {
-    final itemName = purchase.itemName ?? "Unknown Item";
-    final quantity = purchase.quantity ?? "0";
-    final vendor = purchase.vendor ?? "Unknown Vendor";
-    final price = purchase.purchasePrice ?? 0.0;
+    final itemName = purchase.itemName;
+    final quantity = purchase.quantity;
+    final vendor = purchase.vendor;
+    final price = purchase.purchasePrice;
 
     return Container(
       width: double.infinity,

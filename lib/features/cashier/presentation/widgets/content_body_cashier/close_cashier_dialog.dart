@@ -74,7 +74,7 @@ class CloseCashierDialog extends StatelessWidget {
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             // Set shared preference bahwa kasir sudah ditutup dan clear login response
             final authSharedPref = GetIt.instance<AuthSharedPref>();
-            await authSharedPref.clearLoginResponse();
+            await authSharedPref.closeCashier();
 
             // Tutup dialog terlebih dahulu
             Navigator.of(context).pop();

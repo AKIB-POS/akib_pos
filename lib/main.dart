@@ -1,5 +1,6 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/di/accounting_injection.dart';
+import 'package:akib_pos/di/dashboard_injection.dart';
 import 'package:akib_pos/di/hrd_injection.dart';
 import 'package:akib_pos/di/injection_container.dart';
 import 'package:akib_pos/di/stockist_injection.dart';
@@ -46,6 +47,8 @@ import 'package:akib_pos/features/cashier/presentation/bloc/transaction/process_
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/checkout/checkout_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/branch_interaction_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_branches_cubit.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_all_employee.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_recap/attendance_recap_cubit.dart';
@@ -99,7 +102,25 @@ import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/pend
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/rejected_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/detail_subordinate_task_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/widgets/employee_submission/pending_approval_tab.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/add_equipment_stock_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/add_equipment_type_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/add_material_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/add_raw_material_stock_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/add_vendor.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/expired_stock_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_equipment_detail_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_equipment_purchase_history_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_equipment_type_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_equipment_purchase_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_order_status_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_raw_material_purchase_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_raw_material_purchase_history_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_raw_material_type_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_unit_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_vendor_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/get_warehouses_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/material_detail_cubit.dart';
+import 'package:akib_pos/features/stockist/presentation/bloc/running_out_stock_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/stockist_recent_purchase_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/stockist_summary_cubit.dart';
 import 'package:akib_pos/splash_screen.dart';
@@ -115,6 +136,7 @@ import 'package:akib_pos/di/injection_container.dart' as di;
 import 'package:akib_pos/di/accounting_injection.dart' as accounting;
 import 'package:akib_pos/di/hrd_injection.dart' as hrd;
 import 'package:akib_pos/di/stockist_injection.dart' as stockist;
+import 'package:akib_pos/di/dashboard_injection.dart' as dashboard;
 import 'firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart'; // <-- This line imports the initializeDateFormatting function
 
@@ -133,6 +155,8 @@ void main() async {
   await accounting.initAccountingModule();
   await hrd.initHRDModule();
   await stockist.initStockistModule();
+  await dashboard.initDashboardModule();
+
 
   runApp(
     MultiBlocProvider(
@@ -475,7 +499,73 @@ void main() async {
         BlocProvider(
           create: (context) => ExpiredStockCubit(stockistInjection()),
         ),
+        BlocProvider(
+          create: (context) => RunningOutStockCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetVendorCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => AddVendorCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetRawMaterialTypeCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => AddRawMaterialCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => AddEquipmentTypeCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetRawMaterialPurchaseCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetMaterialDetailCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetRawMaterialPurchaseHistoryCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetUnitCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetWarehousesCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetOrderStatusCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => AddRawMaterialStockCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetEquipmentTypeCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetEquipmentPurchaseCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetEquipmentPurchaseCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetEquipmentPurchaseHistoryCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetEquipmentDetailCubit(stockistInjection()),
+        ),
+        BlocProvider(
+          create: (context) => AddEquipmentStockCubit(stockistInjection()),
+        ),
+        
 
+        //Dashboard
+        BlocProvider(
+          create: (context) => GetBranchesCubit(dashboardInjection()),
+        ),
+        BlocProvider(
+          create: (context) => BranchInteractionCubit(authSharedPref: dashboardInjection()),
+        ),
+        
 
       ],
       child: const MyApp(),

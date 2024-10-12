@@ -156,6 +156,50 @@ class AccountingRepositoryImpl implements AccountingRepository {
     required this.connectivity,
   });
 
+    @override
+  Future<Either<Failure, EmployeeListResponse>> getAllEmployees(
+      int branchId, int companyId) async {
+    try {
+      // Check connectivity status
+      final connectivityResult = await connectivity.checkConnectivity();
+
+      if (connectivityResult == ConnectivityResult.none) {
+        // If offline, fetch data from SharedPreferences
+        final cachedEmployees = employeeSharedPref.getEmployeeList();
+        if (cachedEmployees.isNotEmpty) {
+          return Right(EmployeeListResponse(
+            message: 'Data fetched from cache',
+            data: cachedEmployees,
+          ));
+        } else {
+          return Left(CacheFailure('No cached data available'));
+        }
+      } else {
+        // If online, fetch new data from API
+        final response =
+            await remoteDataSource.getAllEmployees(branchId, companyId);
+
+        // Clear existing data in shared preferences
+        await employeeSharedPref.clearEmployeeList();
+
+        // Save new data to shared preferences
+        await employeeSharedPref.saveEmployeeList(response.data);
+
+        return Right(response);
+      }
+    } catch (e) {
+      if (e is GeneralException) {
+        return Left(GeneralFailure(e.message));
+      } else if (e is ServerException) {
+        return Left(ServerFailure());
+      } else if (e is CacheFailure) {
+        return Left(e);
+      } else {
+        return Left(GeneralFailure("Unexpected error occurred"));
+      }
+    }
+  }
+
 
   @override
   Future<Either<Failure, ProfitLossModel>> getProfitLoss({
@@ -584,49 +628,7 @@ class AccountingRepositoryImpl implements AccountingRepository {
     }
   }
 
-  @override
-  Future<Either<Failure, EmployeeListResponse>> getAllEmployees(
-      int branchId, int companyId) async {
-    try {
-      // Check connectivity status
-      final connectivityResult = await connectivity.checkConnectivity();
 
-      if (connectivityResult == ConnectivityResult.none) {
-        // If offline, fetch data from SharedPreferences
-        final cachedEmployees = employeeSharedPref.getEmployeeList();
-        if (cachedEmployees.isNotEmpty) {
-          return Right(EmployeeListResponse(
-            message: 'Data fetched from cache',
-            data: cachedEmployees,
-          ));
-        } else {
-          return Left(CacheFailure('No cached data available'));
-        }
-      } else {
-        // If online, fetch new data from API
-        final response =
-            await remoteDataSource.getAllEmployees(branchId, companyId);
-
-        // Clear existing data in shared preferences
-        await employeeSharedPref.clearEmployeeList();
-
-        // Save new data to shared preferences
-        await employeeSharedPref.saveEmployeeList(response.data);
-
-        return Right(response);
-      }
-    } catch (e) {
-      if (e is GeneralException) {
-        return Left(GeneralFailure(e.message));
-      } else if (e is ServerException) {
-        return Left(ServerFailure());
-      } else if (e is CacheFailure) {
-        return Left(e);
-      } else {
-        return Left(GeneralFailure("Unexpected error occurred"));
-      }
-    }
-  }
 
   @override
   Future<Either<Failure, TransactionSummaryResponse>>
