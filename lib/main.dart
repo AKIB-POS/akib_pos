@@ -1,5 +1,6 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/di/accounting_injection.dart';
+import 'package:akib_pos/di/dashboard_injection.dart';
 import 'package:akib_pos/di/hrd_injection.dart';
 import 'package:akib_pos/di/injection_container.dart';
 import 'package:akib_pos/di/stockist_injection.dart';
@@ -46,6 +47,8 @@ import 'package:akib_pos/features/cashier/presentation/bloc/transaction/process_
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/checkout/checkout_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/branch_interaction_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_branches_cubit.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_all_employee.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_recap/attendance_recap_cubit.dart';
@@ -133,6 +136,7 @@ import 'package:akib_pos/di/injection_container.dart' as di;
 import 'package:akib_pos/di/accounting_injection.dart' as accounting;
 import 'package:akib_pos/di/hrd_injection.dart' as hrd;
 import 'package:akib_pos/di/stockist_injection.dart' as stockist;
+import 'package:akib_pos/di/dashboard_injection.dart' as dashboard;
 import 'firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart'; // <-- This line imports the initializeDateFormatting function
 
@@ -151,6 +155,8 @@ void main() async {
   await accounting.initAccountingModule();
   await hrd.initHRDModule();
   await stockist.initStockistModule();
+  await dashboard.initDashboardModule();
+
 
   runApp(
     MultiBlocProvider(
@@ -549,6 +555,15 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => AddEquipmentStockCubit(stockistInjection()),
+        ),
+        
+
+        //Dashboard
+        BlocProvider(
+          create: (context) => GetBranchesCubit(dashboardInjection()),
+        ),
+        BlocProvider(
+          create: (context) => BranchInteractionCubit(authSharedPref: dashboardInjection()),
         ),
         
 

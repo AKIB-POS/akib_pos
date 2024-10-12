@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:akib_pos/features/auth/data/models/login_response.dart';
+import 'package:akib_pos/features/dashboard/data/models/branch.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthSharedPref {
@@ -18,6 +21,7 @@ class AuthSharedPref {
   static const String permissionsKey = 'permissions';
   static const String cashRegisterIdKey = 'cashRegisterId';
   static const String isLoggedInKey = 'isLoggedIn';
+  static const String branchListKey = 'branchList';
 
   Future<void> saveLoginResponse(LoginResponse response) async {
     await _prefs.setBool(isLoggedInKey, true);
@@ -45,7 +49,40 @@ class AuthSharedPref {
     await _prefs.remove(employeeNameKey);
     await _prefs.remove(employeeRoleKey); // Clear employeeRole
     await _prefs.remove(permissionsKey);
+  }
+
+  Future<void> closeCashier() async {
+    await _prefs.setBool(isLoggedInKey, false);
+    await _prefs.remove(tokenKey);
+    await _prefs.remove(idKey);
+    await _prefs.remove(companyIdKey);
+    await _prefs.remove(companyNameKey);
+    await _prefs.remove(branchIdKey);
+    await _prefs.remove(emailKey);
+    await _prefs.remove(roleKey);
+    await _prefs.remove(employeeNameKey);
+    await _prefs.remove(employeeRoleKey); // Clear employeeRole
+    await _prefs.remove(permissionsKey);
     await _prefs.remove(cashRegisterIdKey); // Clear cash register ID
+  }
+
+  Future<void> saveBranchList(List<Branch> branches) async {
+    final List<String> branchListJson = branches.map((branch) => json.encode(branch.toJson())).toList();
+    await _prefs.setStringList(branchListKey, branchListJson);
+  }
+
+  // Method to get branch list from SharedPreferences
+  List<Branch> getBranchList() {
+    final List<String>? branchListJson = _prefs.getStringList(branchListKey);
+    if (branchListJson != null) {
+      return branchListJson.map((branchJson) => Branch.fromJson(json.decode(branchJson))).toList();
+    }
+    return [];
+  }
+
+  // Method to clear branch list from SharedPreferences
+  Future<void> clearBranchList() async {
+    await _prefs.remove(branchListKey);
   }
 
   bool isLoggedIn() {
@@ -106,5 +143,10 @@ class AuthSharedPref {
   // Method to clear cached cash_register_id
   Future<void> clearCashRegisterIdCache() async {
     await _prefs.remove(cashRegisterIdKey);
+  }
+
+  // New method to save branchId
+  Future<void> saveBranchId(int branchId) async {
+    await _prefs.setInt(branchIdKey, branchId);
   }
 }
