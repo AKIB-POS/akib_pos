@@ -67,4 +67,5 @@ class AppColors {
   // Additional Colors
   static const Color black = Color(0xFF121212);
   static const Color shadow = Color(0xFF323232);
+  static const Color pearlMain = Color(0xFF6477DA);
 }

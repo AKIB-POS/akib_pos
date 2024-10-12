@@ -2,6 +2,7 @@ import 'package:akib_pos/features/dashboard/data/datasources/dahboard_remote_dat
 import 'package:akib_pos/features/dashboard/data/repositories/dashboard_repository.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_branches_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_accounting_summary_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_top_products_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 final dashboardInjection = GetIt.instance;
@@ -24,6 +25,9 @@ Future<void> initDashboardModule() async {
   );
   dashboardInjection.registerFactory(
     () => GetDashboardAccountingSummaryCubit(dashboardInjection()),
+  );
+  dashboardInjection.registerFactory(
+    () => GetDashboardTopProductsCubit(dashboardInjection()),
   );
 
 }

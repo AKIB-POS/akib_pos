@@ -5,11 +5,13 @@ import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/dashboard/data/models/branch.dart';
 import 'package:akib_pos/features/dashboard/data/models/dashboard_accounting_summary.dart';
+import 'package:akib_pos/features/dashboard/data/models/top_products.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 abstract class DashboardRemoteDataSource {
   Future<BranchesResponse> getBranches();
   Future<DashboardAccountingSummaryResponse> getAccountingSummary(int branchId);
+  Future<TopProductsResponse> getTopProducts(int branchId);
 }
 
 class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
@@ -17,6 +19,26 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
   final AuthSharedPref sharedPrefsHelper = GetIt.instance<AuthSharedPref>();
 
   DashboardRemoteDataSourceImpl({required this.client});
+
+  @override
+  Future<TopProductsResponse> getTopProducts(int branchId) async {
+    final url = '${URLs.baseUrlMock}/dashboard-top-products';
+    final response = await client.get(
+      Uri.parse(url).replace(queryParameters: {
+        'branchId': branchId.toString(),
+      }),
+      headers: _buildHeaders(),
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return TopProductsResponse.fromJson(jsonResponse);
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      throw GeneralException(json.decode(response.body)['message']);
+    } else {
+      throw ServerException();
+    }
+  }
 
 
   @override

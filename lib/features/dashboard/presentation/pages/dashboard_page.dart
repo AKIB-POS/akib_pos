@@ -5,9 +5,11 @@ import 'package:akib_pos/features/dashboard/data/models/branch.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/branch_interaction_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_branches_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_accounting_summary_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_top_products_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/widgets/appbar_dashboard_page.dart';
 import 'package:akib_pos/features/dashboard/presentation/widgets/branch_info.dart';
 import 'package:akib_pos/features/dashboard/presentation/widgets/dashboard_accounting_summary_widget.dart';
+import 'package:akib_pos/features/dashboard/presentation/widgets/top_product_widget.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:akib_pos/features/home/widget/my_drawer.dart';
@@ -35,16 +37,22 @@ class _DashboardPageState extends State<DashboardPage> {
     _loadInitialBranch();
   }
 
-  Future<void> _onRefresh() async {
-    // Simulate data reload here
-    await context.read<GetDashboardAccountingSummaryCubit>().fetchAccountingSummary(
-          branchId: selectedBranchId ?? 1, // Replace with actual logic
-        );
-  }
+  
+
+   Future<void> _onRefresh() async {
+  // Run both fetch operations concurrently using Future.wait
+  await Future.wait([
+    context.read<GetDashboardAccountingSummaryCubit>().fetchAccountingSummary(
+          branchId: selectedBranchId ?? 1,
+        ),
+    context.read<GetDashboardTopProductsCubit>().fetchTopProducts(
+          branchId: selectedBranchId ?? 1,
+        ),
+  ]);
+}
 
 
-
- @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundGrey,
@@ -52,22 +60,20 @@ class _DashboardPageState extends State<DashboardPage> {
       body: RefreshIndicator(
         color: AppColors.primaryMain,
         onRefresh: _onRefresh, // Pull-to-refresh handler
-        child: SingleChildScrollView( // Make sure the content is scrollable
-          physics: const AlwaysScrollableScrollPhysics(), // Enable scrolling even if content is less than viewport
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
               isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : BranchInfo(
-                      onTap: () => _showBranchPicker(context),
-                    ),
-              // Use the accounting summary widget here, pass branchId dynamically
+                  : BranchInfo(onTap: () => _showBranchPicker(context)),
               Padding(
-                padding: const EdgeInsets.only(top: 16.0), // Adjust padding to prevent overflow
-                child: DashboardAccountingSummaryWidget(
-                  branchId: selectedBranchId ?? 1, // Use selected branch ID
-                ),
+                padding: const EdgeInsets.only(top: 16.0),
+                child: DashboardAccountingSummaryWidget(branchId: selectedBranchId ?? 1),
               ),
+              const SizedBox(height: 16),
+              // Add the TopProductWidget below accounting summary
+              TopProductWidget(branchId: selectedBranchId ?? 1),
             ],
           ),
         ),
@@ -97,7 +103,7 @@ class _DashboardPageState extends State<DashboardPage> {
       _branchInteractionCubit.selectBranch(branch);
 
       // Fetch accounting summary setelah memilih branch
-      context.read<GetDashboardAccountingSummaryCubit>().fetchAccountingSummary(branchId: branch.id);
+      _onRefresh();
     } else {
       await _fetchAndSaveBranches();
     }
@@ -125,7 +131,7 @@ class _DashboardPageState extends State<DashboardPage> {
         _branchInteractionCubit.selectBranch(selectedBranch);
 
         // Fetch accounting summary setelah memilih branch
-        context.read<GetDashboardAccountingSummaryCubit>().fetchAccountingSummary(branchId: selectedBranch.id);
+        _onRefresh();
       }
     } else {
       setState(() {
@@ -222,7 +228,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           );
 
                           branchInteractionCubit.selectBranch(selectedBranch);
-                          context.read<GetDashboardAccountingSummaryCubit>().fetchAccountingSummary(branchId: selectedBranch.id);
+                          _onRefresh();
                         }
                       },
                       child: const Text(
