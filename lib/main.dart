@@ -49,6 +49,7 @@ import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubi
 import 'package:akib_pos/features/cashier/presentation/checkout/checkout_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/branch_interaction_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_branches_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_accounting_summary_cubit.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_all_employee.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_recap/attendance_recap_cubit.dart';
@@ -564,6 +565,9 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => BranchInteractionCubit(authSharedPref: dashboardInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetDashboardAccountingSummaryCubit(dashboardInjection()),
         ),
         
 

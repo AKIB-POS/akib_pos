@@ -3,11 +3,13 @@ import 'package:akib_pos/core/error/failures.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/dashboard/data/datasources/dahboard_remote_data_source.dart';
 import 'package:akib_pos/features/dashboard/data/models/branch.dart';
+import 'package:akib_pos/features/dashboard/data/models/dashboard_accounting_summary.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class DashboardRepository {
   Future<Either<Failure, BranchesResponse>> getBranches();
+  Future<Either<Failure, DashboardAccountingSummaryResponse>> getAccountingSummary(int branchId);
 }
 
 class DashboardRepositoryImpl implements DashboardRepository {
@@ -20,6 +22,21 @@ class DashboardRepositoryImpl implements DashboardRepository {
     required this.authSharedPref,
     required this.connectivity,
   });
+
+  @override
+  Future<Either<Failure, DashboardAccountingSummaryResponse>> getAccountingSummary(int branchId) async {
+    try {
+      // Check connectivity
+      final connectivityResult = await connectivity.checkConnectivity();
+      if (connectivityResult == ConnectivityResult.none) {
+        return Left(NetworkFailure('No Internet connection'));
+      }
+      final response = await remoteDataSource.getAccountingSummary(branchId);
+      return Right(response);
+    } catch (e) {
+      return Left(GeneralFailure('Failed to fetch accounting summary'));
+    }
+  }
 
   @override
   Future<Either<Failure, BranchesResponse>> getBranches() async {

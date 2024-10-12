@@ -265,7 +265,7 @@ class BuildStockistSummary extends StatelessWidget {
       ),
     );
   }
-
+  
   Widget _buildVerificationCard(int? total, String label, String assetPath) {
     return Container(
       padding: const EdgeInsets.all(12),

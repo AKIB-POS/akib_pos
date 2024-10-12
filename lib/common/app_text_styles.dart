@@ -28,7 +28,7 @@ class AppTextStyle {
   );
 
   static const TextStyle headline4 = TextStyle(
-    fontSize: 24.0,
+    fontSize: 18.0,
     height: 1.5, // Line height of 36 divided by font size of 24
     fontWeight: FontWeight.w700,
     letterSpacing: 0,
