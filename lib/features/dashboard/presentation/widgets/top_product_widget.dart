@@ -49,7 +49,7 @@ class _TopProductWidgetState extends State<TopProductWidget> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: AppTextStyle.headline4),
+                Text(title, style: AppTextStyle.headline5),
                 const SizedBox(height: 16),
                 Container(
                   padding: const EdgeInsets.all(16),

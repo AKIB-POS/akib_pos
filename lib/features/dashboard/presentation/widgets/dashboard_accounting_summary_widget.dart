@@ -37,7 +37,7 @@ class DashboardAccountingSummaryWidget extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 16),
-                child: Text("Dashboard",style: AppTextStyle.headline4.copyWith(fontWeight: FontWeight.bold),),
+                child: Text("Dashboard",style: AppTextStyle.headline5.copyWith(fontWeight: FontWeight.bold),),
               ),
               _buildUiTotalProfit(summary.totalProfit),
               Padding(

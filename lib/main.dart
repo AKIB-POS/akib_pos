@@ -51,6 +51,8 @@ import 'package:akib_pos/features/dashboard/presentation/bloc/branch_interaction
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_branches_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_accounting_summary_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_top_products_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_purchase_chart_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_sales_chart_cubit.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_all_employee.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_recap/attendance_recap_cubit.dart';
@@ -573,6 +575,13 @@ void main() async {
         BlocProvider(
           create: (context) => GetDashboardTopProductsCubit(dashboardInjection()),
         ),
+        BlocProvider(
+          create: (context) => GetSalesChartCubit(dashboardInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetPurchaseChartCubit(dashboardInjection()),
+        ),
+        
         
 
       ],

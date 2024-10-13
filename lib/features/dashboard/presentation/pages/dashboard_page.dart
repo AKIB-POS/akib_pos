@@ -6,9 +6,13 @@ import 'package:akib_pos/features/dashboard/presentation/bloc/branch_interaction
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_branches_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_accounting_summary_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_top_products_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_purchase_chart_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_sales_chart_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/widgets/appbar_dashboard_page.dart';
 import 'package:akib_pos/features/dashboard/presentation/widgets/branch_info.dart';
 import 'package:akib_pos/features/dashboard/presentation/widgets/dashboard_accounting_summary_widget.dart';
+import 'package:akib_pos/features/dashboard/presentation/widgets/purchase_chart_widget.dart';
+import 'package:akib_pos/features/dashboard/presentation/widgets/sales_chart_widget.dart';
 import 'package:akib_pos/features/dashboard/presentation/widgets/top_product_widget.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
@@ -48,6 +52,12 @@ class _DashboardPageState extends State<DashboardPage> {
     context.read<GetDashboardTopProductsCubit>().fetchTopProducts(
           branchId: selectedBranchId ?? 1,
         ),
+    context.read<GetSalesChartCubit>().fetchSalesChart(
+          branchId: selectedBranchId ?? 1,
+        ),
+    context.read<GetPurchaseChartCubit>().fetchPurchaseChart(
+          branchId: selectedBranchId ?? 1,
+        ),
   ]);
 }
 
@@ -71,9 +81,12 @@ class _DashboardPageState extends State<DashboardPage> {
                 padding: const EdgeInsets.only(top: 16.0),
                 child: DashboardAccountingSummaryWidget(branchId: selectedBranchId ?? 1),
               ),
-              const SizedBox(height: 16),
-              // Add the TopProductWidget below accounting summary
+              const SizedBox(height: 12),
               TopProductWidget(branchId: selectedBranchId ?? 1),
+              const SizedBox(height: 12),
+              SalesChartWidget(branchId: selectedBranchId ?? 1),
+              const SizedBox(height: 12),
+              PurchaseChartWidget(branchId: selectedBranchId ?? 1),
             ],
           ),
         ),
