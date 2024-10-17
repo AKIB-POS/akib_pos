@@ -5,6 +5,7 @@ import 'package:akib_pos/features/dashboard/data/datasources/dahboard_remote_dat
 import 'package:akib_pos/features/dashboard/data/models/branch.dart';
 import 'package:akib_pos/features/dashboard/data/models/dashboard_accounting_summary.dart';
 import 'package:akib_pos/features/dashboard/data/models/dashboard_summary_response.dart';
+import 'package:akib_pos/features/dashboard/data/models/dashbord_summary_stock.dart';
 import 'package:akib_pos/features/dashboard/data/models/purchase_chart.dart';
 import 'package:akib_pos/features/dashboard/data/models/sales_chart.dart';
 import 'package:akib_pos/features/dashboard/data/models/top_products.dart';
@@ -18,6 +19,7 @@ abstract class DashboardRepository {
   Future<Either<Failure, SalesChartResponse>> getSalesChart(int branchId);
   Future<Either<Failure, PurchaseChartResponse>> getPurchaseChart(int branchId);
   Future<Either<Failure, DashboardSummaryHrdResponse>> getDashboardHrdSummary(int branchId);
+  Future<Either<Failure, DashboardSummaryStockResponse>> getStockSummary(int branchId);
   
 }
 
@@ -31,6 +33,21 @@ class DashboardRepositoryImpl implements DashboardRepository {
     required this.authSharedPref,
     required this.connectivity,
   });
+
+  @override
+  Future<Either<Failure, DashboardSummaryStockResponse>> getStockSummary(int branchId) async {
+    try {
+      final connectivityResult = await connectivity.checkConnectivity();
+      if (connectivityResult == ConnectivityResult.none) {
+        return Left(NetworkFailure('No Internet connection'));
+      } else {
+        final response = await remoteDataSource.getStockSummary(branchId);
+        return Right(response);
+      }
+    } catch (e) {
+      return Left(GeneralFailure("Unexpected error occurred"));
+    }
+  }
 
    @override
   Future<Either<Failure, DashboardSummaryHrdResponse>> getDashboardHrdSummary(int branchId) async {

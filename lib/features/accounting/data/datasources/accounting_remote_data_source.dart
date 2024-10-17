@@ -453,7 +453,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int companyId,
     required String date,
   }) async {
-    const url = '${URLs.baseUrlProd}/purchased-products';
+    const url = '${URLs.baseUrlProd}/list-expenditure';
     final response = await client
         .get(
           Uri.parse(url).replace(queryParameters: {

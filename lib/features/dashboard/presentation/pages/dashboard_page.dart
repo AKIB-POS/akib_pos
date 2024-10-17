@@ -5,12 +5,16 @@ import 'package:akib_pos/features/dashboard/data/models/branch.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/branch_interaction_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_branches_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_accounting_summary_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_summary_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_summary_stock_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_top_products_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_purchase_chart_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_sales_chart_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/widgets/appbar_dashboard_page.dart';
 import 'package:akib_pos/features/dashboard/presentation/widgets/branch_info.dart';
 import 'package:akib_pos/features/dashboard/presentation/widgets/dashboard_accounting_summary_widget.dart';
+import 'package:akib_pos/features/dashboard/presentation/widgets/dashboard_hrd_summary_widget.dart';
+import 'package:akib_pos/features/dashboard/presentation/widgets/dashboard_stock_summary_widget.dart';
 import 'package:akib_pos/features/dashboard/presentation/widgets/purchase_chart_widget.dart';
 import 'package:akib_pos/features/dashboard/presentation/widgets/sales_chart_widget.dart';
 import 'package:akib_pos/features/dashboard/presentation/widgets/top_product_widget.dart';
@@ -58,6 +62,14 @@ class _DashboardPageState extends State<DashboardPage> {
     context.read<GetPurchaseChartCubit>().fetchPurchaseChart(
           branchId: selectedBranchId ?? 1,
         ),
+    context.read<GetDashboardSummaryHrdCubit>().fetchDashboardHrdSummary(
+          branchId: selectedBranchId ?? 1,
+        ),
+    context.read<GetDashboardSummaryStockCubit>().fetchDashboardStockSummary(
+          branchId: selectedBranchId ?? 1,
+        ),
+    context.read<GetBranchesCubit>().fetchBranches(
+        ),
   ]);
 }
 
@@ -87,6 +99,10 @@ class _DashboardPageState extends State<DashboardPage> {
               SalesChartWidget(branchId: selectedBranchId ?? 1),
               const SizedBox(height: 12),
               PurchaseChartWidget(branchId: selectedBranchId ?? 1),
+              const SizedBox(height: 12),
+              DashboardHrdSummaryWidget(branchId: selectedBranchId ?? 1),
+              const SizedBox(height: 12),
+              DashboardStockSummaryWidget(branchId: selectedBranchId ?? 1),
             ],
           ),
         ),
@@ -96,7 +112,34 @@ class _DashboardPageState extends State<DashboardPage> {
 
 
 
+  //  Future<void> _loadInitialBranch() async {
+  //   final branchList = _authSharedPref.getBranchList();
+
+  //   if (branchList.isNotEmpty) {
+  //     final branchId = _authSharedPref.getBranchId();
+
+  //     final branch = branchList.firstWhere(
+  //       (b) => b.id == branchId,
+  //       orElse: () => branchList[0],
+  //     );
+
+  //     setState(() {
+  //       selectedBranchId = branchId;
+  //       selectedBranchName = branch.branchName;
+  //       isLoading = false;
+  //     });
+
+  //     _branchInteractionCubit.selectBranch(branch);
+
+  //     // Fetch accounting summary setelah memilih branch
+  //     _onRefresh();
+  //   } else {
+  //     await _fetchAndSaveBranches();
+  //   }
+  // }
    Future<void> _loadInitialBranch() async {
+    // Panggil cubit fetchBranches di sini
+  
     final branchList = _authSharedPref.getBranchList();
 
     if (branchList.isNotEmpty) {
@@ -117,41 +160,40 @@ class _DashboardPageState extends State<DashboardPage> {
 
       // Fetch accounting summary setelah memilih branch
       _onRefresh();
-    } else {
-      await _fetchAndSaveBranches();
     }
   }
 
-  Future<void> _fetchAndSaveBranches() async {
-    final cubit = context.read<GetBranchesCubit>();
-    await cubit.fetchBranches();
+  // Future<void> _fetchAndSaveBranches() async {
+  //   final cubit = context.read<GetBranchesCubit>();
+  //   await cubit.fetchBranches();
 
-    if (cubit.state is GetBranchesLoaded) {
-      final branches = (cubit.state as GetBranchesLoaded).branchesResponse.branches;
+  //   if (cubit.state is GetBranchesLoaded) {
+  //     final branches = (cubit.state as GetBranchesLoaded).branchesResponse.branches;
 
-      if (branches.isNotEmpty) {
-        final selectedBranch = branches[0];
+  //     if (branches.isNotEmpty) {
+  //       final selectedBranch = branches[0];
 
-        setState(() {
-          selectedBranchId = selectedBranch.id;
-          selectedBranchName = selectedBranch.branchName;
-          isLoading = false;
-        });
+  //       setState(() {
+  //         selectedBranchId = selectedBranch.id;
+  //         selectedBranchName = selectedBranch.branchName;
+  //         isLoading = false;
+  //       });
 
-        _authSharedPref.saveBranchId(selectedBranch.id);
-        _authSharedPref.saveBranchList(branches);
+  //       _authSharedPref.saveBranchId(selectedBranch.id);
+  //       _authSharedPref.saveBranchList(branches);
 
-        _branchInteractionCubit.selectBranch(selectedBranch);
+  //       _branchInteractionCubit.selectBranch(selectedBranch);
 
-        // Fetch accounting summary setelah memilih branch
-        _onRefresh();
-      }
-    } else {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
+  //       // Fetch accounting summary setelah memilih branch
+  //       _onRefresh();
+  //     }
+  //   } else {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
+ 
 
   Future<void> _showBranchPicker(BuildContext context) async {
     final branchInteractionCubit = context.read<BranchInteractionCubit>();

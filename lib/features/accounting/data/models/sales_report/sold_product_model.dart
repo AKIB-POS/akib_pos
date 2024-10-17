@@ -1,28 +1,37 @@
 class SoldProductModel {
   final String date;
   final String categoryName;
-  final int totalItemsSold;
+  final double totalItemsSold;
   final List<SubCategoryModel>? subCategories;
+  final String? subCategoryText;  // Untuk menampung kondisi sub_category sebagai String
 
   SoldProductModel({
     required this.date,
     required this.categoryName,
     required this.totalItemsSold,
     this.subCategories,
+    this.subCategoryText,  // Tambahkan parameter untuk string
   });
 
   factory SoldProductModel.fromJson(Map<String, dynamic> json) {
-    var subCategoryList = json['sub_categories'] != null
-        ? (json['sub_categories'] as List)
-            .map((subCategory) => SubCategoryModel.fromJson(subCategory))
-            .toList()
-        : null;
+    // Cek apakah sub_categories adalah list atau string
+    var subCategoryList;
+    String? subCategoryString;
+
+    if (json['sub_categories'] is List) {
+      subCategoryList = (json['sub_categories'] as List)
+          .map((subCategory) => SubCategoryModel.fromJson(subCategory))
+          .toList();
+    } else if (json['sub_categories'] is String) {
+      subCategoryString = json['sub_categories'];
+    }
 
     return SoldProductModel(
       date: json['date'] ?? '',
       categoryName: json['category_name'] ?? '',
-      totalItemsSold: (json['total_items_sold'] as num?)?.toInt() ?? 0,
-      subCategories: subCategoryList,
+      totalItemsSold: (json['total_items_sold'] as num?)?.toDouble() ?? 0.0,
+      subCategories: subCategoryList,  // List jika ada
+      subCategoryText: subCategoryString,  // String jika ada
     );
   }
 
@@ -31,7 +40,9 @@ class SoldProductModel {
       'date': date,
       'category_name': categoryName,
       'total_items_sold': totalItemsSold,
-      'sub_categories': subCategories?.map((e) => e.toJson()).toList(),
+      'sub_categories': subCategories != null
+          ? subCategories?.map((e) => e.toJson()).toList()  // Kembalikan List jika ada
+          : subCategoryText,  // Kembalikan String jika ada
     };
   }
 }

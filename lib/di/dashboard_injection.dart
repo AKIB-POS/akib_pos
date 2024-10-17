@@ -2,6 +2,8 @@ import 'package:akib_pos/features/dashboard/data/datasources/dahboard_remote_dat
 import 'package:akib_pos/features/dashboard/data/repositories/dashboard_repository.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_branches_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_accounting_summary_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_summary_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_summary_stock_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_top_products_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_purchase_chart_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_sales_chart_cubit.dart';
@@ -36,6 +38,13 @@ Future<void> initDashboardModule() async {
   );
   dashboardInjection.registerFactory(
     () => GetPurchaseChartCubit(dashboardInjection()),
+  );
+  dashboardInjection.registerFactory(
+    () => GetDashboardSummaryHrdCubit(dashboardInjection()),
+    
+  );
+  dashboardInjection.registerFactory(
+    () => GetDashboardSummaryStockCubit(dashboardInjection()), // Register Stock Summary Cubit
   );
 
 }

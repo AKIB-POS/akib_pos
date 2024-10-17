@@ -133,7 +133,7 @@ class ProductSoldCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                   color: AppColors.primaryBackgorund),
               child: Text(
-                product.totalItemsSold.toString(),
+                product.subCategoryText != null ? Utils.formatCurrencyDouble(product.totalItemsSold) : product.totalItemsSold.toString(),
                 style: AppTextStyle.bigCaptionBold
                     .copyWith(color: AppColors.primaryMain),
               )),

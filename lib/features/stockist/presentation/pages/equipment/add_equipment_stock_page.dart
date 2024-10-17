@@ -1,6 +1,7 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/add_equipment_stock_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_equipment_type_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_order_status_cubit.dart';
@@ -13,6 +14,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -25,6 +27,7 @@ class AddEquipmentStockPage extends StatefulWidget {
 
 class _AddEquipmentStockPageState extends State<AddEquipmentStockPage> {
   final _formKey = GlobalKey<FormState>();
+  final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
 
   int? equipmentId;
   String? unitName;
@@ -42,7 +45,7 @@ class _AddEquipmentStockPageState extends State<AddEquipmentStockPage> {
   }
 
   void _fetchInitialData() {
-    final branchId = 1; // Replace with dynamic branchId if needed
+    final branchId = _authSharedPref.getBranchId() ?? 0; // Replace with dynamic branchId if needed
     context.read<GetEquipmentTypeCubit>().fetchEquipmentList(branchId: branchId, category: 'equipment');
     context.read<GetUnitCubit>().fetchUnits(branchId: branchId);
     context.read<GetVendorCubit>().fetchVendors(branchId: branchId);
@@ -124,7 +127,7 @@ class _AddEquipmentStockPageState extends State<AddEquipmentStockPage> {
     if (_formKey.currentState!.validate()) {
       final AddEquipmentStockRequest stockRequest =
           AddEquipmentStockRequest(
-        branchId: 1, // Replace with actual branch ID
+        branchId: _authSharedPref.getBranchId() ?? 0 , // Replace with actual branch ID
         equipmentId: equipmentId!,
         quantity: quantity!,
         unitName: unitName!,

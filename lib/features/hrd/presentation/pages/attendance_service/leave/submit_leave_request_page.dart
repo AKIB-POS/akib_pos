@@ -28,7 +28,7 @@ class SubmitLeaveRequestPage extends StatefulWidget {
 class _SubmitLeaveRequestPageState extends State<SubmitLeaveRequestPage> {
   final _formKey = GlobalKey<FormState>();
   int? leaveType;
-  int? totalDays;
+  // int? totalDays;
   DateTime? startDate;
   DateTime? endDate;
   String? description;
@@ -271,7 +271,7 @@ void _showPermanentDeniedDialog() {
 
   bool _isFormValid() {
     return leaveType != null &&
-        totalDays != null &&
+        // totalDays != null &&
         startDate != null &&
         endDate != null &&
         attachment != null;
@@ -284,7 +284,6 @@ void _showPermanentDeniedDialog() {
 
       final leaveRequest = LeaveRequest(
         leaveType: leaveType!,
-        totalDays: totalDays!,
         startDate: formatter.format(startDate!),
         endDate: formatter.format(endDate!),
         description: description ?? '',

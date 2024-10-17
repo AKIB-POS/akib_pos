@@ -1,8 +1,8 @@
 class PurchasedProductModel {
   final String date;
   final double amount;
-  final String productName;
-  final String expenditureCategory;
+  final String productName;  // Pemetaan dari 'description'
+  final String expenditureCategory;  // Pemetaan dari 'category'
 
   PurchasedProductModel({
     required this.date,
@@ -15,8 +15,8 @@ class PurchasedProductModel {
     return PurchasedProductModel(
       date: json['date'] ?? '',
       amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
-      productName: json['product_name'] ?? '',
-      expenditureCategory: json['expenditure_category'] ?? '',
+      productName: json['description'] ?? '',  // Pemetaan dari 'description'
+      expenditureCategory: json['category'] ?? '',  // Pemetaan dari 'category'
     );
   }
 
@@ -24,8 +24,8 @@ class PurchasedProductModel {
     return {
       'date': date,
       'amount': amount,
-      'product_name': productName,
-      'expenditure_category': expenditureCategory,
+      'description': productName,  // Pemetaan ke 'description'
+      'category': expenditureCategory,  // Pemetaan ke 'category'
     };
   }
 }

@@ -50,6 +50,7 @@ import 'package:akib_pos/features/cashier/presentation/checkout/checkout_cubit.d
 import 'package:akib_pos/features/dashboard/presentation/bloc/branch_interaction_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_branches_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_accounting_summary_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_summary_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_top_products_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_purchase_chart_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_sales_chart_cubit.dart';
@@ -141,6 +142,7 @@ import 'package:akib_pos/di/accounting_injection.dart' as accounting;
 import 'package:akib_pos/di/hrd_injection.dart' as hrd;
 import 'package:akib_pos/di/stockist_injection.dart' as stockist;
 import 'package:akib_pos/di/dashboard_injection.dart' as dashboard;
+import 'features/dashboard/presentation/bloc/get_dashboard_summary_stock_cubit.dart';
 import 'firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart'; // <-- This line imports the initializeDateFormatting function
 
@@ -207,9 +209,9 @@ void main() async {
         BlocProvider(create: (context) => OpenCashierCubit(repository: sl())),
         BlocProvider(create: (context) => ExpenditureCubit(repository: sl())),
         BlocProvider(create: (context) => AuthCubit(sl())),
-        BlocProvider(
-            create: (context) =>
-                PrinterCubit(bluetooth: sl(), sharedPreferences: sl())),
+        // BlocProvider(
+        //     create: (context) =>
+        //         PrinterCubit(bluetooth: sl(), sharedPreferences: sl())),
 
         //ACCOUNTING MODULE
         BlocProvider(
@@ -580,6 +582,12 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => GetPurchaseChartCubit(dashboardInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetDashboardSummaryHrdCubit(dashboardInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetDashboardSummaryStockCubit(dashboardInjection()),
         ),
         
         

@@ -1,6 +1,7 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/stockist/data/models/raw_material/add_raw_material_stock.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/add_raw_material_stock_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/get_order_status_cubit.dart';
@@ -13,6 +14,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 class AddRawMaterialStockPage extends StatefulWidget {
@@ -25,6 +27,7 @@ class AddRawMaterialStockPage extends StatefulWidget {
 
 class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
   final _formKey = GlobalKey<FormState>();
+   final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
 
   int? rawMaterialId;
   String? unitName; // Instead of unitId, we now store the unitName
@@ -43,7 +46,7 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
   }
 
   void _fetchInitialData() {
-    final branchId = 1; // Example branch ID, replace with dynamic data if needed
+    final branchId = _authSharedPref.getBranchId() ?? 0;
     context.read<GetRawMaterialTypeCubit>().fetchRawMaterialTypes(branchId: branchId);
     context.read<GetUnitCubit>().fetchUnits(branchId: branchId);
     context.read<GetVendorCubit>().fetchVendors(branchId: branchId);
@@ -130,7 +133,7 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
     if (_formKey.currentState!.validate()) {
       final AddRawMaterialStockRequest stockRequest =
           AddRawMaterialStockRequest(
-        branchId: 1, // Replace with actual branch ID
+        branchId: _authSharedPref.getBranchId() ?? 1, // Replace with actual branch ID
         materialId: rawMaterialId!,
         quantity: quantity!,
         unitName: unitName!, // Pass unitName instead of unitId

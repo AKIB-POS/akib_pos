@@ -19,7 +19,7 @@ import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transact
 import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/checkout/checkout_cubit.dart';
 import 'package:akib_pos/util/shared_prefs_helper.dart';
-import 'package:blue_thermal_printer/blue_thermal_printer.dart';
+// import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,7 +32,7 @@ Future<void> init() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => http.Client());
-  sl.registerLazySingleton(() => BlueThermalPrinter.instance);
+  // sl.registerLazySingleton(() => BlueThermalPrinter.instance);
   // Connectivity
   sl.registerLazySingleton(() => Connectivity());
 
@@ -73,9 +73,9 @@ Future<void> init() async {
     () => OpenCashierCubit(repository: sl()),
   );
   
-  sl.registerFactory(
-    () => PrinterCubit(bluetooth: sl(),sharedPreferences: sl()),
-  );
+  // sl.registerFactory(
+  //   () => PrinterCubit(bluetooth: sl(),sharedPreferences: sl()),
+  // );
 
  
 

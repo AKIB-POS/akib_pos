@@ -13,11 +13,11 @@ class BranchInfo extends StatelessWidget {
   final VoidCallback onTap;
 
   const BranchInfo({Key? key, required this.onTap}) : super(key: key);
+  
   bool isTabletDevice(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final width = mediaQuery.size.width;
     final height = mediaQuery.size.height;
-
     final aspectRatio = width / height;
 
     return aspectRatio >= 1.0 && width >= 600;
@@ -45,37 +45,74 @@ class BranchInfo extends StatelessWidget {
           ),
           GestureDetector(
             onTap: onTap,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              margin: const EdgeInsets.only(left: 16,right: 16,bottom: 16),
-              decoration: BoxDecoration(
-                    color: AppColors.primaryBackgorund,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  BlocBuilder<BranchInteractionCubit, BranchInteractionState>(
-                    builder: (context, state) {
-                      return Text(
-                        state.branchName.isNotEmpty
-                            ? state.branchName
-                            : 'Pilih Cabang',
-                        style: const TextStyle(
-                              color: AppColors.primaryMain,
-                              fontWeight: FontWeight.bold,
-                            ),
-                      );
-                    },
-                  ),
-                  SvgPicture.asset(
-                        'assets/icons/ic_branch.svg',
-                        height: 20,
-                        width: 20,
-                      ),
-                ],
-              ),
+            child: BlocBuilder<GetBranchesCubit, GetBranchesState>(
+              builder: (context, state) {
+                // Cek apakah sedang loading, tampilkan Shimmer saat loading
+                if (state is GetBranchesLoading) {
+                  return _buildShimmerBranchInfo();
+                } else {
+                  // Tampilkan branch yang sudah dipilih atau default
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryBackgorund,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        BlocBuilder<BranchInteractionCubit, BranchInteractionState>(
+                          builder: (context, state) {
+                            return Text(
+                              state.branchName.isNotEmpty
+                                  ? state.branchName
+                                  : 'Pilih Cabang',
+                              style: const TextStyle(
+                                color: AppColors.primaryMain,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          },
+                        ),
+                        SvgPicture.asset(
+                          'assets/icons/ic_branch.svg',
+                          height: 20,
+                          width: 20,
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              },
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Fungsi untuk membangun Shimmer Widget
+  Widget _buildShimmerBranchInfo() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+      decoration: BoxDecoration(
+        color: AppColors.primaryBackgorund,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            height: 16,
+            width: 100,
+            color: Colors.grey[300],
+          ),
+          Container(
+            height: 16,
+            width: 20,
+            color: Colors.grey[300],
           ),
         ],
       ),
