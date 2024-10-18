@@ -38,40 +38,7 @@ class _DashboardPageState extends State<DashboardPage> {
   bool isLoading = true;
   final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
 
-  @override
-  void initState() {
-    super.initState();
-    _branchInteractionCubit = BranchInteractionCubit(authSharedPref: _authSharedPref);
-    _loadInitialBranch();
-  }
-
-  
-
-   Future<void> _onRefresh() async {
-  // Run both fetch operations concurrently using Future.wait
-  await Future.wait([
-    context.read<GetDashboardAccountingSummaryCubit>().fetchAccountingSummary(
-          branchId: selectedBranchId ?? 1,
-        ),
-    context.read<GetDashboardTopProductsCubit>().fetchTopProducts(
-          branchId: selectedBranchId ?? 1,
-        ),
-    context.read<GetSalesChartCubit>().fetchSalesChart(
-          branchId: selectedBranchId ?? 1,
-        ),
-    context.read<GetPurchaseChartCubit>().fetchPurchaseChart(
-          branchId: selectedBranchId ?? 1,
-        ),
-    context.read<GetDashboardSummaryHrdCubit>().fetchDashboardHrdSummary(
-          branchId: selectedBranchId ?? 1,
-        ),
-    context.read<GetDashboardSummaryStockCubit>().fetchDashboardStockSummary(
-          branchId: selectedBranchId ?? 1,
-        ),
-    context.read<GetBranchesCubit>().fetchBranches(
-        ),
-  ]);
-}
+ 
 
 
   @override
@@ -109,6 +76,40 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
     );
   }
+   @override
+  void initState() {
+    super.initState();
+    _branchInteractionCubit = BranchInteractionCubit(authSharedPref: _authSharedPref);
+    _loadInitialBranch();
+  }
+
+  
+
+   Future<void> _onRefresh() async {
+  // Run both fetch operations concurrently using Future.wait
+  await Future.wait([
+    context.read<GetDashboardAccountingSummaryCubit>().fetchAccountingSummary(
+          branchId: selectedBranchId ?? 1,
+        ),
+    context.read<GetDashboardTopProductsCubit>().fetchTopProducts(
+          branchId: selectedBranchId ?? 1,
+        ),
+    context.read<GetSalesChartCubit>().fetchSalesChart(
+          branchId: selectedBranchId ?? 1,
+        ),
+    context.read<GetPurchaseChartCubit>().fetchPurchaseChart(
+          branchId: selectedBranchId ?? 1,
+        ),
+    context.read<GetDashboardSummaryHrdCubit>().fetchDashboardHrdSummary(
+          branchId: selectedBranchId ?? 1,
+        ),
+    context.read<GetDashboardSummaryStockCubit>().fetchDashboardStockSummary(
+          branchId: selectedBranchId ?? 1,
+        ),
+    context.read<GetBranchesCubit>().fetchBranches(
+        ),
+  ]);
+}
 
 
 
