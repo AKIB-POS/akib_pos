@@ -46,13 +46,14 @@ class _ProfitLossPageState extends State<ProfitLossPage> {
         );
   }
 @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.backgroundGrey,
-      body: Stack(
-        children: [
-          // Konten Scrollable
-          RefreshIndicator(
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: AppColors.backgroundGrey,
+    body: Column(
+      children: [
+        // Konten Scrollable
+        Expanded(
+          child: RefreshIndicator(
             color: AppColors.primaryMain,
             onRefresh: () async {
               _fetchProfitLossData();
@@ -62,7 +63,7 @@ class _ProfitLossPageState extends State<ProfitLossPage> {
               padding: const EdgeInsets.only(bottom: 150), // Menambah jarak untuk widget fixed
               child: Column(
                 children: [
-                  ProfitLossTopWidget(onDateTap: () =>_selectDate(context)),
+                  ProfitLossTopWidget(onDateTap: () => _selectDate(context)),
                   const SalesRevenueWidget(),
                   const COGSWidget(),
                   const OperatingExpensesWidget(),
@@ -70,43 +71,42 @@ class _ProfitLossPageState extends State<ProfitLossPage> {
               ),
             ),
           ),
-          
-          // Widget Fixed di Bawah
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: BlocBuilder<ProfitLossCubit, ProfitLossState>(
-              builder: (context, state) {
-                if (state is ProfitLossLoaded) {
-                  return ProfitLossDetailsWidget(
-                    totalSales: state.profitLoss.salesRevenue.totalSales,
-                    totalCOGS: state.profitLoss.cogs.totalCogs,
-                    totalOperatingExpenses: state.profitLoss.totalOperatingExpenses,
-                  );
-                } else if (state is ProfitLossLoading) {
-                  return Utils.buildLoadingCardShimmer();
-                } else if (state is ProfitLossError) {
-                  return Container(
-                   color: Colors.white,
+        ),
+
+        // Widget Fixed di Bawah
+        BlocBuilder<ProfitLossCubit, ProfitLossState>(
+          builder: (context, state) {
+            if (state is ProfitLossLoaded) {
+              return ProfitLossDetailsWidget(
+                totalSales: state.profitLoss.salesRevenue.totalSales,
+                totalCOGS: state.profitLoss.cogs.totalCogs,
+                totalOperatingExpenses: state.profitLoss.totalOperatingExpenses,
+              );
+            } else if (state is ProfitLossLoading) {
+              return Utils.buildLoadingCardShimmer();
+            } else if (state is ProfitLossError) {
+              return Container(
+                color: Colors.white,
                 padding: const EdgeInsets.all(16),
-                    child: Center(child: Column(
-                      children: [
-                        Text(state.message),
-                        Text("Swipe Kebawah Untuk Load Ulang"),
-                      ],
-                    )),
-                  );
-                } else {
-                  return Container();
-                }
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+                child: Center(
+                  child: Column(
+                    children: [
+                      Text(state.message),
+                      Text("Swipe Kebawah Untuk Load Ulang"),
+                    ],
+                  ),
+                ),
+              );
+            } else {
+              return Container();
+            }
+          },
+        ),
+      ],
+    ),
+  );
+}
+
 
 void _selectDate(BuildContext context) async {
   print("kjnasfad");

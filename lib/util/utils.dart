@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/common/app_themes.dart';
@@ -6,8 +8,58 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Utils {
+  static Widget buildErrorStatePlain({
+    required String title,
+    required String message,
+    required VoidCallback onRetry, // Parameter untuk menangani tombol retry
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              'assets/images/accounting/empty_report.svg', // Ganti dengan path icon error yang sesuai
+              height: 80,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: AppTextStyle.bigCaptionBold,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: AppTextStyle.caption,
+            ),
+            const SizedBox(height: 4),
+            ElevatedButton(
+              onPressed: onRetry, // Callback saat tombol ditekan
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 24, vertical: 12), // Atur padding di sini
+                backgroundColor:
+                    AppColors.primaryMain, // Atur warna latar belakang
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8), // Atur radius sudut
+                ),
+              ),
+              child: const Text(
+                'Coba Lagi',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   static const List<String> months = [
     'Januari',
     'Februari',
@@ -426,54 +478,6 @@ class Utils {
       ),
     );
   }
-  static Widget buildErrorStatePlain({
-    required String title,
-    required String message,
-    required VoidCallback onRetry, // Parameter untuk menangani tombol retry
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              'assets/images/accounting/empty_report.svg', // Ganti dengan path icon error yang sesuai
-              height: 80,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              style: AppTextStyle.bigCaptionBold,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: AppTextStyle.caption,
-            ),
-            const SizedBox(height: 4),
-            ElevatedButton(
-              onPressed: onRetry, // Callback saat tombol ditekan
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 24, vertical: 12), // Atur padding di sini
-                backgroundColor:
-                    AppColors.primaryMain, // Atur warna latar belakang
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8), // Atur radius sudut
-                ),
-              ),
-              child: const Text(
-                'Coba Lagi',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   static Widget buildEmptyState(String title, String? message) {
     return Container(
@@ -506,7 +510,8 @@ class Utils {
       ),
     );
   }
-  static Widget buildEmptyStatePlain(String? title , String? message) {
+
+  static Widget buildEmptyStatePlain(String? title, String? message) {
     return Container(
       padding: const EdgeInsets.all(16),
       child: Center(
@@ -640,5 +645,32 @@ class Utils {
         );
       },
     );
+  }
+
+  static Future<void> whatsapp(String phoneNumber, String message) async {
+    String formattedPhoneNumber = _formatPhoneNumber(phoneNumber);
+    var androidUrl =
+        "whatsapp://send?phone=$formattedPhoneNumber&text=$message";
+    var iosUrl =
+        "https://wa.me/$formattedPhoneNumber?text=${Uri.encodeComponent(message)}";
+
+    try {
+      if (Platform.isIOS) {
+        await launchUrl(Uri.parse(iosUrl));
+      } else {
+        await launchUrl(Uri.parse(androidUrl));
+      }
+    } on Exception {
+      const SnackBar(
+        content: Text('WhatsApp tidak terpasang di perangkat Anda.'),
+      );
+    }
+  }
+
+  static String _formatPhoneNumber(String phoneNumber) {
+    if (phoneNumber.startsWith('0')) {
+      return '+62${phoneNumber.substring(1)}';
+    }
+    return phoneNumber;
   }
 }

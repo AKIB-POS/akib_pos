@@ -112,7 +112,7 @@ class PurchasedProductCard extends StatelessWidget {
       const SizedBox(height: 4),
       Text(
         product.productName,
-        style: AppTextStyle.caption,
+        style: AppTextStyle.headline5,
       ),
     ]);
   }

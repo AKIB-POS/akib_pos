@@ -7,6 +7,7 @@ import 'package:akib_pos/features/accounting/presentation/pages/purchasing_repor
 import 'package:akib_pos/features/accounting/presentation/pages/sales_report.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/tax_management_and_tax_services/tax_management_and_tax_services.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/transaction_report.dart';
+import 'package:auto_height_grid_view/auto_height_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -115,20 +116,26 @@ class AccountingGridMenu extends StatelessWidget {
   }
 }
 
+  bool isTabletDevice(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final width = mediaQuery.size.width;
+    final height = mediaQuery.size.height;
+
+    final aspectRatio = width / height;
+
+    return aspectRatio >= 1.0 && width >= 600;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
+    bool isTablet = isTabletDevice(context);
+    return AutoHeightGridView(
       padding: const EdgeInsets.all(16),
       shrinkWrap: true, // Tambahkan ini agar GridView mengukur tinggi berdasarkan isinya
       physics: const NeverScrollableScrollPhysics(), 
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2, // 2 cards per row
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-        childAspectRatio: 1.26,
-      ),
       itemCount: menuItems.length,
-      itemBuilder: (context, index) {
+      crossAxisCount: isTablet ? 4 : 2,
+      builder: (context, index) {
         return GestureDetector(
           onTap: () {
             onItemTap(index, context);
@@ -151,19 +158,28 @@ class AccountingMenuItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
+    return Container(
+      height: 150,
+      decoration: BoxDecoration(
+        color: Colors.white, // Background color
+        borderRadius: BorderRadius.circular(16.0), // Rounded corners
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3), // Shadow position
+          ),
+        ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16.0), // Terapkan radius yang sama
+        borderRadius: BorderRadius.circular(16.0),
         child: Stack(
           children: [
             Positioned.fill(
               child: SvgPicture.asset(
-                "assets/images/bg_card_accounting.svg", // Background SVG
-                fit: BoxFit.scaleDown,
+                "assets/images/bg_card_accounting.svg", // Background image (optional)
+                fit: BoxFit.cover,
               ),
             ),
             Padding(
@@ -176,7 +192,7 @@ class AccountingMenuItem extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                    ), // Sesuaikan ukuran teks dengan Sizer atau AppTextStyle jika ada
+                    ),
                   ),
                   const Spacer(),
                   Row(
@@ -184,11 +200,11 @@ class AccountingMenuItem extends StatelessWidget {
                       const Spacer(),
                       SvgPicture.asset(
                         iconPath,
-                        height: 40, // Sesuaikan ukuran ikon
+                        height: 40,
                         width: 40,
                       ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
@@ -197,8 +213,4 @@ class AccountingMenuItem extends StatelessWidget {
       ),
     );
   }
-
-  // Assuming you have a list or some identifier to handle the different cases
-
-
 }

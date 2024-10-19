@@ -41,7 +41,6 @@ import 'package:akib_pos/features/cashier/presentation/bloc/expenditure/expendit
 import 'package:akib_pos/features/cashier/presentation/bloc/member/member_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/open_cashier/open_cashier_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/post_close_cashier/post_close_cashier_cubit.dart';
-import 'package:akib_pos/features/cashier/presentation/bloc/printer/printer_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/product/product_bloc.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/process_transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
@@ -49,6 +48,11 @@ import 'package:akib_pos/features/cashier/presentation/bloc/voucher/voucher_cubi
 import 'package:akib_pos/features/cashier/presentation/checkout/checkout_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/branch_interaction_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_branches_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_accounting_summary_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_summary_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_top_products_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_purchase_chart_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_sales_chart_cubit.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_all_employee.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_recap/attendance_recap_cubit.dart';
@@ -101,7 +105,8 @@ import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/appr
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/pending_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_submission/rejected_submission_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/employee_service/tasking/detail_subordinate_task_cubit.dart';
-import 'package:akib_pos/features/hrd/presentation/widgets/employee_submission/pending_approval_tab.dart';
+import 'package:akib_pos/features/settings/presentation/bloc/change_password_cubit.dart';
+import 'package:akib_pos/features/settings/presentation/bloc/get_personal_information_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/add_equipment_stock_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/add_equipment_type_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/add_material_cubit.dart';
@@ -124,10 +129,8 @@ import 'package:akib_pos/features/stockist/presentation/bloc/running_out_stock_c
 import 'package:akib_pos/features/stockist/presentation/bloc/stockist_recent_purchase_cubit.dart';
 import 'package:akib_pos/features/stockist/presentation/bloc/stockist_summary_cubit.dart';
 import 'package:akib_pos/splash_screen.dart';
-import 'package:akib_pos/util/bloc_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -137,6 +140,8 @@ import 'package:akib_pos/di/accounting_injection.dart' as accounting;
 import 'package:akib_pos/di/hrd_injection.dart' as hrd;
 import 'package:akib_pos/di/stockist_injection.dart' as stockist;
 import 'package:akib_pos/di/dashboard_injection.dart' as dashboard;
+import 'package:akib_pos/di/setting_injection.dart' as setting;
+import 'features/dashboard/presentation/bloc/get_dashboard_summary_stock_cubit.dart';
 import 'firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart'; // <-- This line imports the initializeDateFormatting function
 
@@ -156,6 +161,7 @@ void main() async {
   await hrd.initHRDModule();
   await stockist.initStockistModule();
   await dashboard.initDashboardModule();
+  await setting.initSettingModule();
 
 
   runApp(
@@ -203,9 +209,9 @@ void main() async {
         BlocProvider(create: (context) => OpenCashierCubit(repository: sl())),
         BlocProvider(create: (context) => ExpenditureCubit(repository: sl())),
         BlocProvider(create: (context) => AuthCubit(sl())),
-        BlocProvider(
-            create: (context) =>
-                PrinterCubit(bluetooth: sl(), sharedPreferences: sl())),
+        // BlocProvider(
+        //     create: (context) =>
+        //         PrinterCubit(bluetooth: sl(), sharedPreferences: sl())),
 
         //ACCOUNTING MODULE
         BlocProvider(
@@ -565,6 +571,35 @@ void main() async {
         BlocProvider(
           create: (context) => BranchInteractionCubit(authSharedPref: dashboardInjection()),
         ),
+        BlocProvider(
+          create: (context) => GetDashboardAccountingSummaryCubit(dashboardInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetDashboardTopProductsCubit(dashboardInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetSalesChartCubit(dashboardInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetPurchaseChartCubit(dashboardInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetDashboardSummaryHrdCubit(dashboardInjection()),
+        ),
+        BlocProvider(
+          create: (context) => GetDashboardSummaryStockCubit(dashboardInjection()),
+        ),
+
+
+
+        //Settting
+        BlocProvider(
+          create: (context) => GetPersonalInformationCubit(dashboardInjection()),
+        ),
+        BlocProvider(
+          create: (context) => ChangePasswordCubit(dashboardInjection()),
+        ),
+        
         
 
       ],

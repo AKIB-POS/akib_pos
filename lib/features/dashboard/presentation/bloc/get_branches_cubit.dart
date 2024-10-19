@@ -2,7 +2,6 @@ import 'package:akib_pos/core/error/failures.dart';
 import 'package:akib_pos/features/dashboard/data/models/branch.dart';
 import 'package:akib_pos/features/dashboard/data/repositories/dashboard_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 class GetBranchesCubit extends Cubit<GetBranchesState> {
   final DashboardRepository repository;
 
@@ -15,7 +14,13 @@ class GetBranchesCubit extends Cubit<GetBranchesState> {
 
     result.fold(
       (failure) {
-        emit(GetBranchesError(failure is GeneralFailure ? failure.message : 'Failed to fetch branches.'));
+        if (failure is NetworkFailure) {
+          emit(GetBranchesError('No Internet connection'));
+        } else if (failure is GeneralFailure) {
+          emit(GetBranchesError(failure.message));
+        } else {
+          emit(GetBranchesError('Failed to fetch branches.'));
+        }
       },
       (branchesResponse) {
         emit(GetBranchesLoaded(branchesResponse));
@@ -23,6 +28,7 @@ class GetBranchesCubit extends Cubit<GetBranchesState> {
     );
   }
 }
+
 
 abstract class GetBranchesState {}
 

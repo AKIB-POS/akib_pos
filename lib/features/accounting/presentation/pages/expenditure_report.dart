@@ -78,7 +78,7 @@ class _ExpenditureReportState extends State<ExpenditureReport> {
                ExpenditureReportSummary(),
               const Padding(
                 padding: EdgeInsets.only(left: 16,bottom: 16),
-                child: Text("Produk Dibeli",style: AppTextStyle.headline5,),
+                child: Text("List Pengeluaran",style: AppTextStyle.headline5,),
               ),
               const PurchasedProductCard()
             ],

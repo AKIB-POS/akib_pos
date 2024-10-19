@@ -63,7 +63,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
   @override
   Future<AddEquipmentStockResponse> addEquipmentStock(AddEquipmentStockRequest request) async {
-    const url = '${URLs.baseUrlMock}/add-equipment-stock';
+    const url = '${URLs.baseUrlProd}/add-equipment-stock';
     
     final response = await client.post(
       Uri.parse(url),
@@ -71,7 +71,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
       body: json.encode(request.toJson()),
     ).timeout(const Duration(seconds: 30));
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 201 || response.statusCode == 200) {
       return AddEquipmentStockResponse.fromJson(json.decode(response.body));
     } else {
       throw GeneralException(json.decode(response.body)['message']);
@@ -80,7 +80,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
   @override
   Future<EquipmentPurchaseHistoryResponse> getEquipmentPurchaseHistory(int branchId, int equipmentId) async {
-    const url = '${URLs.baseUrlMock}/equipment-purchase-history';
+    const url = '${URLs.baseUrlProd}/equipment-purchase-history';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branchId': branchId.toString(),
@@ -101,7 +101,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
   @override
   Future<EquipmentDetailResponse> getEquipmentDetail(int branchId, int equipmentId) async {
-    const url = '${URLs.baseUrlMock}/equipment-detail';
+    const url = '${URLs.baseUrlProd}/equipment-detail';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branchId': branchId.toString(),
@@ -123,7 +123,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
   @override
   Future<EquipmentPurchaseResponse> getEquipmentPurchases(int branchId) async {
-    const url = '${URLs.baseUrlMock}/purchases';
+    const url = '${URLs.baseUrlProd}/purchases';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branchId': branchId.toString(),
@@ -144,14 +144,14 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
   @override
   Future<AddEquipmentTypeResponse> addEquipmentType(AddEquipmentTypeRequest request) async {
-    const url = '${URLs.baseUrlMock}/stock-type';
+    const url = '${URLs.baseUrlProd}/stock';
     final response = await client.post(
       Uri.parse(url),
       headers: _buildHeaders(),
       body: jsonEncode(request.toJson()),
     ).timeout(const Duration(seconds: 30));
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 201 || response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return AddEquipmentTypeResponse.fromJson(jsonResponse);
     } else if (response.statusCode >= 400 && response.statusCode < 500) {
@@ -163,7 +163,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
   @override
   Future<EquipmentTypeResponse> getEquipmentType(int branchId, String category) async {
-    final url = '${URLs.baseUrlMock}/stock-type?branch_id=$branchId&category=$category';
+    final url = '${URLs.baseUrlProd}/stock-type?branch_id=$branchId&category=$category';
     final response = await client.get(
       Uri.parse(url),
       headers: _buildHeaders(),
@@ -182,7 +182,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
   @override
   Future<AddRawMaterialStockResponse> addRawMaterialStock(AddRawMaterialStockRequest request) async {
-    const url = '${URLs.baseUrlMock}/add-raw-material-stock';
+    const url = '${URLs.baseUrlProd}/add-raw-material-stock';
     final response = await client.post(
       Uri.parse(url),
       headers: _buildHeaders(),
@@ -202,7 +202,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
    @override
   Future<OrderStatusResponse> getOrderStatuses(int branchId) async {
-    final url = '${URLs.baseUrlMock}/order-status?branch_id=$branchId';
+    final url = '${URLs.baseUrlProd}/order-status?branch_id=$branchId';
     final response = await client.get(
       Uri.parse(url),
       headers: _buildHeaders(),
@@ -220,7 +220,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
   @override
   Future<GetWarehousesResponse> getWarehouses(int branchId) async {
-    const url = '${URLs.baseUrlMock}/warehouses';
+    const url = '${URLs.baseUrlProd}/warehouses';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),
@@ -240,7 +240,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
   @override
   Future<GetUnitsResponse> getUnits(int branchId) async {
-    const url = '${URLs.baseUrlMock}/units';
+    const url = '${URLs.baseUrlProd}/units';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),
@@ -261,7 +261,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
   @override
   Future<RawMaterialPurchaseHistoryResponse> getRawMaterialPurchaseHistory(int branchId, int materialId) async {
-    const url = '${URLs.baseUrlMock}/raw-material-purchase-history';
+    const url = '${URLs.baseUrlProd}/raw-material-purchase-history';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branchId': branchId.toString(),
@@ -284,7 +284,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
   
 @override
   Future<MaterialDetailResponse> getMaterialDetail(int branchId, int materialId) async {
-    final url = '${URLs.baseUrlMock}/material-detail';
+    final url = '${URLs.baseUrlProd}/material-detail';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branchId': branchId.toString(),
@@ -305,7 +305,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
   
   @override
   Future<RawMaterialPurchasesResponse> getRawMaterialPurcases(int branchId) async {
-    const url = '${URLs.baseUrlMock}/purchases';
+    const url = '${URLs.baseUrlProd}/purchases';
     
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
@@ -330,7 +330,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
   @override
   Future<AddRawMaterialResponse> addRawMaterial(AddRawMaterialRequest request) async {
-    const url = '${URLs.baseUrlMock}/stock-type';
+    const url = '${URLs.baseUrlProd}/stock';
     
     final response = await client.post(
       Uri.parse(url),
@@ -341,7 +341,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
       body: json.encode(request.toJson()),
     ).timeout(const Duration(seconds: 30));
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 201 || response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return AddRawMaterialResponse.fromJson(jsonResponse);
     } else if (response.statusCode >= 400 && response.statusCode < 500) {
@@ -354,7 +354,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
   @override
   Future<RawMaterialTypeResponse> getRawMaterialTypes(int branchId) async {
-    const url = '${URLs.baseUrlMock}/stock-type';
+    const url = '${URLs.baseUrlProd}/stock-type';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),
@@ -375,7 +375,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
   @override
   Future<AddVendorResponse> addVendor(AddVendorRequest request) async {
-    const url = '${URLs.baseUrlMock}/vendors';
+    const url = '${URLs.baseUrlProd}/vendors';
     final response = await client.post(
       Uri.parse(url),
       headers: {
@@ -385,7 +385,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
       body: json.encode(request.toJson()),
     ).timeout(const Duration(seconds: 30));
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 201 || response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       return AddVendorResponse.fromJson(jsonResponse);
     } else if (response.statusCode >= 400 && response.statusCode < 500) {
@@ -399,7 +399,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
   @override
   Future<VendorListResponse> getVendors(int branchId) async {
-    const url = '${URLs.baseUrlMock}/vendors';
+    const url = '${URLs.baseUrlProd}/vendors';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),
@@ -420,7 +420,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
   @override
   Future<RunningOutStockResponse> getRunningOutStock(int branchId) async {
-    const url = '${URLs.baseUrlMock}/stock-running-out';
+    const url = '${URLs.baseUrlProd}/stock-running-out';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),
@@ -441,7 +441,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
    @override
   Future<ExpiredStockResponse> getExpiredStock(int branchId) async {
-    const url = '${URLs.baseUrlMock}/expired-stock';
+    const url = '${URLs.baseUrlProd}/expired-stock';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),
@@ -462,7 +462,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
   @override
   Future<StockistRecentPurchasesResponse> getStockistRecentPurchases(int branchId) async {
-    const url = '${URLs.baseUrlMock}/stockist-recent-purchases';
+    const url = '${URLs.baseUrlProd}/stockist-recent-purchases';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),
@@ -482,7 +482,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
 
   @override
   Future<StockistSummaryResponse> getStockistSummary(int branchId) async {
-    const url = '${URLs.baseUrlMock}/stockist-summary';
+    const url = '${URLs.baseUrlProd}/stockist-summary';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString(),

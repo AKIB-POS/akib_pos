@@ -12,7 +12,7 @@ class AddEquipmentTypeRequest {
   Map<String, dynamic> toJson() {
     return {
       'branch_id': branchId.toString(),
-      'name': name,
+      'raw_material_name': name,
       'category': category,
     };
   }

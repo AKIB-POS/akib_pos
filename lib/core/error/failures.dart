@@ -15,7 +15,9 @@ class CacheFailure extends Failure {
 
   CacheFailure(this.message) : super([message]);
 }
-class NetworkFailure extends Failure {}
+class NetworkFailure extends Failure {
+  NetworkFailure(String s);
+}
 class GeneralFailure extends Failure {
   final String message;
 

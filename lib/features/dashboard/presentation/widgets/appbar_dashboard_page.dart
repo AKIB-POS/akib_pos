@@ -23,7 +23,7 @@ class AppbarDashboardPage extends StatelessWidget {
   Widget build(BuildContext context) {
      bool isTablet = isTabletDevice(context);
     return Padding(
-      padding: isTablet ? const EdgeInsets.symmetric(vertical: 8) : const EdgeInsets.only(top:4,bottom: 4),
+      padding: isTablet ? const EdgeInsets.symmetric(vertical: 8) : const EdgeInsets.only(top:4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,

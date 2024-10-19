@@ -4,8 +4,21 @@ import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/a
 import 'package:akib_pos/features/dashboard/data/models/branch.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/branch_interaction_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_branches_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_accounting_summary_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_summary_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_summary_stock_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_top_products_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_purchase_chart_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/bloc/get_sales_chart_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/widgets/appbar_dashboard_page.dart';
 import 'package:akib_pos/features/dashboard/presentation/widgets/branch_info.dart';
+import 'package:akib_pos/features/dashboard/presentation/widgets/dashboard_accounting_summary_widget.dart';
+import 'package:akib_pos/features/dashboard/presentation/widgets/dashboard_hrd_summary_widget.dart';
+import 'package:akib_pos/features/dashboard/presentation/widgets/dashboard_stock_summary_widget.dart';
+import 'package:akib_pos/features/dashboard/presentation/widgets/purchase_chart_widget.dart';
+import 'package:akib_pos/features/dashboard/presentation/widgets/sales_chart_widget.dart';
+import 'package:akib_pos/features/dashboard/presentation/widgets/top_product_widget.dart';
+import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:akib_pos/features/home/widget/my_drawer.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,235 +32,274 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-
-  bool isTabletDevice(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final width = mediaQuery.size.width;
-    final height = mediaQuery.size.height;
-
-    final aspectRatio = width / height;
-
-    return aspectRatio >= 1.0 && width >= 600;
-  }
-
   late final BranchInteractionCubit _branchInteractionCubit;
   String? selectedBranchName;
   int? selectedBranchId;
   bool isLoading = true;
   final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
 
+ 
+
+
   @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.backgroundGrey,
+      drawer: MyDrawer(),
+      body: RefreshIndicator(
+        color: AppColors.primaryMain,
+        onRefresh: _onRefresh, // Pull-to-refresh handler
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            children: [
+          
+             BranchInfo(onTap: () => _showBranchPicker(context)),
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: DashboardAccountingSummaryWidget(branchId: selectedBranchId ?? 1),
+              ),
+              const SizedBox(height: 12),
+              TopProductWidget(branchId: selectedBranchId ?? 1),
+              const SizedBox(height: 12),
+              SalesChartWidget(branchId: selectedBranchId ?? 1),
+              const SizedBox(height: 12),
+              PurchaseChartWidget(branchId: selectedBranchId ?? 1),
+              const SizedBox(height: 12),
+              DashboardHrdSummaryWidget(branchId: selectedBranchId ?? 1),
+              const SizedBox(height: 12),
+              DashboardStockSummaryWidget(branchId: selectedBranchId ?? 1),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+   @override
   void initState() {
     super.initState();
     _branchInteractionCubit = BranchInteractionCubit(authSharedPref: _authSharedPref);
     _loadInitialBranch();
   }
 
- Future<void> _loadInitialBranch() async {
-  // Ambil branch list dari _authSharedPref
-  final branchList = _authSharedPref.getBranchList();
+  
 
-  if (branchList.isNotEmpty) {
-    // Jika data cabang sudah ada, langsung gunakan dari cache
-    final branchId = _authSharedPref.getBranchId();
-
-    final branch = branchList.firstWhere(
-      (b) => b.id == branchId,
-      orElse: () => branchList[0],  // Gunakan branch pertama jika tidak ditemukan
-    );
-
-    setState(() {
-      selectedBranchId = branchId;
-      selectedBranchName = branch.branchName;
-      isLoading = false;
-    });
-
-    _branchInteractionCubit.selectBranch(branch);
-  } else {
-    // Jika tidak ada data lokal, fetch dari internet
-    await _fetchAndSaveBranches();
-  }
+   Future<void> _onRefresh() async {
+  // Run both fetch operations concurrently using Future.wait
+  await Future.wait([
+    context.read<GetDashboardAccountingSummaryCubit>().fetchAccountingSummary(
+          branchId: selectedBranchId ?? 1,
+        ),
+    context.read<GetDashboardTopProductsCubit>().fetchTopProducts(
+          branchId: selectedBranchId ?? 1,
+        ),
+    context.read<GetSalesChartCubit>().fetchSalesChart(
+          branchId: selectedBranchId ?? 1,
+        ),
+    context.read<GetPurchaseChartCubit>().fetchPurchaseChart(
+          branchId: selectedBranchId ?? 1,
+        ),
+    context.read<GetDashboardSummaryHrdCubit>().fetchDashboardHrdSummary(
+          branchId: selectedBranchId ?? 1,
+        ),
+    context.read<GetDashboardSummaryStockCubit>().fetchDashboardStockSummary(
+          branchId: selectedBranchId ?? 1,
+        ),
+    context.read<GetBranchesCubit>().fetchBranches(
+        ),
+  ]);
 }
 
 
 
-Future<void> _fetchAndSaveBranches() async {
-  final cubit = context.read<GetBranchesCubit>();
+  //  Future<void> _loadInitialBranch() async {
+  //   final branchList = _authSharedPref.getBranchList();
 
-  // Fetch data dari internet
-  await cubit.fetchBranches();
+  //   if (branchList.isNotEmpty) {
+  //     final branchId = _authSharedPref.getBranchId();
 
-  if (cubit.state is GetBranchesLoaded) {
-    final branches = (cubit.state as GetBranchesLoaded).branchesResponse.branches;
+  //     final branch = branchList.firstWhere(
+  //       (b) => b.id == branchId,
+  //       orElse: () => branchList[0],
+  //     );
 
-    if (branches.isNotEmpty) {
-      final selectedBranch = branches[0];
+  //     setState(() {
+  //       selectedBranchId = branchId;
+  //       selectedBranchName = branch.branchName;
+  //       isLoading = false;
+  //     });
+
+  //     _branchInteractionCubit.selectBranch(branch);
+
+  //     // Fetch accounting summary setelah memilih branch
+  //     _onRefresh();
+  //   } else {
+  //     await _fetchAndSaveBranches();
+  //   }
+  // }
+   Future<void> _loadInitialBranch() async {
+    // Panggil cubit fetchBranches di sini
+  
+    final branchList = _authSharedPref.getBranchList();
+
+    if (branchList.isNotEmpty) {
+      final branchId = _authSharedPref.getBranchId();
+
+      final branch = branchList.firstWhere(
+        (b) => b.id == branchId,
+        orElse: () => branchList[0],
+      );
 
       setState(() {
-        selectedBranchId = selectedBranch.id;
-        selectedBranchName = selectedBranch.branchName;
+        selectedBranchId = branchId;
+        selectedBranchName = branch.branchName;
         isLoading = false;
       });
 
-      // Simpan data ke SharedPreferences setelah fetch
-      _authSharedPref.saveBranchId(selectedBranch.id);
-      _authSharedPref.saveBranchList(branches);
+      _branchInteractionCubit.selectBranch(branch);
 
-      _branchInteractionCubit.selectBranch(selectedBranch);
+      // Fetch accounting summary setelah memilih branch
+      _onRefresh();
+    }else{
+       _onRefresh();
     }
-  } else {
-    // Jika fetch gagal, handle error dan matikan loading
-    setState(() {
-      isLoading = false;
-    });
   }
-}
 
-Future<void> _showBranchPicker(BuildContext context) async {
-  final branchInteractionCubit = context.read<BranchInteractionCubit>();
+  // Future<void> _fetchAndSaveBranches() async {
+  //   final cubit = context.read<GetBranchesCubit>();
+  //   await cubit.fetchBranches();
 
-  // Ambil branch list dari _authSharedPref
-  final branchList = _authSharedPref.getBranchList();
+  //   if (cubit.state is GetBranchesLoaded) {
+  //     final branches = (cubit.state as GetBranchesLoaded).branchesResponse.branches;
 
-  // Inisialisasi dengan nama branch yang sedang terpilih dari cubit
-  String? tempSelectedBranchName = branchInteractionCubit.state.branchName;
+  //     if (branches.isNotEmpty) {
+  //       final selectedBranch = branches[0];
 
-  await showModalBottomSheet(
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(12),
-      ),
-    ),
-    backgroundColor: Colors.white,
-    context: context,
-    builder: (context) {
-      return StatefulBuilder(
-        builder: (BuildContext context, StateSetter setState) {
-          return Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  height: 8,
-                  width: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: AppColors.textGrey300,
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Pilih Branch',
-                        style: AppTextStyle.headline5,
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Expanded(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: branchList.length,
-                    itemBuilder: (context, index) {
-                      final branch = branchList[index];
-                      return RadioListTile<String>(
-                        title: Text(branch.branchName),
-                        value: branch.branchName,
-                        groupValue: tempSelectedBranchName,
-                        activeColor: AppColors.primaryMain,
-                        onChanged: (String? value) {
-                          setState(() {
-                            tempSelectedBranchName = value;
-                          });
-                        },
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryMain,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      if (tempSelectedBranchName != null) {
-                        final selectedBranch = branchList.firstWhere(
-                          (b) => b.branchName == tempSelectedBranchName,
-                        );
+  //       setState(() {
+  //         selectedBranchId = selectedBranch.id;
+  //         selectedBranchName = selectedBranch.branchName;
+  //         isLoading = false;
+  //       });
 
-                        // Update the cubit with the selected branch
-                        branchInteractionCubit.selectBranch(selectedBranch);
-                      }
-                    },
-                    child: const Text(
-                      'Terapkan',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-    },
-  );
-}
+  //       _authSharedPref.saveBranchId(selectedBranch.id);
+  //       _authSharedPref.saveBranchList(branches);
 
+  //       _branchInteractionCubit.selectBranch(selectedBranch);
 
+  //       // Fetch accounting summary setelah memilih branch
+  //       _onRefresh();
+  //     }
+  //   } else {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
+ 
 
+  Future<void> _showBranchPicker(BuildContext context) async {
+    final branchInteractionCubit = context.read<BranchInteractionCubit>();
+    final branchList = _authSharedPref.getBranchList();
+    String? tempSelectedBranchName = branchInteractionCubit.state.branchName;
 
-  @override
-  Widget build(BuildContext context) {
-    bool isTablet = isTabletDevice(context);
-    return Scaffold(
-      backgroundColor: AppColors.backgroundGrey,
-      drawer: MyDrawer(),
-      appBar: PreferredSize(
-        preferredSize: isTablet ? Size.fromHeight(8.h) : Size.fromHeight(10.h),
-        child: AppBar(
-          backgroundColor: Colors.white,
-          surfaceTintColor: Colors.white,
-          automaticallyImplyLeading: false,
-          elevation: 0,
-          flexibleSpace: SafeArea(
-            child: AppbarDashboardPage(),
-          ),
+    await showModalBottomSheet(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(12),
         ),
       ),
-      body: Column(
-        children: [
-          isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : BranchInfo(
-                  onTap: () => _showBranchPicker(context),
-                ),
-          const Expanded(
-            child: Center(
-              child: Text('Welcome to Dashboard'),
-            ),
-          ),
-        ],
-      ),
+      backgroundColor: Colors.white,
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    height: 8,
+                    width: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: AppColors.textGrey300,
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Pilih Branch',
+                          style: AppTextStyle.headline5,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: branchList.length,
+                      itemBuilder: (context, index) {
+                        final branch = branchList[index];
+                        return RadioListTile<String>(
+                          title: Text(branch.branchName),
+                          value: branch.branchName,
+                          groupValue: tempSelectedBranchName,
+                          activeColor: AppColors.primaryMain,
+                          onChanged: (String? value) {
+                            setState(() {
+                              tempSelectedBranchName = value;
+                            });
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryMain,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        if (tempSelectedBranchName != null) {
+                          final selectedBranch = branchList.firstWhere(
+                            (b) => b.branchName == tempSelectedBranchName,
+                          );
+
+                          branchInteractionCubit.selectBranch(selectedBranch);
+                          _onRefresh();
+                        }
+                      },
+                      child: const Text(
+                        'Terapkan',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
