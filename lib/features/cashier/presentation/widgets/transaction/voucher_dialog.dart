@@ -95,7 +95,7 @@ class _VoucherDialogState extends State<VoucherDialog> {
 
                     Navigator.of(context).pop(); // Close the dialog
                   } else if (state is VoucherError) {
-                    DInfo.snackBarError(context, "Gagal Menerapkan Diskon");
+                    DInfo.toastError("Gagal Menerapkan/Diskon Tidak Valid");
                   }
                 },
                 child: SingleChildScrollView(

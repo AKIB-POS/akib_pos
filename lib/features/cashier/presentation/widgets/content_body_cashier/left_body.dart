@@ -64,6 +64,7 @@ class _LeftBodyState extends State<LeftBody> {
             );
           });
         }
+      
 
         return RefreshIndicator(
           color: AppColors.primaryMain,

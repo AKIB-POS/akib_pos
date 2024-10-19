@@ -75,6 +75,10 @@ dependencies:
   photo_view: ^0.15.0
   fl_chart: ^0.69.0
   device_info_plus: ^11.0.0
+  webview_flutter: ^4.9.0
+  webview_flutter_android: ^3.16.9
+  webview_flutter_wkwebview: ^3.16.0
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:
@@ -127,7 +131,7 @@ flutter:
     - assets/images/hrd/
     - assets/images/stockist/
     - assets/icons/setting/
-    
+    - assets/images/setting/    
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

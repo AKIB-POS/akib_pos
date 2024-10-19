@@ -12,7 +12,7 @@ class AddRawMaterialRequest {
   Map<String, dynamic> toJson() {
     return {
       'branch_id': branchId,
-      'name': name,
+      'raw-material-name': name,
       'category': category,
     };
   }

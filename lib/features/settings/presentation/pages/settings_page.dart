@@ -3,7 +3,10 @@ import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/home/widget/my_drawer.dart';
 import 'package:akib_pos/features/settings/presentation/pages/change_password_page.dart';
+import 'package:akib_pos/features/settings/presentation/pages/help_page.dart';
 import 'package:akib_pos/features/settings/presentation/pages/personal_information_page.dart';
+import 'package:akib_pos/features/settings/presentation/pages/privacy_policy_page.dart';
+import 'package:akib_pos/features/settings/presentation/pages/terms_agreement_page.dart';
 import 'package:akib_pos/features/settings/presentation/widgets/appbar_setting_content.dart';
 import 'package:akib_pos/util/utils.dart';
 import 'package:flutter/material.dart';
@@ -66,14 +69,14 @@ class _SettingPageState extends State<SettingPage> {
               title: "Kebijakan Privasi",
               iconPath: "assets/icons/setting/ic_privacy_policy.svg",
               onTap: () {
-                // Action for Kebijakan Privasi
+                Utils.navigateToPage(context, PrivacyPolicyPage());
               },
             ),
             _buildSettingsItem(
               title: "Syarat dan Ketentuan",
               iconPath: "assets/icons/setting/ic_terms_condition.svg",
               onTap: () {
-                // Action for Syarat dan Ketentuan
+                Utils.navigateToPage(context, TermsAgreementPage());
               },
             ),
             _buildSettingsItem(
@@ -81,6 +84,7 @@ class _SettingPageState extends State<SettingPage> {
               iconPath: "assets/icons/setting/ic_help.svg",
               onTap: () {
                 // Action for Bantuan
+                Utils.navigateToPage(context, HelpPage());
               },
             ),
           ],

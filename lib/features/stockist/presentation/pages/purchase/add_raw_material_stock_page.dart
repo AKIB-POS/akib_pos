@@ -30,7 +30,7 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
    final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
 
   int? rawMaterialId;
-  String? unitName; // Instead of unitId, we now store the unitName
+  int? unitId; // Instead of unitId, we now store the unitName
   int? vendorId;
   int? warehouseId;
   int? orderStatusId;
@@ -119,7 +119,7 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
 
   bool _isFormValid() {
     return rawMaterialId != null &&
-        unitName != null && // Checking unitName instead of unitId
+        unitId != null && // Checking unitName instead of unitId
         vendorId != null &&
         warehouseId != null &&
         orderStatusId != null &&
@@ -134,13 +134,15 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
       final AddRawMaterialStockRequest stockRequest =
           AddRawMaterialStockRequest(
         branchId: _authSharedPref.getBranchId() ?? 1, // Replace with actual branch ID
-        materialId: rawMaterialId!,
+        ingredientId: rawMaterialId!,
+        itemName: null,
         quantity: quantity!,
-        unitName: unitName!, // Pass unitName instead of unitId
+        unitId: unitId!, // Pass unitName instead of unitId
         price: price!,
         vendorId: vendorId!,
         warehouseId: warehouseId!,
         orderStatusId: orderStatusId!,
+        itemType: "ingredient",
         purchaseDate: _formatDate(purchaseDate!),
         expiryDate: _formatDate(expiryDate!),
       );
@@ -251,30 +253,36 @@ class _AddRawMaterialStockPageState extends State<AddRawMaterialStockPage> {
                         const Text('Satuan', style: AppTextStyle.bigCaptionBold),
                         const SizedBox(height: 8),
                         BlocBuilder<GetUnitCubit, GetUnitState>(
-                          builder: (context, state) {
-                            if (state is GetUnitLoading) {
-                              return _loadingDropdown();
-                            } else if (state is GetUnitLoaded) {
-                              return _buildDropdown<String>(
-                                value: unitName, // Now store unitName
-                                hint: 'Pilih Satuan',
-                                items: state.unitsResponse.units.map((unit) {
-                                  return DropdownMenuItem<String>(
-                                    value: unit.unitName, // Store unitName
-                                    child: Text(unit.unitName),
-                                  );
-                                }).toList(),
-                                onChanged: (value) {
-                                  setState(() {
-                                    unitName = value;
-                                  });
-                                },
-                              );
-                            } else {
-                              return _errorDropdown();
-                            }
-                          },
-                        ),
+  builder: (context, state) {
+    if (state is GetUnitLoading) {
+      return _loadingDropdown();
+    } else if (state is GetUnitLoaded) {
+      // Pastikan unitId ter-set dengan benar dan ada di items
+      if (unitId == null || !state.unitsResponse.units.any((unit) => unit.unitId == unitId)) {
+        unitId = state.unitsResponse.units.first.unitId;  // Set unitId ke nilai pertama jika null atau tidak cocok
+      }
+      
+      return _buildDropdown<int>(
+        value: unitId, // Use the unitId from API
+        hint: 'Pilih Satuan',
+        items: state.unitsResponse.units.map((unit) {
+          return DropdownMenuItem<int>(
+            value: unit.unitId,  // Use unitId from API
+            child: Text(unit.unitName),
+          );
+        }).toList(),
+        onChanged: (value) {
+          setState(() {
+            unitId = value;
+          });
+        },
+      );
+    } else {
+      return _errorDropdown();
+    }
+  },
+),
+
                       ],
                     ),
                   ),

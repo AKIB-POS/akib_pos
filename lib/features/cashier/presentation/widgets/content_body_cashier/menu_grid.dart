@@ -1,5 +1,6 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
 import 'package:akib_pos/features/cashier/data/models/menu_item_exmpl.dart';
 import 'package:akib_pos/features/cashier/data/models/product_model.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/cashier_cubit.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get_it/get_it.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
 
@@ -20,6 +22,7 @@ class MenuGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
     return BlocBuilder<CashierCubit, CashierState>(
       builder: (context, state) {
         final menuItems = context.read<CashierCubit>().filteredItems;
@@ -27,6 +30,9 @@ class MenuGrid extends StatelessWidget {
         // Cek apakah status kasir "close"
         if (state.cashRegisterStatus == "close") {
           return _buildClosedCashierView(context);
+        }
+        if (state.cashRegisterStatus == "open" && _authSharedPref.getCachedCashRegisterId() == null ) {
+          return _buildMustOpenCashierView(context);
         }
 
         if (menuItems.isEmpty) {
@@ -104,6 +110,41 @@ class MenuGrid extends StatelessWidget {
               },
               child: const Text('Buka Kasir'),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+  Widget _buildMustOpenCashierView(BuildContext context) {
+    return SingleChildScrollView(
+      child: Container(
+        alignment: Alignment.center,
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom + 15.h,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: 8.h,
+            ),
+            SvgPicture.asset(
+              "assets/icons/ic_open_cashier.svg",
+              height: 12.h,
+              width: 12.h,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Tidak Dapat Melakukan Transaksi',
+              style: AppTextStyle.headline5,
+            ),
+            const Text(
+              'Perangkat Lain Telah Membuka Kasir Dengan Akun Yang Sama\nTutup Kasir Di Perangkat Tersebut Untuk Dapat Melakkukan Transaksi\nPada Perangkat Ini',
+              style: AppTextStyle.body3,
+              textAlign: TextAlign.center,
+            ),
+            
           ],
         ),
       ),

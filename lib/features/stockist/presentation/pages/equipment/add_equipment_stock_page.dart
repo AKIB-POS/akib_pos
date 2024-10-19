@@ -30,7 +30,7 @@ class _AddEquipmentStockPageState extends State<AddEquipmentStockPage> {
   final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
 
   int? equipmentId;
-  String? unitName;
+  int? unitId;
   int? vendorId;
   int? warehouseId;
   int? orderStatusId;
@@ -114,7 +114,7 @@ class _AddEquipmentStockPageState extends State<AddEquipmentStockPage> {
 
   bool _isFormValid() {
     return equipmentId != null &&
-        unitName != null &&
+        unitId != null &&
         vendorId != null &&
         warehouseId != null &&
         orderStatusId != null &&
@@ -128,13 +128,15 @@ class _AddEquipmentStockPageState extends State<AddEquipmentStockPage> {
       final AddEquipmentStockRequest stockRequest =
           AddEquipmentStockRequest(
         branchId: _authSharedPref.getBranchId() ?? 0 , // Replace with actual branch ID
-        equipmentId: equipmentId!,
+        ingredientId: equipmentId!,
         quantity: quantity!,
-        unitName: unitName!,
+        unitId: unitId!,
         price: price!,
         vendorId: vendorId!,
         warehouseId: warehouseId!,
         orderStatusId: orderStatusId!,
+        expiryDate: null,
+        itemType: "equipment",
         purchaseDate: _formatDate(purchaseDate!),
       );
 
@@ -248,18 +250,18 @@ class _AddEquipmentStockPageState extends State<AddEquipmentStockPage> {
                             if (state is GetUnitLoading) {
                               return _loadingDropdown();
                             } else if (state is GetUnitLoaded) {
-                              return _buildDropdown<String>(
-                                value: unitName,
+                              return _buildDropdown<int>(
+                                value: unitId,
                                 hint: 'Pilih Satuan',
                                 items: state.unitsResponse.units.map((unit) {
-                                  return DropdownMenuItem<String>(
-                                    value: unit.unitName,
+                                  return DropdownMenuItem<int>(
+                                    value: unit.unitId,
                                     child: Text(unit.unitName),
                                   );
                                 }).toList(),
                                 onChanged: (value) {
                                   setState(() {
-                                    unitName = value;
+                                    unitId = value;
                                   });
                                 },
                               );

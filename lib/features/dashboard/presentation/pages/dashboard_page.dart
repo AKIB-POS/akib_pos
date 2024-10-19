@@ -53,9 +53,8 @@ class _DashboardPageState extends State<DashboardPage> {
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
-              isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : BranchInfo(onTap: () => _showBranchPicker(context)),
+          
+             BranchInfo(onTap: () => _showBranchPicker(context)),
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: DashboardAccountingSummaryWidget(branchId: selectedBranchId ?? 1),
@@ -161,6 +160,8 @@ class _DashboardPageState extends State<DashboardPage> {
 
       // Fetch accounting summary setelah memilih branch
       _onRefresh();
+    }else{
+       _onRefresh();
     }
   }
 
