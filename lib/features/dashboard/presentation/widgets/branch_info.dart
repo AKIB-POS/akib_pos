@@ -14,35 +14,14 @@ class BranchInfo extends StatelessWidget {
 
   const BranchInfo({Key? key, required this.onTap}) : super(key: key);
   
-  bool isTabletDevice(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final width = mediaQuery.size.width;
-    final height = mediaQuery.size.height;
-    final aspectRatio = width / height;
 
-    return aspectRatio >= 1.0 && width >= 600;
-  }
 
   @override
   Widget build(BuildContext context) {
-    bool isTablet = isTabletDevice(context);
     return Container(
       color: Colors.white,
       child: Column(
         children: [
-          PreferredSize(
-            preferredSize:
-                isTablet ? Size.fromHeight(8.h) : Size.fromHeight(10.h),
-            child: AppBar(
-              backgroundColor: Colors.white,
-              surfaceTintColor: Colors.white,
-              automaticallyImplyLeading: false,
-              elevation: 0,
-              flexibleSpace: SafeArea(
-                child: AppbarDashboardPage(),
-              ),
-            ),
-          ),
           GestureDetector(
             onTap: onTap,
             child: BlocBuilder<GetBranchesCubit, GetBranchesState>(
@@ -53,7 +32,7 @@ class BranchInfo extends StatelessWidget {
                 } else {
                   // Tampilkan branch yang sudah dipilih atau default
                   return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.only(left: 16,right: 16, bottom: 16,top: 16),
                     margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
                     decoration: BoxDecoration(
                       color: AppColors.primaryBackgorund,

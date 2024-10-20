@@ -9,10 +9,10 @@ class AuthCubit extends Cubit<AuthState> {
 
   AuthCubit(this._authRepository) : super(AuthInitial());
 
-  Future<void> login(String email, String password) async {
+  Future<void> login(String email, String password, bool isCashier) async {
     emit(AuthLoading());
 
-    final result = await _authRepository.login(email, password);
+    final result = await _authRepository.login(email, password,isCashier);
 
     result.fold(
       (failure) {
