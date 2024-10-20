@@ -1,6 +1,7 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
+import 'package:akib_pos/features/auth/data/models/login_response.dart';
 import 'package:akib_pos/features/auth/presentation/pages/auth_page.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
 import 'package:flutter/material.dart';
@@ -15,9 +16,11 @@ class MyDrawer extends StatelessWidget {
 
   final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
 
+  
   @override
   Widget build(BuildContext context) {
-    String cafeInitials = getInitials(_authSharedPref.getCompanyName() ?? "");
+    MobilePermissions? mobilePermissions = _authSharedPref.getMobilePermissions();
+
     return Drawer(
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.white,
@@ -29,43 +32,40 @@ class MyDrawer extends StatelessWidget {
       ),
       child: Column(
         children: [
+          // Drawer Header
           CustomDrawerHeader(
             cafeName: _authSharedPref.getCompanyName() ?? "",
             ownerName: _authSharedPref.getEmployeeName() ?? "",
-            cafeInitials: cafeInitials,
-            iconPath: "assets/icons/ic_app.svg", // Replace with your icon asset
+            cafeInitials: getInitials(_authSharedPref.getCompanyName() ?? ""),
+            iconPath: "assets/icons/ic_app.svg",
           ),
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(10.0), // Padding for the entire list
-              itemCount: menuTitles.length,
-              itemBuilder: (BuildContext context, int index) {
-                bool isSelected = BlocProvider.of<NavigationCubit>(context).state == index;
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 15), // Padding between each ListTile
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0), // Rounded corners for the ListTile
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0),
-                      tileColor: isSelected ? AppColors.primaryBackgorund : null,
-                      selected: isSelected,
-                      selectedTileColor: AppColors.primaryBackgorund.withOpacity(0.8),
-                      selectedColor: AppColors.primaryMain,
-                      title: Text(menuTitles[index]),
-                      leading: SvgPicture.asset(
-                        iconTitles[index],
-                        width: 2.h,
-                        height: 2.h,
-                        colorFilter: isSelected ? const ColorFilter.mode(AppColors.primaryMain, BlendMode.srcIn) : const ColorFilter.mode(AppColors.textGrey600, BlendMode.srcIn),
-                      ),
-                      onTap: () {
-                        BlocProvider.of<NavigationCubit>(context).navigateTo(index);
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ),
-                );
-              },
+            child: ListView(
+              padding: const EdgeInsets.all(10.0),
+              children: [
+                // Dashboard
+                // if (mobilePermissions?.dashboard.isNotEmpty ?? false)
+                  _buildMenuItem(context, "Dashboard", "assets/icons/ic_dashboard.svg", 0),
+                
+                // Kasir
+                if(mobilePermissions?.cashier != null)
+                  _buildMenuItem(context, "Kasir", "assets/icons/ic_kasir.svg", 1),
+
+                // HRD - Hidden if mobilePermissions.hrd is empty
+                if (mobilePermissions?.hrd.isNotEmpty ?? false)
+                  _buildMenuItem(context, "HRD", "assets/icons/ic_hrd.svg", 2),
+
+                // Akunting
+                if (mobilePermissions?.accounting.isNotEmpty ?? false)
+                  _buildMenuItem(context, "Akunting", "assets/icons/ic_akunting.svg", 3),
+
+                // Stockist
+                if (mobilePermissions?.stockist.isNotEmpty ?? false)
+                  _buildMenuItem(context, "Stockist", "assets/icons/ic_stockist.svg", 4),
+
+                // Settings
+                _buildMenuItem(context, "Settings", "assets/icons/ic_pengaturan.svg", 5),
+              ],
             ),
           ),
           Divider(),
@@ -73,16 +73,45 @@ class MyDrawer extends StatelessWidget {
             leading: Icon(Icons.logout),
             title: Text('Logout'),
             onTap: () async {
-              // Handle logout logic
               await _authSharedPref.clearLoginResponse(); // Clear login data
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => AuthPage()), // Navigate to login page
-                (Route<dynamic> route) => false, // Remove all previous routes
+                MaterialPageRoute(builder: (context) => AuthPage()),
+                (Route<dynamic> route) => false,
               );
             },
           ),
         ],
+      ),
+    );
+  }
+  Widget _buildMenuItem(BuildContext context, String title, String iconPath, int index) {
+    bool isSelected = BlocProvider.of<NavigationCubit>(context).state == index;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8.0),
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0),
+          tileColor: isSelected ? AppColors.primaryBackgorund : null,
+          selected: isSelected,
+          selectedTileColor: AppColors.primaryBackgorund.withOpacity(0.8),
+          selectedColor: AppColors.primaryMain,
+          title: Text(title),
+          leading: SvgPicture.asset(
+            iconPath,
+            width: 2.h,
+            height: 2.h,
+            colorFilter: isSelected
+                ? const ColorFilter.mode(AppColors.primaryMain, BlendMode.srcIn)
+                : const ColorFilter.mode(AppColors.textGrey600, BlendMode.srcIn),
+          ),
+          onTap: () {
+            BlocProvider.of<NavigationCubit>(context).navigateTo(index);
+            Navigator.pop(context);
+          },
+        ),
       ),
     );
   }

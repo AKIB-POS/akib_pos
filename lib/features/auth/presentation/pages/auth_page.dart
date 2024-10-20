@@ -147,7 +147,7 @@ class _AuthPage extends State<AuthPage> {
    
   }
 
-  void _login(BuildContext context) async{
+  void _login(BuildContext context, bool isCashier) async{
     _unfocusAllFields();
 
     if (_formKey.currentState?.saveAndValidate() ?? false) {
@@ -158,7 +158,7 @@ class _AuthPage extends State<AuthPage> {
    final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
 
-      context.read<AuthCubit>().login(email, password);
+      context.read<AuthCubit>().login(email, password,isCashier);
     } else {
       // Handle jika izin tidak diberikan
       setState(() {
@@ -376,7 +376,7 @@ class _AuthPage extends State<AuthPage> {
                       borderRadius: BorderRadius.circular(4.0),
                     ),
                   ),
-                  onPressed: _isLoading ? null : () => _login(context),
+                  onPressed: _isLoading ? null : () => _login(context,false),
                   child: Container(
                     width: double.infinity,
                     alignment: Alignment.center,
@@ -389,18 +389,38 @@ class _AuthPage extends State<AuthPage> {
                     ),
                   ),
                 ),
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      currentSteps = 0;
-                      currentPage = currentPage == "Login" ? "Register" : "Login";
-                    });
-                  },
-                  child: Text(
-                    "Belum punya akun? daftar di sini",
-                    style: AppTextStyle.body2.copyWith(color: AppColors.primaryMain),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryMain,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4.0),
+                    ),
+                  ),
+                  onPressed: _isLoading ? null : () => _login(context,true),
+                  child: Container(
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    child: Text(
+                      "Masuk Sebagai Kasir",
+                      style: AppTextStyle.body2.copyWith(
+                        color: AppColors.backgroundWhite,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ),
+                // TextButton(
+                //   onPressed: () {
+                //     setState(() {
+                //       currentSteps = 0;
+                //       currentPage = currentPage == "Login" ? "Register" : "Login";
+                //     });
+                //   },
+                //   child: Text(
+                //     "Belum punya akun? daftar di sini",
+                //     style: AppTextStyle.body2.copyWith(color: AppColors.primaryMain),
+                //   ),
+                // ),
               ],
             ),
           ),

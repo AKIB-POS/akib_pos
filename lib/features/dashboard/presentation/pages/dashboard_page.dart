@@ -19,12 +19,14 @@ import 'package:akib_pos/features/dashboard/presentation/widgets/purchase_chart_
 import 'package:akib_pos/features/dashboard/presentation/widgets/sales_chart_widget.dart';
 import 'package:akib_pos/features/dashboard/presentation/widgets/top_product_widget.dart';
 import 'package:akib_pos/util/utils.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:akib_pos/features/home/widget/my_drawer.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:sizer/sizer.dart';
+import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svgProvider;
 
 class DashboardPage extends StatefulWidget {
   @override
@@ -40,40 +42,71 @@ class _DashboardPageState extends State<DashboardPage> {
 
  
 
+@override
+Widget build(BuildContext context) {
+  debugPrint("Current role: ${_authSharedPref.getEmployeeRole()}");
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.backgroundGrey,
-      drawer: MyDrawer(),
-      body: RefreshIndicator(
-        color: AppColors.primaryMain,
-        onRefresh: _onRefresh, // Pull-to-refresh handler
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(
-            children: [
-          
-             BranchInfo(onTap: () => _showBranchPicker(context)),
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: DashboardAccountingSummaryWidget(branchId: selectedBranchId ?? 1),
-              ),
-              const SizedBox(height: 12),
-              TopProductWidget(branchId: selectedBranchId ?? 1),
-              const SizedBox(height: 12),
-              SalesChartWidget(branchId: selectedBranchId ?? 1),
-              const SizedBox(height: 12),
-              PurchaseChartWidget(branchId: selectedBranchId ?? 1),
-              const SizedBox(height: 12),
-              DashboardHrdSummaryWidget(branchId: selectedBranchId ?? 1),
-              const SizedBox(height: 12),
-              DashboardStockSummaryWidget(branchId: selectedBranchId ?? 1),
-            ],
+  return Scaffold(
+    backgroundColor: AppColors.backgroundGrey,
+    drawer: MyDrawer(),
+    appBar: PreferredSize(
+        preferredSize: Size.fromHeight(8.h),
+        child: AppBar(
+          surfaceTintColor: Colors.white,
+          automaticallyImplyLeading: false,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          flexibleSpace: SafeArea(
+            child: AppbarDashboardPage(),
           ),
         ),
       ),
-    );
+    body: RefreshIndicator(
+      color: AppColors.primaryMain,
+      onRefresh: _onRefresh, // Pull-to-refresh handler
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            BranchInfo(onTap: () => _showBranchPicker(context)),
+            
+            
+            // Menggunakan ternary operator
+            if(_authSharedPref.getEmployeeRole() == "employee")
+              employeeItem(),
+          
+            if(_authSharedPref.getEmployeeRole() == "owner" || _authSharedPref.getEmployeeRole() == "manager")
+               dashboardItem()  // Jika employeeRole tidak null
+
+
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+
+  Column dashboardItem() {
+    return Column(
+              children: [
+                Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: DashboardAccountingSummaryWidget(branchId: selectedBranchId ?? 1),
+            ),
+            const SizedBox(height: 12),
+                TopProductWidget(branchId: selectedBranchId ?? 1),
+                const SizedBox(height: 12),
+                SalesChartWidget(branchId: selectedBranchId ?? 1),
+                const SizedBox(height: 12),
+                PurchaseChartWidget(branchId: selectedBranchId ?? 1),
+                const SizedBox(height: 12),
+                DashboardHrdSummaryWidget(branchId: selectedBranchId ?? 1),
+                const SizedBox(height: 12),
+                DashboardStockSummaryWidget(branchId: selectedBranchId ?? 1),
+              ],
+            );
   }
    @override
   void initState() {
@@ -112,31 +145,6 @@ class _DashboardPageState extends State<DashboardPage> {
 
 
 
-  //  Future<void> _loadInitialBranch() async {
-  //   final branchList = _authSharedPref.getBranchList();
-
-  //   if (branchList.isNotEmpty) {
-  //     final branchId = _authSharedPref.getBranchId();
-
-  //     final branch = branchList.firstWhere(
-  //       (b) => b.id == branchId,
-  //       orElse: () => branchList[0],
-  //     );
-
-  //     setState(() {
-  //       selectedBranchId = branchId;
-  //       selectedBranchName = branch.branchName;
-  //       isLoading = false;
-  //     });
-
-  //     _branchInteractionCubit.selectBranch(branch);
-
-  //     // Fetch accounting summary setelah memilih branch
-  //     _onRefresh();
-  //   } else {
-  //     await _fetchAndSaveBranches();
-  //   }
-  // }
    Future<void> _loadInitialBranch() async {
     // Panggil cubit fetchBranches di sini
   
@@ -165,37 +173,7 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  // Future<void> _fetchAndSaveBranches() async {
-  //   final cubit = context.read<GetBranchesCubit>();
-  //   await cubit.fetchBranches();
 
-  //   if (cubit.state is GetBranchesLoaded) {
-  //     final branches = (cubit.state as GetBranchesLoaded).branchesResponse.branches;
-
-  //     if (branches.isNotEmpty) {
-  //       final selectedBranch = branches[0];
-
-  //       setState(() {
-  //         selectedBranchId = selectedBranch.id;
-  //         selectedBranchName = selectedBranch.branchName;
-  //         isLoading = false;
-  //       });
-
-  //       _authSharedPref.saveBranchId(selectedBranch.id);
-  //       _authSharedPref.saveBranchList(branches);
-
-  //       _branchInteractionCubit.selectBranch(selectedBranch);
-
-  //       // Fetch accounting summary setelah memilih branch
-  //       _onRefresh();
-  //     }
-  //   } else {
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //   }
-  // }
- 
 
   Future<void> _showBranchPicker(BuildContext context) async {
     final branchInteractionCubit = context.read<BranchInteractionCubit>();
@@ -301,5 +279,41 @@ class _DashboardPageState extends State<DashboardPage> {
         );
       },
     );
+  }
+  
+  Widget employeeItem() {
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+                padding: const EdgeInsets.only(left: 16,top: 16),
+                child: Text("Dashboard",style: AppTextStyle.headline5.copyWith(fontWeight: FontWeight.bold),),
+              ),
+
+      Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 30),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        image: const DecorationImage(
+            image: ExtendedAssetImageProvider("assets/images/dashboard_welcome.png"),
+            fit: BoxFit.cover),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Selamat Datang",
+              style: AppTextStyle.caption.copyWith(color: Colors.white)),
+          const SizedBox(height: 10),
+          Text("Selamat Beraktifitas",
+              style: AppTextStyle.bigCaptionBold.copyWith(color: Colors.white)),
+        ],
+      ),
+    ),
+      ],
+    );
+
   }
 }

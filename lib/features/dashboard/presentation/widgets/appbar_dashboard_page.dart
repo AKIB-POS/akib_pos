@@ -18,12 +18,12 @@ class AppbarDashboardPage extends StatelessWidget {
 
     return aspectRatio >= 1.0 && width >= 600;
   }
-
-  @override
+ @override
   Widget build(BuildContext context) {
-     bool isTablet = isTabletDevice(context);
-    return Padding(
-      padding: isTablet ? const EdgeInsets.symmetric(vertical: 8) : const EdgeInsets.only(top:4),
+    return Container(
+  
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,

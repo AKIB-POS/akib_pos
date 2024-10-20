@@ -22,6 +22,8 @@ class AuthSharedPref {
   static const String cashRegisterIdKey = 'cashRegisterId';
   static const String isLoggedInKey = 'isLoggedIn';
   static const String branchListKey = 'branchList';
+  static const String mobilePermissionsKey = 'mobilePermissions';
+
 
   Future<void> saveLoginResponse(LoginResponse response) async {
     await _prefs.setBool(isLoggedInKey, true);
@@ -33,8 +35,26 @@ class AuthSharedPref {
     await _prefs.setString(emailKey, response.email ?? '');
     await _prefs.setString(roleKey, response.role ?? '');
     await _prefs.setString(employeeNameKey, response.employeeName);
-    await _prefs.setString(employeeRoleKey, response.employeeRole); // Save employeeRole
+    await _prefs.setString(employeeRoleKey, response.employeeRole);
     await _prefs.setStringList(permissionsKey, response.permissions);
+    await _prefs.setString(
+      mobilePermissionsKey, 
+      json.encode(response.mobilePermissions.toJson()), // Save mobilePermissions as JSON string
+    );
+  }
+
+  // Method to get mobilePermissions from SharedPreferences
+  MobilePermissions? getMobilePermissions() {
+    final String? mobilePermissionsJson = _prefs.getString(mobilePermissionsKey);
+    if (mobilePermissionsJson != null) {
+      return MobilePermissions.fromJson(json.decode(mobilePermissionsJson));
+    }
+    return null;
+  }
+
+  // Method to clear mobilePermissions from SharedPreferences
+  Future<void> clearMobilePermissions() async {
+    await _prefs.remove(mobilePermissionsKey);
   }
 
   Future<void> clearLoginResponse() async {
@@ -49,6 +69,7 @@ class AuthSharedPref {
     await _prefs.remove(employeeNameKey);
     await _prefs.remove(employeeRoleKey); // Clear employeeRole
     await _prefs.remove(permissionsKey);
+    await _prefs.remove(mobilePermissionsKey);
   }
 
   Future<void> closeCashier() async {
@@ -64,6 +85,7 @@ class AuthSharedPref {
     await _prefs.remove(employeeRoleKey); // Clear employeeRole
     await _prefs.remove(permissionsKey);
     await _prefs.remove(cashRegisterIdKey); // Clear cash register ID
+    await _prefs.remove(mobilePermissionsKey); // Clear cash register ID
   }
 
   Future<void> saveBranchList(List<Branch> branches) async {

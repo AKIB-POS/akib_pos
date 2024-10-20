@@ -7,7 +7,7 @@ import 'package:dartz/dartz.dart';
 
 
 abstract class AuthRepository {
-  Future<Either<Failure, LoginResponse>> login(String email, String password);
+  Future<Either<Failure, LoginResponse>> login(String email, String password, bool isCashier);
   
   Future<Either<Failure, bool>> register({
     required String username,
@@ -30,9 +30,9 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this._remoteDataSource, this._authSharedPref);
 
   @override
-  Future<Either<Failure, LoginResponse>> login(String email, String password) async {
+  Future<Either<Failure, LoginResponse>> login(String email, String password, bool isCashier) async {
     try {
-      final response = await _remoteDataSource.login(email: email, password: password);
+      final response = await _remoteDataSource.login(email: email, password: password,isCashier : isCashier);
       await _authSharedPref.saveLoginResponse(response);
       return Right(response);
     } on GeneralException catch (e) {

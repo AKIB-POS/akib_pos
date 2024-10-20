@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:akib_pos/api/urls.dart';
 import 'package:akib_pos/core/error/exceptions.dart';
 import 'package:akib_pos/features/auth/data/models/login_response.dart';
@@ -9,7 +11,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 abstract class RemoteAuthDataSource {
-  Future<LoginResponse> login({required String email, required String password});
+  Future<LoginResponse> login({required String email, required String password,required bool isCashier});
   Future<bool> register({
     required String username,
     required String email,
@@ -32,7 +34,7 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
   });
 
   @override
-  Future<LoginResponse> login({required String email, required String password}) async {
+  Future<LoginResponse> login({required String email, required String password, required bool isCashier}) async {
     String? deviceId;
     try {
       // Mengambil device ID dari Android atau iOS menggunakan device_info_plus
@@ -56,6 +58,7 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
         'email': email,
         'password': password,
         'device_id': deviceId,  // Tambahkan deviceId di sini
+        'is_cashier': isCashier,  // Tambahkan deviceId di sini
       }),
     );
 
