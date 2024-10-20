@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
+import 'package:akib_pos/features/auth/data/models/login_response.dart';
 import 'package:akib_pos/features/hrd/data/models/hrd_summary.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/hrd_summary_cubit.dart';
 import 'package:akib_pos/features/hrd/presentation/pages/submission/candidate/candidate_submission_page.dart';
@@ -21,6 +22,9 @@ class SummaryHRD extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Ambil mobile permissions dari AuthSharedPref
+    final MobilePermissions? permissions = _authSharedPref.getMobilePermissions();
+
     return BlocBuilder<HRDSummaryCubit, HRDSummaryState>(
       builder: (context, state) {
         if (state is HRDSummaryLoading) {
@@ -30,46 +34,64 @@ class SummaryHRD extends StatelessWidget {
               child: Text(state.message, style: AppTextStyle.caption));
         } else if (state is HRDSummaryLoaded) {
           final data = state.hrdSummary;
+
+          // Cek apakah user punya akses untuk fitur "employee-candidate" dan "employee-submission-request"
+          final bool hasCandidateAccess = permissions?.hrd.contains('employee-candidate') ?? false;
+          final bool hasSubmissionAccess = permissions?.hrd.contains('employee-submission-request') ?? false;
+
+          // Tampilkan teks dan card jika salah satu atau keduanya punya akses
+          final bool showVerificationSection = hasCandidateAccess || hasSubmissionAccess;
+
           return Container(
             width: double.infinity,
             child: Column(
               children: [
-                if(_authSharedPref.getEmployeeRole() == "owner")
+                // Tampilkan konten berdasarkan peran (role) dari user
+                if (_authSharedPref.getEmployeeRole() == "owner")
                   _buildUiTotalEmployee(data.totalEmployee),
-                if(_authSharedPref.getEmployeeRole() != "owner")
+                if (_authSharedPref.getEmployeeRole() != "owner")
                   _buildSummaryContent(data),
-                // Check if role is not "employee"
-                if (_authSharedPref.getEmployeeRole() != "employee")
+
+                // Tampilkan bagian "Layanan Verifikasi" hanya jika salah satu fitur diakses
+                if (showVerificationSection)
                   Padding(
                     padding: const EdgeInsets.only(
                         left: 16, right: 16, bottom: 16, top: 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                    
                       children: [
-                        const Text("Layanan Verifikasi",style: AppTextStyle.headline5,),
-                        const SizedBox(height: 16,),
+                        const Text(
+                          "Layanan Verifikasi",
+                          style: AppTextStyle.headline5,
+                        ),
+                        const SizedBox(height: 16),
+
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  Utils.navigateToPage(context, const CandidateSubmissionPage());
-                                },
-                                child: _buildCandidateVerificationCard(
-                                    data.totalCandidateVerifications),
+                            // Tampilkan "Candidate Verification" hanya jika punya akses
+                            if (hasCandidateAccess)
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Utils.navigateToPage(context, const CandidateSubmissionPage());
+                                  },
+                                  child: _buildCandidateVerificationCard(
+                                      data.totalCandidateVerifications),
+                                ),
                               ),
-                            ),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  Utils.navigateToPage(context, const EmployeeSubmissionPage());
-                                },
-                                child: _buildSubmissionVerificationCard(
-                                    data.totalSubmissionVerifications),
+
+                            // Tampilkan "Submission Verification" hanya jika punya akses
+                            if (hasSubmissionAccess)
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Utils.navigateToPage(context, const EmployeeSubmissionPage());
+                                  },
+                                  child: _buildSubmissionVerificationCard(
+                                      data.totalSubmissionVerifications),
+                                ),
                               ),
-                            ),
                           ],
                         ),
                       ],
