@@ -1,3 +1,4 @@
+import 'package:akib_pos/api/firebase_messaging_api.dart';
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/di/accounting_injection.dart';
 import 'package:akib_pos/di/dashboard_injection.dart';
@@ -53,6 +54,7 @@ import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_summ
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_dashboard_top_products_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_purchase_chart_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_sales_chart_cubit.dart';
+import 'package:akib_pos/features/dashboard/presentation/pages/notification_handler_page.dart';
 import 'package:akib_pos/features/home/cubit/navigation_cubit.dart';
 import 'package:akib_pos/features/hrd/data/models/employee_service/employee/hrd_all_employee.dart';
 import 'package:akib_pos/features/hrd/presentation/bloc/attendance_recap/attendance_recap_cubit.dart';
@@ -145,13 +147,16 @@ import 'features/dashboard/presentation/bloc/get_dashboard_summary_stock_cubit.d
 import 'firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart'; // <-- This line imports the initializeDateFormatting function
 
-void main() async {
+final navigatorKey = GlobalKey<NavigatorState>();
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
   await initializeDateFormatting('id', null);
+  await FirebaseMessagingApi().initNotifications();
 
   await _requestPermissions();
   //for auth and cashier injection initialization
@@ -629,6 +634,7 @@ class MyApp extends StatelessWidget {
     return Sizer(
       builder: (context, orientation, deviceType) {
         return MaterialApp(
+          navigatorKey: navigatorKey,
           title: 'AK Solutions',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
@@ -648,6 +654,9 @@ class MyApp extends StatelessWidget {
             ),
           ),
           home: const SplashScreen(),
+          routes: {
+            NotificationHandlerPage.route: (context) => const NotificationHandlerPage()
+          },
         );
       },
     );
