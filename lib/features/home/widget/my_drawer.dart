@@ -74,6 +74,8 @@ class MyDrawer extends StatelessWidget {
             title: Text('Logout'),
             onTap: () async {
               await _authSharedPref.clearLoginResponse(); // Clear login data
+              // Reset state NavigationCubit to Dashboard (index 0)
+              BlocProvider.of<NavigationCubit>(context).navigateTo(0); 
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => AuthPage()),

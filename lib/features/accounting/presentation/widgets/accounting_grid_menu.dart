@@ -7,22 +7,29 @@ import 'package:akib_pos/features/accounting/presentation/pages/purchasing_repor
 import 'package:akib_pos/features/accounting/presentation/pages/sales_report.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/tax_management_and_tax_services/tax_management_and_tax_services.dart';
 import 'package:akib_pos/features/accounting/presentation/pages/transaction_report.dart';
+import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
+import 'package:akib_pos/features/auth/data/models/login_response.dart';
 import 'package:auto_height_grid_view/auto_height_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get_it/get_it.dart';
 
 class AccountingGridMenu extends StatelessWidget {
+    final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
+
+  // Menu Akunting (Fitur)
   final List<Map<String, String>> menuItems = [
-    {"title": "Laporan\nTransaksi", "icon": "assets/icons/accounting/ic_arus_kas.svg"},
-    {"title": "Laporan\nPenjualan", "icon": "assets/icons/accounting/ic_laporan_penjualan.svg"},
-    {"title": "Laporan\nPembelian", "icon": "assets/icons/accounting/ic_laporan_pembelian.svg"},
-    {"title": "Laporan\nPengeluaran", "icon": "assets/icons/accounting/ic_laporan_pengeluaran.svg"},
-    {"title": "Laba\nRugi", "icon": "assets/icons/accounting/ic_laba_rugi.svg"},
-    {"title": "Neraca\nKeuangan", "icon": "assets/icons/accounting/ic_neraca_keuangan.svg"},
-    {"title": "Arus\nKas", "icon": "assets/icons/accounting/ic_arus_kas.svg"},
-    {"title": "Manajemen\nNilai Pajak", "icon": "assets/icons/accounting/ic_manajemen_pajak.svg"},
-    {"title": "Manajemen\nAset", "icon": "assets/icons/accounting/ic_manajemen_aset.svg"},
+    {"title": "Laporan\nTransaksi", "icon": "assets/icons/accounting/ic_arus_kas.svg", "feature": "transaction-report"},
+    {"title": "Laporan\nPenjualan", "icon": "assets/icons/accounting/ic_laporan_penjualan.svg", "feature": "sales-report"},
+    {"title": "Laporan\nPembelian", "icon": "assets/icons/accounting/ic_laporan_pembelian.svg", "feature": "purchase-report"},
+    {"title": "Laporan\nPengeluaran", "icon": "assets/icons/accounting/ic_laporan_pengeluaran.svg", "feature": "expenditure-report"},
+    {"title": "Laba\nRugi", "icon": "assets/icons/accounting/ic_laba_rugi.svg", "feature": "profit-loss"},
+    {"title": "Neraca\nKeuangan", "icon": "assets/icons/accounting/ic_neraca_keuangan.svg", "feature": "balance-sheet"},
+    {"title": "Arus\nKas", "icon": "assets/icons/accounting/ic_arus_kas.svg", "feature": "cash-flow"}, // Fitur Arus Kas
+    {"title": "Manajemen\nNilai Pajak", "icon": "assets/icons/accounting/ic_manajemen_pajak.svg", "feature": "tax-rate-management"},
+    {"title": "Manajemen\nAset", "icon": "assets/icons/accounting/ic_manajemen_aset.svg", "feature": "asset-management"},
   ];
+
 
    AccountingGridMenu({super.key});
 
@@ -126,14 +133,29 @@ class AccountingGridMenu extends StatelessWidget {
     return aspectRatio >= 1.0 && width >= 600;
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
-    bool isTablet = isTabletDevice(context);
+    final MobilePermissions? permissions = _authSharedPref.getMobilePermissions();
+
+    // Jika permissions tidak ada, tampilkan pesan error
+    if (permissions == null) {
+      return Center(child: Text("No permissions available"));
+    }
+
+    // Filter menu yang ditampilkan berdasarkan akses di modul accounting
+    final List<Map<String, String>> availableMenuItems = menuItems.where((item) {
+      // Cek apakah user punya akses ke fitur ini di accounting
+      return permissions.accounting.contains(item['feature']);
+    }).toList();
+
+    bool isTablet = MediaQuery.of(context).size.width > 600;
+
+    // Render Grid dengan menu yang ada aksesnya
     return AutoHeightGridView(
       padding: const EdgeInsets.all(16),
-      shrinkWrap: true, // Tambahkan ini agar GridView mengukur tinggi berdasarkan isinya
-      physics: const NeverScrollableScrollPhysics(), 
-      itemCount: menuItems.length,
+      shrinkWrap: true, 
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: availableMenuItems.length,
       crossAxisCount: isTablet ? 4 : 2,
       builder: (context, index) {
         return GestureDetector(
@@ -141,8 +163,8 @@ class AccountingGridMenu extends StatelessWidget {
             onItemTap(index, context);
           },
           child: AccountingMenuItem(
-            title: menuItems[index]["title"]!,
-            iconPath: menuItems[index]["icon"]!,
+            title: availableMenuItems[index]["title"]!,
+            iconPath: availableMenuItems[index]["icon"]!,
           ),
         );
       },
