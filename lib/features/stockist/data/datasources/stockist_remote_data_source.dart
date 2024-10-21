@@ -189,7 +189,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
       body: json.encode(request.toJson()),
     ).timeout(const Duration(seconds: 30));
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       final jsonResponse = json.decode(response.body);
       return AddRawMaterialStockResponse.fromJson(jsonResponse);
     } else if (response.statusCode >= 400 && response.statusCode < 500) {

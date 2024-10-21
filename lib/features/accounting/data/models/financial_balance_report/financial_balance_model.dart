@@ -31,118 +31,81 @@ class FinancialBalanceModel {
 }
 
 class Assets {
-  final CurrentAssets currentAssets;
-  final FixedAssets fixedAssets;
+  final List<AssetItem> currentAssets;
+  final List<AssetItem> fixedAssets;
 
   Assets({required this.currentAssets, required this.fixedAssets});
 
   factory Assets.fromJson(Map<String, dynamic> json) {
     return Assets(
-      currentAssets: CurrentAssets.fromJson(json['current_assets']),
-      fixedAssets: FixedAssets.fromJson(json['fixed_assets']),
+      currentAssets: (json['current_assets'] as List)
+          .map((item) => AssetItem.fromJson(item))
+          .toList(),
+      fixedAssets: (json['fixed_assets'] as List)
+          .map((item) => AssetItem.fromJson(item))
+          .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'current_assets': currentAssets.toJson(),
-      'fixed_assets': fixedAssets.toJson(),
-    };
-  }
-}
-
-class CurrentAssets {
-  final double cash;
-  final double inventory;
-
-  CurrentAssets({required this.cash, required this.inventory});
-
-  factory CurrentAssets.fromJson(Map<String, dynamic> json) {
-    return CurrentAssets(
-      cash: (json['cash'] as num?)?.toDouble() ?? 0.0,
-      inventory: (json['inventory'] as num?)?.toDouble() ?? 0.0,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'cash': cash,
-      'inventory': inventory,
-    };
-  }
-}
-
-class FixedAssets {
-  final double buildingValue;
-
-  FixedAssets({required this.buildingValue});
-
-  factory FixedAssets.fromJson(Map<String, dynamic> json) {
-    return FixedAssets(
-      buildingValue: (json['building_value'] as num?)?.toDouble() ?? 0.0,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'building_value': buildingValue,
+      'current_assets': currentAssets.map((item) => item.toJson()).toList(),
+      'fixed_assets': fixedAssets.map((item) => item.toJson()).toList(),
     };
   }
 }
 
 class LiabilitiesAndOwnerEquity {
-  final CurrentLiabilities currentLiabilities;
-  final OwnerEquity ownerEquity;
+  final List<AssetItem> currentLiabilities;
+  final List<AssetItem> longTermLiabilities;
+  final List<AssetItem> ownerEquity;
 
-  LiabilitiesAndOwnerEquity({required this.currentLiabilities, required this.ownerEquity});
+  LiabilitiesAndOwnerEquity({
+    required this.currentLiabilities,
+    required this.longTermLiabilities,
+    required this.ownerEquity,
+  });
 
   factory LiabilitiesAndOwnerEquity.fromJson(Map<String, dynamic> json) {
     return LiabilitiesAndOwnerEquity(
-      currentLiabilities: CurrentLiabilities.fromJson(json['current_liabilities']),
-      ownerEquity: OwnerEquity.fromJson(json['owner_equity']),
+      currentLiabilities: (json['current_liabilities'] as List)
+          .map((item) => AssetItem.fromJson(item))
+          .toList(),
+      longTermLiabilities: (json['long_term_liabilities'] as List)
+          .map((item) => AssetItem.fromJson(item))
+          .toList(),
+      ownerEquity: (json['owner_equity'] as List)
+          .map((item) => AssetItem.fromJson(item))
+          .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'current_liabilities': currentLiabilities.toJson(),
-      'owner_equity': ownerEquity.toJson(),
+      'current_liabilities': currentLiabilities.map((item) => item.toJson()).toList(),
+      'long_term_liabilities': longTermLiabilities.map((item) => item.toJson()).toList(),
+      'owner_equity': ownerEquity.map((item) => item.toJson()).toList(),
     };
   }
 }
 
-class CurrentLiabilities {
-  final double tradePayables;
+class AssetItem {
+  final String name;
+  final double balance;
 
-  CurrentLiabilities({required this.tradePayables});
+  AssetItem({required this.name, required this.balance});
 
-  factory CurrentLiabilities.fromJson(Map<String, dynamic> json) {
-    return CurrentLiabilities(
-      tradePayables: (json['trade_payables'] as num?)?.toDouble() ?? 0.0,
+  factory AssetItem.fromJson(Map<String, dynamic> json) {
+    return AssetItem(
+      name: json['name'] ?? '',
+      balance: (json['balance'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'trade_payables': tradePayables,
-    };
-  }
-}
-
-class OwnerEquity {
-  final double retainedEarnings;
-
-  OwnerEquity({required this.retainedEarnings});
-
-  factory OwnerEquity.fromJson(Map<String, dynamic> json) {
-    return OwnerEquity(
-      retainedEarnings: (json['retained_earnings'] as num?)?.toDouble() ?? 0.0,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'retained_earnings': retainedEarnings,
+      'name': name,
+      'balance': balance,
     };
   }
 }

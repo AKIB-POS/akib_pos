@@ -430,7 +430,6 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
         .get(
           Uri.parse(url).replace(queryParameters: {
             'branch_id': branchId.toString(),
-
             'date': date,
           }),
           headers: _buildHeaders(),

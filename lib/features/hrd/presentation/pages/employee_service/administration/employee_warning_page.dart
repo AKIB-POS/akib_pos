@@ -141,7 +141,7 @@ class _EmployeeWarningPageState extends State<EmployeeWarningPage> {
           const SizedBox(height: 8),
           // Pastikan bahwa warning.action tidak null
           Padding(
-            padding: const EdgeInsets.only(bottom: 16,right: 16),
+            padding: const EdgeInsets.only(bottom: 16,right: 16,left: 16),
             child: HtmlWidget(
               '''
             <style>
