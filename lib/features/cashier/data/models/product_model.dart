@@ -66,6 +66,9 @@ class ProductModel {
       totalPrice: json['total_price'] is String
           ? int.tryParse(json['total_price']) ?? 0
           : (json['total_price'] as num?)?.toInt(),
+      totalPriceDisc: json['total_price_disc'] is String
+          ? double.tryParse(json['total_price']) ?? 0
+          : (json['total_price'] as num?)?.toDouble(),
       discounts: discountList ?? [],
       totalDiscount: json['total_discount'] is String
           ? double.tryParse(json['total_discount']) ?? 0.0
@@ -130,7 +133,7 @@ class ProductModel {
     int? variantId,
     int? additionId,
     int? totalPrice,
-    int? totalPriceDisc,
+    double? totalPriceDisc,
     List<Discount>? discounts,
     double? totalDiscount,
   }) {
@@ -148,6 +151,7 @@ class ProductModel {
       variantId: variantId ?? this.variantId,
       additionId: additionId ?? this.additionId,
       totalPrice: totalPrice ?? this.totalPrice,
+      totalPriceDisc: totalPriceDisc ?? this.totalPriceDisc,
       discounts: discounts ?? this.discounts,
       totalDiscount: totalDiscount ?? this.totalDiscount,
     );

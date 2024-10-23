@@ -273,6 +273,7 @@ class TransactionCubit extends Cubit<TransactionState> {
 
   void addQuantity(int index) {
     final currentTransaction = state.transactions[index];
+     print("apakahh di add 0 ${state.transactions}");
     final updatedTransaction =
         currentTransaction.copyWith(quantity: currentTransaction.quantity + 1);
     final updatedTransactions = List<TransactionModel>.from(state.transactions)
@@ -280,7 +281,7 @@ class TransactionCubit extends Cubit<TransactionState> {
     emit(state.copyWith(transactions: updatedTransactions));
 
     _updateTotalPrice(index: index); // Update the total price
-    print("apakahh di add ${state.quantity}");
+    print("apakahh di add ${state.transactions}");
   }
 
   void subtractQuantity(int index) {
@@ -325,7 +326,6 @@ class TransactionCubit extends Cubit<TransactionState> {
               state.quantity, state.selectedVariants, state.selectedAdditions) -
           reduce * state.quantity;
       
-
       
       final updatedProduct =
           state.transactions.last.product.copyWith(totalPrice: totalPrice,totalPriceDisc: totalPriceDisc);
@@ -343,6 +343,7 @@ class TransactionCubit extends Cubit<TransactionState> {
       final totalPriceDIsc = _calculateTotalPriceDIsc(transaction.quantity,
               transaction.selectedVariants, transaction.selectedAdditions,) -
           reduce * transaction.quantity;
+        print("apaitu ${totalPriceDIsc}");
       final updatedProduct =
           transaction.product.copyWith(totalPrice: totalPrice,totalPriceDisc: totalPriceDIsc);
       final updatedTransaction = transaction.copyWith(product: updatedProduct);
@@ -352,7 +353,7 @@ class TransactionCubit extends Cubit<TransactionState> {
       emit(state.copyWith(transactions: updatedTransactions));
     }
 
-    print("apakahhh di updatetotal ${state.quantity}");
+    print("apakahhh di updatetotal ${state.transactions}");
   }
 
   int _calculateTotalPrice(int quantity, List<SelectedVariant> variants,
@@ -382,7 +383,7 @@ class TransactionCubit extends Cubit<TransactionState> {
 
     return totalPrice;
   }
-  int _calculateTotalPriceDIsc(
+  double _calculateTotalPriceDIsc(
     int quantity,
     List<SelectedVariant> variants,
     List<SelectedAddition> additions,
@@ -390,41 +391,33 @@ class TransactionCubit extends Cubit<TransactionState> {
   if (state.transactions.isEmpty) return 0;
 
   // Calculate base price of the product with quantity
-  int price = (state.transactions.last.product.price - state.transactions.last.product.totalDiscount!.toInt()) * quantity;
-   double totalDiscount = state.transactions.last.product.totalDiscount ?? 0;
-   int totalPrice = price - totalDiscount.toInt();
-   print("isnyadiskon ${price}");
-   print("isnyadiskon1 ${totalDiscount}");
-   print("isnyadiskon2 ${totalPrice}");
+  double totalDiscount = state.transactions.last.product.totalDiscount!*quantity;
+   print("isinyaadd1 ${state.transactions.last.product.totalDiscount}");
+   print("isinyaadd2 ${quantity}");
+   print("isinyaadd3 ${totalDiscount}");
+   
 
   // Add variant prices
   variants.forEach((variant) {
-    totalPrice += variant.price * quantity;
+    totalDiscount += variant.price * quantity;
   });
 
   // Add addition prices
   additions.forEach((addition) {
-    totalPrice += addition.price * quantity;
+    totalDiscount += addition.price * quantity;
   });
  
-  // Apply total discount if available
-  if (totalDiscount != null && totalDiscount > 0) {
-    totalPrice -= totalDiscount.toInt();
-  }
-
-    print("isinyaadd ${state.transactions.last.product.totalDiscount}");
 
   // Apply voucher discount
   if (state.voucher != null) {
     if (state.voucher!.type == 'nominal') {
-      totalPrice -= state.voucher!.amount.toInt();
+      totalDiscount -= state.voucher!.amount.toInt();
     } else if (state.voucher!.type == 'percentage') {
-      totalPrice -= (totalPrice * state.voucher!.amount / 100).toInt();
+      totalDiscount -= (totalDiscount * state.voucher!.amount / 100).toInt();
     }
   }
   
-
-  return totalPrice < 0 ? 0 : totalPrice; // Ensure the total price doesn't go below 0
+  return totalDiscount < 0 ? 0 : totalDiscount; // Ensure the total price doesn't go below 0
 }
 
 }

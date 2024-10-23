@@ -113,16 +113,7 @@ class _ProductDialogState extends State<ProductDialog> {
                             print("berapakahh $currentState");
 
                             // Hitung total harga berdasarkan kuantitas terbaru dan varian serta tambahan yang dipilih
-                            int totalPrice =
-                                widget.product.price * currentQuantity;
-
-                            currentState.selectedVariants.forEach((variant) {
-                              totalPrice += variant.price * currentQuantity;
-                            });
-
-                            currentState.selectedAdditions.forEach((addition) {
-                              totalPrice += addition.price * currentQuantity;
-                            });
+                          
 
                             // Buat model transaksi berdasarkan state terbaru
                             final transaction = TransactionModel(
@@ -582,18 +573,8 @@ class _ProductDialogState extends State<ProductDialog> {
                       print("apakahh di product dialog  ${currentQuantity}");
 
                       // Hitung total harga berdasarkan kuantitas terbaru dan varian serta tambahan yang dipilih
-                      int totalPrice = widget.product.price * currentQuantity;
-                      int totalPriceDIsc = widget.product.price * currentQuantity;
-
-                      currentState.selectedVariants.forEach((variant) {
-                        totalPrice += variant.price * currentQuantity;
-                        totalPriceDIsc +=totalPrice;
-                      });
-
-                      currentState.selectedAdditions.forEach((addition) {
-                        totalPrice += addition.price * currentQuantity;
-                        totalPriceDIsc +=totalPrice;
-                      });
+                  
+                    
                       print("apakahh sebelum ${currentQuantity}");
                       // Buat model transaksi berdasarkan state terbaru
                       final transaction = TransactionModel(
