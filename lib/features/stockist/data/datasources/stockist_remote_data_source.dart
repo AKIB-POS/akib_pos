@@ -126,7 +126,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
     const url = '${URLs.baseUrlProd}/purchases';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
-        'branchId': branchId.toString(),
+        'branch_id': branchId.toString(),
         'category': 'equipment',
       }),
       headers: _buildHeaders(),
@@ -309,7 +309,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
     
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
-        'branchId': branchId.toString(),
+        'branch_id': branchId.toString(),
         'category': 'raw-material',
       }),
       headers: {

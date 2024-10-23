@@ -556,6 +556,18 @@ class Utils {
     );
     return formatter.format(input);
   }
+static String formatCurrencyS(String input) {
+  // Try parsing the input as double
+  double value = double.parse(input);
+  
+  final NumberFormat formatter = NumberFormat.currency(
+    locale: 'id',
+    symbol: 'Rp ',
+    decimalDigits: 0, // Change to 2 if you want to show decimals
+  );
+  
+  return formatter.format(value);
+}
 
   static String formatCurrency(String input) {
     int value = int.parse(input);
