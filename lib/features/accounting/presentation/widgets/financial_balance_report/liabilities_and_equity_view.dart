@@ -15,12 +15,20 @@ class LiabilitiesAndEquityView extends StatelessWidget {
     return BlocBuilder<FinancialBalanceCubit, FinancialBalanceState>(
       builder: (context, state) {
         if (state is FinancialBalanceLoading) {
-          return Utils.buildLoadingCardShimmer();
+          return _buildLoadingShimmer();
         } else if (state is FinancialBalanceLoaded) {
           final liabilitiesAndEquity = state.financialBalance.liabilitiesAndOwnerEquity;
           return _buildLiabilitiesAndEquityView(liabilitiesAndEquity);
         } else if (state is FinancialBalanceError) {
-          return Container(
+          return _buildErrorState(state.message);
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  Widget _buildErrorState(String message) {
+    return Container(
       padding: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
@@ -47,15 +55,9 @@ class LiabilitiesAndEquityView extends StatelessWidget {
                   .copyWith(color: AppColors.warningMain),
             ),
           ),
-          Utils.buildEmptyStatePlain(state.message,
-                      "Silahkan Swipe Kebawah\nUntuk Memuat Ulang"),
-          
+          Utils.buildEmptyStatePlain(message, "Silahkan Swipe Kebawah\nUntuk Memuat Ulang"),
         ],
       ),
-    );
-        }
-        return const SizedBox.shrink();
-      },
     );
   }
 
@@ -72,9 +74,9 @@ class LiabilitiesAndEquityView extends StatelessWidget {
         children: [
           ShimmerWidget.rectangular(height: 20, width: 150),
           SizedBox(height: 8),
-          ShimmerWidget.rectangular(height: 20, width: 100,),
+          ShimmerWidget.rectangular(height: 20, width: 100),
           SizedBox(height: 8),
-          ShimmerWidget.rectangular(height: 20, width: 100,),
+          ShimmerWidget.rectangular(height: 20, width: 100),
         ],
       ),
     );
@@ -92,6 +94,7 @@ class LiabilitiesAndEquityView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          // Header Section
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
@@ -108,17 +111,37 @@ class LiabilitiesAndEquityView extends StatelessWidget {
                   .copyWith(color: AppColors.warningMain),
             ),
           ),
+          
           const SizedBox(height: 8),
+          
+          // Liabilitas Lancar Section
           const Padding(
-            padding: EdgeInsets.only(left: 16,bottom: 8),
-            child: const Text("Liabilitas Lancar", style: AppTextStyle.bigCaptionBold),
+            padding: EdgeInsets.only(left: 16, bottom: 8),
+            child: Text("Liabilitas Lancar", style: AppTextStyle.bigCaptionBold),
           ),
-          _buildRow("Hutang Dagang", Utils.formatCurrencyDouble(liabilitiesAndEquity.currentLiabilities.tradePayables)),
+          ...liabilitiesAndEquity.currentLiabilities.map(
+            (liability) => _buildRow(liability.name, Utils.formatCurrencyDouble(liability.balance)),
+          ),
+
+          // Liabilitas Jangka Panjang Section (if available)
+          if (liabilitiesAndEquity.longTermLiabilities.isNotEmpty) ...[
+            const Padding(
+              padding: EdgeInsets.only(left: 16, bottom: 8, top: 8),
+              child: Text("Liabilitas Jangka Panjang", style: AppTextStyle.bigCaptionBold),
+            ),
+            ...liabilitiesAndEquity.longTermLiabilities.map(
+              (liability) => _buildRow(liability.name, Utils.formatCurrencyDouble(liability.balance)),
+            ),
+          ],
+
+          // Ekuitas Pemilik Section
           const Padding(
-            padding: EdgeInsets.only(left: 16,bottom: 8),
+            padding: EdgeInsets.only(left: 16, bottom: 8, top: 16),
             child: Text("Ekuitas Pemilik", style: AppTextStyle.bigCaptionBold),
           ),
-          _buildRow("Laba Ditahan", Utils.formatCurrencyDouble(liabilitiesAndEquity.ownerEquity.retainedEarnings)),
+          ...liabilitiesAndEquity.ownerEquity.map(
+            (equity) => _buildRow(equity.name, Utils.formatCurrencyDouble(equity.balance)),
+          ),
         ],
       ),
     );

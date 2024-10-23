@@ -1,6 +1,7 @@
 import 'package:akib_pos/common/app_colors.dart';
 import 'package:akib_pos/common/app_text_styles.dart';
 import 'package:akib_pos/features/auth/data/datasources/local_data_source.dart/auth_shared_pref.dart';
+import 'package:akib_pos/features/auth/data/models/login_response.dart';
 import 'package:akib_pos/features/dashboard/data/models/branch.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/branch_interaction_cubit.dart';
 import 'package:akib_pos/features/dashboard/presentation/bloc/get_branches_cubit.dart';
@@ -39,17 +40,24 @@ class _DashboardPageState extends State<DashboardPage> {
   int? selectedBranchId;
   bool isLoading = true;
   final AuthSharedPref _authSharedPref = GetIt.instance<AuthSharedPref>();
+  late final MobilePermissions? permissions;
+  @override
+  void initState() {
+    super.initState();
+    _branchInteractionCubit =
+        BranchInteractionCubit(authSharedPref: _authSharedPref);
+    permissions = _authSharedPref.getMobilePermissions();
+    _loadInitialBranch();
+  }
 
- 
+  @override
+  Widget build(BuildContext context) {
+    debugPrint("Current role: ${_authSharedPref.getEmployeeRole()}");
 
-@override
-Widget build(BuildContext context) {
-  debugPrint("Current role: ${_authSharedPref.getEmployeeRole()}");
-
-  return Scaffold(
-    backgroundColor: AppColors.backgroundGrey,
-    drawer: MyDrawer(),
-    appBar: PreferredSize(
+    return Scaffold(
+      backgroundColor: AppColors.backgroundGrey,
+      drawer: MyDrawer(),
+      appBar: PreferredSize(
         preferredSize: Size.fromHeight(8.h),
         child: AppBar(
           surfaceTintColor: Colors.white,
@@ -61,93 +69,107 @@ Widget build(BuildContext context) {
           ),
         ),
       ),
-    body: RefreshIndicator(
-      color: AppColors.primaryMain,
-      onRefresh: _onRefresh, // Pull-to-refresh handler
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            BranchInfo(onTap: () => _showBranchPicker(context)),
-            
-            
-            // Menggunakan ternary operator
-            if(_authSharedPref.getEmployeeRole() == "employee")
-              employeeItem(),
-          
-            if(_authSharedPref.getEmployeeRole() == "owner" || _authSharedPref.getEmployeeRole() == "manager")
-               dashboardItem()  // Jika employeeRole tidak null
+      body: RefreshIndicator(
+        color: AppColors.primaryMain,
+        onRefresh: _onRefresh, // Pull-to-refresh handler
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              BranchInfo(onTap: () => _showBranchPicker(context)),
 
+              // Menggunakan ternary operator
+              if (_authSharedPref.getEmployeeRole() == "employee")
+                employeeItem(),
 
-          ],
+              if (_authSharedPref.getEmployeeRole() == "owner" ||
+                  _authSharedPref.getEmployeeRole() == "manager")
+                dashboardItem(), // Jika employeeRole tidak null
+
+              if (_authSharedPref.getEmployeeRole() == null) dashboardItem()
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Column dashboardItem() {
     return Column(
-              children: [
-                Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: DashboardAccountingSummaryWidget(branchId: selectedBranchId ?? 1),
-            ),
-            const SizedBox(height: 12),
-                TopProductWidget(branchId: selectedBranchId ?? 1),
-                const SizedBox(height: 12),
-                SalesChartWidget(branchId: selectedBranchId ?? 1),
-                const SizedBox(height: 12),
-                PurchaseChartWidget(branchId: selectedBranchId ?? 1),
-                const SizedBox(height: 12),
-                DashboardHrdSummaryWidget(branchId: selectedBranchId ?? 1),
-                const SizedBox(height: 12),
-                DashboardStockSummaryWidget(branchId: selectedBranchId ?? 1),
-              ],
-            );
+      children: [
+        if (permissions?.dashboard.contains("accounting") ?? false)
+          Padding(
+            padding: const EdgeInsets.only(top: 16.0),
+            child: DashboardAccountingSummaryWidget(
+                branchId: selectedBranchId ?? 1),
+          ),
+        const SizedBox(height: 12),
+        // Check permission and display widget accordingly
+
+        if (permissions?.dashboard.contains("cashier") ?? false)
+          TopProductWidget(branchId: selectedBranchId ?? 1),
+
+        if (permissions?.dashboard.contains("accounting") ?? false)
+          SalesChartWidget(branchId: selectedBranchId ?? 1),
+
+        if (permissions?.dashboard.contains("cashier") ?? false)
+          PurchaseChartWidget(branchId: selectedBranchId ?? 1),
+
+        if (permissions?.dashboard.contains("hr") ?? false)
+          DashboardHrdSummaryWidget(branchId: selectedBranchId ?? 1),
+
+        if (permissions?.dashboard.contains("stok") ?? false)
+          DashboardStockSummaryWidget(branchId: selectedBranchId ?? 1),
+      ],
+    );
   }
-   @override
-  void initState() {
-    super.initState();
-    _branchInteractionCubit = BranchInteractionCubit(authSharedPref: _authSharedPref);
-    _loadInitialBranch();
+
+  Future<void> _onRefresh() async {
+    // Run both fetch operations concurrently using Future.wait
+    // Buat list task yang akan dijalankan
+    List<Future<void>> fetchTasks = [];
+
+    // Load data berdasarkan izin akses
+    if (permissions?.dashboard.contains("accounting") ?? false) {
+      fetchTasks.add(context.read<GetDashboardAccountingSummaryCubit>().fetchAccountingSummary(
+        branchId: selectedBranchId ?? 1,
+      ));
+      fetchTasks.add(context.read<GetSalesChartCubit>().fetchSalesChart(
+        branchId: selectedBranchId ?? 1,
+      ));
+    }
+
+    if (permissions?.dashboard.contains("cashier") ?? false) {
+      fetchTasks.add(context.read<GetDashboardTopProductsCubit>().fetchTopProducts(
+        branchId: selectedBranchId ?? 1,
+      ));
+      fetchTasks.add(context.read<GetPurchaseChartCubit>().fetchPurchaseChart(
+        branchId: selectedBranchId ?? 1,
+      ));
+    }
+
+    if (permissions?.dashboard.contains("hr") ?? false) {
+      fetchTasks.add(context.read<GetDashboardSummaryHrdCubit>().fetchDashboardHrdSummary(
+        branchId: selectedBranchId ?? 1,
+      ));
+    }
+
+    if (permissions?.dashboard.contains("stok") ?? false) {
+      fetchTasks.add(context.read<GetDashboardSummaryStockCubit>().fetchDashboardStockSummary(
+        branchId: selectedBranchId ?? 1,
+      ));
+    }
+
+    fetchTasks.add(context.read<GetBranchesCubit>().fetchBranches());
+
+    // Run all tasks concurrently
+    await Future.wait(fetchTasks);
   }
 
-  
-
-   Future<void> _onRefresh() async {
-  // Run both fetch operations concurrently using Future.wait
-  await Future.wait([
-    context.read<GetDashboardAccountingSummaryCubit>().fetchAccountingSummary(
-          branchId: selectedBranchId ?? 1,
-        ),
-    context.read<GetDashboardTopProductsCubit>().fetchTopProducts(
-          branchId: selectedBranchId ?? 1,
-        ),
-    context.read<GetSalesChartCubit>().fetchSalesChart(
-          branchId: selectedBranchId ?? 1,
-        ),
-    context.read<GetPurchaseChartCubit>().fetchPurchaseChart(
-          branchId: selectedBranchId ?? 1,
-        ),
-    context.read<GetDashboardSummaryHrdCubit>().fetchDashboardHrdSummary(
-          branchId: selectedBranchId ?? 1,
-        ),
-    context.read<GetDashboardSummaryStockCubit>().fetchDashboardStockSummary(
-          branchId: selectedBranchId ?? 1,
-        ),
-    context.read<GetBranchesCubit>().fetchBranches(
-        ),
-  ]);
-}
-
-
-
-   Future<void> _loadInitialBranch() async {
+  Future<void> _loadInitialBranch() async {
     // Panggil cubit fetchBranches di sini
-  
+
     final branchList = _authSharedPref.getBranchList();
 
     if (branchList.isNotEmpty) {
@@ -168,12 +190,10 @@ Widget build(BuildContext context) {
 
       // Fetch accounting summary setelah memilih branch
       _onRefresh();
-    }else{
-       _onRefresh();
+    } else {
+      _onRefresh();
     }
   }
-
-
 
   Future<void> _showBranchPicker(BuildContext context) async {
     final branchInteractionCubit = context.read<BranchInteractionCubit>();
@@ -280,40 +300,42 @@ Widget build(BuildContext context) {
       },
     );
   }
-  
-  Widget employeeItem() {
 
+  Widget employeeItem() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-                padding: const EdgeInsets.only(left: 16,top: 16),
-                child: Text("Dashboard",style: AppTextStyle.headline5.copyWith(fontWeight: FontWeight.bold),),
-              ),
-
-      Container(
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 30),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        image: const DecorationImage(
-            image: ExtendedAssetImageProvider("assets/images/dashboard_welcome.png"),
-            fit: BoxFit.cover),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Selamat Datang",
-              style: AppTextStyle.caption.copyWith(color: Colors.white)),
-          const SizedBox(height: 10),
-          Text("Selamat Beraktifitas",
-              style: AppTextStyle.bigCaptionBold.copyWith(color: Colors.white)),
-        ],
-      ),
-    ),
+          padding: const EdgeInsets.only(left: 16, top: 16),
+          child: Text(
+            "Dashboard",
+            style: AppTextStyle.headline5.copyWith(fontWeight: FontWeight.bold),
+          ),
+        ),
+        Container(
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 30),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            image: const DecorationImage(
+                image: ExtendedAssetImageProvider(
+                    "assets/images/dashboard_welcome.png"),
+                fit: BoxFit.cover),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Selamat Datang",
+                  style: AppTextStyle.caption.copyWith(color: Colors.white)),
+              const SizedBox(height: 10),
+              Text("Selamat Beraktifitas",
+                  style: AppTextStyle.bigCaptionBold
+                      .copyWith(color: Colors.white)),
+            ],
+          ),
+        ),
       ],
     );
-
   }
 }

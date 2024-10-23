@@ -126,7 +126,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
     const url = '${URLs.baseUrlProd}/purchases';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
-        'branchId': branchId.toString(),
+        'branch_id': branchId.toString(),
         'category': 'equipment',
       }),
       headers: _buildHeaders(),
@@ -189,7 +189,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
       body: json.encode(request.toJson()),
     ).timeout(const Duration(seconds: 30));
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       final jsonResponse = json.decode(response.body);
       return AddRawMaterialStockResponse.fromJson(jsonResponse);
     } else if (response.statusCode >= 400 && response.statusCode < 500) {
@@ -309,7 +309,7 @@ class StockistRemoteDataSourceImpl implements StockistRemoteDataSource {
     
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
-        'branchId': branchId.toString(),
+        'branch_id': branchId.toString(),
         'category': 'raw-material',
       }),
       headers: {

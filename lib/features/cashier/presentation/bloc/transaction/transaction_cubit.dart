@@ -237,6 +237,8 @@ class TransactionCubit extends Cubit<TransactionState> {
       ..add(transaction);
     emit(state.copyWith(transactions: updatedTransactions, tax: tax));
     _updateTotalPrice();
+      print("isinyaa ${state.transactions}");
+
   }
 
   void updateTransaction(int index, TransactionModel transaction) {
@@ -319,8 +321,14 @@ class TransactionCubit extends Cubit<TransactionState> {
       final totalPrice = _calculateTotalPrice(
               state.quantity, state.selectedVariants, state.selectedAdditions) -
           reduce * state.quantity;
+      final totalPriceDisc = _calculateTotalPriceDIsc(
+              state.quantity, state.selectedVariants, state.selectedAdditions) -
+          reduce * state.quantity;
+      
+
+      
       final updatedProduct =
-          state.transactions.last.product.copyWith(totalPrice: totalPrice);
+          state.transactions.last.product.copyWith(totalPrice: totalPrice,totalPriceDisc: totalPriceDisc);
       final updatedTransaction =
           state.transactions.last.copyWith(product: updatedProduct);
       final updatedTransactions =
@@ -332,8 +340,11 @@ class TransactionCubit extends Cubit<TransactionState> {
       final totalPrice = _calculateTotalPrice(transaction.quantity,
               transaction.selectedVariants, transaction.selectedAdditions) -
           reduce * transaction.quantity;
+      final totalPriceDIsc = _calculateTotalPriceDIsc(transaction.quantity,
+              transaction.selectedVariants, transaction.selectedAdditions,) -
+          reduce * transaction.quantity;
       final updatedProduct =
-          transaction.product.copyWith(totalPrice: totalPrice);
+          transaction.product.copyWith(totalPrice: totalPrice,totalPriceDisc: totalPriceDIsc);
       final updatedTransaction = transaction.copyWith(product: updatedProduct);
       final updatedTransactions =
           List<TransactionModel>.from(state.transactions)
@@ -371,4 +382,49 @@ class TransactionCubit extends Cubit<TransactionState> {
 
     return totalPrice;
   }
+  int _calculateTotalPriceDIsc(
+    int quantity,
+    List<SelectedVariant> variants,
+    List<SelectedAddition> additions,
+    ) {
+  if (state.transactions.isEmpty) return 0;
+
+  // Calculate base price of the product with quantity
+  int price = (state.transactions.last.product.price - state.transactions.last.product.totalDiscount!.toInt()) * quantity;
+   double totalDiscount = state.transactions.last.product.totalDiscount ?? 0;
+   int totalPrice = price - totalDiscount.toInt();
+   print("isnyadiskon ${price}");
+   print("isnyadiskon1 ${totalDiscount}");
+   print("isnyadiskon2 ${totalPrice}");
+
+  // Add variant prices
+  variants.forEach((variant) {
+    totalPrice += variant.price * quantity;
+  });
+
+  // Add addition prices
+  additions.forEach((addition) {
+    totalPrice += addition.price * quantity;
+  });
+ 
+  // Apply total discount if available
+  if (totalDiscount != null && totalDiscount > 0) {
+    totalPrice -= totalDiscount.toInt();
+  }
+
+    print("isinyaadd ${state.transactions.last.product.totalDiscount}");
+
+  // Apply voucher discount
+  if (state.voucher != null) {
+    if (state.voucher!.type == 'nominal') {
+      totalPrice -= state.voucher!.amount.toInt();
+    } else if (state.voucher!.type == 'percentage') {
+      totalPrice -= (totalPrice * state.voucher!.amount / 100).toInt();
+    }
+  }
+  
+
+  return totalPrice < 0 ? 0 : totalPrice; // Ensure the total price doesn't go below 0
+}
+
 }

@@ -210,66 +210,91 @@ class MenuCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-          
-              ExtendedImage.network(
-                    item.imageUrl != null && item.imageUrl.isNotEmpty
-                        ? item.imageUrl!
-                        : 'assets/images/no_imgproduk.png', // Placeholder URL atau path lokal
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
-                    height: 11.h,
-                    clearMemoryCacheWhenDispose: true,
-                    cache: true,
-                    shape: BoxShape.rectangle,
-                    borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                    loadStateChanged: (ExtendedImageState state) {
-                      switch (state.extendedImageLoadState) {
-                        case LoadState.loading:
-                          return Shimmer.fromColors(
-                            baseColor: Colors.grey[300]!,
-                            highlightColor: Colors.grey[100]!,
-                            child: Container(
-                              width: double.infinity,
-                              height: 11.h,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(8.0)),
-                              ),
-                            ),
-                          );
-                        case LoadState.completed:
-                          return null;
-                        case LoadState.failed:
-                      
-                          return ClipRRect(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(8.0)),
-                            child: Image.asset(
-                              'assets/images/no_imgproduk.png',
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                              alignment: Alignment.center,
-                              height: 11.h,
-                            ),
-                          );
-                      }
-                    },
-                  ),
+            // Image section
+            ExtendedImage.network(
+              item.imageUrl != null && item.imageUrl.isNotEmpty
+                  ? item.imageUrl
+                  : 'assets/images/no_imgproduk.png', // Placeholder URL atau path lokal
+              width: double.infinity,
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
+              height: 11.h,
+              clearMemoryCacheWhenDispose: true,
+              cache: true,
+              shape: BoxShape.rectangle,
+              borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+              loadStateChanged: (ExtendedImageState state) {
+                switch (state.extendedImageLoadState) {
+                  case LoadState.loading:
+                    return Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        width: double.infinity,
+                        height: 11.h,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                        ),
+                      ),
+                    );
+                  case LoadState.completed:
+                    return null;
+                  case LoadState.failed:
+                    return ClipRRect(
+                      borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                      child: Image.asset(
+                        'assets/images/no_imgproduk.png',
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        alignment: Alignment.center,
+                        height: 11.h,
+                      ),
+                    );
+                }
+              },
+            ),
+            // Info section
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Product name
                 Text(
                   item.name,
                   style: AppTextStyle.headline6,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 1.0),
-                Text(
-                  Utils.formatCurrency(item.price.toString()),
-                  style: AppTextStyle.body3,
-                ),
+
+                // // If there is a discount, show the price with strikethrough effect
+                // if (item.totalDiscount != null) ...[
+                //   // Original price with strikethrough
+                //   Text(
+                //     Utils.formatCurrency(item.price.toString()),
+                //     style: AppTextStyle.body3.copyWith(
+                //       decoration: TextDecoration.lineThrough,
+                //       color: Colors.grey, // Strikethrough color
+                //     ),
+                //   ),
+                //   const SizedBox(height: 2.0),
+
+                //   // Price after discount
+                  
+                //   Text(
+                //     Utils.formatCurrencyS(
+                //         (item.price - (item.totalDiscount ?? 0)).toString()),
+                //     style: AppTextStyle.body3.copyWith(
+                //       color: Colors.red, // Discounted price color
+                //       fontWeight: FontWeight.bold,
+                //     ),
+                //   ),
+                // ] else ...[
+                  // No discount, show normal price
+                  Text(
+                    Utils.formatCurrency(item.price.toString()),
+                    style: AppTextStyle.body3,
+                  ),
+                // ],
               ],
             ),
           ],

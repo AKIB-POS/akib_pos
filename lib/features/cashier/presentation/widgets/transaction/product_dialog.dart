@@ -222,10 +222,35 @@ class _ProductDialogState extends State<ProductDialog> {
                                   Text(widget.product.name,
                                       style: AppTextStyle.headline6),
                                   const SizedBox(height: 2),
-                                  Text(
-                                      Utils.formatCurrency(
-                                          widget.product.price.toString()),
-                                      style: AppTextStyle.body3),
+                                   // If there is a discount, show the price with strikethrough effect
+                if (widget.product.discounts != null) ...[
+                  // Original price with strikethrough
+                  Text(
+                    Utils.formatCurrency(widget.product.price.toString()),
+                    style: AppTextStyle.body3.copyWith(
+                      decoration: TextDecoration.lineThrough,
+                      color: Colors.grey, // Strikethrough color
+                    ),
+                  ),
+                  const SizedBox(height: 2.0),
+
+                  // Price after discount
+                  
+                  Text(
+                    Utils.formatCurrencyS(
+                        (widget.product.price - (widget.product.totalDiscount ?? 0)).toString()),
+                    style: AppTextStyle.body3.copyWith(
+                      color: Colors.red, // Discounted price color
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ] else ...[
+                  // No discount, show normal price
+                  Text(
+                    Utils.formatCurrency(widget.product.price.toString()),
+                    style: AppTextStyle.body3,
+                  ),
+                ],
                                 ],
                               ),
                             ]
@@ -558,13 +583,16 @@ class _ProductDialogState extends State<ProductDialog> {
 
                       // Hitung total harga berdasarkan kuantitas terbaru dan varian serta tambahan yang dipilih
                       int totalPrice = widget.product.price * currentQuantity;
+                      int totalPriceDIsc = widget.product.price * currentQuantity;
 
                       currentState.selectedVariants.forEach((variant) {
                         totalPrice += variant.price * currentQuantity;
+                        totalPriceDIsc +=totalPrice;
                       });
 
                       currentState.selectedAdditions.forEach((addition) {
                         totalPrice += addition.price * currentQuantity;
+                        totalPriceDIsc +=totalPrice;
                       });
                       print("apakahh sebelum ${currentQuantity}");
                       // Buat model transaksi berdasarkan state terbaru

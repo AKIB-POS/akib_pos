@@ -263,7 +263,10 @@ class RightBody extends StatelessWidget {
                                                   .product.totalPrice
                                                   .toString()),
                                               style: AppTextStyle.body3),
-                                          const SizedBox(height: 8),
+                                          // Text(
+                                          //     transaction.product.totalPriceDisc.toString(),
+                                          //     style: AppTextStyle.body3),
+                                          // const SizedBox(height: 8),
                                           Text('Catatan: ${transaction.notes}',
                                               style: AppTextStyle.body3),
                                           const SizedBox(height: 8),

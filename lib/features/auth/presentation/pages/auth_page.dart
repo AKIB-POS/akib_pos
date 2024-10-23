@@ -351,22 +351,22 @@ class _AuthPage extends State<AuthPage> {
                             ),
                           ),
                           const SizedBox(width: 4),
-                          Text("Tetap Masuk", style: AppTextStyle.body3),
+                          // Text("Tetap Masuk", style: AppTextStyle.body3),
                         ],
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const ForgotPasswordPage()),
-                        );
-                      },
-                      child: Text(
-                        "Lupa Password?",
-                        style: AppTextStyle.body3.copyWith(color: AppColors.primaryMain),
-                      ),
-                    ),
+                    // TextButton(
+                    //   onPressed: () {
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(builder: (context) => const ForgotPasswordPage()),
+                    //     );
+                    //   },
+                    //   child: Text(
+                    //     "Lupa Password?",
+                    //     style: AppTextStyle.body3.copyWith(color: AppColors.primaryMain),
+                    //   ),
+                    // ),
                   ],
                 ),
                 ElevatedButton(

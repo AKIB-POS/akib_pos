@@ -15,12 +15,20 @@ class AssetsView extends StatelessWidget {
     return BlocBuilder<FinancialBalanceCubit, FinancialBalanceState>(
       builder: (context, state) {
         if (state is FinancialBalanceLoading) {
-          return Utils.buildLoadingCardShimmer();
+          return _buildLoadingShimmer();
         } else if (state is FinancialBalanceLoaded) {
           final assets = state.financialBalance.assets;
           return _buildAssetsView(assets);
         } else if (state is FinancialBalanceError) {
-          return Container(
+          return _buildErrorState(state.message);
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  Widget _buildErrorState(String message) {
+    return Container(
       padding: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
@@ -46,17 +54,11 @@ class AssetsView extends StatelessWidget {
               style: AppTextStyle.bigCaptionBold
                   .copyWith(color: AppColors.successMain),
             ),
-
           ),
-          Utils.buildEmptyStatePlain(state.message,
-                      "Silahkan Swipe Kebawah\nUntuk Memuat Ulang"),
-          
+          Utils.buildEmptyStatePlain(
+              message, "Silahkan Swipe Kebawah\nUntuk Memuat Ulang"),
         ],
       ),
-    );
-        }
-        return const SizedBox.shrink();
-      },
     );
   }
 
@@ -110,17 +112,20 @@ class AssetsView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
+
+          // Section Aset Lancar
           const Padding(
-            padding: EdgeInsets.only(left: 16,bottom: 8),
+            padding: EdgeInsets.only(left: 16, bottom: 8),
             child: Text("Aset Lancar", style: AppTextStyle.bigCaptionBold),
           ),
-          _buildRow("Kas", Utils.formatCurrencyDouble(assets.currentAssets.cash)),
-          _buildRow("Persediaan", Utils.formatCurrencyDouble(assets.currentAssets.inventory)),
+          ...assets.currentAssets.map((asset) => _buildRow(asset.name, Utils.formatCurrencyDouble(asset.balance))),
+
+          // Section Aset Tetap
           const Padding(
-            padding: EdgeInsets.only(left: 16,bottom: 8),
+            padding: EdgeInsets.only(left: 16, bottom: 8, top: 16),
             child: Text("Aset Tetap", style: AppTextStyle.bigCaptionBold),
           ),
-          _buildRow("Bangunan", Utils.formatCurrencyDouble(assets.fixedAssets.buildingValue)),
+          ...assets.fixedAssets.map((asset) => _buildRow(asset.name, Utils.formatCurrencyDouble(asset.balance))),
         ],
       ),
     );
@@ -139,3 +144,4 @@ class AssetsView extends StatelessWidget {
     );
   }
 }
+
