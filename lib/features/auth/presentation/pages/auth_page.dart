@@ -346,7 +346,7 @@ class _AuthPage extends State<AuthPage> {
                           //     value: _isSaveUsername,
                           //     onChanged: (val) {
                           //       _isSaveUsername = val?? false;
-                          //       setState(() {});
+                          //       setState(() {}
                           //     },
                           //   ),
                           // ),
