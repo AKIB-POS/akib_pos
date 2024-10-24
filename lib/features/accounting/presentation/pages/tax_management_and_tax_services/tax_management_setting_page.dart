@@ -65,7 +65,7 @@ class _TaxManagementSettingPageState extends State<TaxManagementSettingPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message), backgroundColor: AppColors.successMain),
             );
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(true);
           } else if (state is TaxManagementSettingError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message), backgroundColor: AppColors.errorMain),

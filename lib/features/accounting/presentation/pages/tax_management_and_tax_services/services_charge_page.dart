@@ -135,14 +135,26 @@ class _ServiceChargePageState extends State<ServiceChargePage> {
           ),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               // Arahkan ke halaman pengaturan layanan
-              Navigator.push(
-                context,
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => const ServiceChargeSettingPage(),
+              //   ),
+              // );
+
+              final result = await Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => const ServiceChargeSettingPage(),
                 ),
               );
+
+              // Jika result true, refresh data cuti
+              if (result == true) {
+                context.read<ServiceChargeCubit>().fetchServiceCharge(
+                    branchId, companyId); // Panggil fungsi untuk refresh data
+              }
             },
             style: ElevatedButton.styleFrom(
               foregroundColor: Colors.white, // Warna latar belakang

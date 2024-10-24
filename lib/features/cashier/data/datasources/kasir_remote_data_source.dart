@@ -135,7 +135,7 @@ Map<String, String> _buildHeaders() {
 
  @override
 Future<double> getTaxAmount() async {
-  final url = '${URLs.baseUrlProd}/tax';
+  final url = '${URLs.baseUrlProd}/tax-service';
   final response = await client.get(Uri.parse(url), headers: _buildHeaders());
 
   if (response.statusCode != 200) {

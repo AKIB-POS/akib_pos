@@ -87,7 +87,10 @@ class _DashboardPageState extends State<DashboardPage> {
                   _authSharedPref.getEmployeeRole() == "manager")
                 dashboardItem(), // Jika employeeRole tidak null
 
-              if (_authSharedPref.getEmployeeRole() == null) dashboardItem()
+              if (_authSharedPref.getEmployeeRole() == "")...[
+                dashboardItem()
+              ] 
+                
             ],
           ),
         ),

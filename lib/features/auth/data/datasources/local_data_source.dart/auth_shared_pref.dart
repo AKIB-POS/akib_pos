@@ -35,7 +35,7 @@ class AuthSharedPref {
     await _prefs.setString(emailKey, response.email ?? '');
     await _prefs.setString(roleKey, response.role ?? '');
     await _prefs.setString(employeeNameKey, response.employeeName);
-    await _prefs.setString(employeeRoleKey, response.employeeRole);
+    await _prefs.setString(employeeRoleKey, response.employeeRole ?? "");
     await _prefs.setStringList(permissionsKey, response.permissions);
     await _prefs.setString(
       mobilePermissionsKey, 

@@ -330,26 +330,26 @@ class _AuthPage extends State<AuthPage> {
                         mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: Checkbox(
-                              checkColor: AppColors.backgroundWhite,
-                              hoverColor: AppColors.primaryDark,
-                              fillColor: WidgetStateProperty.resolveWith<Color>((Set<MaterialState> states) {
-                                if (states.contains(WidgetState.selected)) {
-                                  return AppColors.primaryMain;
-                                }
-                                return AppColors.backgroundWhite;
-                              }),
-                              side: const BorderSide(color: AppColors.primaryMain),
-                              value: _isSaveUsername,
-                              onChanged: (val) {
-                                _isSaveUsername = val?? false;
-                                setState(() {});
-                              },
-                            ),
-                          ),
+                          // SizedBox(
+                          //   width: 18,
+                          //   height: 18,
+                          //   child: Checkbox(
+                          //     checkColor: AppColors.backgroundWhite,
+                          //     hoverColor: AppColors.primaryDark,
+                          //     fillColor: WidgetStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+                          //       if (states.contains(WidgetState.selected)) {
+                          //         return AppColors.primaryMain;
+                          //       }
+                          //       return AppColors.backgroundWhite;
+                          //     }),
+                          //     side: const BorderSide(color: AppColors.primaryMain),
+                          //     value: _isSaveUsername,
+                          //     onChanged: (val) {
+                          //       _isSaveUsername = val?? false;
+                          //       setState(() {});
+                          //     },
+                          //   ),
+                          // ),
                           const SizedBox(width: 4),
                           // Text("Tetap Masuk", style: AppTextStyle.body3),
                         ],
