@@ -66,7 +66,7 @@ class _ServiceChargeSettingPageState extends State<ServiceChargeSettingPage> {
               
               SnackBar(content: Text(state.message),backgroundColor: AppColors.successMain,),
             );
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(true);
           } else if (state is ServiceChargeSettingError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message),backgroundColor: AppColors.errorMain,),

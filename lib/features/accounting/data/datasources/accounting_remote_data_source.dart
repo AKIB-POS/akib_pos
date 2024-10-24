@@ -182,7 +182,6 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     }
   }
 
-
   @override
   Future<List<AssetsDepreciationModel>> getAssetsDepreciation({
     required int branchId,
@@ -211,7 +210,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int branchId,
     required int companyId,
   }) async {
-    const url = '${URLs.baseUrlProd}/tax-charge';
+    const url = '${URLs.baseUrlProd}/tax';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString()
@@ -235,7 +234,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int companyId,
     required double amount,
   }) async {
-    const url = '${URLs.baseUrlProd}/tax-charge';
+    const url = '${URLs.baseUrlProd}/tax';
     final response = await client.post(
       Uri.parse(url),
       headers: _buildHeaders(),
@@ -245,7 +244,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
       }),
     ).timeout(const Duration(seconds: 30));
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 201 || response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       // if (jsonResponse['message'] != 'Berhasil Mengatur Pajak') {
       //   throw GeneralException('Error mengatur pajak');
@@ -263,7 +262,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int companyId,
     required double amount,
   }) async {
-    const url = '${URLs.baseUrlProd}/service-charge';
+    const url = '${URLs.baseUrlProd}/service-fee';
     final response = await client.post(
       Uri.parse(url),
       headers: _buildHeaders(),
@@ -273,7 +272,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
       }),
     ).timeout(const Duration(seconds: 30));
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 201 || response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       // if (jsonResponse['message'] != 'Berhasil Mengatur Biaya Layanan') {
       //   throw GeneralException('Error mengatur biaya layanan');
@@ -292,7 +291,7 @@ class AccountingRemoteDataSourceImpl implements AccountingRemoteDataSource {
     required int branchId,
     required int companyId,
   }) async {
-    const url = '${URLs.baseUrlProd}/service-charge';
+    const url = '${URLs.baseUrlProd}/service-fee';
     final response = await client.get(
       Uri.parse(url).replace(queryParameters: {
         'branch_id': branchId.toString()

@@ -147,13 +147,23 @@ class _TaxManagementPageState extends State<TaxManagementPage> {
                     14, // Padding horizontal, atur lebih kecil sesuai kebutuhan
               ),
             ),
-            onPressed: () {
-              Navigator.push(
-                context,
+            onPressed: () async {
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => const TaxManagementSettingPage(),
+              //   ),
+              // );
+              final result = await Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => const TaxManagementSettingPage(),
                 ),
               );
+
+              // Jika result true, refresh data cuti
+              if (result == true) {
+                context.read<TaxManagementCubit>().fetchTaxCharge(branchId, companyId);// Panggil fungsi untuk refresh data
+              }
             },
             child: const Text("Atur Pajak"),
           ),

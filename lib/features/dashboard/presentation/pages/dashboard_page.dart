@@ -52,6 +52,11 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    MobilePermissions? mobilePermissions =
+        _authSharedPref.getMobilePermissions();
+
+    debugPrint(
+        "Current role: ${_authSharedPref.getEmployeeRole() != "employee" || mobilePermissions?.cashier == null || _authSharedPref.getEmployeeRole() != ""}");
     debugPrint("Current role: ${_authSharedPref.getEmployeeRole()}");
 
     return Scaffold(
@@ -77,17 +82,28 @@ class _DashboardPageState extends State<DashboardPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              BranchInfo(onTap: () => _showBranchPicker(context)),
+              if (_authSharedPref.getEmployeeRole() == "manager" ||
+                  _authSharedPref.getEmployeeRole() == "owner")
+                BranchInfo(onTap: () => _showBranchPicker(context)),
+
+              if (_authSharedPref.getEmployeeRole() == "") ...[
+                if (mobilePermissions != null &&
+                    (mobilePermissions.hrd.isNotEmpty ||
+                        mobilePermissions.accounting.isNotEmpty ||
+                        mobilePermissions.stockist.isNotEmpty)) ...[
+                  BranchInfo(onTap: () => _showBranchPicker(context)),
+                ]
+              ],
 
               // Menggunakan ternary operator
-              if (_authSharedPref.getEmployeeRole() == "employee")
+              if (_authSharedPref.getEmployeeRole() == "employee" || mobilePermissions?.cashier != null)
                 employeeItem(),
 
               if (_authSharedPref.getEmployeeRole() == "owner" ||
                   _authSharedPref.getEmployeeRole() == "manager")
                 dashboardItem(), // Jika employeeRole tidak null
 
-              if (_authSharedPref.getEmployeeRole() == null) dashboardItem()
+              if (_authSharedPref.getEmployeeRole() == "") ...[dashboardItem()]
             ],
           ),
         ),
@@ -132,33 +148,39 @@ class _DashboardPageState extends State<DashboardPage> {
 
     // Load data berdasarkan izin akses
     if (permissions?.dashboard.contains("accounting") ?? false) {
-      fetchTasks.add(context.read<GetDashboardAccountingSummaryCubit>().fetchAccountingSummary(
-        branchId: selectedBranchId ?? 1,
-      ));
+      fetchTasks.add(context
+          .read<GetDashboardAccountingSummaryCubit>()
+          .fetchAccountingSummary(
+            branchId: selectedBranchId ?? 1,
+          ));
       fetchTasks.add(context.read<GetSalesChartCubit>().fetchSalesChart(
-        branchId: selectedBranchId ?? 1,
-      ));
+            branchId: selectedBranchId ?? 1,
+          ));
     }
 
     if (permissions?.dashboard.contains("cashier") ?? false) {
-      fetchTasks.add(context.read<GetDashboardTopProductsCubit>().fetchTopProducts(
-        branchId: selectedBranchId ?? 1,
-      ));
+      fetchTasks
+          .add(context.read<GetDashboardTopProductsCubit>().fetchTopProducts(
+                branchId: selectedBranchId ?? 1,
+              ));
       fetchTasks.add(context.read<GetPurchaseChartCubit>().fetchPurchaseChart(
-        branchId: selectedBranchId ?? 1,
-      ));
+            branchId: selectedBranchId ?? 1,
+          ));
     }
 
     if (permissions?.dashboard.contains("hr") ?? false) {
-      fetchTasks.add(context.read<GetDashboardSummaryHrdCubit>().fetchDashboardHrdSummary(
-        branchId: selectedBranchId ?? 1,
-      ));
+      fetchTasks.add(
+          context.read<GetDashboardSummaryHrdCubit>().fetchDashboardHrdSummary(
+                branchId: selectedBranchId ?? 1,
+              ));
     }
 
     if (permissions?.dashboard.contains("stok") ?? false) {
-      fetchTasks.add(context.read<GetDashboardSummaryStockCubit>().fetchDashboardStockSummary(
-        branchId: selectedBranchId ?? 1,
-      ));
+      fetchTasks.add(context
+          .read<GetDashboardSummaryStockCubit>()
+          .fetchDashboardStockSummary(
+            branchId: selectedBranchId ?? 1,
+          ));
     }
 
     fetchTasks.add(context.read<GetBranchesCubit>().fetchBranches());

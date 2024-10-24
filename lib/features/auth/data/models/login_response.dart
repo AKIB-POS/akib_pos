@@ -7,7 +7,7 @@ class LoginResponse {
   final String? email;
   final String? role;
   final String employeeName;
-  final String employeeRole;
+  final String? employeeRole;
   final List<String> permissions;
   final MobilePermissions mobilePermissions; // Field untuk mobile_permissions
 
@@ -33,7 +33,7 @@ class LoginResponse {
       branchId: json['branch_id'],
       role: json['role'],
       employeeName: json['employee_name'],
-      employeeRole: json['employee_role'] ?? "OWNER",
+      employeeRole: json['employee_role'] ,
       permissions: List<String>.from(json['permissions']),
       email: json['email'] ?? "",
       token: json['token'],
