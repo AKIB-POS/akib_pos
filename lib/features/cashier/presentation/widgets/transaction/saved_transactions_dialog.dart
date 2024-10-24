@@ -353,6 +353,7 @@ void _showTransactionDetailDialog(
                               .read<TransactionCubit>()
                               .removeFullTransaction(fullTransaction);
                           context.read<BadgeCubit>().updateBadgeCount();
+                          print("lanjutkan $fullTransaction");
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryMain,

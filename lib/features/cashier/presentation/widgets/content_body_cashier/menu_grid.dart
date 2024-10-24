@@ -45,7 +45,7 @@ class MenuGrid extends StatelessWidget {
             crossAxisCount: isLandscape(context) ? 4 : 3,
             crossAxisSpacing: 8.0,
             mainAxisSpacing: 8.0,
-            childAspectRatio: 0.6,
+            childAspectRatio: 0.8,
           ),
           itemCount: menuItems.length,
           itemBuilder: (context, index) {

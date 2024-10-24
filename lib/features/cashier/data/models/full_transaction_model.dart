@@ -6,6 +6,7 @@ import 'package:akib_pos/features/cashier/data/models/transaction_model.dart';
 class FullTransactionModel {
   final List<TransactionModel> transactions;
   final double totalPrice;
+  final double totalDiscountProduct;
   final double discount;
   final double tax;
   final VoucherData? voucher;
@@ -25,6 +26,7 @@ class FullTransactionModel {
     required this.totalPrice,
     required this.discount,
     required this.tax,
+    required this.totalDiscountProduct,
     this.voucher,
     this.customerId,
     this.customerName,
@@ -43,6 +45,7 @@ class FullTransactionModel {
     double? totalPrice,
     double? discount,
     double? tax,
+    double? totalDiscountProduct,
     VoucherData? voucher,
     int? customerId,
     String? customerName,
@@ -59,6 +62,7 @@ class FullTransactionModel {
       transactions: transactions ?? this.transactions,
       totalPrice: totalPrice ?? this.totalPrice,
       discount: discount ?? this.discount,
+      totalDiscountProduct: totalDiscountProduct ?? this.totalDiscountProduct,
       tax: tax ?? this.tax,
       voucher: voucher ?? this.voucher,
       customerId: customerId ?? this.customerId,
@@ -79,6 +83,7 @@ class FullTransactionModel {
       'transactions': transactions.map((t) => t.toJson()).toList(),
       'totalPrice': totalPrice,
       'discount': discount,
+      'total_discount_product': totalDiscountProduct,
       'tax': tax,
       'voucher': voucher?.toJson(),
       'customerId': customerId,
@@ -99,6 +104,7 @@ class FullTransactionModel {
       'transactions': transactions.map((t) => t.toApiJson()).toList(),
       'totalPrice': totalPrice,
       'discount': discount,
+      'total_discount_product': totalDiscountProduct,
       'tax': tax,
       'customerId': customerId,
       'paymentMethod': paymentMethod,
@@ -118,6 +124,7 @@ class FullTransactionModel {
           .toList(),
       totalPrice: json['totalPrice'],
       discount: json['discount'],
+      totalDiscountProduct: json['total_discount_product'],
       tax: json['tax'],
       voucher: json['voucher'] != null ? VoucherData.fromJson(json['voucher']) : null,
       customerId: json['customerId'],
@@ -139,6 +146,7 @@ class FullTransactionModel {
         'transactions: $transactions, '
         'totalPrice: $totalPrice, '
         'discount: $discount, '
+        'total_discount_product: $totalDiscountProduct, '
         'tax: $tax, '
         'voucher: $voucher, '
         'customerId: $customerId, '

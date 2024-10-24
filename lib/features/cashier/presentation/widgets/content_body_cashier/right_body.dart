@@ -663,6 +663,7 @@ class RightBody extends StatelessWidget {
                                       voucher: state.voucher,
                                       customerId: state.customerId,
                                       customerName: state.customerName,
+                                      totalDiscountProduct: _calculateSubtotalDisc(state),
                                       customerPhone: state.customerPhone,
                                       totalPrice: _calculateTotal(context
                                           .read<TransactionCubit>()
@@ -753,18 +754,26 @@ class RightBody extends StatelessWidget {
     );
   }
 
-  double _calculateSubtotal(TransactionState state) {
-    return state.transactions.fold(
-        0, (total, transaction) => total + transaction.product.totalPrice!);
-  }
+ double _calculateSubtotal(TransactionState state) {
+  return state.transactions.fold(
+    0.0, // Initial value is a double
+    (total, transaction) => total + (transaction.product.totalPrice?.toDouble() ?? 0.0),
+  );
+}
+
 
   double _calculateSubtotalDisc(TransactionState state) {
-    return state.transactions.fold(
-        0, (total, transaction) => total + transaction.product.totalPriceDisc!);
-  }
+  return state.transactions.fold(
+    0.0, // Initial value as a double
+    (total, transaction) => total + (transaction.product.totalPriceDisc ?? 0.0),
+  );
+}
+
 
   double _calculateDiscount(TransactionState state) {
-    final subtotal = _calculateSubtotal(state);
+    final subtotalDisc = _calculateSubtotal(state);
+      final productDiscount = _calculateSubtotalDisc(state);
+      final subtotal = subtotalDisc - productDiscount;
     double discountAmount = state.discount;
     if (state.voucher != null) {
       if (state.voucher!.type == 'nominal') {
@@ -779,15 +788,23 @@ class RightBody extends StatelessWidget {
   double _calculateTotal(TransactionState state) {
     final subtotal = _calculateSubtotal(state);
     final discount = _calculateDiscount(state);
-    final totalAfterDiscount = subtotal - discount;
+    final productDiscount = _calculateSubtotalDisc(state);
+
+    print("hehe subtotal ${subtotal}");
+    print("hehe discount ${discount}");
+    print("hehe prod ${productDiscount}");
+    final totalAfterDiscount = subtotal - discount-productDiscount;
+    print("hehe total after ${totalAfterDiscount}");
     final tax = state.tax / 100 * totalAfterDiscount;
+    print("hehe tax ${tax}");
     return (totalAfterDiscount + tax);
   }
 
   double _getTax(TransactionState state) {
     final subtotal = _calculateSubtotal(state);
     final discount = _calculateDiscount(state);
-    final totalAfterDiscount = subtotal - discount;
+     final productDiscount = _calculateSubtotalDisc(state);
+    final totalAfterDiscount = subtotal - discount-productDiscount;
     final tax = state.tax / 100 * totalAfterDiscount;
 
     // Membatasi angka di belakang koma menjadi 1 digit
