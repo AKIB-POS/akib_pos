@@ -34,49 +34,50 @@ class ProductModel {
     this.additionId,
     this.totalPrice,
     this.discounts,
-    this.totalPriceDisc,
     this.totalDiscount,
+    this.totalPriceDisc,
   });
 
   /// Factory constructor with error handling for parsing
   factory ProductModel.fromJson(Map<String, dynamic> json) {
-  try {
-    var discountList = (json['discounts'] as List?)
-        ?.map((item) => Discount.fromJson(item))
-        .toList();
+    try {
+      var discountList = (json['discounts'] as List?)
+          ?.map((item) => Discount.fromJson(item))
+          .toList();
 
-    // Parse fields that can be either num or String
-    return ProductModel(
-      id: (json['id'] as num?)?.toInt() ?? 0,
-      name: json['name'] ?? '',
-      description: json['description'],
-      price: json['price'] is String
-          ? int.tryParse(json['price']) ?? 0
-          : (json['price'] as num?)?.toInt() ?? 0,
-      stock: json['stock'] is String
-          ? int.tryParse(json['stock']) ?? 0
-          : (json['stock'] as num?)?.toInt() ?? 0,
-      imageUrl: json['image_url'] ?? '',
-      sku: json['sku'] ?? '',
-      unitId: (json['unit_id'] as num?)?.toInt() ?? 0,
-      categoryId: (json['category_id'] as num?)?.toInt() ?? 0,
-      subCategoryId: (json['sub_category_id'] as num?)?.toInt(),
-      variantId: (json['variant_id'] as num?)?.toInt(),
-      additionId: (json['addition_id'] as num?)?.toInt(),
-      totalPrice: json['total_price'] is String
-          ? int.tryParse(json['total_price']) ?? 0
-          : (json['total_price'] as num?)?.toInt(),
-      discounts: discountList ?? [],
-      totalDiscount: json['total_discount'] is String
-          ? double.tryParse(json['total_discount']) ?? 0.0
-          : (json['total_discount'] as num?)?.toDouble(),
-    );
-  } catch (e, stackTrace) {
-    log('Error parsing ProductModel: $e', error: e, stackTrace: stackTrace);
-    rethrow;
+      return ProductModel(
+        id: (json['id'] as num?)?.toInt() ?? 0,
+        name: json['name'] ?? '',
+        description: json['description'],
+        price: json['price'] is String
+            ? int.tryParse(json['price']) ?? 0
+            : (json['price'] as num?)?.toInt() ?? 0,
+        stock: json['stock'] is String
+            ? int.tryParse(json['stock']) ?? 0
+            : (json['stock'] as num?)?.toInt() ?? 0,
+        imageUrl: json['image_url'] ?? '',
+        sku: json['sku'] ?? '',
+        unitId: (json['unit_id'] as num?)?.toInt() ?? 0,
+        categoryId: (json['category_id'] as num?)?.toInt() ?? 0,
+        subCategoryId: (json['sub_category_id'] as num?)?.toInt(),
+        variantId: (json['variant_id'] as num?)?.toInt(),
+        additionId: (json['addition_id'] as num?)?.toInt(),
+        totalPrice: json['total_price'] is String
+            ? int.tryParse(json['total_price']) ?? 0
+            : (json['total_price'] as num?)?.toInt(),
+        totalPriceDisc: json['total_price_disc'] is String
+            ? double.tryParse(json['total_price_disc']) ?? 0
+            : (json['total_price_disc'] as num?)?.toDouble(),
+        discounts: discountList ?? [],
+        totalDiscount: json['total_discount'] is String
+            ? double.tryParse(json['total_discount']) ?? 0.0
+            : (json['total_discount'] as num?)?.toDouble(),
+      );
+    } catch (e, stackTrace) {
+      log('Error parsing ProductModel: $e', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
   }
-}
-
 
   /// Convert the model back to JSON
   Map<String, dynamic> toJson() {
@@ -94,6 +95,7 @@ class ProductModel {
       'variant_id': variantId,
       'addition_id': additionId,
       'total_price': totalPrice?.toString(),
+      'total_price_disc': totalPriceDisc?.toString(),
       'discounts': discounts?.map((discount) => discount.toJson()).toList(),
       'total_discount': totalDiscount?.toString(),
     };
@@ -105,6 +107,7 @@ class ProductModel {
       'id': id,
       'price': price,
       'total_price': totalPrice?.toString(),
+      'discount_product': totalPriceDisc?.toString(),
     };
   }
 
@@ -130,7 +133,7 @@ class ProductModel {
     int? variantId,
     int? additionId,
     int? totalPrice,
-    int? totalPriceDisc,
+    double? totalPriceDisc,
     List<Discount>? discounts,
     double? totalDiscount,
   }) {
@@ -148,11 +151,14 @@ class ProductModel {
       variantId: variantId ?? this.variantId,
       additionId: additionId ?? this.additionId,
       totalPrice: totalPrice ?? this.totalPrice,
+      totalPriceDisc: totalPriceDisc ?? this.totalPriceDisc,
       discounts: discounts ?? this.discounts,
       totalDiscount: totalDiscount ?? this.totalDiscount,
     );
   }
 }
+
+
 class Discount {
   final String type;
   final double value;
@@ -169,7 +175,6 @@ class Discount {
   /// Factory constructor for Discount with error handling
   factory Discount.fromJson(Map<String, dynamic> json) {
     try {
-      // Mengubah value menjadi double dengan tryParse agar bisa menangani String atau num
       final dynamic value = json['value'];
       return Discount(
         type: json['type'] ?? '',
@@ -178,9 +183,8 @@ class Discount {
         endDate: json['end_date'] ?? '',
       );
     } catch (e, stackTrace) {
-      // Log error dan stack trace
       log('Error parsing Discount: $e', error: e, stackTrace: stackTrace);
-      rethrow; // Rethrow jika ingin menangani error di level lebih tinggi
+      rethrow;
     }
   }
 
@@ -193,15 +197,7 @@ class Discount {
       'end_date': endDate,
     };
   }
-
-  @override
-  String toString() {
-    return 'Discount{type: $type, value: $value, startDate: $startDate, endDate: $endDate}';
-  }
 }
-
-
-
 
 
 class SelectedVariant {

@@ -267,34 +267,34 @@ class MenuCard extends StatelessWidget {
                 const SizedBox(height: 1.0),
 
                 // // If there is a discount, show the price with strikethrough effect
-                // if (item.totalDiscount != null) ...[
-                //   // Original price with strikethrough
-                //   Text(
-                //     Utils.formatCurrency(item.price.toString()),
-                //     style: AppTextStyle.body3.copyWith(
-                //       decoration: TextDecoration.lineThrough,
-                //       color: Colors.grey, // Strikethrough color
-                //     ),
-                //   ),
-                //   const SizedBox(height: 2.0),
+                if (item.totalDiscount != null) ...[
+                  // Original price with strikethrough
+                  Text(
+                    Utils.formatCurrency(item.price.toString()),
+                    style: AppTextStyle.body3.copyWith(
+                      decoration: TextDecoration.lineThrough,
+                      color: Colors.grey, // Strikethrough color
+                    ),
+                  ),
+                  const SizedBox(height: 2.0),
 
                 //   // Price after discount
                   
-                //   Text(
-                //     Utils.formatCurrencyS(
-                //         (item.price - (item.totalDiscount ?? 0)).toString()),
-                //     style: AppTextStyle.body3.copyWith(
-                //       color: Colors.red, // Discounted price color
-                //       fontWeight: FontWeight.bold,
-                //     ),
-                //   ),
-                // ] else ...[
+                  Text(
+                    Utils.formatCurrencyS(
+                        (item.price - (item.totalDiscount ?? 0)).toString()),
+                    style: AppTextStyle.body3.copyWith(
+                      color: Colors.red, // Discounted price color
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ] else ...[
                   // No discount, show normal price
                   Text(
                     Utils.formatCurrency(item.price.toString()),
                     style: AppTextStyle.body3,
                   ),
-                // ],
+                ],
               ],
             ),
           ],

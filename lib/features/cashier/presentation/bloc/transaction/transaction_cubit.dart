@@ -97,7 +97,7 @@ class TransactionCubit extends Cubit<TransactionState> {
 
   Future<void> saveFullTransaction(List<TransactionModel> transactions, String notes, double discount, String? name, String? telp, int? id) async {
 
-    print("berapakahe $discount");
+    print("fufu $transactions");
     print("berapakahe $name");
     print("berapakahe $id");
     print("berapakahe $telp");
@@ -115,7 +115,7 @@ class TransactionCubit extends Cubit<TransactionState> {
         tax: state.tax,
         orderType: state.orderType,
       );
-        print("berapakahe1 $telp");
+     
 
       await transactionService.saveFullTransaction(fullTransaction);
     } else {
@@ -126,6 +126,7 @@ class TransactionCubit extends Cubit<TransactionState> {
           tax: state.tax,
           discount: discount,
           orderType: state.orderType);
+             print("fufufa ${fullTransaction.transactions}");
       await transactionService.saveFullTransaction(fullTransaction);
     }
 
@@ -148,6 +149,7 @@ class TransactionCubit extends Cubit<TransactionState> {
   Future<void> loadFullTransactions(
       SaveTransactionModel fullTransaction) async {
     final allTransactions = fullTransaction.transactions;
+    print("lanjutkan load ${allTransactions}");
     emit(state.copyWith(
         transactions: allTransactions,
         tax: fullTransaction.tax,
@@ -156,12 +158,15 @@ class TransactionCubit extends Cubit<TransactionState> {
         customerId: fullTransaction.customerId,
         customerPhone: fullTransaction.customerPhone,
         ));
+
+      print("lanjutkan load state ${state.transactions}");
   }
 
   Future<void> removeFullTransaction(
       SaveTransactionModel fullTransaction) async {
     await transactionService.removeFullTransaction(fullTransaction);
     await loadFullTransactions(fullTransaction);
+    print("lanjutkan after $fullTransaction");
   }
 
   void updateVoucher(VoucherData? voucher) {
@@ -273,6 +278,7 @@ class TransactionCubit extends Cubit<TransactionState> {
 
   void addQuantity(int index) {
     final currentTransaction = state.transactions[index];
+     print("apakahh di add 0 ${state.transactions}");
     final updatedTransaction =
         currentTransaction.copyWith(quantity: currentTransaction.quantity + 1);
     final updatedTransactions = List<TransactionModel>.from(state.transactions)
@@ -280,7 +286,7 @@ class TransactionCubit extends Cubit<TransactionState> {
     emit(state.copyWith(transactions: updatedTransactions));
 
     _updateTotalPrice(index: index); // Update the total price
-    print("apakahh di add ${state.quantity}");
+    print("apakahh di add ${state.transactions}");
   }
 
   void subtractQuantity(int index) {
@@ -314,46 +320,93 @@ class TransactionCubit extends Cubit<TransactionState> {
     _updateTotalPrice();
   }
 
-  void _updateTotalPrice({int? index, int reduce = 0}) {
-    if (state.transactions.isEmpty) return;
+void _updateTotalPrice({int? index, int reduce = 0}) {
+  if (state.transactions.isEmpty) return;
 
-    if (index == null) {
-      final totalPrice = _calculateTotalPrice(
-              state.quantity, state.selectedVariants, state.selectedAdditions) -
-          reduce * state.quantity;
-      final totalPriceDisc = _calculateTotalPriceDIsc(
-              state.quantity, state.selectedVariants, state.selectedAdditions) -
-          reduce * state.quantity;
-      
+  if (index == null) {
+    // For the last transaction
+    final totalPrice = _calculateTotalPrice(
+            state.quantity, state.selectedVariants, state.selectedAdditions) -
+        reduce * state.quantity;
 
-      
-      final updatedProduct =
-          state.transactions.last.product.copyWith(totalPrice: totalPrice,totalPriceDisc: totalPriceDisc);
-      final updatedTransaction =
-          state.transactions.last.copyWith(product: updatedProduct);
-      final updatedTransactions =
-          List<TransactionModel>.from(state.transactions)
-            ..[state.transactions.length - 1] = updatedTransaction;
-      emit(state.copyWith(transactions: updatedTransactions));
-    } else {
-      final transaction = state.transactions[index];
-      final totalPrice = _calculateTotalPrice(transaction.quantity,
-              transaction.selectedVariants, transaction.selectedAdditions) -
-          reduce * transaction.quantity;
-      final totalPriceDIsc = _calculateTotalPriceDIsc(transaction.quantity,
-              transaction.selectedVariants, transaction.selectedAdditions,) -
-          reduce * transaction.quantity;
-      final updatedProduct =
-          transaction.product.copyWith(totalPrice: totalPrice,totalPriceDisc: totalPriceDIsc);
-      final updatedTransaction = transaction.copyWith(product: updatedProduct);
-      final updatedTransactions =
-          List<TransactionModel>.from(state.transactions)
-            ..[index] = updatedTransaction;
-      emit(state.copyWith(transactions: updatedTransactions));
-    }
+    final totalPriceDisc = _calculateTotalPriceDisc(
+            state.quantity, state.selectedVariants, state.selectedAdditions) -
+        reduce * state.quantity;
 
-    print("apakahhh di updatetotal ${state.quantity}");
+    final updatedProduct =
+        state.transactions.last.product.copyWith(totalPrice: totalPrice, totalPriceDisc: totalPriceDisc,totalDiscount: state.transactions.last.product.totalDiscount);
+    final updatedTransaction =
+        state.transactions.last.copyWith(product: updatedProduct);
+    final updatedTransactions =
+        List<TransactionModel>.from(state.transactions)
+          ..[state.transactions.length - 1] = updatedTransaction;
+    emit(state.copyWith(transactions: updatedTransactions));
+  } else {
+    // For the transaction at the provided index
+    final transaction = state.transactions[index];
+
+    final totalPrice = _calculateTotalPrice(transaction.quantity,
+            transaction.selectedVariants, transaction.selectedAdditions) -
+        reduce * transaction.quantity;
+
+    final totalPriceDisc = _calculateTotalPriceDisc(
+            transaction.quantity, transaction.selectedVariants, transaction.selectedAdditions, transaction) -
+        reduce * transaction.quantity;
+
+    print("oite ${transaction.product.totalDiscount}");
+
+    final updatedProduct =
+        transaction.product.copyWith(totalPrice: totalPrice, totalPriceDisc: totalPriceDisc,totalDiscount: transaction.product.totalDiscount);
+    final updatedTransaction = transaction.copyWith(product: updatedProduct);
+    final updatedTransactions =
+        List<TransactionModel>.from(state.transactions)
+          ..[index] = updatedTransaction;
+    emit(state.copyWith(transactions: updatedTransactions));
   }
+
+  print("apakahhh di updatetotal ${state.transactions}");
+}
+
+double _calculateTotalPriceDisc(
+  int quantity,
+  List<SelectedVariant> variants,
+  List<SelectedAddition> additions, [
+  TransactionModel? transaction
+]) {
+  if (state.transactions.isEmpty) return 0;
+
+  // Determine which transaction to use (if index is provided, use that transaction)
+  final currentTransaction = transaction ?? state.transactions.last;
+
+  // Use null-aware operator to handle null totalDiscount
+  double totalDiscount = (currentTransaction.product.totalDiscount ?? 0.0) * quantity;
+
+  print("isinyaadd1 ${currentTransaction.product.totalDiscount}");
+  print("isinyaadd2 ${quantity}");
+  print("isinyaadd3 ${totalDiscount}");
+
+  // Add variant prices
+  // variants.forEach((variant) {
+  //   totalDiscount += variant.price * quantity;
+  // });
+
+  // // Add addition prices
+  // additions.forEach((addition) {
+  //   totalDiscount += addition.price * quantity;
+  // });
+
+  // // Apply voucher discount
+  // if (state.voucher != null) {
+  //   if (state.voucher!.type == 'nominal') {
+  //     totalDiscount -= state.voucher!.amount.toInt();
+  //   } else if (state.voucher!.type == 'percentage') {
+  //     totalDiscount -= (totalDiscount * state.voucher!.amount / 100).toInt();
+  //   }
+  // }
+
+  // Ensure the total price doesn't go below 0
+  return totalDiscount < 0 ? 0 : totalDiscount;
+}
 
   int _calculateTotalPrice(int quantity, List<SelectedVariant> variants,
       List<SelectedAddition> additions) {
@@ -380,51 +433,49 @@ class TransactionCubit extends Cubit<TransactionState> {
       }
     }
 
+    
+   
+
     return totalPrice;
   }
-  int _calculateTotalPriceDIsc(
-    int quantity,
-    List<SelectedVariant> variants,
-    List<SelectedAddition> additions,
-    ) {
+  double _calculateTotalPriceDIsc(
+  int quantity,
+  List<SelectedVariant> variants,
+  List<SelectedAddition> additions,
+) {
   if (state.transactions.isEmpty) return 0;
 
-  // Calculate base price of the product with quantity
-  int price = (state.transactions.last.product.price - state.transactions.last.product.totalDiscount!.toInt()) * quantity;
-   double totalDiscount = state.transactions.last.product.totalDiscount ?? 0;
-   int totalPrice = price - totalDiscount.toInt();
-   print("isnyadiskon ${price}");
-   print("isnyadiskon1 ${totalDiscount}");
-   print("isnyadiskon2 ${totalPrice}");
+  // Use null-aware operator to handle null totalDiscount
+  double totalDiscount = (state.transactions.last.product.totalDiscount ?? 0.0) * quantity;
+
+   print("isinyaadd1 ${state.transactions.last.product.totalDiscount}");
+   print("isinyaadd2 ${quantity}");
+   print("isinyaadd3 ${totalDiscount}");
 
   // Add variant prices
   variants.forEach((variant) {
-    totalPrice += variant.price * quantity;
+    totalDiscount += variant.price * quantity;
   });
 
   // Add addition prices
   additions.forEach((addition) {
-    totalPrice += addition.price * quantity;
+    totalDiscount += addition.price * quantity;
   });
- 
-  // Apply total discount if available
-  if (totalDiscount != null && totalDiscount > 0) {
-    totalPrice -= totalDiscount.toInt();
-  }
-
-    print("isinyaadd ${state.transactions.last.product.totalDiscount}");
 
   // Apply voucher discount
   if (state.voucher != null) {
     if (state.voucher!.type == 'nominal') {
-      totalPrice -= state.voucher!.amount.toInt();
+      totalDiscount -= state.voucher!.amount.toInt();
     } else if (state.voucher!.type == 'percentage') {
-      totalPrice -= (totalPrice * state.voucher!.amount / 100).toInt();
+      totalDiscount -= (totalDiscount * state.voucher!.amount / 100).toInt();
     }
   }
-  
 
-  return totalPrice < 0 ? 0 : totalPrice; // Ensure the total price doesn't go below 0
+  // Ensure the total price doesn't go below 0
+  return totalDiscount < 0 ? 0 : totalDiscount;
 }
+
+
+
 
 }

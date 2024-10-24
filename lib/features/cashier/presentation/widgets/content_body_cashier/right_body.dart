@@ -31,9 +31,9 @@ class RightBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final customerName =
-    context.select((TransactionCubit cubit) => cubit.state.customerName);
+        context.select((TransactionCubit cubit) => cubit.state.customerName);
     final customerPhone = context.select(
-            (TransactionCubit cubit) => cubit.state.customerPhone); // Add this line
+        (TransactionCubit cubit) => cubit.state.customerPhone); // Add this line
 
     return Container(
       decoration: BoxDecoration(
@@ -49,12 +49,18 @@ class RightBody extends StatelessWidget {
       ),
       child: Column(
         children: [
-          if(!isLandscape(context)) Container(
-            margin: EdgeInsets.only(top: 30, bottom: 12),
-            height: 2,
-            color: AppColors.textGrey800.withOpacity(0.1),
-          ),
-          if(!isLandscape(context)) AppBarRight(buildContext: context, customerPhone: customerPhone, customerName: customerName,),
+          if (!isLandscape(context))
+            Container(
+              margin: EdgeInsets.only(top: 30, bottom: 12),
+              height: 2,
+              color: AppColors.textGrey800.withOpacity(0.1),
+            ),
+          if (!isLandscape(context))
+            AppBarRight(
+              buildContext: context,
+              customerPhone: customerPhone,
+              customerName: customerName,
+            ),
           Expanded(
             child: BlocBuilder<TransactionCubit, TransactionState>(
               builder: (context, state) {
@@ -125,8 +131,7 @@ class RightBody extends StatelessWidget {
                         itemCount: state.transactions.length,
                         itemBuilder: (context, index) {
                           final transaction = state.transactions[index];
-                          print(
-                              "apakahh di right body ${transaction.quantity}");
+                          print("apakahh di right body ${transaction}");
                           return Container(
                             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                             child: Column(
@@ -258,15 +263,62 @@ class RightBody extends StatelessWidget {
                                           Text(transaction.product.name,
                                               style: AppTextStyle.headline6),
                                           const SizedBox(height: 2),
-                                          Text(
+                                          if (transaction
+                                                  .product.totalDiscount !=
+                                              null) ...[
+                                            Text(
                                               Utils.formatCurrency(transaction
                                                   .product.totalPrice
                                                   .toString()),
-                                              style: AppTextStyle.body3),
-                                          // Text(
-                                          //     transaction.product.totalPriceDisc.toString(),
-                                          //     style: AppTextStyle.body3),
-                                          // const SizedBox(height: 8),
+                                              style:
+                                                  AppTextStyle.body3.copyWith(
+                                                decoration:
+                                                    TextDecoration.lineThrough,
+                                                color: Colors
+                                                    .grey, // Strikethrough color
+                                              ),
+                                            ),
+                                            const SizedBox(height: 2.0),
+
+                                            //   // Price after discount
+
+                                            Text(
+                                              Utils.formatCurrencyDouble(
+                                                  (transaction.product
+                                                              .totalPrice
+                                                              ?.toDouble() ??
+                                                          0) -
+                                                      (transaction.product
+                                                              .totalPriceDisc
+                                                              ?.toDouble() ??
+                                                          0)),
+                                              style:
+                                                  AppTextStyle.body3.copyWith(
+                                                color: Colors
+                                                    .red, // Discounted price color
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+
+                                            //     Text(
+                                            //   Utils.formatCurrency(transaction
+                                            //       .product.totalPrice
+                                            //       .toString()),
+                                            //   style: AppTextStyle.body3),
+                                            // Text(
+                                            //     Utils.formatCurrencyDouble(
+                                            //         transaction.product
+                                            //                 .totalDiscount ??
+                                            //             0),
+                                            //    style: AppTextStyle.body3),
+                                          ] else ...[
+                                            Text(
+                                                Utils.formatCurrency(transaction
+                                                    .product.totalPrice
+                                                    .toString()),
+                                                style: AppTextStyle.body3),
+                                          ],
+                                          const SizedBox(height: 8),
                                           Text('Catatan: ${transaction.notes}',
                                               style: AppTextStyle.body3),
                                           const SizedBox(height: 8),
@@ -301,7 +353,9 @@ class RightBody extends StatelessWidget {
                                               ),
                                               onPressed: () async {
                                                 // Cek apakah quantity saat ini adalah 1
-                                                if (transaction.quantity == 1 && state.transactions.length == 1) {
+                                                if (transaction.quantity == 1 &&
+                                                    state.transactions.length ==
+                                                        1) {
                                                   // Tampilkan dialog konfirmasi
                                                   final bool? confirmDelete =
                                                       await showDialog<bool>(
@@ -422,6 +476,18 @@ class RightBody extends StatelessWidget {
                                       style: AppTextStyle.body3),
                                 ],
                               ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text('Diskon Produk',
+                                      style: AppTextStyle.body3),
+                                  Text("- ${Utils.formatCurrencyDouble(
+                                          _calculateSubtotalDisc(state))}"
+                                      ,
+                                      style: AppTextStyle.body3),
+                                ],
+                              ),
                               const SizedBox(height: 4),
                               Row(
                                 mainAxisAlignment:
@@ -429,11 +495,8 @@ class RightBody extends StatelessWidget {
                                 children: [
                                   const Text('Diskon',
                                       style: AppTextStyle.body3),
-                                  Text("-${Utils.formatCurrencyDouble(
-                                          _calculateDiscount(context
-                                              .read<TransactionCubit>()
-                                              .state))}"
-                                      ,
+                                  Text(
+                                      "-${Utils.formatCurrencyDouble(_calculateDiscount(context.read<TransactionCubit>().state))}",
                                       style: AppTextStyle.body3),
                                 ],
                               ),
@@ -540,18 +603,35 @@ class RightBody extends StatelessWidget {
                                                     .read<TransactionCubit>()
                                                     .state
                                                     .transactions;
-                                            double disc = context.read<TransactionCubit>().state.discount;
-                                            String? name = context.read<TransactionCubit>().state.customerName;
-                                            String? telp = context.read<TransactionCubit>().state.customerPhone;
-                                            int? id = context.read<TransactionCubit>().state.customerId;
-                                                    
+                                            double disc = context
+                                                .read<TransactionCubit>()
+                                                .state
+                                                .discount;
+                                            String? name = context
+                                                .read<TransactionCubit>()
+                                                .state
+                                                .customerName;
+                                            String? telp = context
+                                                .read<TransactionCubit>()
+                                                .state
+                                                .customerPhone;
+                                            int? id = context
+                                                .read<TransactionCubit>()
+                                                .state
+                                                .customerId;
+
                                             await context
                                                 .read<TransactionCubit>()
                                                 .saveFullTransaction(
-                                                    transactions, notes,disc,name,telp,id);                    
+                                                    transactions,
+                                                    notes,
+                                                    disc,
+                                                    name,
+                                                    telp,
+                                                    id);
                                             context
                                                 .read<BadgeCubit>()
-                                                .updateBadgeCount();   
+                                                .updateBadgeCount();
                                           },
                                         );
                                       },
@@ -583,6 +663,7 @@ class RightBody extends StatelessWidget {
                                       voucher: state.voucher,
                                       customerId: state.customerId,
                                       customerName: state.customerName,
+                                      totalDiscountProduct: _calculateSubtotalDisc(state),
                                       customerPhone: state.customerPhone,
                                       totalPrice: _calculateTotal(context
                                           .read<TransactionCubit>()
@@ -673,13 +754,26 @@ class RightBody extends StatelessWidget {
     );
   }
 
-  double _calculateSubtotal(TransactionState state) {
-    return state.transactions.fold(
-        0, (total, transaction) => total + transaction.product.totalPrice!);
-  }
+ double _calculateSubtotal(TransactionState state) {
+  return state.transactions.fold(
+    0.0, // Initial value is a double
+    (total, transaction) => total + (transaction.product.totalPrice?.toDouble() ?? 0.0),
+  );
+}
+
+
+  double _calculateSubtotalDisc(TransactionState state) {
+  return state.transactions.fold(
+    0.0, // Initial value as a double
+    (total, transaction) => total + (transaction.product.totalPriceDisc ?? 0.0),
+  );
+}
+
 
   double _calculateDiscount(TransactionState state) {
-    final subtotal = _calculateSubtotal(state);
+    final subtotalDisc = _calculateSubtotal(state);
+      final productDiscount = _calculateSubtotalDisc(state);
+      final subtotal = subtotalDisc - productDiscount;
     double discountAmount = state.discount;
     if (state.voucher != null) {
       if (state.voucher!.type == 'nominal') {
@@ -694,15 +788,23 @@ class RightBody extends StatelessWidget {
   double _calculateTotal(TransactionState state) {
     final subtotal = _calculateSubtotal(state);
     final discount = _calculateDiscount(state);
-    final totalAfterDiscount = subtotal - discount;
+    final productDiscount = _calculateSubtotalDisc(state);
+
+    print("hehe subtotal ${subtotal}");
+    print("hehe discount ${discount}");
+    print("hehe prod ${productDiscount}");
+    final totalAfterDiscount = subtotal - discount-productDiscount;
+    print("hehe total after ${totalAfterDiscount}");
     final tax = state.tax / 100 * totalAfterDiscount;
+    print("hehe tax ${tax}");
     return (totalAfterDiscount + tax);
   }
 
   double _getTax(TransactionState state) {
     final subtotal = _calculateSubtotal(state);
     final discount = _calculateDiscount(state);
-    final totalAfterDiscount = subtotal - discount;
+     final productDiscount = _calculateSubtotalDisc(state);
+    final totalAfterDiscount = subtotal - discount-productDiscount;
     final tax = state.tax / 100 * totalAfterDiscount;
 
     // Membatasi angka di belakang koma menjadi 1 digit
