@@ -153,7 +153,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
                             image: DecorationImage(
                               image: ExtendedAssetImageProvider(
                                   "assets/images/bg_payment.png"),
-                              fit: BoxFit.fitWidth,
+                              fit: BoxFit.cover,
                             ),
                           ),
                           width: double.infinity,

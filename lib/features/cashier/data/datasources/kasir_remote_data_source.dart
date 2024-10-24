@@ -133,18 +133,30 @@ Map<String, String> _buildHeaders() {
     return CloseCashierResponse.fromJson(jsonResponse);
   }
 
-  @override
-  Future<double> getTaxAmount() async {
-    final url = '${URLs.baseUrlProd}/tax';
-    final response = await client.get(Uri.parse(url), headers: _buildHeaders());
+ @override
+Future<double> getTaxAmount() async {
+  final url = '${URLs.baseUrlProd}/tax';
+  final response = await client.get(Uri.parse(url), headers: _buildHeaders());
 
-    if (response.statusCode != 200) {
-      throw ServerException();
-    }
-
-    final Map<String, dynamic> jsonResponse = json.decode(response.body);
-    return jsonResponse['data']['amount'];
+  if (response.statusCode != 200) {
+    throw ServerException();
   }
+
+  final Map<String, dynamic> jsonResponse = json.decode(response.body);
+  
+  // Mendapatkan nilai amount
+  final amount = jsonResponse['data']['amount'];
+
+  // Jika nilai amount adalah integer, konversi ke double
+  if (amount is int) {
+    return amount.toDouble();  // Konversi integer ke double
+  } else if (amount is double) {
+    return amount;  // Jika sudah double, langsung kembalikan
+  } else {
+    throw FormatException('Invalid tax amount format'); // Jika formatnya tidak valid
+  }
+}
+
 
   @override
   Future<void> postTransaction(FullTransactionModel fullTransaction) async {

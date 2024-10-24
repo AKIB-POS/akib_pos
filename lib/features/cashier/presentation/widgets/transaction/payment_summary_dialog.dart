@@ -134,7 +134,7 @@ class PaymentSummaryDialog extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(label, style: const TextStyle(fontSize: 16)),
+            Text(label, style: const TextStyle(fontSize: 16),textAlign: TextAlign.center,),
             Text(value,
                 style: const TextStyle(
                     fontSize: 16, fontWeight: FontWeight.bold)),
@@ -155,9 +155,9 @@ class PaymentSummaryDialog extends StatelessWidget {
               onPressed: () {
                 FinishedTransactionPrint testPrint = FinishedTransactionPrint();
                 testPrint.printTransaction(
-                    transaction,
-                    Utils.formatCurrencyDouble(receivedAmount),
-                    Utils.formatCurrencyDouble(receivedAmount - totalAmount));
+                    transaction: transaction,
+                    receivedAmount:  Utils.formatCurrencyDouble(receivedAmount),
+                    cashback:  Utils.formatCurrencyDouble(receivedAmount - totalAmount));
               },
               style: OutlinedButton.styleFrom(
                 side: BorderSide(color: AppColors.primaryMain), // Warna border
@@ -196,7 +196,7 @@ class PaymentSummaryDialog extends StatelessWidget {
                 elevation: 5, // Tingkat bayangan (elevasi)
               ),
               child: Text(
-                '+ Buat Transaksi Baru',
+                'Transaksi Baru',
                 style: AppTextStyle.headline5.copyWith(color: Colors.white),
               ),
             ),
