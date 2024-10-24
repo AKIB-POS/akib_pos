@@ -482,7 +482,7 @@ class RightBody extends StatelessWidget {
                                 children: [
                                   const Text('Diskon Produk',
                                       style: AppTextStyle.body3),
-                                  Text("- ${Utils.formatCurrencyDouble(
+                                  Text("${Utils.formatCurrencyDouble(
                                           _calculateSubtotalDisc(state))}"
                                       ,
                                       style: AppTextStyle.body3),

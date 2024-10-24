@@ -348,7 +348,6 @@ void _showTransactionDetailDialog(
                         onPressed: () async {
                           Navigator.of(context).pop();
                           Navigator.of(context, rootNavigator: true).pop();
-
                           await context
                               .read<TransactionCubit>()
                               .removeFullTransaction(fullTransaction);

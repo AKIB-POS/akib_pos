@@ -199,10 +199,11 @@ class MenuCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8.0),
+    return Container(
+      width: 800,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8)
       ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -269,24 +270,24 @@ class MenuCard extends StatelessWidget {
                 // // If there is a discount, show the price with strikethrough effect
                 if (item.totalDiscount != null) ...[
                   // Original price with strikethrough
-                  Text(
-                    Utils.formatCurrency(item.price.toString()),
-                    style: AppTextStyle.body3.copyWith(
-                      decoration: TextDecoration.lineThrough,
-                      color: Colors.grey, // Strikethrough color
-                    ),
-                  ),
-                  const SizedBox(height: 2.0),
-
-                //   // Price after discount
-                  
-                  Text(
-                    Utils.formatCurrencyS(
-                        (item.price - (item.totalDiscount ?? 0)).toString()),
-                    style: AppTextStyle.body3.copyWith(
-                      color: Colors.red, // Discounted price color
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    children: [
+                                       //   // Price after discount              
+                      Text(
+                        Utils.formatCurrencyS(
+                            (item.price - (item.totalDiscount ?? 0)).toString()),
+                         style: AppTextStyle.body3,
+                      ),
+                      SizedBox(width: 5,),
+                      Text(
+                        Utils.formatCurrency(item.price.toString()),
+                        style: AppTextStyle.body4.copyWith(
+                          color: Colors.red, 
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      )
+                     
+                    ],
                   ),
                 ] else ...[
                   // No discount, show normal price

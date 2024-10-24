@@ -42,6 +42,7 @@ import 'package:akib_pos/features/cashier/presentation/bloc/expenditure/expendit
 import 'package:akib_pos/features/cashier/presentation/bloc/member/member_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/open_cashier/open_cashier_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/post_close_cashier/post_close_cashier_cubit.dart';
+import 'package:akib_pos/features/cashier/presentation/bloc/printer/printer_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/product/product_bloc.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/process_transaction_cubit.dart';
 import 'package:akib_pos/features/cashier/presentation/bloc/transaction/transaction_cubit.dart';
@@ -214,9 +215,9 @@ Future<void> main() async {
         BlocProvider(create: (context) => OpenCashierCubit(repository: sl())),
         BlocProvider(create: (context) => ExpenditureCubit(repository: sl())),
         BlocProvider(create: (context) => AuthCubit(sl())),
-        // BlocProvider(
-        //     create: (context) =>
-        //         PrinterCubit(bluetooth: sl(), sharedPreferences: sl())),
+        BlocProvider(
+            create: (context) =>
+                PrinterCubit(bluetooth: sl(), sharedPreferences: sl())),
 
         //ACCOUNTING MODULE
         BlocProvider(
